@@ -6,14 +6,11 @@ from discord.ext import menus
 import discord
 import aiofiles
 from itertools import starmap, chain
-from dotenv import load_dotenv
 from deep_translator import GoogleTranslator
 import concurrent.futures
 from concurrent.futures import ThreadPoolExecutor
-import aiohttp
 from discord.ext import commands
 
-load_dotenv('venv/.env')
 bot = commands.Bot(command_prefix=commands.when_mentioned_or('n!'), intents=discord.Intents.all())
 rate = {}
 
@@ -105,7 +102,7 @@ class MyHelp(commands.MinimalHelpCommand):
         await menu.start(self.context)
 
     async def send_command_help(self, command):
-        embed = discord.Embed(title=self.get_command_signature(command))
+        embed = discord.Embed(title=self.get_command_signature(command), color=discord.Colour.random())
         embed.add_field(name="Help", value=command.help)
         alias = command.aliases
         if alias:
@@ -132,52 +129,69 @@ def download_image(img_url, num):
     return num, translated
 
 
+@tasks.loop(seconds=120)
+async def census():
+  await bot.change_presence(status=discord.Status.idle, activity=discord.Activity(type=discord.ActivityType.watching, name=f"{len(bot.users)} novel enthusiasts. Prefix: .t"))
+
+
 @bot.event 
 async def on_ready():
-    await bot.change_presence(status=discord.Status.idle, activity=discord.Activity(type=discord.ActivityType.watching, name=f"{len(bot.users)} novel enthusiasts. Prefix: t!"))
     print(f'Running as {bot.user}')
+    census.start()
 
 
-@bot.command(help='Gives progress of novel translation')
+@bot.command(help='Gives progress of novel translation', aliases=['now', 'n', 'p'])
 async def progress(ctx):
     if ctx.author.id not in rate: return await ctx.send("**You have no novel deposited for translation currently.**")
     await ctx.send(f"**🚄{rate[ctx.author.id]}**")
 
 
-@bot.command(help='Send along with ur novel txt or doc to auto translate')
-async def translate(ctx):
-    if ctx.author.id in rate: return await ctx.send('**⛔You cant translate two novels at a time.**')
-    if not ctx.message.attachments: return await ctx.send('**⛔You must add a novel to translate**')
-    name = ctx.message.attachments[0].filename
+def ask(link):
+  resp = requests.get(link)
+  return resp
+
+
+@bot.command(help='Send along with ur novel txt or doc or link to auto translate. Currently supports only https://temp.sh', aliases=['t'])
+async def translate(ctx, link=None):
     await ctx.typing()
-    async with aiohttp.ClientSession() as session:
-        async with session.get(ctx.message.attachments[0].url) as resp:
-            file_type = resp.headers['content-type'].split('/')[-1]
-            if 'plain' in file_type.lower(): file_type = 'txt'
-            elif 'document' in file_type.lower(): file_type = 'docx'
-            else: return await ctx.send('Only .docx and .txt supported')
-            async with aiofiles.open(f'{ctx.author.id}.{file_type}', 'wb') as f:
-                async for chunk in resp.content.iter_chunked(1024): await f.write(chunk)
-            if 'docx' in file_type:
-                await ctx.reply('**Docx file detected please wait while we finish converting.**')
-                doc = docx.Document(f'{ctx.author.id}.{file_type}')
-                fullText = '\n'.join([para.text for para in doc.paragraphs])
-                os.remove(f'{ctx.author.id}.docx')
-                async with aiofiles.open(f'{ctx.author.id}.txt', 'w', encoding='utf-8') as f: await f.write(fullText)
+    if ctx.author.id in rate: return await ctx.send('**⛔You cant translate two novels at a time.**')
+    if not ctx.message.attachments and not link: return await ctx.send('**⛔You must add a novel/link to translate**')
+    if link:
+        resp = await bot.loop.run_in_executor(None, ask, 
+    link)
+        try: 
+          file_type = ''.join([i for i in resp.headers['Content-Disposition'].split('.')[-1] if i.isalnum()])
+        except: 
+          return await ctx.send("Currently this link is not supported.please try with https://temp.sh")
+        name = link.split('/')[-1].replace('.txt', '').replace('.docx', '')
+    else:
+        name = ctx.message.attachments[0].filename.replace('.txt', '').replace('.docx', '')
+        resp = await bot.loop.run_in_executor(None, ask, ctx.message.attachments[0].url)
+        file_type = resp.headers['content-type'].split('/')[-1]
+    if 'plain' in file_type.lower() or 'txt' in file_type.lower(): file_type = 'txt'
+    elif 'document' in file_type.lower() or 'docx' in file_type.lower(): file_type = 'docx'
+    else: return await ctx.send('Only .docx and .txt supported')
+    async with aiofiles.open(f'{ctx.author.id}.{file_type}', 'wb') as f: await f.write(resp.content)
+    if 'docx' in file_type:
+        await ctx.reply('**Docx file detected please wait while we finish converting.**')
+        doc = docx.Document(f'{ctx.author.id}.{file_type}')
+        string = '\n'.join([para.text for para in doc.paragraphs])
+        async with aiofiles.open(f'{ctx.author.id}.txt', 'w', encoding='utf-8') as f: await f.write(string)
+        os.remove(f'{ctx.author.id}.docx')
+    try:
+        async with aiofiles.open(f'{ctx.author.id}.txt', 'r', encoding='utf-8') as f: novel = await f.read()
+    except:
+        try:
+            async with aiofiles.open(f'{ctx.author.id}.txt', 'r', encoding='cp936') as f: novel = await f.read()
+        except:
             try:
-                async with aiofiles.open(f'{ctx.author.id}.txt', 'r', encoding='utf-8') as f: novel = await f.read()
+                async with aiofiles.open(f'{ctx.author.id}.txt', 'r', encoding='utf-16') as f: novel = await f.read()
             except:
                 try:
-                    async with aiofiles.open(f'{ctx.author.id}.txt', 'r', encoding='cp936') as f: novel = await f.read()
-                except:
-                    try:
-                        async with aiofiles.open(f'{ctx.author.id}.txt', 'r', encoding='utf-16') as f: novel = await f.read()
-                    except:
-                        try:
-                            async with aiofiles.open(f'{ctx.author.id}.txt', 'r', encoding='cp949') as f: novel = await f.read()
-                        except Exception as e:
-                            print(e)
-                            return await ctx.reply("**⛔Currently we are only translating korean and chinese.**")
+                    async with aiofiles.open(f'{ctx.author.id}.txt', 'r', encoding='cp949') as f: novel = await f.read()
+                except Exception as e:
+                    print(e)
+                    return await ctx.reply("**⛔Currently we are only translating korean and chinese.**")        
     await ctx.reply('**✅Translation started**')
     os.remove(f'{ctx.author.id}.txt')
     liz = [novel[i:i+1800] for i in range(0, len(novel), 1800)]
@@ -191,12 +205,10 @@ async def translate(ctx):
     await ctx.reply("**🎉Here is your translated novel**", file=file)
     os.remove(f"{ctx.author.id}.txt")
     del rate[ctx.author.id]
-
+    
 
 async def main():
     async with bot:
-        async with aiohttp.ClientSession() as session:
-            bot.con = session
-            await bot.start(os.environ['TOKEN'])
+        await bot.start(os.getenv('TOKEN'))
 
 asyncio.run(main())
