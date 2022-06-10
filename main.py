@@ -9,7 +9,7 @@ from itertools import starmap, chain
 from deep_translator import GoogleTranslator
 import concurrent.futures
 from concurrent.futures import ThreadPoolExecutor
-from discord.ext import commands
+from discord.ext import commands, tasks
 
 bot = commands.Bot(command_prefix=commands.when_mentioned_or('n!'), intents=discord.Intents.all())
 rate = {}
