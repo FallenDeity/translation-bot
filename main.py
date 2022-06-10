@@ -174,6 +174,7 @@ async def translate(ctx, link=None):
     async with aiofiles.open(f'{ctx.author.id}.{file_type}', 'wb') as f: await f.write(resp.content)
     if 'docx' in file_type:
         await ctx.reply('**Docx file detected please wait while we finish converting.**')
+        await ctx.typing()
         doc = docx.Document(f'{ctx.author.id}.{file_type}')
         string = '\n'.join([para.text for para in doc.paragraphs])
         async with aiofiles.open(f'{ctx.author.id}.txt', 'w', encoding='utf-8') as f: await f.write(string)
