@@ -3,6 +3,7 @@ import os
 import docx
 from discord import ui
 from discord.ext import menus
+import requests
 import discord
 import aiofiles
 from itertools import starmap, chain
@@ -11,7 +12,7 @@ import concurrent.futures
 from concurrent.futures import ThreadPoolExecutor
 from discord.ext import commands, tasks
 
-bot = commands.Bot(command_prefix=commands.when_mentioned_or('n!'), intents=discord.Intents.all())
+bot = commands.Bot(command_prefix=commands.when_mentioned_or('.t'), intents=discord.Intents.all())
 rate = {}
 
 
