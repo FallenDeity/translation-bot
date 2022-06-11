@@ -3,8 +3,10 @@ import os
 import docx
 from discord import ui
 from discord.ext import menus
+from filestack import Client
 import requests
 import discord
+import chardet
 import aiofiles
 from itertools import starmap, chain
 from deep_translator import GoogleTranslator
@@ -191,9 +193,12 @@ async def translate(ctx, link=None):
             except:
                 try:
                     async with aiofiles.open(f'{ctx.author.id}.txt', 'r', encoding='cp949') as f: novel = await f.read()
-                except Exception as e:
-                    print(e)
-                    return await ctx.reply("**⛔Currently we are only translating korean and chinese.**")        
+                except:
+                    try:
+                        async with aiofiles.open(f'{ctx.author.id}.txt', 'r', encoding=chardet.detect(resp.read())['encoding']) as f: novel = await f.read()
+                    except Exception as e:
+                        print(e)
+                        return await ctx.reply("**⛔Currently we are only translating korean and chinese.**")        
     await ctx.reply('**✅Translation started**')
     os.remove(f'{ctx.author.id}.txt')
     liz = [novel[i:i+1800] for i in range(0, len(novel), 1800)]
@@ -203,8 +208,13 @@ async def translate(ctx, link=None):
     comp = {k: v for k, v in sorted(translated.items(), key=lambda item: item[0])}
     full = [i[0] for i in list(comp.values())]
     async with aiofiles.open(f'{ctx.author.id}.txt', 'w', encoding='utf-8') as f: await f.write(" ".join(full))
-    file = discord.File(f"{ctx.author.id}.txt", f"{name}.txt")
-    await ctx.reply("**🎉Here is your translated novel**", file=file)
+    if os.path.getsize(f"{ctx.author.id}.txt") > 8*10**6:
+        c = Client("AXiAEgFvETpKeqBHufPBXz")
+        filelnk = c.upload(filepath = f"{ctx.author.id}.txt")
+        await ctx.reply(f"{name}: here is your novel {filelnk.url}")
+    else:
+        file = discord.File(f"{ctx.author.id}.txt", f"{name}.txt")
+        await ctx.reply("**🎉Here is your translated novel**", file=file)
     os.remove(f"{ctx.author.id}.txt")
     del rate[ctx.author.id]
     
