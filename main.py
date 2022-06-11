@@ -195,8 +195,9 @@ async def translate(ctx, link=None):
                     async with aiofiles.open(f'{ctx.author.id}.txt', 'r', encoding='cp949') as f: novel = await f.read()
                 except:
                     try:
+                        await ctx.send('encoding not in db trying to auto detect please be patient.')
                         async with aiofiles.open(f'{ctx.author.id}.txt', 'rb') as f: novel = await f.read()
-                        async with aiofiles.open(f'{ctx.author.id}.txt', 'r', encoding=chardet.detect(novel)['encoding']) as f: novel= await f.read()
+                        async with aiofiles.open(f'{ctx.author.id}.txt', 'r', encoding=chardet.detect(novel[:250])['encoding']) as f: novel= await f.read()
                     except Exception as e:
                         print(e)
                         return await ctx.reply("**⛔Currently we are only translating korean and chinese.**")        
