@@ -119,7 +119,7 @@ bot.help_command = MyHelp()
 
 
 def translates(liz, order, author):
-    with ThreadPoolExecutor(max_workers=10) as executor:
+    with ThreadPoolExecutor(max_workers=8) as executor:
         futures = [executor.submit(download_image, [url], num) for num, url in enumerate(liz)]
         for future in concurrent.futures.as_completed(futures):
             order[future.result()[0]] = future.result()[1]
@@ -208,8 +208,10 @@ async def translate(ctx, link=None):
     rate[ctx.author.id] = f"0/{len(liz)}"
     translated = await bot.loop.run_in_executor(None, translates, liz, order, ctx.author.id)
     comp = {k: v for k, v in sorted(translated.items(), key=lambda item: item[0])}
-    full = [i[0] for i in list(comp.values())]
-    async with aiofiles.open(f'{ctx.author.id}.txt', 'w', encoding='utf-8') as f: await f.write(" ".join(full))
+    full = [i[0] for i in list(comp.values()) if i[0] is not None]
+    async with aiofiles.open(f'{ctx.author.id}.txt', 'w', encoding='utf-8') as f: await f.write("")
+    for i in full:
+         async with aiofiles.open(f'{ctx.author.id}.txt', 'a', encoding='utf-8') as f: await f.write(i)
     if os.path.getsize(f"{ctx.author.id}.txt") > 8*10**6:
         c = Client("AXiAEgFvETpKeqBHufPBXz")
         filelnk = c.upload(filepath = f"{ctx.author.id}.txt")
