@@ -4,6 +4,7 @@ import docx
 from discord import ui
 from discord.ext import menus
 from filestack import Client
+import zipfile
 import requests
 import discord
 import chardet
@@ -119,7 +120,7 @@ bot.help_command = MyHelp()
 
 
 def translates(liz, order, author):
-    with ThreadPoolExecutor(max_workers=8) as executor:
+    with ThreadPoolExecutor(max_workers=10) as executor:
         futures = [executor.submit(download_image, [url], num) for num, url in enumerate(liz)]
         for future in concurrent.futures.as_completed(futures):
             order[future.result()[0]] = future.result()[1]
@@ -146,7 +147,7 @@ async def on_ready():
 @bot.command(help='Gives progress of novel translation', aliases=['now', 'n', 'p'])
 async def progress(ctx):
     if ctx.author.id not in rate: return await ctx.send("**You have no novel deposited for translation currently.**")
-    await ctx.send(f"**🚄{rate[ctx.author.id]}**")
+    await ctx.send(f"**🚄`{rate[ctx.author.id]}`**")
 
 
 def ask(link):
@@ -209,12 +210,13 @@ async def translate(ctx, link=None):
     translated = await bot.loop.run_in_executor(None, translates, liz, order, ctx.author.id)
     comp = {k: v for k, v in sorted(translated.items(), key=lambda item: item[0])}
     full = [i[0] for i in list(comp.values()) if i[0] is not None]
-    async with aiofiles.open(f'{ctx.author.id}.txt', 'w', encoding='utf-8') as f: await f.write("")
-    for i in full:
-         async with aiofiles.open(f'{ctx.author.id}.txt', 'a', encoding='utf-8') as f: await f.write(i)
+    async with aiofiles.open(f'{ctx.author.id}.txt', 'w', encoding='utf-8') as f: await f.write(" ".join(full))
     if os.path.getsize(f"{ctx.author.id}.txt") > 8*10**6:
         c = Client("AXiAEgFvETpKeqBHufPBXz")
-        filelnk = c.upload(filepath = f"{ctx.author.id}.txt")
+        with zipfile.ZipFile(f'{ctx.author.id}.zip', 'w') as jungle_zip:
+            jungle_zip.write('{ctx.author.id}.txt', compress_type=zipfile.ZIP_DEFLATED)
+        filelnk = c.upload(filepath = f"{ctx.author.id}.zip")
+        os.remove(f"{ctx.author.id}.zip")
         await ctx.reply(f"{name}: here is your novel {filelnk.url}")
     else:
         file = discord.File(f"{ctx.author.id}.txt", f"{name}.txt")
