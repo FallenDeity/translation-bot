@@ -213,8 +213,7 @@ async def translate(ctx, link=None):
     async with aiofiles.open(f'{ctx.author.id}.txt', 'w', encoding='utf-8') as f: await f.write(" ".join(full))
     if os.path.getsize(f"{ctx.author.id}.txt") > 8*10**6:
         c = Client("AXiAEgFvETpKeqBHufPBXz")
-        with zipfile.ZipFile(f'{ctx.author.id}.zip', 'w') as jungle_zip:
-            jungle_zip.write('{ctx.author.id}.txt', compress_type=zipfile.ZIP_DEFLATED)
+        with zipfile.ZipFile(f'{ctx.author.id}.zip', 'w') as jungle_zip: jungle_zip.write(f'{ctx.author.id}.txt', compress_type=zipfile.ZIP_DEFLATED)
         filelnk = c.upload(filepath = f"{ctx.author.id}.zip")
         os.remove(f"{ctx.author.id}.zip")
         await ctx.reply(f"{name}: here is your novel {filelnk.url}")
