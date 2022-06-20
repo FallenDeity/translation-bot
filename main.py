@@ -18,6 +18,7 @@ from discord.ext import commands, tasks
 bot = commands.Bot(command_prefix=commands.when_mentioned_or('.t'), intents=discord.Intents.all())
 rate = {}
 track = []
+choices = {'afrikaans': 'af', 'albanian': 'sq', 'amharic': 'am', 'arabic': 'ar', 'armenian': 'hy', 'azerbaijani': 'az', 'basque': 'eu', 'belarusian': 'be', 'bengali': 'bn', 'bosnian': 'bs', 'bulgarian': 'bg', 'catalan': 'ca', 'cebuano': 'ceb', 'chichewa': 'ny', 'chinese (simplified)': 'zh-CN', 'chinese (traditional)': 'zh-TW', 'corsican': 'co', 'croatian': 'hr', 'czech': 'cs', 'danish': 'da', 'dutch': 'nl', 'english': 'en', 'esperanto': 'eo', 'estonian': 'et', 'filipino': 'tl', 'finnish': 'fi', 'french': 'fr', 'frisian': 'fy', 'galician': 'gl', 'georgian': 'ka', 'german': 'de', 'greek': 'el', 'gujarati': 'gu', 'haitian creole': 'ht', 'hausa': 'ha', 'hawaiian': 'haw', 'hebrew': 'iw', 'hindi': 'hi', 'hmong': 'hmn', 'hungarian': 'hu', 'icelandic': 'is', 'igbo': 'ig', 'indonesian': 'id', 'irish': 'ga', 'italian': 'it', 'japanese': 'ja', 'javanese': 'jw', 'kannada': 'kn', 'kazakh': 'kk', 'khmer': 'km', 'kinyarwanda': 'rw', 'korean': 'ko', 'kurdish': 'ku', 'kyrgyz': 'ky', 'lao': 'lo', 'latin': 'la', 'latvian': 'lv', 'lithuanian': 'lt', 'luxembourgish': 'lb', 'macedonian': 'mk', 'malagasy': 'mg', 'malay': 'ms', 'malayalam': 'ml', 'maltese': 'mt', 'maori': 'mi', 'marathi': 'mr', 'mongolian': 'mn', 'myanmar': 'my', 'nepali': 'ne', 'norwegian': 'no', 'odia': 'or', 'pashto': 'ps', 'persian': 'fa', 'polish': 'pl', 'portuguese': 'pt', 'punjabi': 'pa', 'romanian': 'ro', 'russian': 'ru', 'samoan': 'sm', 'scots gaelic': 'gd', 'serbian': 'sr', 'sesotho': 'st', 'shona': 'sn', 'sindhi': 'sd', 'sinhala': 'si', 'slovak': 'sk', 'slovenian': 'sl', 'somali': 'so', 'spanish': 'es', 'sundanese': 'su', 'swahili': 'sw', 'swedish': 'sv', 'tajik': 'tg', 'tamil': 'ta', 'tatar': 'tt', 'telugu': 'te', 'thai': 'th', 'turkish': 'tr', 'turkmen': 'tk', 'ukrainian': 'uk', 'urdu': 'ur', 'uyghur': 'ug', 'uzbek': 'uz', 'vietnamese': 'vi', 'welsh': 'cy', 'xhosa': 'xh', 'yiddish': 'yi', 'yoruba': 'yo', 'zulu': 'zu'}
 
 
 class MyMenuPages(ui.View, menus.MenuPages):
@@ -120,17 +121,17 @@ class MyHelp(commands.MinimalHelpCommand):
 bot.help_command = MyHelp()
 
 
-def translates(liz, order, author):
+def translates(liz, order, author, lang):
     with ThreadPoolExecutor(max_workers=10) as executor:
-        futures = [executor.submit(download_image, [url], num) for num, url in enumerate(liz)]
+        futures = [executor.submit(download_image, [url], num, lang) for num, url in enumerate(liz)]
         for future in concurrent.futures.as_completed(futures):
             order[future.result()[0]] = future.result()[1]
             rate[author] = f"{len(order)}/{len(liz)}"
         return order
 
 
-def download_image(img_url, num):
-    translated = GoogleTranslator(source='auto', target='english').translate_batch(img_url)
+def download_image(img_url, num, lang):
+    translated = GoogleTranslator(source='auto', target=lang).translate_batch(img_url)
     return num, translated
 
 
@@ -163,8 +164,10 @@ def ask(link):
 
 
 @bot.command(help='Send along with ur novel txt or doc or link to auto translate. Currently supports only https://temp.sh', aliases=['t'])
-async def translate(ctx, link=None):
+async def translate(ctx, link=None, language='english'):
+    string = '\n'.join([f"{k} --> {v}" for k, v in choices.items()])
     await ctx.typing()
+    if language not in list(choices.keys()) or in list(choices.values()): return await ctx.send(f"```{string}```")
     if ctx.author.id in rate: return await ctx.send('**⛔You cant translate two novels at a time.**')
     if not ctx.message.attachments and not link: return await ctx.send('**⛔You must add a novel/link to translate**')
     if link:
@@ -209,13 +212,13 @@ async def translate(ctx, link=None):
                     except Exception as e:
                         print(e)
                         return await ctx.reply("**⛔Currently we are only translating korean and chinese.**")        
-    await ctx.reply('**✅Translation started**')
+    await ctx.reply(f'**✅Translation started. Translating to {language}.**')
     os.remove(f'{ctx.author.id}.txt')
     liz = [novel[i:i+1800] for i in range(0, len(novel), 1800)]
     order = {}
     rate[ctx.author.id] = f"0/{len(liz)}"
     track.append(ctx.author.id)
-    translated = await bot.loop.run_in_executor(None, translates, liz, order, ctx.author.id)
+    translated = await bot.loop.run_in_executor(None, translates, liz, order, ctx.author.id, language)
     comp = {k: v for k, v in sorted(translated.items(), key=lambda item: item[0])}
     full = [i[0] for i in list(comp.values()) if i[0] is not None]
     async with aiofiles.open(f'{ctx.author.id}.txt', 'w', encoding='utf-8') as f: await f.write(" ".join(full))
