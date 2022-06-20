@@ -165,7 +165,7 @@ def ask(link):
 
 @bot.command(help='Send along with ur novel txt or doc or link to auto translate. Currently supports only https://temp.sh', aliases=['t'])
 async def translate(ctx, link=None, language='english'):
-    string = ["{0: ^35}".format(f"{k} --> {v}") for k, v in choices.items()]
+    string = ["{0: ^18}".format(f"{k} --> {v}") for k, v in choices.items()]
     string = '\n'.join([''.join(string[i:i+3]) for i in range(0, len(string), 3)])
     await ctx.typing()
     if language not in list(choices.keys()) or language not in list(choices.values()): return await ctx.reply(f"**We have the following languages in our db.**```{string}```")
