@@ -17,6 +17,7 @@ from discord.ext import commands, tasks
 
 bot = commands.Bot(command_prefix=commands.when_mentioned_or('.t'), intents=discord.Intents.all())
 rate = {}
+track = []
 
 
 class MyMenuPages(ui.View, menus.MenuPages):
@@ -136,6 +137,12 @@ def download_image(img_url, num):
 @tasks.loop(seconds=120)
 async def census():
   await bot.change_presence(status=discord.Status.idle, activity=discord.Activity(type=discord.ActivityType.watching, name=f"{len(bot.users)} novel enthusiasts. Prefix: .t"))
+  for i, j in rate.items():
+        if int(j.split('/')[0]) == 0 and i in track:
+            member = bot.get_member(i) or await bot.get_member(i) 
+            await member.send(f"sorry your novel is unable to be translated.")
+            track.remove(i)
+            del rate[i]
 
 
 @bot.event 
@@ -207,6 +214,7 @@ async def translate(ctx, link=None):
     liz = [novel[i:i+1800] for i in range(0, len(novel), 1800)]
     order = {}
     rate[ctx.author.id] = f"0/{len(liz)}"
+    track.append(ctx.author.id)
     translated = await bot.loop.run_in_executor(None, translates, liz, order, ctx.author.id)
     comp = {k: v for k, v in sorted(translated.items(), key=lambda item: item[0])}
     full = [i[0] for i in list(comp.values()) if i[0] is not None]
@@ -225,6 +233,7 @@ async def translate(ctx, link=None):
         await ctx.reply("**🎉Here is your translated novel**", file=file)
     os.remove(f"{ctx.author.id}.txt")
     del rate[ctx.author.id]
+    track.remove(ctx.author.id)
     
 
 async def main():
