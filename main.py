@@ -164,7 +164,7 @@ def ask(link):
 
 
 @bot.command(help='Send along with ur novel txt or doc or link to auto translate. Currently supports only https://temp.sh', aliases=['t'])
-async def translate(ctx, link=None, language='english'):
+async def translate(ctx, language='english', link=None):
     string = ["{0: ^17}".format(f"{k} --> {v}") for k, v in choices.items()]
     string = '\n'.join([''.join(string[i:i+4]) for i in range(0, len(string), 4)])
     await ctx.typing()
