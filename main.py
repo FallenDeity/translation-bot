@@ -166,9 +166,13 @@ def ask(link):
 @bot.command(help='Send along with ur novel txt or doc or link to auto translate. Currently supports only https://temp.sh', aliases=['t'])
 async def translate(ctx, language='english', link=None):
     string = ["{0: ^17}".format(f"{k} --> {v}") for k, v in choices.items()]
-    string = '\n'.join([''.join(string[i:i+4]) for i in range(0, len(string), 4)])
+    string = '\n'.join([''.join(string[i:i+3]) for i in range(0, len(string), 3)])
     await ctx.typing()
-    if language not in list(choices.keys()) or language not in list(choices.values()): return await ctx.reply(f"**We have the following languages in our db.**```{string}```")
+    total = []
+    for k, v in choices.items():
+        total.append(k)
+        total.append(v)
+    if language not in total: return await ctx.reply(f"**We have the following languages in our db.**```{string}```")
     if ctx.author.id in rate: return await ctx.send('**⛔You cant translate two novels at a time.**')
     if not ctx.message.attachments and not link: return await ctx.send('**⛔You must add a novel/link to translate**')
     if link:
