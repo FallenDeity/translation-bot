@@ -167,7 +167,7 @@ def ask(link):
 async def translate(ctx, link=None, language='english'):
     string = '\n'.join([f"{k} --> {v}" for k, v in choices.items()])
     await ctx.typing()
-    if language not in list(choices.keys()) or in list(choices.values()): return await ctx.send(f"```{string}```")
+    if language not in list(choices.keys()) or language not in list(choices.values()): return await ctx.send(f"```{string}```")
     if ctx.author.id in rate: return await ctx.send('**⛔You cant translate two novels at a time.**')
     if not ctx.message.attachments and not link: return await ctx.send('**⛔You must add a novel/link to translate**')
     if link:
