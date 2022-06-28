@@ -21,6 +21,13 @@ track = []
 choices = {'afrikaans': 'af', 'albanian': 'sq', 'amharic': 'am', 'arabic': 'ar', 'armenian': 'hy', 'azerbaijani': 'az', 'basque': 'eu', 'belarusian': 'be', 'bengali': 'bn', 'bosnian': 'bs', 'bulgarian': 'bg', 'catalan': 'ca', 'cebuano': 'ceb', 'chichewa': 'ny', 'chinese (simplified)': 'zh-CN', 'chinese (traditional)': 'zh-TW', 'corsican': 'co', 'croatian': 'hr', 'czech': 'cs', 'danish': 'da', 'dutch': 'nl', 'english': 'en', 'esperanto': 'eo', 'estonian': 'et', 'filipino': 'tl', 'finnish': 'fi', 'french': 'fr', 'frisian': 'fy', 'galician': 'gl', 'georgian': 'ka', 'german': 'de', 'greek': 'el', 'gujarati': 'gu', 'haitian creole': 'ht', 'hausa': 'ha', 'hawaiian': 'haw', 'hebrew': 'iw', 'hindi': 'hi', 'hmong': 'hmn', 'hungarian': 'hu', 'icelandic': 'is', 'igbo': 'ig', 'indonesian': 'id', 'irish': 'ga', 'italian': 'it', 'japanese': 'ja', 'javanese': 'jw', 'kannada': 'kn', 'kazakh': 'kk', 'khmer': 'km', 'kinyarwanda': 'rw', 'korean': 'ko', 'kurdish': 'ku', 'kyrgyz': 'ky', 'lao': 'lo', 'latin': 'la', 'latvian': 'lv', 'lithuanian': 'lt', 'luxembourgish': 'lb', 'macedonian': 'mk', 'malagasy': 'mg', 'malay': 'ms', 'malayalam': 'ml', 'maltese': 'mt', 'maori': 'mi', 'marathi': 'mr', 'mongolian': 'mn', 'myanmar': 'my', 'nepali': 'ne', 'norwegian': 'no', 'odia': 'or', 'pashto': 'ps', 'persian': 'fa', 'polish': 'pl', 'portuguese': 'pt', 'punjabi': 'pa', 'romanian': 'ro', 'russian': 'ru', 'samoan': 'sm', 'scots gaelic': 'gd', 'serbian': 'sr', 'sesotho': 'st', 'shona': 'sn', 'sindhi': 'sd', 'sinhala': 'si', 'slovak': 'sk', 'slovenian': 'sl', 'somali': 'so', 'spanish': 'es', 'sundanese': 'su', 'swahili': 'sw', 'swedish': 'sv', 'tajik': 'tg', 'tamil': 'ta', 'tatar': 'tt', 'telugu': 'te', 'thai': 'th', 'turkish': 'tr', 'turkmen': 'tk', 'ukrainian': 'uk', 'urdu': 'ur', 'uyghur': 'ug', 'uzbek': 'uz', 'vietnamese': 'vi', 'welsh': 'cy', 'xhosa': 'xh', 'yiddish': 'yi', 'yoruba': 'yo', 'zulu': 'zu'}
 
 
+from itertools import chain, starmap
+
+import discord
+from discord import ui
+from discord.ext import commands, menus
+
+
 class MyMenuPages(ui.View, menus.MenuPages):
     def __init__(self, source, *, delete_message_after=False):
         super().__init__(timeout=60)
@@ -31,93 +38,135 @@ class MyMenuPages(ui.View, menus.MenuPages):
         self.delete_message_after = delete_message_after
 
     async def start(self, ctx, *, channel=None, wait=False):
-        # We wont be using wait/channel, you can implement them yourself. This is to match the MenuPages signature.
         await self._source._prepare_once()
         self.ctx = ctx
         self.message = await self.send_initial_message(ctx, ctx.channel)
 
     async def _get_kwargs_from_page(self, page):
-        """This method calls ListPageSource.format_page class"""
         value = await super()._get_kwargs_from_page(page)
-        if 'view' not in value:
-            value.update({'view': self})
+        if "view" not in value:
+            value.update({"view": self})
         return value
 
     async def interaction_check(self, interaction):
-        """Only allow the author that invoke the command to be able to use the interaction"""
         return interaction.user == self.ctx.author
 
-    @ui.button(emoji='<:before_fast_check:754948796139569224>', style=discord.ButtonStyle.blurple)
+    @ui.button(
+        emoji="<:DoubleArrowLeft:989134953142956152>",
+        style=discord.ButtonStyle.blurple,
+    )
     async def first_page(self, button, interaction):
-        await self.show_page(0)
+        await button.response.defer()
+        return await self.show_page(0)
 
-    @ui.button(emoji='<:before_check:754948796487565332>', style=discord.ButtonStyle.blurple)
+    @ui.button(
+        emoji="<:ArrowLeft:989134685068202024>", style=discord.ButtonStyle.blurple
+    )
     async def before_page(self, button, interaction):
-        await self.show_checked_page(self.current_page - 1)
+        await button.response.defer()
+        return await self.show_checked_page(self.current_page - 1)
 
-    @ui.button(emoji='<:stop_check:754948796365930517>', style=discord.ButtonStyle.blurple)
+    @ui.button(emoji="<:dustbin:989150297333043220>", style=discord.ButtonStyle.blurple)
     async def stop_page(self, button, interaction):
         self.stop()
         if self.delete_message_after:
-            await self.message.delete(delay=0)
+            return await self.message.delete(delay=0)
 
-    @ui.button(emoji='<:next_check:754948796361736213>', style=discord.ButtonStyle.blurple)
+    @ui.button(
+        emoji="<:rightArrow:989136803284004874>", style=discord.ButtonStyle.blurple
+    )
     async def next_page(self, button, interaction):
-        await self.show_checked_page(self.current_page + 1)
+        await button.response.defer()
+        return await self.show_checked_page(self.current_page + 1)
 
-    @ui.button(emoji='<:next_fast_check:754948796391227442>', style=discord.ButtonStyle.blurple)
+    @ui.button(
+        emoji="<:DoubleArrowRight:989134892384256011>",
+        style=discord.ButtonStyle.blurple,
+    )
     async def last_page(self, button, interaction):
-        await self.show_page(self._source.get_max_pages() - 1)
+        await button.response.defer()
+        return await self.show_page(self._source.get_max_pages() - 1)
 
 
 class HelpPageSource(menus.ListPageSource):
-    def __init__(self, data, helpcommand):
-        super().__init__(data, per_page=6)
+    def __init__(self, data, helpcommand, mode):
+        super().__init__(data, per_page=3)
         self.helpcommand = helpcommand
+        self.mode = mode
 
     def format_command_help(self, no, command):
-        signature = self.helpcommand.get_command_signature(command)
-        docs = self.helpcommand.get_command_brief(command)
-        return f"**{no})** **{signature}**\n*{docs}*"
+        signature = (
+            str(self.helpcommand.get_command_signature(command))
+            .lower()
+            .replace("=none", "")
+        )
+        signature += (30 - len(signature)) * " "
+        docs = command.short_doc or "Command is not documented."
+        return f"**`{no})`  {command.qualified_name.title()}**```\n{signature}             ```*{docs}*".replace(
+            "[", "<"
+        ).replace(
+            "]", ">"
+        )
 
     async def format_page(self, menu, entries):
         page = menu.current_page
         max_page = self.get_max_pages()
         starting_number = page * self.per_page + 1
-        iterator = starmap(self.format_command_help, enumerate(entries, start=starting_number))
+        iterator = starmap(
+            self.format_command_help, enumerate(entries, start=starting_number)
+        )
         page_content = "\n\n".join(iterator)
         embed = discord.Embed(
-            title=f"Help Command [{page + 1}/{max_page}]",
+            title=f"{self.mode} Command",
             description=page_content,
-            color=0xffcccb
+            color=discord.Color.random(),
         )
         author = menu.ctx.author
-        embed.set_footer(text=f"Requested by {author}", icon_url=author.display_avatar)  # author.avatar in 2.0
+        embed.set_thumbnail(url=menu.ctx.bot.user.display_avatar)
+        embed.set_footer(
+            text=f"{page + 1}/{max_page} | Requested by {author.name}",
+            icon_url=author.display_avatar,
+        )  # author.avatar in 2.0
         return embed
 
 
 class MyHelp(commands.MinimalHelpCommand):
-
-    def get_command_brief(self, command):
-        return command.short_doc or "Command is not documented."
-
     async def send_bot_help(self, mapping):
         all_commands = list(chain.from_iterable(mapping.values()))
-        formatter = HelpPageSource(all_commands, self)
+        formatter = HelpPageSource(all_commands, self, "Help")
+        menu = MyMenuPages(formatter, delete_message_after=True)
+        await menu.start(self.context)
+
+    async def send_group_help(self, group):
+        subcommands = group.commands
+        if len(subcommands) == 0:
+            return await self.send_command_help(group)
+        filtered = await self.filter_commands(subcommands, sort=True)
+        filtered.insert(0, group)
+        formatter = HelpPageSource(filtered, self, f"{group.qualified_name}")
         menu = MyMenuPages(formatter, delete_message_after=True)
         await menu.start(self.context)
 
     async def send_command_help(self, command):
-        embed = discord.Embed(title=self.get_command_signature(command), color=discord.Colour.random())
-        embed.add_field(name="Help", value=command.help)
-        alias = command.aliases
-        if alias:
-            embed.add_field(name="Aliases", value=", ".join(alias), inline=False)
-
-        channel = self.get_destination()
-        await channel.send(embed=embed)
-
-
+        embed = discord.Embed(
+            color=discord.Color.random(),
+            title=f"{command.qualified_name.title()} Command",
+        )
+        if command.description:
+            embed.description = f"{command.description}\n\n{command.help}"
+        else:
+            embed.description = command.help or "No help found..."
+        embed.add_field(
+            name="Usage",
+            value=f"```{self.get_command_signature(command).lower().replace('=none', '')}```",
+        )
+        if command.aliases:
+            embed.add_field(name="Aliases", value=", ".join(command.aliases))
+        embed.set_thumbnail(url=self.context.bot.user.display_avatar)
+        embed.set_footer(text=f"Requested by {self.context.author.name}")
+        await self.context.send(embed=embed)
+        
+        
 bot.help_command = MyHelp()
 
 
