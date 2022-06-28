@@ -313,6 +313,15 @@ async def clear(ctx):
     
  
 def easy(nums, links):
+    blacklist = [
+    '[document]',
+    'noscript',
+    'header',
+    'html',
+    'meta',
+    'head', 
+    'input',
+    'script']
     data = requests.get(links)
     soup = BeautifulSoup(data.content, 'lxml')
     text = soup.find_all(text=True)
@@ -320,7 +329,7 @@ def easy(nums, links):
     return nums, full
     
     
-def direct():
+def direct(urls, novel):
     with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
         futures = [executor.submit(easy, i, j) for i, j in enumerate(urls)]
         for future in concurrent.futures.as_completed(futures):
@@ -360,7 +369,7 @@ async def crawl(ctx, link=None):
     name = ctx.author.id
     crawler[ctx.author.id] = f'0/{len(urls)}'
     await ctx.reply(f"**Crawl started.**")
-    await bot.loop.run_in_executor(None, direct)
+    await bot.loop.run_in_executor(None, direct, urls, novel)
     parsed = {k:v for k, v in sorted(novel.items(), key=lambda item: item[0])}
     full = [i for i in list(parsed.values())]
     async with aiofiles.open(f'{ctx.author.id}_crawl.txt', 'w', encoding='utf-8') as f: await f.write("\n".join(full))
