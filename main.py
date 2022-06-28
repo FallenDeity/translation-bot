@@ -261,7 +261,7 @@ async def translate(ctx, language='english', link=None):
                     async with aiofiles.open(f'{ctx.author.id}.txt', 'r', encoding='cp949') as f: novel = await f.read()
                 except:
                     try:
-                        await ctx.send('encoding not in db trying to auto detect please be patient.')
+                        await ctx.send('**encoding not in db trying to auto detect please be patient**')
                         async with aiofiles.open(f'{ctx.author.id}.txt', 'rb') as f: novel = await f.read()
                         async with aiofiles.open(f'{ctx.author.id}.txt', 'r', encoding=chardet.detect(novel[:250])['encoding']) as f: novel= await f.read()
                     except Exception as e:
@@ -282,9 +282,9 @@ async def translate(ctx, language='english', link=None):
         try:
             with zipfile.ZipFile(f'{ctx.author.id}.zip', 'w') as jungle_zip: jungle_zip.write(f'{ctx.author.id}.txt', compress_type=zipfile.ZIP_DEFLATED)
             filelnk = c.upload(filepath = f"{ctx.author.id}.zip")
-            await ctx.reply(f"{name}: here is your novel {filelnk.url}")
+            await ctx.reply(f"**{name}: here is your novel {filelnk.url}**")
         except:
-            await ctx.reply("sorry your file was too big please split it and try again.")
+            await ctx.reply("**Sorry your file was too big please split it and try again.**")
         os.remove(f"{ctx.author.id}.zip")
     else:
         file = discord.File(f"{ctx.author.id}.txt", f"{name}.txt")
@@ -294,7 +294,7 @@ async def translate(ctx, language='english', link=None):
     track.remove(ctx.author.id)
     
     
-@bot.command()
+@bot.command(help='Clears any stagnant novels which were deposited for translation.')
 async def clear(ctx):
     if ctx.author.id in rate:
         if rate[ctx.author.id].split('/')[0] == '0':
