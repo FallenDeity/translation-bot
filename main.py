@@ -297,7 +297,7 @@ async def translate(ctx, language='english', link=None):
     
     
 @bot.command(help='Clears any stagnant novels which were deposited for translation.')
-async def clear(ctx):
+async def tclear(ctx):
     if ctx.author.id in rate:
         if rate[ctx.author.id].split('/')[0] == '0':
             del rate[çtx.author.id]
@@ -328,6 +328,7 @@ def direct(urls, novel, name):
             novel[future.result()[0]] = future.result()[1]
             crawler[name] = f'{len(novel)}/{len(urls)}'
             
+            
 @bot.command(help='Gives progress of novel crawling', aliases=['cp'])
 async def crawled(ctx):
     if ctx.author.id not in crawler: return await ctx.send("**You have no novel deposited for crawling currently.**")
@@ -348,7 +349,7 @@ async def crawl(ctx, link=None):
     if num == 5:
         return await ctx.reply(f"**We currently crawl only from {', '.join(allowed)}**")
     if link[-1] == '/':
-        link = link[:-2]
+        link = link[:-1]
     res = await bot.loop.run_in_executor(None, ask, link)
     novel = {}
     soup = BeautifulSoup(res.text, 'html.parser')
@@ -379,6 +380,20 @@ async def crawl(ctx, link=None):
         await ctx.reply("**🎉Here is your crawled novel**", file=file)
     os.remove(f"{ctx.author.id}_crawl.txt")
     del crawler[ctx.author.id]
+    
+    
+@bot.command(help='Clears any stagnant novels which were deposited for crawling.')
+async def cclear(ctx):
+    if ctx.author.id in crawler:
+        if rate[ctx.author.id].split('/')[0] == '0':
+            del rate[çtx.author.id]
+        else:
+            return await ctx.reply(f"**There is a novel scraping going on currently.**")
+    files = os.listdir()
+    for i in files:
+        if str(ctx.author.id) in str(i) and 'crawl' in i:
+            os.remove(i)
+    await ctx.reply("**Cleared all records.**")
 
     
 
