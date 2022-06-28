@@ -322,14 +322,14 @@ def easy(nums, links):
     'head', 
     'input',
     'script']
-    data = requests.get(links)
+    data = await bot.loop,run_in_executor(None, ask, links)
     soup = BeautifulSoup(data.content, 'lxml')
     text = soup.find_all(text=True)
     full = ''.join([i for i in text if i not in blacklist])
     return nums, full
     
     
-def direct(urls, novel):
+def direct(urls, novel, name):
     with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
         futures = [executor.submit(easy, i, j) for i, j in enumerate(urls)]
         for future in concurrent.futures.as_completed(futures):
@@ -359,17 +359,15 @@ async def crawl(ctx, link=None):
     novel = {}
     soup = BeautifulSoup(res.text, 'html.parser')
     name = str(link.split('/')[-1].replace('.html', ''))
-    print(name)
     frontend_part = link.replace(f'/{name}', '').split('/')[-1]
     frontend = link.replace(f'/{name}', '').replace(f'/{frontend_part}', '')
-    print(frontend)
     urls = [f'{frontend}{j}' for j in [str(i.get('href')) for i in soup.find_all('a')] if name in j and '.html' in j and 'txt' not in j]
-    print(len(urls))
+    print(urls[:10])
     maxs = len(urls)
     name = ctx.author.id
     crawler[ctx.author.id] = f'0/{len(urls)}'
     await ctx.reply(f"**Crawl started.**")
-    await bot.loop.run_in_executor(None, direct, urls, novel)
+    await bot.loop.run_in_executor(None, direct, urls, novel, name)
     parsed = {k:v for k, v in sorted(novel.items(), key=lambda item: item[0])}
     full = [i for i in list(parsed.values())]
     async with aiofiles.open(f'{ctx.author.id}_crawl.txt', 'w', encoding='utf-8') as f: await f.write("\n".join(full))
