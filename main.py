@@ -137,9 +137,10 @@ def download_image(img_url, num, lang):
 
 @tasks.loop(seconds=120)
 async def census():
+  await bot.wait_until_ready()
   await bot.change_presence(status=discord.Status.idle, activity=discord.Activity(type=discord.ActivityType.watching, name=f"{len(bot.users)} novel enthusiasts. Prefix: .t"))
   for i, j in rate.items():
-        if int(j.split('/')[0]) == 0 and i in track:
+        if j.split('/')[0] == '0' and i in track:
             member = bot.get_member(i) or await bot.get_member(i) 
             await member.send(f"sorry your novel is unable to be translated.")
             track.remove(i)
@@ -218,11 +219,11 @@ async def translate(ctx, language='english', link=None):
                         print(e)
                         return await ctx.reply("**⛔Currently we are only translating korean and chinese.**")        
     await ctx.reply(f'**✅Translation started. Translating to {language}.**')
+    track.append(ctx.author.id)
     os.remove(f'{ctx.author.id}.txt')
     liz = [novel[i:i+1800] for i in range(0, len(novel), 1800)]
     order = {}
     rate[ctx.author.id] = f"0/{len(liz)}"
-    track.append(ctx.author.id)
     translated = await bot.loop.run_in_executor(None, translates, liz, order, ctx.author.id, language)
     comp = {k: v for k, v in sorted(translated.items(), key=lambda item: item[0])}
     full = [i[0] for i in list(comp.values()) if i[0] is not None]
@@ -242,6 +243,22 @@ async def translate(ctx, language='english', link=None):
     os.remove(f"{ctx.author.id}.txt")
     del rate[ctx.author.id]
     track.remove(ctx.author.id)
+    
+    
+@bot.command()
+async def clear(ctx):
+    if ctx.author.id in rate:
+        if rate[ctx.author.id].split('/')[0] == '0':
+            del rate[çtx.author.id]
+        else:
+            return await ctx.reply(f"**There is a novel translation going on currently.**")
+    if ctx.author.id in track:
+        track.remove(ctx.author.id)
+    files = os.listdir()
+    for i in files:
+        if str(ctx.author.id) in str(i):
+            os.remove(i)
+    await ctx.reply("**Cleared all records.**")
     
 
 async def main():
