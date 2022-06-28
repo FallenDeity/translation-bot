@@ -326,6 +326,11 @@ def direct():
         for future in concurrent.futures.as_completed(futures):
             novel[future.result()[0]] = future.result()[1]
             crawler[name] = f'{len(novel)}/{len(urls)}'
+            
+@bot.command(help='Gives progress of novel crawling', aliases=['cp'])
+async def crawled(ctx):
+    if ctx.author.id not in crawler: return await ctx.send("**You have no novel deposited for crawling currently.**")
+    await ctx.send(f"**🚄`{crawler[ctx.author.id]}`**")
     
     
 @bot.command(help='Crawls other sites for novels. Currently available trxs, tongrenquan, ffxs.')
@@ -352,6 +357,7 @@ async def crawl(ctx, link=None):
     maxs = len(urls)
     name = ctx.author.id
     crawler[ctx.author.id] = f'0/{len(urls)}'
+    await ctx.reply(f"**Crawl started.**")
     await bot.loop.run_in_executor(None, direct)
     parsed = {k:v for k, v in sorted(novel.items(), key=lambda item: item[0])}
     full = [i for i in list(parsed.values())]
