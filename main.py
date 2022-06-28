@@ -322,7 +322,7 @@ def easy(nums, links):
     'head', 
     'input',
     'script']
-    data = await bot.loop.run_in_executor(None, ask, links)
+    data = requests.get(links)
     soup = BeautifulSoup(data.content, 'lxml')
     text = soup.find_all(text=True)
     full = ''.join([i for i in text if i not in blacklist])
