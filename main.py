@@ -338,7 +338,7 @@ async def crawl(ctx, link=None):
     if ctx.author.id in crawler:
         return await ctx.reply("**You cannot crawl two novels at the same time.**")
     allowed = ['trxs', 'tongrenquan', 'ffxs']
-    if link in None:
+    if link is None:
         return await ctx.reply(f"**Enter a link for crawling.**")
     num = 0
     for i in allowed:
