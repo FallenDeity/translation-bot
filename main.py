@@ -314,7 +314,10 @@ async def clear(ctx):
  
 def easy(nums, links):
     blacklist = ['[document]', 'noscript', 'header', 'html', 'meta', 'head', 'input', 'script']
-    data = requests.get(links)
+    try:
+        data = requests.get('https://'+links)
+    except:
+        data = requests.get('http://'+links)
     soup = BeautifulSoup(data.content, 'lxml')
     text = soup.find_all(text=True)
     full = ''.join([i for i in text if i not in blacklist])
@@ -334,23 +337,24 @@ async def crawled(ctx):
     await ctx.send(f"**🚄`{crawler[ctx.author.id]}`**")
     
     
-@bot.command(help='Crawls other sites for novels. Currently available trxs, tongrenquan, ffxs, bixiange.')
+@bot.command(help='Crawls other sites for novels. Currently available trxs, tongrenquan, ffxs, bixiange, powanjuan.')
 async def crawl(ctx, link=None):
     if ctx.author.id in crawler:
         return await ctx.reply("**You cannot crawl two novels at the same time.**")
-    allowed = ['trxs', 'tongrenquan', 'ffxs', 'bixiange']
+    allowed = ['trxs', 'tongrenquan', 'ffxs', 'bixiange', 'powanjuan']
     if link is None:
         return await ctx.reply(f"**Enter a link for crawling.**")
     num = 0
     for i in allowed:
         if i not in link:
             num += 1
-    if num == 4:
+    if num == 5:
         return await ctx.reply(f"**We currently crawl only from {', '.join(allowed)}**")
     res = await bot.loop.run_in_executor(None, ask, link)
     novel = {}
     soup = BeautifulSoup(res.text, 'html.parser')
     name = str(link.split('/')[-1].replace('.html', ''))
+    link = link.replace('https://', '').replace('http://', '')
     frontend_part = link.replace(f'/{name}', '').split('/')[-1]
     frontend = link.replace(f'/{name}', '').replace(f'/{frontend_part}', '')
     urls = [f'{frontend}{j}' for j in [str(i.get('href')) for i in soup.find_all('a')] if name in j and '.html' in j and 'txt' not in j]
