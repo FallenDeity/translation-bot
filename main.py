@@ -314,10 +314,7 @@ async def clear(ctx):
  
 def easy(nums, links):
     blacklist = ['[document]', 'noscript', 'header', 'html', 'meta', 'head', 'input', 'script']
-    try:
-        data = requests.get('https://'+links)
-    except:
-        data = requests.get('http://'+links)
+    data = requests.get(links)
     soup = BeautifulSoup(data.content, 'lxml')
     text = soup.find_all(text=True)
     full = ''.join([i for i in text if i not in blacklist])
@@ -354,7 +351,6 @@ async def crawl(ctx, link=None):
     novel = {}
     soup = BeautifulSoup(res.text, 'html.parser')
     name = str(link.split('/')[-1].replace('.html', ''))
-    link = link.replace('https://', '').replace('http://', '')
     frontend_part = link.replace(f'/{name}', '').split('/')[-1]
     frontend = link.replace(f'/{name}', '').replace(f'/{frontend_part}', '')
     urls = [f'{frontend}{j}' for j in [str(i.get('href')) for i in soup.find_all('a')] if name in j and '.html' in j and 'txt' not in j]
