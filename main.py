@@ -8,6 +8,7 @@ import zipfile
 import requests
 import discord
 import chardet
+from bs4 import BeautifulSoup
 import aiofiles
 from itertools import starmap, chain
 from deep_translator import GoogleTranslator
@@ -18,6 +19,7 @@ from discord.ext import commands, tasks
 bot = commands.Bot(command_prefix=commands.when_mentioned_or('.t'), intents=discord.Intents.all())
 rate = {}
 track = []
+crawler = {}
 choices = {'afrikaans': 'af', 'albanian': 'sq', 'amharic': 'am', 'arabic': 'ar', 'armenian': 'hy', 'azerbaijani': 'az', 'basque': 'eu', 'belarusian': 'be', 'bengali': 'bn', 'bosnian': 'bs', 'bulgarian': 'bg', 'catalan': 'ca', 'cebuano': 'ceb', 'chichewa': 'ny', 'chinese (simplified)': 'zh-CN', 'chinese (traditional)': 'zh-TW', 'corsican': 'co', 'croatian': 'hr', 'czech': 'cs', 'danish': 'da', 'dutch': 'nl', 'english': 'en', 'esperanto': 'eo', 'estonian': 'et', 'filipino': 'tl', 'finnish': 'fi', 'french': 'fr', 'frisian': 'fy', 'galician': 'gl', 'georgian': 'ka', 'german': 'de', 'greek': 'el', 'gujarati': 'gu', 'haitian creole': 'ht', 'hausa': 'ha', 'hawaiian': 'haw', 'hebrew': 'iw', 'hindi': 'hi', 'hmong': 'hmn', 'hungarian': 'hu', 'icelandic': 'is', 'igbo': 'ig', 'indonesian': 'id', 'irish': 'ga', 'italian': 'it', 'japanese': 'ja', 'javanese': 'jw', 'kannada': 'kn', 'kazakh': 'kk', 'khmer': 'km', 'kinyarwanda': 'rw', 'korean': 'ko', 'kurdish': 'ku', 'kyrgyz': 'ky', 'lao': 'lo', 'latin': 'la', 'latvian': 'lv', 'lithuanian': 'lt', 'luxembourgish': 'lb', 'macedonian': 'mk', 'malagasy': 'mg', 'malay': 'ms', 'malayalam': 'ml', 'maltese': 'mt', 'maori': 'mi', 'marathi': 'mr', 'mongolian': 'mn', 'myanmar': 'my', 'nepali': 'ne', 'norwegian': 'no', 'odia': 'or', 'pashto': 'ps', 'persian': 'fa', 'polish': 'pl', 'portuguese': 'pt', 'punjabi': 'pa', 'romanian': 'ro', 'russian': 'ru', 'samoan': 'sm', 'scots gaelic': 'gd', 'serbian': 'sr', 'sesotho': 'st', 'shona': 'sn', 'sindhi': 'sd', 'sinhala': 'si', 'slovak': 'sk', 'slovenian': 'sl', 'somali': 'so', 'spanish': 'es', 'sundanese': 'su', 'swahili': 'sw', 'swedish': 'sv', 'tajik': 'tg', 'tamil': 'ta', 'tatar': 'tt', 'telugu': 'te', 'thai': 'th', 'turkish': 'tr', 'turkmen': 'tk', 'ukrainian': 'uk', 'urdu': 'ur', 'uyghur': 'ug', 'uzbek': 'uz', 'vietnamese': 'vi', 'welsh': 'cy', 'xhosa': 'xh', 'yiddish': 'yi', 'yoruba': 'yo', 'zulu': 'zu'}
 
 
@@ -305,9 +307,70 @@ async def clear(ctx):
         track.remove(ctx.author.id)
     files = os.listdir()
     for i in files:
-        if str(ctx.author.id) in str(i):
+        if str(ctx.author.id) in str(i) and 'crawl' not in i:
             os.remove(i)
     await ctx.reply("**Cleared all records.**")
+    
+ 
+def easy(nums, links):
+    data = requests.get(links)
+    soup = BeautifulSoup(data.content, 'lxml')
+    text = soup.find_all(text=True)
+    full = ''.join([i for i in text if i not in blacklist])
+    return nums, full
+    
+    
+def direct():
+    with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
+        futures = [executor.submit(easy, i, j) for i, j in enumerate(urls)]
+        for future in concurrent.futures.as_completed(futures):
+            novel[future.result()[0]] = future.result()[1]
+            crawler[name] = f'{len(novel)}/{len(urls)}'
+    
+    
+@bot.command(help='Crawls other sites for novels. Currently available trxs, tongrenquan, ffxs.')
+async def crawl(ctx, link=None):
+    if ctx.author.id in crawler:
+        return await ctx.reply("**You cannot crawl two novels at the same time.**")
+    allowed = ['trxs', 'tongrenquan', 'ffxs']
+    if link in None:
+        return await ctx.reply(f"**Enter a link for crawling.**")
+    num = 0
+    for i in allowed:
+        if i not in link:
+            num += 1
+    if num == 3:
+        return await ctx.reply(f"**We currently crawl only from {', '.join(allowed)}**")
+    res = await bot.loop.run_in_executor(None, ask, link)
+    novel = {}
+    res = res.text
+    soup = BeautifulSoup(res, 'lxml')
+    name = str(link.split('/')[-1].replace('.html', ''))
+    frontend_part = link.replace(f'/{name}', '').split('/')[-1]
+    frontend = link.replace(f'/{name}', '').replace(f'/{frontend_part}', '')
+    urls = [f'{frontend}{j}' for j in [str(i.get('href')) for i in soup.find_all('a')] if name in j and '.html' in j and 'txt' not in j]
+    maxs = len(urls)
+    name = ctx.author.id
+    crawler[ctx.author.id] = f'0/{len(urls)}'
+    await bot.loop.run_in_executor(None, direct)
+    parsed = {k:v for k, v in sorted(novel.items(), key=lambda item: item[0])}
+    full = [i for i in list(parsed.values())]
+    async with aiofiles.open(f'{ctx.author.id}_crawl.txt', 'w', encoding='utf-8') as f: await f.write("\n".join(full))
+    if os.path.getsize(f"{ctx.author.id}_crawl.txt") > 8*10**6:
+        c = Client("AXiAEgFvETpKeqBHufPBXz")
+        try:
+            with zipfile.ZipFile(f'{ctx.author.id}_crawl.zip', 'w') as jungle_zip: jungle_zip.write(f'{ctx.author.id}_crawl.txt', compress_type=zipfile.ZIP_DEFLATED)
+            filelnk = c.upload(filepath = f"{ctx.author.id}.zip")
+            await ctx.reply(f"**{ctx.author.mention}: here is your novel {filelnk.url}**")
+        except:
+            await ctx.reply("**Sorry the file is too big to send.**")
+        os.remove(f"{ctx.author.id}_crawl.zip")
+    else:
+        file = discord.File(f"{ctx.author.id}_crawl.txt", f"{link}.txt")
+        await ctx.reply("**🎉Here is your translated novel**", file=file)
+    os.remove(f"{ctx.author.id}_crawl.txt")
+    del crawler[ctx.author.id]
+
     
 
 async def main():
