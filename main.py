@@ -313,15 +313,7 @@ async def clear(ctx):
     
  
 def easy(nums, links):
-    blacklist = [
-    '[document]',
-    'noscript',
-    'header',
-    'html',
-    'meta',
-    'head', 
-    'input',
-    'script']
+    blacklist = ['[document]', 'noscript', 'header', 'html', 'meta', 'head', 'input', 'script']
     data = requests.get(links)
     soup = BeautifulSoup(data.content, 'lxml')
     text = soup.find_all(text=True)
@@ -342,18 +334,18 @@ async def crawled(ctx):
     await ctx.send(f"**🚄`{crawler[ctx.author.id]}`**")
     
     
-@bot.command(help='Crawls other sites for novels. Currently available trxs, tongrenquan, ffxs.')
+@bot.command(help='Crawls other sites for novels. Currently available trxs, tongrenquan, ffxs, bixiange.')
 async def crawl(ctx, link=None):
     if ctx.author.id in crawler:
         return await ctx.reply("**You cannot crawl two novels at the same time.**")
-    allowed = ['trxs', 'tongrenquan', 'ffxs']
+    allowed = ['trxs', 'tongrenquan', 'ffxs', 'bixiange']
     if link is None:
         return await ctx.reply(f"**Enter a link for crawling.**")
     num = 0
     for i in allowed:
         if i not in link:
             num += 1
-    if num == 3:
+    if num == 4:
         return await ctx.reply(f"**We currently crawl only from {', '.join(allowed)}**")
     res = await bot.loop.run_in_executor(None, ask, link)
     novel = {}
@@ -382,7 +374,7 @@ async def crawl(ctx, link=None):
         os.remove(f"{ctx.author.id}_crawl.zip")
     else:
         file = discord.File(f"{ctx.author.id}_crawl.txt", f"{link}.txt")
-        await ctx.reply("**🎉Here is your translated novel**", file=file)
+        await ctx.reply("**🎉Here is your crawled novel**", file=file)
     os.remove(f"{ctx.author.id}_crawl.txt")
     del crawler[ctx.author.id]
 
