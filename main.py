@@ -347,6 +347,8 @@ async def crawl(ctx, link=None):
             num += 1
     if num == 5:
         return await ctx.reply(f"**We currently crawl only from {', '.join(allowed)}**")
+    if link[-1] == '/':
+        link = link[:-2]
     res = await bot.loop.run_in_executor(None, ask, link)
     novel = {}
     soup = BeautifulSoup(res.text, 'html.parser')
