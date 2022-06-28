@@ -335,18 +335,18 @@ async def crawled(ctx):
     await ctx.send(f"**🚄`{crawler[ctx.author.id]}`**")
     
     
-@bot.command(help='Crawls other sites for novels. Currently available trxs, tongrenquan, ffxs, bixiange, powanjuan.')
+@bot.command(help='Crawls other sites for novels. Currently available trxs, tongrenquan, ffxs, bixiange, powanjuan, biqugeabc.')
 async def crawl(ctx, link=None):
     if ctx.author.id in crawler:
         return await ctx.reply("**You cannot crawl two novels at the same time.**")
-    allowed = ['trxs', 'tongrenquan', 'ffxs', 'bixiange', 'powanjuan']
+    allowed = ['trxs', 'tongrenquan', 'ffxs', 'bixiange', 'powanjuan', 'biqugeabc']
     if link is None:
         return await ctx.reply(f"**Enter a link for crawling.**")
     num = 0
     for i in allowed:
         if i not in link:
             num += 1
-    if num == 5:
+    if num == len(allowed):
         return await ctx.reply(f"**We currently crawl only from {', '.join(allowed)}**")
     if link[-1] == '/':
         link = link[:-1]
