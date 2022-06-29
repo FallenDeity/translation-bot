@@ -369,7 +369,7 @@ async def crawl(ctx, link=None):
     parsed = {k:v for k, v in sorted(novel.items(), key=lambda item: item[0])}
     full = [i for i in list(parsed.values())]
     async with aiofiles.open(f'{title}.txt', 'w', encoding='utf-8') as f: await f.write("\n".join(full))
-    if os.path.getsize(f"{ctx.author.id}_crawl.txt") > 8*10**6:
+    if os.path.getsize(f"{title}.txt") > 8*10**6:
         c = Client("AXiAEgFvETpKeqBHufPBXz")
         try:
             with zipfile.ZipFile(f'{title}.zip', 'w') as jungle_zip: jungle_zip.write(f'{title}.txt', compress_type=zipfile.ZIP_DEFLATED)
