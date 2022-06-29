@@ -220,6 +220,9 @@ async def translate(ctx, language='english', link=None):
     string = ["{0: ^17}".format(f"{k} --> {v}") for k, v in choices.items()]
     string = '\n'.join([''.join(string[i:i+3]) for i in range(0, len(string), 3)])
     await ctx.typing()
+    if not link:
+        link = language
+        language = 'english'
     total = []
     for k, v in choices.items():
         total.append(k)
@@ -353,11 +356,11 @@ async def crawl(ctx, link=None):
     res = await bot.loop.run_in_executor(None, ask, link)
     novel = {}
     soup = BeautifulSoup(res.text, 'html.parser')
+    title = soup.find('title').string
     name = str(link.split('/')[-1].replace('.html', ''))
     frontend_part = link.replace(f'/{name}', '').split('/')[-1]
     frontend = link.replace(f'/{name}', '').replace(f'/{frontend_part}', '')
     urls = [f'{frontend}{j}' for j in [str(i.get('href')) for i in soup.find_all('a')] if name in j and '.html' in j and 'txt' not in j]
-    print(urls[:10])
     maxs = len(urls)
     name = ctx.author.id
     crawler[ctx.author.id] = f'0/{len(urls)}'
@@ -365,20 +368,20 @@ async def crawl(ctx, link=None):
     await bot.loop.run_in_executor(None, direct, urls, novel, name)
     parsed = {k:v for k, v in sorted(novel.items(), key=lambda item: item[0])}
     full = [i for i in list(parsed.values())]
-    async with aiofiles.open(f'{ctx.author.id}_crawl.txt', 'w', encoding='utf-8') as f: await f.write("\n".join(full))
+    async with aiofiles.open(f'{title}.txt', 'w', encoding='utf-8') as f: await f.write("\n".join(full))
     if os.path.getsize(f"{ctx.author.id}_crawl.txt") > 8*10**6:
         c = Client("AXiAEgFvETpKeqBHufPBXz")
         try:
-            with zipfile.ZipFile(f'{ctx.author.id}_crawl.zip', 'w') as jungle_zip: jungle_zip.write(f'{ctx.author.id}_crawl.txt', compress_type=zipfile.ZIP_DEFLATED)
-            filelnk = c.upload(filepath = f"{ctx.author.id}.zip")
+            with zipfile.ZipFile(f'{title}.zip', 'w') as jungle_zip: jungle_zip.write(f'{title}.txt', compress_type=zipfile.ZIP_DEFLATED)
+            filelnk = c.upload(filepath = f"{title}.zip")
             await ctx.reply(f"**{ctx.author.mention}: here is your novel {filelnk.url}**")
         except:
             await ctx.reply("**Sorry the file is too big to send.**")
-        os.remove(f"{ctx.author.id}_crawl.zip")
+        os.remove(f"{title}.zip")
     else:
-        file = discord.File(f"{ctx.author.id}_crawl.txt", f"{link}.txt")
+        file = discord.File(f"{title}.txt", f"{title}.txt")
         await ctx.reply("**🎉Here is your crawled novel**", file=file)
-    os.remove(f"{ctx.author.id}_crawl.txt")
+    os.remove(f"{title}.txt")
     del crawler[ctx.author.id]
     
     
