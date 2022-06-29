@@ -1,3 +1,4 @@
+
 import asyncio
 import os
 import docx
@@ -304,10 +305,7 @@ async def translate(ctx, language='english', link=None):
 @bot.command(help='Clears any stagnant novels which were deposited for translation.')
 async def tclear(ctx):
     if ctx.author.id in rate:
-        if rate[ctx.author.id].split('/')[0] == '0':
-            del rate[çtx.author.id]
-        else:
-            return await ctx.reply(f"**There is a novel translation going on currently.**")
+        del rate[çtx.author.id]
     if ctx.author.id in track:
         track.remove(ctx.author.id)
     files = os.listdir()
@@ -391,10 +389,7 @@ async def crawl(ctx, link=None):
 @bot.command(help='Clears any stagnant novels which were deposited for crawling.')
 async def cclear(ctx):
     if ctx.author.id in crawler:
-        if rate[ctx.author.id].split('/')[0] == '0':
-            del rate[çtx.author.id]
-        else:
-            return await ctx.reply(f"**There is a novel scraping going on currently.**")
+        del rate[çtx.author.id]
     files = os.listdir()
     for i in files:
         if str(ctx.author.id) in str(i) and 'crawl' in i:
