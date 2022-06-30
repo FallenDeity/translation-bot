@@ -47,12 +47,13 @@ class Crawler(commands.Cog):
             full = ''.join([i for i in text if i not in blacklist])
         return nums, full
 
-    def direct(self, urls: t.List[str], novel: t.Dict[int, str], name: int) -> None:
+    def direct(self, urls: t.List[str], novel: t.Dict[int, str], name: int) -> dict:
         with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
             futures = [executor.submit(self.easy, i, j) for i, j in enumerate(urls)]
             for future in concurrent.futures.as_completed(futures):
                 novel[future.result()[0]] = future.result()[1]
                 self.bot.crawler[name] = f'{len(novel)}/{len(urls)}'
+            return novel
 
     @commands.command(help='Gives progress of novel crawling', aliases=['cp'])
     async def crawled(self, ctx):
@@ -91,9 +92,9 @@ class Crawler(commands.Cog):
                 name in j and '.html' in j and 'txt' not in j]
         self.bot.crawler[ctx.author.id] = f'0/{len(urls)}'
         await ctx.reply(f"> **✔Crawl started.**")
-        await self.bot.loop.run_in_executor(None, self.direct, urls, novel, ctx.author.id)
-        print(novel[5])
-        parsed = {k: v for k, v in sorted(novel.items(), key=lambda item: item[0])}
+        book = await self.bot.loop.run_in_executor(None, self.direct, urls, novel, ctx.author.id)
+        print(book[5])
+        parsed = {k: v for k, v in sorted(book.items(), key=lambda item: item[0])}
         whole = [i for i in list(parsed.values())]
         async with aiofiles.open(f'{title}.txt', 'w', encoding='utf-8') as f:
             await f.write("\n".join(whole))
