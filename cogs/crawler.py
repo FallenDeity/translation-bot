@@ -17,33 +17,11 @@ class Crawler(commands.Cog):
 
     @staticmethod
     def easy(nums: int, links: str) -> t.Tuple[int, str]:
-
-        def stripper(lst: list) -> str:
-            process = '\n'.join([r.text for r in lst])
-            return process
-
         blacklist = ['[document]', 'noscript', 'header', 'html', 'meta', 'head', 'input', 'script']
         data = requests.get(links)
         soup = BeautifulSoup(data.content, 'lxml')
-        string = ''
-        if 'trxs' in links:
-            text1 = soup.select('.read_chapterDetail')
-            string = stripper(text1)
-        elif 'bixiange' in links:
-            text1 = soup.select('.read_chapterDetail')
-            string = stripper(text1)
-        elif 'tongrenquan' in links:
-            text1 = soup.select('.read_chapterDetail')
-            string = stripper(text1)
-        elif 'powanjuan' in links:
-            text1 = soup.select('.content p')
-            string = stripper(text1)
-        elif 'ffxs' in links:
-            text1 = soup.select('.content p')
-            string = stripper(text1)
-        else:
-            text1 = soup.find_all(text=True)
-            string = '\n'.join([i for i in text1 if i not in blacklist])
+        text = soup.find_all(text=True)
+        string = '\n'.join([i for i in text if i not in blacklist])
         return nums, string
 
     def direct(self, urls: t.List[str], novel: t.Dict[int, str], name: int) -> dict:
