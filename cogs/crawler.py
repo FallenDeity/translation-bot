@@ -110,7 +110,8 @@ class Crawler(commands.Cog):
                                            emoji="📔")
                 view.add_item(button)
                 await ctx.reply(f"> **✔{ctx.author.mention} your novel {title_name} is ready.**", view=view)
-            except:
+            except Exception as e:
+                print(e)
                 await ctx.reply("> **❌Sorry the file is too big to send.**")
             os.remove(f"{title}.zip")
         else:
