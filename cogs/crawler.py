@@ -28,26 +28,25 @@ class Crawler(commands.Cog):
         blacklist = ['[document]', 'noscript', 'header', 'html', 'meta', 'head', 'input', 'script']
         data = requests.get(links)
         soup = BeautifulSoup(data.content, 'lxml')
-        '''
         if 'trxs' in links:
             text = soup.select('.read_chapterDetail')
-            string = stripper(text)
+            string += stripper(text)
         elif 'bixiange' in links:
             text = soup.select('.read_chapterDetail')
-            string = stripper(text)
+            string += stripper(text)
         elif 'tongrenquan' in links:
             text = soup.select('.read_chapterDetail')
-            string = stripper(text)
+            string += stripper(text)
         elif 'powanjuan' in links:
             text = soup.select('.content p')
-            string = stripper(text)
+            string += stripper(text)
         elif 'ffxs' in links:
             text = soup.select('.content p')
-            string = stripper(text)
+            string += stripper(text)
         else:
-        '''
-        text = soup.find_all(text=True)
-        string = ''.join([i for i in text if i not in blacklist])
+            text = soup.find_all(text=True)
+            string += ''.join([i for i in text if i not in blacklist])
+        print(string[:100])
         return nums, string
 
     def direct(self, urls: t.List[str], novel: t.Dict[int, str], name: int) -> dict:
