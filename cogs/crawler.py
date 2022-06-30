@@ -19,34 +19,32 @@ class Crawler(commands.Cog):
     def easy(nums: int, links: str) -> t.Tuple[int, str]:
 
         def stripper(lst: list) -> str:
-            process = ''
-            for r in lst:
-                process += r.text.strip()
+            process = ''.join([r.text.strip() for r in lst])
+            print(process[:100])
             return process
 
         blacklist = ['[document]', 'noscript', 'header', 'html', 'meta', 'head', 'input', 'script']
         data = requests.get(links)
         soup = BeautifulSoup(data.content, 'lxml')
-        '''
+        string = ''
         if 'trxs' in links:
-            text = soup.select('.read_chapterDetail')
-            string += stripper(text)
+            text1 = soup.select('.read_chapterDetail')
+            string = stripper(text1)
         elif 'bixiange' in links:
-            text = soup.select('.read_chapterDetail')
-            string += stripper(text)
+            text1 = soup.select('.read_chapterDetail')
+            string = stripper(text1)
         elif 'tongrenquan' in links:
-            text = soup.select('.read_chapterDetail')
-            string += stripper(text)
+            text1 = soup.select('.read_chapterDetail')
+            string = stripper(text1)
         elif 'powanjuan' in links:
-            text = soup.select('.content p')
-            string += stripper(text)
+            text1 = soup.select('.content p')
+            string = stripper(text1)
         elif 'ffxs' in links:
-            text = soup.select('.content p')
-            string += stripper(text)
-        else:
-        '''
+            text1 = soup.select('.content p')
+            string = stripper(text1)
+        print(string[:100])
         text = soup.find_all(text=True)
-        string = ''.join([i for i in text if i not in blacklist])
+        string = '\n'.join([i for i in text if i not in blacklist])
         return nums, string
 
     def direct(self, urls: t.List[str], novel: t.Dict[int, str], name: int) -> dict:
