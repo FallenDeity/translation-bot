@@ -54,4 +54,4 @@ class Raizel(commands.Bot):
 
     @property
     def invite_url(self) -> str:
-        return "https://discord.com/api/oauth2/authorize?client_id=925597069748621353&permissions=8&scope=bot%20applications.commands"
+        return f"https://discord.com/api/oauth2/authorize?client_id={self.user.id}&permissions=8&scope=bot%20applications.commands"

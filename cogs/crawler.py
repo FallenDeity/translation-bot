@@ -41,16 +41,16 @@ class Crawler(commands.Cog):
         help='Crawls other sites for novels. Currently available trxs, tongrenquan, ffxs, bixiange, powanjuan, biqugeabc.')
     async def crawl(self, ctx, link=None):
         if ctx.author.id in self.bot.crawler:
-            return await ctx.reply("**You cannot crawl two novels at the same time.**")
+            return await ctx.reply("> **❌You cannot crawl two novels at the same time.**")
         allowed = ['trxs', 'tongrenquan', 'ffxs', 'bixiange', 'powanjuan', 'biqugeabc']
         if link is None:
-            return await ctx.reply(f"**Enter a link for crawling.**")
+            return await ctx.reply(f"> **❌Enter a link for crawling.**")
         num = 0
         for i in allowed:
             if i not in link:
                 num += 1
         if num == len(allowed):
-            return await ctx.reply(f"**We currently crawl only from {', '.join(allowed)}**")
+            return await ctx.reply(f"> **❌We currently crawl only from {', '.join(allowed)}**")
         if link[-1] == '/':
             link = link[:-1]
         await ctx.typing()
@@ -67,7 +67,7 @@ class Crawler(commands.Cog):
         urls = [f'{frontend}{j}' for j in [str(i.get('href')) for i in soup.find_all('a')] if
                 name in j and '.html' in j and 'txt' not in j]
         self.bot.crawler[ctx.author.id] = f'0/{len(urls)}'
-        await ctx.reply(f"**Crawl started.**")
+        await ctx.reply(f"> **✔Crawl started.**")
         await self.bot.loop.run_in_executor(None, self.direct, urls, novel, ctx.author.id)
         parsed = {k: v for k, v in sorted(novel.items(), key=lambda item: item[0])}
         full = [i for i in list(parsed.values())]
@@ -80,7 +80,7 @@ class Crawler(commands.Cog):
                 filelnk = self.bot.drive.upload(filepath=f"{title}.zip")
                 await ctx.reply(f"**{ctx.author.mention}: here is your novel {filelnk.url}**")
             except:
-                await ctx.reply("**Sorry the file is too big to send.**")
+                await ctx.reply("> **❌Sorry the file is too big to send.**")
             os.remove(f"{title}.zip")
         else:
             file = discord.File(f"{title}.txt", f"{title_name}.txt")
@@ -96,7 +96,7 @@ class Crawler(commands.Cog):
         for i in files:
             if str(ctx.author.id) in str(i) and 'crawl' in i:
                 os.remove(i)
-        await ctx.reply("**Cleared all records.**")
+        await ctx.reply("> **✔Cleared all records.**")
 
 
 async def setup(bot: Raizel) -> None:
