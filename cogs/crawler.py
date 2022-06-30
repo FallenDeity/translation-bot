@@ -17,11 +17,34 @@ class Crawler(commands.Cog):
 
     @staticmethod
     def easy(nums: int, links: str) -> t.Tuple[int, str]:
+
+        def stripper(lst: list) -> str:
+            full = ''
+            for r in lst:
+                full += r.text.strip()
+            return full
+
         blacklist = ['[document]', 'noscript', 'header', 'html', 'meta', 'head', 'input', 'script']
         data = requests.get(links)
         soup = BeautifulSoup(data.content, 'lxml')
-        text = soup.find_all(text=True)
-        full = ''.join([i for i in text if i not in blacklist])
+        if 'trxs' in links:
+            text = soup.select('.read_chapterDetail')
+            full = stripper(text)
+        elif 'bixiange' in links:
+            text = soup.select('.read_chapterDetail')
+            full = stripper(text)
+        elif 'tongrenquan' in links:
+            text = soup.select('.read_chapterDetail')
+            full = stripper(text)
+        elif 'powanjuan' in links:
+            text = soup.select('.content p')
+            full = stripper(text)
+        elif 'ffxs' in links:
+            text = soup.select('.content p')
+            full = stripper(text)
+        else:
+            text = soup.find_all(text=True)
+            full = ''.join([i for i in text if i not in blacklist])
         return nums, full
 
     def direct(self, urls: t.List[str], novel: t.Dict[int, str], name: int) -> None:
@@ -78,7 +101,11 @@ class Crawler(commands.Cog):
                 with zipfile.ZipFile(f'{title}.zip', 'w') as jungle_zip:
                     jungle_zip.write(f'{title}.txt', compress_type=zipfile.ZIP_DEFLATED)
                 filelnk = self.bot.drive.upload(filepath=f"{title}.zip")
-                await ctx.reply(f"**{ctx.author.mention}: here is your novel {filelnk.url}**")
+                view = discord.ui.View()
+                button = discord.ui.Button(label="Novel", style=discord.ButtonStyle.link, url=filelnk.url,
+                                           emoji="📔")
+                view.add_item(button)
+                await ctx.reply(f"> **✔{ctx.author.mention} your novel {title_name} is ready.**", view=view)
             except:
                 await ctx.reply("> **❌Sorry the file is too big to send.**")
             os.remove(f"{title}.zip")
