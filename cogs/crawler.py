@@ -20,7 +20,6 @@ class Crawler(commands.Cog):
 
         def stripper(lst: list) -> str:
             process = ''.join([r.text.strip() for r in lst])
-            print(process[:100])
             return process
 
         blacklist = ['[document]', 'noscript', 'header', 'html', 'meta', 'head', 'input', 'script']
@@ -42,9 +41,9 @@ class Crawler(commands.Cog):
         elif 'ffxs' in links:
             text1 = soup.select('.content p')
             string = stripper(text1)
-        print(string[:100])
-        text = soup.find_all(text=True)
-        string = '\n'.join([i for i in text if i not in blacklist])
+        else:
+            text1 = soup.find_all(text=True)
+            string = '\n'.join([i for i in text1 if i not in blacklist])
         return nums, string
 
     def direct(self, urls: t.List[str], novel: t.Dict[int, str], name: int) -> dict:
