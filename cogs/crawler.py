@@ -19,7 +19,7 @@ class Crawler(commands.Cog):
     def easy(nums: int, links: str) -> t.Tuple[int, str]:
 
         def stripper(lst: list) -> str:
-            process = '\n'.join([r.text.strip() for r in lst])
+            process = '\n'.join([r.text for r in lst])
             return process
 
         blacklist = ['[document]', 'noscript', 'header', 'html', 'meta', 'head', 'input', 'script']
