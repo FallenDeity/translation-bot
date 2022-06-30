@@ -19,7 +19,7 @@ class Crawler(commands.Cog):
     def easy(nums: int, links: str) -> t.Tuple[int, str]:
 
         def stripper(lst: list) -> str:
-            process = ''.join([r.text.strip() for r in lst])
+            process = '\n'.join([r.text.strip() for r in lst])
             return process
 
         blacklist = ['[document]', 'noscript', 'header', 'html', 'meta', 'head', 'input', 'script']
@@ -92,7 +92,6 @@ class Crawler(commands.Cog):
         self.bot.crawler[ctx.author.id] = f'0/{len(urls)}'
         await ctx.reply(f"> **✔Crawl started.**")
         book = await self.bot.loop.run_in_executor(None, self.direct, urls, novel, ctx.author.id)
-        print(book[5])
         parsed = {k: v for k, v in sorted(book.items(), key=lambda item: item[0])}
         whole = [i for i in list(parsed.values())]
         async with aiofiles.open(f'{title}.txt', 'w', encoding='utf-8') as f:
