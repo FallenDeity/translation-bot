@@ -389,7 +389,7 @@ async def crawl(ctx, link=None):
 @bot.command(help='Clears any stagnant novels which were deposited for crawling.')
 async def cclear(ctx):
     if ctx.author.id in crawler:
-        del rate[çtx.author.id]
+        del crawler[çtx.author.id]
     files = os.listdir()
     for i in files:
         if str(ctx.author.id) in str(i) and 'crawl' in i:
