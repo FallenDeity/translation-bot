@@ -92,10 +92,11 @@ class Crawler(commands.Cog):
         self.bot.crawler[ctx.author.id] = f'0/{len(urls)}'
         await ctx.reply(f"> **✔Crawl started.**")
         await self.bot.loop.run_in_executor(None, self.direct, urls, novel, ctx.author.id)
+        print(novel[5])
         parsed = {k: v for k, v in sorted(novel.items(), key=lambda item: item[0])}
-        full = [i for i in list(parsed.values())]
+        whole = [i for i in list(parsed.values())]
         async with aiofiles.open(f'{title}.txt', 'w', encoding='utf-8') as f:
-            await f.write("\n".join(full))
+            await f.write("\n".join(whole))
         if os.path.getsize(f"{title}.txt") > 8 * 10 ** 6:
             try:
                 with zipfile.ZipFile(f'{title}.zip', 'w') as jungle_zip:
