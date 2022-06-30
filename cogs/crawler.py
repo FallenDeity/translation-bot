@@ -17,35 +17,36 @@ class Crawler(commands.Cog):
 
     @staticmethod
     def easy(nums: int, links: str) -> t.Tuple[int, str]:
+        string = ""
 
         def stripper(lst: list) -> str:
-            full = ''
+            process = ''
             for r in lst:
-                full += r.text.strip()
-            return full
+                process += r.text.strip()
+            return process
 
         blacklist = ['[document]', 'noscript', 'header', 'html', 'meta', 'head', 'input', 'script']
         data = requests.get(links)
         soup = BeautifulSoup(data.content, 'lxml')
         if 'trxs' in links:
             text = soup.select('.read_chapterDetail')
-            full = stripper(text)
+            string = stripper(text)
         elif 'bixiange' in links:
             text = soup.select('.read_chapterDetail')
-            full = stripper(text)
+            string = stripper(text)
         elif 'tongrenquan' in links:
             text = soup.select('.read_chapterDetail')
-            full = stripper(text)
+            string = stripper(text)
         elif 'powanjuan' in links:
             text = soup.select('.content p')
-            full = stripper(text)
+            string = stripper(text)
         elif 'ffxs' in links:
             text = soup.select('.content p')
-            full = stripper(text)
+            string = stripper(text)
         else:
             text = soup.find_all(text=True)
-            full = ''.join([i for i in text if i not in blacklist])
-        return nums, full
+            string = ''.join([i for i in text if i not in blacklist])
+        return nums, string
 
     def direct(self, urls: t.List[str], novel: t.Dict[int, str], name: int) -> dict:
         with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
