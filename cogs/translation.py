@@ -38,16 +38,15 @@ class Translator(commands.Cog):
     @commands.command(
         help='Send along with ur novel txt or doc or link to auto translate. Currently supports only https://temp.sh',
         aliases=['t'])
-    async def translate(self, ctx, language: str = 'english', link: str = None):
+    async def translate(self, ctx, language: str = 'english', *, link: str = None):
         string = ["{0: ^17}".format(f"{k} --> {v}") for k, v in self.bot.languages.items()]
         string = '\n'.join([''.join(string[i:i + 3]) for i in range(0, len(string), 3)])
         total = []
         for k, v in self.bot.languages.items():
             total.append(k)
             total.append(v)
-        if not link:
-            link = language
-            language = 'english'
+        if link and ctx.message.attachments:
+            return await ctx.reply(f'> **❌Send only an attachment or only a link.**')
         if ctx.message.attachments:
             link = None
         if language not in total:
@@ -55,7 +54,11 @@ class Translator(commands.Cog):
         if ctx.author.id in self.bot.translator:
             return await ctx.send('> **❌You cannot translate two novels at a time.**')
         if not ctx.message.attachments and not link:
-            return await ctx.send('> **❌You must add a novel/link to translate**')
+            if language != 'english':
+                link = language
+                language = 'english'
+            else:
+                return await ctx.send('> **❌You must add a novel/link to translate**')
         await ctx.typing()
         if link:
             resp = await self.bot.con.get(link)
