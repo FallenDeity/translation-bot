@@ -99,9 +99,9 @@ class Translator(commands.Cog):
             async with aiofiles.open(f'{ctx.author.id}.txt', 'r', encoding='utf-8') as f:
                     novel = await f.read()
         except:
-            async with open(f'{ctx.author.id}.txt', 'rb') as f:
+            async with aiofiles.open(f'{ctx.author.id}.txt', 'rb') as f:
                 rawdata = await f.read()
-            codec=await detect(rawdata)['encoding']
+            codec= detect(rawdata)['encoding']
             # codec = await self.get_encoding_type(f'{ctx.author.id}.txt')
             await ctx.send('Codec found as  '+str(codec))
             try:
