@@ -1724,7 +1724,7 @@ class Translator(commands.Cog):
     @commands.command(
         help='Send along with ur novel txt or doc or link to auto translate. Currently supports only https://temp.sh',
         aliases=['t'])
-    async def translate(self, ctx, language: str = 'english', *, link: str = None,term=None):
+    async def translate(self, ctx, language: str = 'english', *, link: str = None,term:int=None):
         string = ["{0: ^17}".format(f"{k} --> {v}") for k, v in self.bot.languages.items()]
         string = '\n'.join([''.join(string[i:i + 3]) for i in range(0, len(string), 3)])
         total = []
@@ -1821,6 +1821,7 @@ class Translator(commands.Cog):
         #                 return await ctx.reply("> **❌Currently we are only translating korean and chinese.**")
         #         continue
         if not term is None:
+            await ctx.reply('terming')
             self.sel_terms(term)
             novel= await self.term_raw(novel)
         await ctx.reply(f'> **✅Translation started. Translating to {language}.**')
