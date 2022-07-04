@@ -13,7 +13,7 @@ async def census():
     await bot.wait_until_ready()
     await bot.change_presence(
         activity=discord.Activity(
-            type=discord.ActivityType.listening, name=f"{len(bot.users)} novel enthusiasts. Prefix: .t"
+            type=discord.ActivityType.listening, name=f"{len(bot.users)} novel enthusiasts. Prefix: .bot"
         ),
         status=discord.Status.idle,
     )
