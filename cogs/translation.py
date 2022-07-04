@@ -1823,7 +1823,7 @@ class Translator(commands.Cog):
         if not term is None:
             await ctx.reply('terming')
             self.sel_terms(term)
-            novel= await self.term_raw(novel)
+            novel=  self.term_raw(novel)
         await ctx.reply(f'> **✅Translation started. Translating to {language}.**')
         os.remove(f'{ctx.author.id}.txt')
         liz = [novel[i:i + 1800] for i in range(0, len(novel), 1800)]
