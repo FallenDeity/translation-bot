@@ -6,6 +6,8 @@ import chardet
 import docx
 import zipfile
 import typing as t
+
+from chardet import detect
 from deep_translator import GoogleTranslator
 from core.bot import Raizel
 from discord.ext import commands
@@ -15,6 +17,11 @@ class Translator(commands.Cog):
 
     def __init__(self, bot: Raizel) -> None:
         self.bot = bot
+
+    def get_encoding_type(file):
+        with open(file, 'rb') as f:
+            rawdata = f.read()
+        return detect(rawdata)['encoding']
 
     def translates(self, liz: t.List[str], order: t.Dict[int, str], author: int, lang: str) -> t.Dict[int, str]:
         with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
@@ -90,25 +97,37 @@ class Translator(commands.Cog):
             string = '\n'.join([para.text for para in doc.paragraphs])
             async with aiofiles.open(f'{ctx.author.id}.txt', 'w', encoding='utf-8') as f: await f.write(string)
             os.remove(f'{ctx.author.id}.docx')
-        encoding = ['utf-8', 'cp936', 'utf-16', 'cp949']
-        for i, j in enumerate(encoding):
-            try:
-                async with aiofiles.open(f'{ctx.author.id}.txt', 'r', encoding=j) as f:
+        try:
+            async with aiofiles.open(f'{ctx.author.id}.txt', 'r', encoding=j) as f:
                     novel = await f.read()
-                    break
-            except:
-                if i+1 == len(encoding):
-                    try:
-                        await ctx.send('> **✔Encoding not in db trying to auto detect please be patient.**')
-                        async with aiofiles.open(f'{ctx.author.id}.txt', 'rb') as f:
-                            novel = await f.read()
-                        async with aiofiles.open(f'{ctx.author.id}.txt', 'r',
-                                                 encoding=chardet.detect(novel[:250])['encoding']) as f:
-                            novel = await f.read()
-                    except Exception as e:
-                        print(e)
-                        return await ctx.reply("> **❌Currently we are only translating korean and chinese.**")
-                continue
+        except:
+            codec = await self.get_encoding_type(f'{ctx.author.id}.txt')
+            await ctx.send('Codec found as  '+str(codec))
+            try:
+                async with aiofiles.open(f'{ctx.author.id}.txt', 'r', encoding=codec,errors='ignore') as f:
+                    novel = await f.read()
+            except Exception as e:
+                print(e)
+                return await ctx.reply("> **❌Currently we are only translating korean and chinese.**")
+        # encoding = ['utf-8', 'cp936', 'utf-16', 'cp949']
+        # for i, j in enumerate(encoding):
+        #     try:
+        #         async with aiofiles.open(f'{ctx.author.id}.txt', 'r', encoding=j) as f:
+        #             novel = await f.read()
+        #             break
+        #     except:
+        #         if i+1 == len(encoding):
+        #             try:
+        #                 await ctx.send('> **✔Encoding not in db trying to auto detect please be patient.**')
+        #                 async with aiofiles.open(f'{ctx.author.id}.txt', 'rb') as f:
+        #                     novel = await f.read()
+        #                 async with aiofiles.open(f'{ctx.author.id}.txt', 'r',
+        #                                          encoding=chardet.detect(novel[:250])['encoding']) as f:
+        #                     novel = await f.read()
+        #             except Exception as e:
+        #                 print(e)
+        #                 return await ctx.reply("> **❌Currently we are only translating korean and chinese.**")
+        #         continue
         await ctx.reply(f'> **✅Translation started. Translating to {language}.**')
         os.remove(f'{ctx.author.id}.txt')
         liz = [novel[i:i + 1800] for i in range(0, len(novel), 1800)]
