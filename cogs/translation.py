@@ -19,8 +19,8 @@ class Translator(commands.Cog):
         self.bot = bot
 
     def get_encoding_type(self,file):
-        with open(file, 'rb') as f:
-            rawdata = f.read()
+        async with open(file, 'rb') as f:
+             rawdata = await f.read()
         return detect(rawdata)['encoding']
 
     def translates(self, liz: t.List[str], order: t.Dict[int, str], author: int, lang: str) -> t.Dict[int, str]:
