@@ -1724,7 +1724,7 @@ class Translator(commands.Cog):
     @commands.command(
         help='Send along with ur novel txt or doc or link to auto translate. Currently supports only https://temp.sh',
         aliases=['t'])
-    async def translate(self, ctx,term:int=None ,language: str = 'english', *, link: str = None):
+    async def translate(self, ctx,term:str=None ,language: str = 'english', *, link: str = None):
         string = ["{0: ^17}".format(f"{k} --> {v}") for k, v in self.bot.languages.items()]
         string = '\n'.join([''.join(string[i:i + 3]) for i in range(0, len(string), 3)])
         total = []
