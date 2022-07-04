@@ -49,8 +49,8 @@ class Translator(commands.Cog):
             return await ctx.reply(f'> **❌Send only an attachment or only a link.**')
         if ctx.message.attachments:
             link = None
-        if language not in total:
-            return await ctx.reply(f"> **❌We have the following languages in our db.**\n```{string}```")
+        if language not in total and 'http' not in language:
+            return await ctx.reply(f"> **❌We have the following languages in our db.**\n```\n{string}```")
         if ctx.author.id in self.bot.translator:
             return await ctx.send('> **❌You cannot translate two novels at a time.**')
         if not ctx.message.attachments and not link:
