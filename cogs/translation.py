@@ -19,9 +19,7 @@ class Translator(commands.Cog):
         self.bot = bot
 
 
-        async with open(file, 'rb') as f:
-             rawdata = await f.read()
-        return detect(rawdata)['encoding']
+
 
     def translates(self, liz: t.List[str], order: t.Dict[int, str], author: int, lang: str) -> t.Dict[int, str]:
         with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
