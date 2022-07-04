@@ -96,7 +96,7 @@ class Translator(commands.Cog):
             async with aiofiles.open(f'{ctx.author.id}.txt', 'w', encoding='utf-8') as f: await f.write(string)
             os.remove(f'{ctx.author.id}.docx')
         try:
-            async with aiofiles.open(f'{ctx.author.id}.txt', 'r', encoding=j) as f:
+            async with aiofiles.open(f'{ctx.author.id}.txt', 'r', encoding='utf-8') as f:
                     novel = await f.read()
         except:
             async with open(f'{ctx.author.id}.txt', 'rb') as f:
