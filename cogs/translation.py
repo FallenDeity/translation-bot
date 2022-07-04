@@ -18,7 +18,7 @@ class Translator(commands.Cog):
     def __init__(self, bot: Raizel) -> None:
         self.bot = bot
 
-    def get_encoding_type(file):
+    def get_encoding_type(self,file):
         with open(file, 'rb') as f:
             rawdata = f.read()
         return detect(rawdata)['encoding']
