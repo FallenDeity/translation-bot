@@ -7,3 +7,4 @@ deep-translator==1.8.3
 discord-ext-menus @ git+https://github.com/Rapptz/discord-ext-menus@8686b5d1bbc1d3c862292eb436ab630d6e9c9b53
 discord.py @ git+https://github.com/Rapptz/discord.py@863df7d04970afe02b227f79e13a6e630c6ce591
 docx==0.2.4
+python-docx==0.8.11
