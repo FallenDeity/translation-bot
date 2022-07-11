@@ -57,9 +57,8 @@ class Crawler(commands.Cog):
         await ctx.typing()
         res = await self.bot.con.get(link)
         novel = {}
-        soup = BeautifulSoup(await res.text(), 'html.parser')
-        data = await res.read()
-        soup1 = BeautifulSoup(data, 'lxml')
+        soup = BeautifulSoup(await res.content.read(), 'html.parser')
+        soup1 = BeautifulSoup(await res.read(), 'lxml')
         title_name = str(soup1.find('title').string)
         title = f"{ctx.author.id}_crawl"
         name = str(link.split('/')[-1].replace('.html', ''))
