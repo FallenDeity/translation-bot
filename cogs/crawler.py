@@ -24,10 +24,13 @@ class Crawler(commands.Cog):
         cleaned_text = ""
         for item in text:
             if item.parent.name not in blacklist:
-                cleaned_text += '{} '.format(item)
+                try:
+                    cleaned_text += '{} '.format(str(item))
+                except:
+                    pass
         #string = '\n'.join([i for i in text if i not in blacklist])
         cleaned_text = cleaned_text.replace('\t', '')
-        return nums, cleaned_text.strip()
+        return nums, str(cleaned_text.strip())
 
     def direct(self, urls: t.List[str], novel: t.Dict[int, str], name: int) -> dict:
         with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
