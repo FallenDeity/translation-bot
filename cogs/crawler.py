@@ -19,7 +19,7 @@ class Crawler(commands.Cog):
     def easy(nums: int, links: str) -> t.Tuple[int, str]:
         blacklist = ['[document]', 'noscript', 'header', 'html', 'meta', 'head', 'input', 'script']
         data = requests.get(links)
-        soup = BeautifulSoup(data.content, 'html.parser')
+        soup = BeautifulSoup(data.text, 'html.parser')
         text = soup.find_all(text=True)
         cleaned_text = ""
         for item in text:
