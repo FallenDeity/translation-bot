@@ -57,7 +57,7 @@ class Crawler(commands.Cog):
         await ctx.typing()
         res = await self.bot.con.get(link)
         novel = {}
-        x = await res.read()
+        x = await res.content.read()
         soup = BeautifulSoup(x, 'html.parser')
         data = await res.read()
         soup1 = BeautifulSoup(data, 'lxml')
