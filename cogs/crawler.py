@@ -19,10 +19,15 @@ class Crawler(commands.Cog):
     def easy(nums: int, links: str) -> t.Tuple[int, str]:
         blacklist = ['[document]', 'noscript', 'header', 'html', 'meta', 'head', 'input', 'script']
         data = requests.get(links)
-        soup = BeautifulSoup(data.content, 'lxml')
+        soup = BeautifulSoup(data.content, 'html.parser')
         text = soup.find_all(text=True)
-        string = '\n'.join([i for i in text if i not in blacklist])
-        return nums, string
+        cleaned_text = ""
+        for item in text:
+            if item.parent.name not in blacklist:
+                cleaned_text += '{} '.format(item)
+        #string = '\n'.join([i for i in text if i not in blacklist])
+         cleaned_text = cleaned_text.replace('\t', '')
+        return nums, cleaned_text.strip()
 
     def direct(self, urls: t.List[str], novel: t.Dict[int, str], name: int) -> dict:
         with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
