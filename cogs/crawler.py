@@ -26,7 +26,7 @@ class Crawler(commands.Cog):
             if item.parent.name not in blacklist:
                 cleaned_text += '{} '.format(item)
         #string = '\n'.join([i for i in text if i not in blacklist])
-         cleaned_text = cleaned_text.replace('\t', '')
+        cleaned_text = cleaned_text.replace('\t', '')
         return nums, cleaned_text.strip()
 
     def direct(self, urls: t.List[str], novel: t.Dict[int, str], name: int) -> dict:
