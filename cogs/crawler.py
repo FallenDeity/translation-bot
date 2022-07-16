@@ -21,7 +21,7 @@ class Crawler(commands.Cog):
         data = requests.get(links)
         soup = BeautifulSoup(data.content, 'lxml')
         text = soup.find_all(text=True)
-        full = '\n'.join([i for i in text if i not in blacklist])
+        full = ''.join([i for i in text if i not in blacklist])
         return nums, full
 
     def direct(self, urls: t.List[str], novel: t.Dict[int, str], name: int) -> dict:
