@@ -103,7 +103,7 @@ class Translator(commands.Cog):
                         async with aiofiles.open(f'{ctx.author.id}.txt', 'rb') as f:
                             novel = await f.read()
                         async with aiofiles.open(f'{ctx.author.id}.txt', 'r',
-                                                 encoding=chardet.detect(novel[:250])['encoding']) as f:
+                                                 encoding=chardet.detect(novel[:500])['encoding'], errors='ignore') as f:
                             novel = await f.read()
                     except Exception as e:
                         print(e)
