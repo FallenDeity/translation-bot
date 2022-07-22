@@ -61,7 +61,10 @@ class Crawler(commands.Cog):
         data = await res.read()
         soup1 = BeautifulSoup(data, 'lxml')
         title_name = str(soup1.find('title').string)
-        title = f"{ctx.author.id}_crawl"
+        if title_name=='':
+            title = f"{ctx.author.id}_crawl"
+        else:
+            title=title_name
         name = str(link.split('/')[-1].replace('.html', ''))
         frontend_part = link.replace(f'/{name}', '').split('/')[-1]
         frontend = link.replace(f'/{name}', '').replace(f'/{frontend_part}', '')
