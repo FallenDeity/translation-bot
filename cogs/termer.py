@@ -37,11 +37,6 @@ class Termer(commands.Cog):
         translated = GoogleTranslator(source='auto', target=lang).translate_batch(img_url)
         return num, translated
 
-    @commands.command(help='Gives progress of novel translation.', aliases=['trp'])
-    async def tprogress(self, ctx):
-        if ctx.author.id not in self.bot.translator:
-            return await ctx.send("> **❌You have no novel deposited for translation currently.**", delete_after=5)
-        await ctx.send(f"> **🚄`{self.bot.translator[ctx.author.id]}`**")
 
     @commands.command(
         help='Send along with ur novel txt or doc or link to auto translate. Currently supports only https://temp.sh',
