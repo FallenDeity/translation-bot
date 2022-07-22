@@ -38,7 +38,7 @@ class Termer(commands.Cog):
         return num, translated
 
     @commands.command(help='Gives progress of novel translation.', aliases=['now', 'n', 'p','trp'])
-    async def progress(self, ctx):
+    async def tprogress(self, ctx):
         if ctx.author.id not in self.bot.translator:
             return await ctx.send("> **❌You have no novel deposited for translation currently.**", delete_after=5)
         await ctx.send(f"> **🚄`{self.bot.translator[ctx.author.id]}`**")
@@ -159,7 +159,7 @@ class Termer(commands.Cog):
         del self.bot.translator[ctx.author.id]
 
     @commands.command(help='Clears any stagnant novels which were deposited for translation.')
-    async def tclear(self, ctx):
+    async def termclear(self, ctx):
         if ctx.author.id in self.bot.translator:
             del self.bot.translator[ctx.author.id]
         files = os.listdir()
