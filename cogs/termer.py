@@ -10,7 +10,6 @@ from deep_translator import GoogleTranslator
 from core.bot import Raizel
 from discord.ext import commands
 
-
 from languages.terms import terms
 
 
@@ -19,11 +18,12 @@ class Termer(commands.Cog):
     def __init__(self, bot: Raizel) -> None:
         self.bot = bot
 
-    def term_raw(self, text):
-        global term_dict
+    def term_raw(self, text, term_dict):
+        # global term_dict
         for t in term_dict:
             text = text.replace(t, term_dict[t])
         return text
+
     def translates(self, liz: t.List[str], order: t.Dict[int, str], author: int, lang: str) -> t.Dict[int, str]:
         with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
             futures = [executor.submit(self.download_image, [url], num, lang) for num, url in enumerate(liz)]
@@ -37,15 +37,14 @@ class Termer(commands.Cog):
         translated = GoogleTranslator(source='auto', target=lang).translate_batch(img_url)
         return num, translated
 
-
     @commands.command(
         help='Send along with ur novel txt or doc or link to auto translate. Currently supports only https://temp.sh',
         aliases=['term'])
-    async def termer(self, ctx,term, language: str = 'english', *, link: str = None):
+    async def termer(self, ctx, term, language: str = 'english', *, link: str = None):
         string = ["{0: ^17}".format(f"{k} --> {v}") for k, v in self.bot.languages.items()]
         string = '\n'.join([''.join(string[i:i + 3]) for i in range(0, len(string), 3)])
         total = []
-        term_dict={}
+        term_dict = {}
         for k, v in self.bot.languages.items():
             total.append(k)
             total.append(v)
@@ -59,8 +58,8 @@ class Termer(commands.Cog):
                                    f"5 : Prince of Tennis\n\t6 : Anime + Marvel + DC\n\t7 : Cultivation terms\n\t"
                                    f"8 : encoding converter \t")
         else:
-            term_dict=terms(term)
-        if term_dict=={}:
+            term_dict = terms(term)
+        if term_dict == {}:
             return await ctx.reply(f"select valid term")
         if language not in total and 'http' not in language:
             return await ctx.reply(f"**❌We have the following languages in our db.**\n```ini\n{string}```")
@@ -79,7 +78,8 @@ class Termer(commands.Cog):
                 file_type = ''.join([i for i in resp.headers['Content-Disposition'].split('.')[-1] if i.isalnum()])
             except:
                 view = discord.ui.View()
-                button = discord.ui.Button(label="link", style=discord.ButtonStyle.link, url='https://temp.sh', emoji="📨")
+                button = discord.ui.Button(label="link", style=discord.ButtonStyle.link, url='https://temp.sh',
+                                           emoji="📨")
                 view.add_item(button)
                 return await ctx.send("> **❌Currently this link is not supported.**", view=view)
             name = link.split('/')[-1].replace('.txt', '').replace('.docx', '')
@@ -110,20 +110,21 @@ class Termer(commands.Cog):
                     novel = await f.read()
                     break
             except:
-                if i+1 == len(encoding):
+                if i + 1 == len(encoding):
                     try:
                         await ctx.send('> **✔Encoding not in db trying to auto detect please be patient.**')
                         async with aiofiles.open(f'{ctx.author.id}.txt', 'rb') as f:
                             novel = await f.read()
                         async with aiofiles.open(f'{ctx.author.id}.txt', 'r',
-                                                 encoding=chardet.detect(novel[:500])['encoding'], errors='ignore') as f:
+                                                 encoding=chardet.detect(novel[:500])['encoding'],
+                                                 errors='ignore') as f:
                             novel = await f.read()
                     except Exception as e:
                         print(e)
                         return await ctx.reply("> **❌Currently we are only translating korean and chinese.**")
                 continue
         await ctx.reply(f'> **✅Terming started. **')
-        novel=  self.term_raw(novel)
+        novel = self.term_raw(novel, term_dict)
         await ctx.reply(f'> **✅Terming completed ..Translation started. Translating to {language}.**')
         os.remove(f'{ctx.author.id}.txt')
         liz = [novel[i:i + 1800] for i in range(0, len(novel), 1800)]
