@@ -37,7 +37,7 @@ class Termer(commands.Cog):
         translated = GoogleTranslator(source='auto', target=lang).translate_batch(img_url)
         return num, translated
 
-    @commands.command(help='Gives progress of novel translation.', aliases=['now', 'n', 'p','trp'])
+    @commands.command(help='Gives progress of novel translation.', aliases=['trp'])
     async def tprogress(self, ctx):
         if ctx.author.id not in self.bot.translator:
             return await ctx.send("> **❌You have no novel deposited for translation currently.**", delete_after=5)
