@@ -60,7 +60,10 @@ class Termer(commands.Cog):
         else:
             term_dict = terms(term)
         if term_dict == {}:
-            return await ctx.reply(f"select valid term")
+            return await ctx.reply(f"**Please Choose the validterms to be applied :\n\t"
+                                   f"1 : Naruto \n\t2 : One-Piece \n\t3 : Pokemon\n\t4 : Mixed anime terms\n\t"
+                                   f"5 : Prince of Tennis\n\t6 : Anime + Marvel + DC\n\t7 : Cultivation terms\n\t")
+            # return await ctx.reply(f"select valid term")
         if language not in total and 'http' not in language:
             return await ctx.reply(f"**❌We have the following languages in our db.**\n```ini\n{string}```")
         if ctx.author.id in self.bot.translator:
