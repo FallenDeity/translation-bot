@@ -1,6 +1,8 @@
 import discord
 import aiofiles
 import requests
+
+import parsel
 from bs4 import BeautifulSoup
 import concurrent.futures
 import os
@@ -9,7 +11,9 @@ import typing as t
 from core.bot import Raizel
 from discord.ext import commands
 
-
+headers = {
+ 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.142 Safari/537.36'
+}
 class Crawler(commands.Cog):
 
     def __init__(self, bot: Raizel) -> None:
@@ -17,11 +21,12 @@ class Crawler(commands.Cog):
 
     @staticmethod
     def easy(nums: int, links: str) -> t.Tuple[int, str]:
-        blacklist = ['[document]', 'noscript', 'header', 'html', 'meta', 'head', 'input', 'script']
-        data = requests.get(links)
-        soup = BeautifulSoup(data.content, 'lxml')
-        text = soup.find_all(text=True)
-        full = ''.join([i for i in text if i not in blacklist])
+        response = requests.get(links, headers=headers)
+        response.encoding = response.apparent_encoding
+        html = response.text
+        sel = parsel.Selector(html)
+        text=sel.css('.read_chapterDetail p').extract()
+        full="\n".join(text)
         return nums, full
 
     def direct(self, urls: t.List[str], novel: t.Dict[int, str], name: int) -> dict:
