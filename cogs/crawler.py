@@ -50,7 +50,7 @@ class Crawler(commands.Cog):
         html = response.text
         sel = parsel.Selector(html)
         text=sel.css(css).extract()
-        print(css)
+        # print(css)
         if text==[]:
             return nums,''
         full="\n".join(text)
