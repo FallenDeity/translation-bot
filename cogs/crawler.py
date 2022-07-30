@@ -99,6 +99,7 @@ class Crawler(commands.Cog):
         else:
             title=title_name
         self.urlcss=findURLCSS(link)
+        print(self.urlcss)
         name = str(link.split('/')[-1].replace('.html', ''))
         frontend_part = link.replace(f'/{name}', '').split('/')[-1]
         frontend = link.replace(f'/{name}', '').replace(f'/{frontend_part}', '')
