@@ -36,7 +36,7 @@ def findURLCSS(link):
     if 'sj.uukanshu' in link:
         return 'p ::text'
     if 'uukanshu.cc' in link:
-        return '.bbb.font-normal.readcotent ::text'
+        return 'font ::text'
     if 'biqugeabc' in link:
         return '.text_row_txt >p ::text'
     else:
