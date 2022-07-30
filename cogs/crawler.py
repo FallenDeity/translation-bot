@@ -33,6 +33,12 @@ def findURLCSS(link):
         return '.content p::text'
     if 'sjks' in link:
         return '.content p::text'
+    if 'sj.uukanshu' in link:
+        return 'p ::text'
+    if 'uukanshu.cc' in link:
+        return '.bbb.font-normal.readcotent ::text'
+    if 'biqugeabc' in link:
+        return '.text_row_txt >p ::text'
     else:
         return '*::text'
 
