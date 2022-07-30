@@ -25,7 +25,7 @@ class Crawler(commands.Cog):
         response.encoding = response.apparent_encoding
         html = response.text
         sel = parsel.Selector(html)
-        text=sel.css('.read_chapterDetail p ::text').extract()
+        text=sel.css('*::text').extract()
         full="\n".join(text)
         return nums, full
 
