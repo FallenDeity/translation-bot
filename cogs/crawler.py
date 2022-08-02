@@ -92,7 +92,10 @@ class Crawler(commands.Cog):
         text = sel.css(css).extract()
         full = ''
         if not chptitleCSS == '':
-            chpTitle = sel.css(chptitleCSS).extract_first()
+            try:
+                chpTitle = sel.css(chptitleCSS).extract_first()
+            except:
+                chpTitle=None
             # print('chp' + str(chpTitle))
             if not chpTitle is None:
                 full += str(chpTitle) + "\n\n"
@@ -141,7 +144,10 @@ class Crawler(commands.Cog):
         soup1 = BeautifulSoup(data, 'lxml')
         self.titlecss = findchptitlecss(link)
         maintitleCSS = self.titlecss[0]
-        title_name = str(soup1.select(maintitleCSS)[0].text)
+        try:
+            title_name = str(soup1.select(maintitleCSS)[0].text)
+        except:
+            title_name=None
         # print('titlename'+title_name)
         self.chptitlecss = self.titlecss[1]
         if title_name == '' or title_name == 'None' or title_name is None:
