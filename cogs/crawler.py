@@ -66,11 +66,11 @@ def findchptitlecss(link):
     if 'sj.uukanshu' in link:
         return ['.bookname', '#divContent >h3 ::text']
     if 'uukanshu.cc' in link:
-        return ['.booktitle', 'h1 ::text', '']
+        return ['.booktitle', 'h1 ::text']
     if 'biqugeabc' in link:
-        return ['.text_row_txt', '']
+        return ['.top>h1', '.reader-main .title']
     if 'uuks' in link:
-        return ['div#contentbox', '']
+        return ['div#contentbox', 'h1#timu ::text']
     else:
         return ['title', '']
 
@@ -93,7 +93,7 @@ class Crawler(commands.Cog):
         full = ''
         if not chptitleCSS == '':
             chpTitle = sel.css(chptitleCSS).extract_first()
-            print('chp' + str(chpTitle))
+            # print('chp' + str(chpTitle))
             if not chpTitle is None:
                 full += str(chpTitle) + "\n\n"
         # print(css)
@@ -144,19 +144,17 @@ class Crawler(commands.Cog):
         title_name = str(soup1.select(maintitleCSS)[0].text)
         # print('titlename'+title_name)
         self.chptitlecss = self.titlecss[1]
-        print(title_name)
         if title_name == '' or title_name == 'None' or title_name is None:
             title = f"{ctx.author.id}_crawl"
         else:
             title_name = GoogleTranslator(source='auto', target='english').translate(title_name)
             title = title_name
         self.urlcss = findURLCSS(link)
-        print('translated' + title_name)
+        # print('translated' + title_name)
         # print(self.urlcss)
         name = str(link.split('/')[-1].replace('.html', ''))
         frontend_part = link.replace(f'/{name}', '').split('/')[-1]
         frontend = link.replace(f'/{name}', '').replace(f'/{frontend_part}', '')
-        # print(frontend)
         urls = [f'{frontend}{j}' for j in [str(i.get('href')) for i in soup.find_all('a')] if
                 name in j and '.html' in j and 'txt' not in j]
         if urls == []:
@@ -167,7 +165,6 @@ class Crawler(commands.Cog):
             else:
                 urls = [f'{frontend}{j}' for j in [str(i.get('href')) for i in soup.find_all('a')] if
                         name in j and 'txt' not in j]
-            # print(urls)
         self.bot.crawler[ctx.author.id] = f'0/{len(urls)}'
         await ctx.reply(f"> **✔Crawl started.**")
         book = await self.bot.loop.run_in_executor(None, self.direct, urls, novel, ctx.author.id)
