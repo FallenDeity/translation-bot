@@ -50,7 +50,7 @@ def findchptitlecss(link):
     if 'trxs' in link:
         return ['h1', '']
     if 'tongrenquan' in link:
-        return ['.infos', '']
+        return [".infos>h1:first-child", '']
     if 'bixiange' in link:
         return ['h1', '']
     if 'qbtr' in link:
@@ -141,7 +141,7 @@ class Crawler(commands.Cog):
         soup1 = BeautifulSoup(data, 'lxml')
         self.titlecss = findchptitlecss(link)
         maintitleCSS = self.titlecss[0]
-        title_name = str(soup1.find(maintitleCSS))
+        title_name = str(soup1.select(maintitleCSS)[0].text)
         # print('titlename'+title_name)
         self.chptitlecss = self.titlecss[1]
         print(title_name)
