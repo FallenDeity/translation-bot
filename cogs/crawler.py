@@ -147,7 +147,7 @@ class Crawler(commands.Cog):
         try:
             title_name = str(soup1.select(maintitleCSS)[0].text)
         except:
-            title = f"{ctx.author.id}_crawl"
+            title_name = f"{ctx.author.id}_crawl"
         # print('titlename'+title_name)
         self.chptitlecss = self.titlecss[1]
         if title_name == '' or title_name == 'None' or title_name is None :
