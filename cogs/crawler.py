@@ -95,7 +95,7 @@ class Crawler(commands.Cog):
             try:
                 chpTitle = sel.css(chptitleCSS).extract_first()
             except:
-                chpTitle=None
+                chpTitle = None
             # print('chp' + str(chpTitle))
             if not chpTitle is None:
                 full += str(chpTitle) + "\n\n"
@@ -147,14 +147,14 @@ class Crawler(commands.Cog):
         try:
             title_name = str(soup1.select(maintitleCSS)[0].text)
         except:
-            title_name=None
+            title = f"{ctx.author.id}_crawl"
         # print('titlename'+title_name)
         self.chptitlecss = self.titlecss[1]
-        if title_name == '' or title_name == 'None' or title_name is None:
+        if title_name == '' or title_name == 'None' or title_name is None or title is None:
             title = f"{ctx.author.id}_crawl"
         else:
             title_name = GoogleTranslator(source='auto', target='english').translate(title_name)
-            title = title_name
+            title = str(title_name)
         self.urlcss = findURLCSS(link)
         # print('translated' + title_name)
         # print(self.urlcss)
