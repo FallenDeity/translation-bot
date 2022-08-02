@@ -143,7 +143,7 @@ class Crawler(commands.Cog):
         title_name = str(soup1.find(maintitleCSS))
         # print('titlename'+title_name)
         self.chptitlecss=self.titlecss[1]
-        if title_name=='':
+        if title_name=='' or title_name=='None':
             title = f"{ctx.author.id}_crawl"
         else:
             title_name = GoogleTranslator(source='auto', target='english').translate(title_name)
