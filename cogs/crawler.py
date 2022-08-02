@@ -50,7 +50,7 @@ def findchptitlecss(link):
     if 'trxs' in link:
         return ['h1 ::text','']
     if 'tongrenquan' in link:
-        return ['h1 ::text','']
+        return ['.infos > h1 ::text','']
     if 'bixiange' in link:
         return ['h1 ::text','']
     if 'qbtr' in link:
@@ -149,7 +149,7 @@ class Crawler(commands.Cog):
             title=title_name
         self.urlcss=findURLCSS(link)
         print(title_name)
-        print(self.urlcss)
+        # print(self.urlcss)
         name = str(link.split('/')[-1].replace('.html', ''))
         frontend_part = link.replace(f'/{name}', '').split('/')[-1]
         frontend = link.replace(f'/{name}', '').replace(f'/{frontend_part}', '')
