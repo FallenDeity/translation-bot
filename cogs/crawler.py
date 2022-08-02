@@ -39,6 +39,8 @@ def findURLCSS(link):
         return 'font ::text'
     if 'biqugeabc' in link:
         return '.text_row_txt >p ::text'
+    if 'uuks' in link:
+        return 'div#contentbox > p ::text'
     else:
         return '*::text'
 
@@ -78,7 +80,7 @@ class Crawler(commands.Cog):
         await ctx.send(f"> **🚄`{self.bot.crawler[ctx.author.id]}`**")
 
     @commands.command(
-        help='Crawls other sites for novels. Currently available trxs, tongrenquan, ffxs, bixiange, powanjuan, biqugeabc.')
+        help='Crawls other sites for novels. Currently available trxs, tongrenquan, ffxs, bixiange, powanjuan, biqugeabc, uuks')
     async def crawl(self, ctx, link=None):
         if ctx.author.id in self.bot.crawler:
             return await ctx.reply("> **❌You cannot crawl two novels at the same time.**")
