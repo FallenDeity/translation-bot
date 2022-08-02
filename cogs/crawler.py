@@ -48,29 +48,29 @@ def findURLCSS(link):
 
 def findchptitlecss(link):
     if 'trxs' in link:
-        return ['h1 ::text','']
+        return ['h1','']
     if 'tongrenquan' in link:
-        return ['.infos > h1 ::text','']
+        return ['.infos','']
     if 'bixiange' in link:
-        return ['h1 ::text','']
+        return ['h1','']
     if 'qbtr' in link:
-        return ['h1 ::text','']
+        return ['h1','']
     if 'jpxs' in link:
-        return ['h1 ::text','']
+        return ['h1','']
     if 'powanjuan' in link:
-        return ['h1 ::text','']
+        return ['h1','']
     if 'ffxs' in link:
-        return ['h1 ::text','']
+        return ['h1','']
     if 'sjks' in link:
-        return ['h1 ::text','']
+        return ['h1','']
     if 'sj.uukanshu' in link:
-        return ['.bookname  b ::text','h3 > font > font ::text']
+        return ['.bookname','h3 > font > font ::text']
     if 'uukanshu.cc' in link:
         return ['.booktitle','h1 ::text','']
     if 'biqugeabc' in link:
-        return ['.text_row_txt >p ::text','']
+        return ['.text_row_txt','']
     if 'uuks' in link:
-        return ['div#contentbox > p ::text','']
+        return ['div#contentbox','']
     else:
         return ['title','']
 
@@ -140,14 +140,13 @@ class Crawler(commands.Cog):
         soup1 = BeautifulSoup(data, 'lxml')
         self.titlecss=findchptitlecss(link)
         maintitleCSS=self.titlecss[0]
-        title_name = str(soup1.select(maintitleCSS,limit=1))
-
-        print('titlename'+title_name)
+        title_name = str(soup1.find(maintitleCSS))
+        # print('titlename'+title_name)
         self.chptitlecss=self.titlecss[1]
-        title_name=GoogleTranslator(source='auto',target='english').translate(title_name)
         if title_name=='':
             title = f"{ctx.author.id}_crawl"
         else:
+            title_name = GoogleTranslator(source='auto', target='english').translate(title_name)
             title=title_name
         self.urlcss=findURLCSS(link)
         print('translated'+title_name)
