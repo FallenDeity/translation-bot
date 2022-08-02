@@ -70,7 +70,7 @@ def findchptitlecss(link):
     if 'biqugeabc' in link:
         return ['.top>h1', '.reader-main .title']
     if 'uuks' in link:
-        return ['div#contentbox', 'h1#timu ::text']
+        return ['#contentbox', 'h1#timu ::text']
     else:
         return ['title', '']
 
