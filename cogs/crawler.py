@@ -152,16 +152,17 @@ class Crawler(commands.Cog):
         print('translated'+title_name)
         # print(self.urlcss)
         name = str(link.split('/')[-1].replace('.html', ''))
+        print(name)
         frontend_part = link.replace(f'/{name}', '').split('/')[-1]
         frontend = link.replace(f'/{name}', '').replace(f'/{frontend_part}', '')
-        print(frontend)
+        # print(frontend)
         urls = [f'{frontend}{j}' for j in [str(i.get('href')) for i in soup.find_all('a')] if
                 name in j and '.html' in j and 'txt' not in j]
         if urls==[]:
             if 'sj.uukanshu' in link:
                 surl='/sj.uukanshu.com/'
                 urls=[f'{frontend}{surl}{j}' for j in [str(i.get('href')) for i in soup.find_all('a')] if
-                    name in j and '.html' in j and 'txt' not in j]
+                    name in j  and 'txt' not in j]
             else:
                 urls=[f'{frontend}{j}' for j in [str(i.get('href')) for i in soup.find_all('a')]]
             print(urls)
