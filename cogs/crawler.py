@@ -158,7 +158,12 @@ class Crawler(commands.Cog):
         urls = [f'{frontend}{j}' for j in [str(i.get('href')) for i in soup.find_all('a')] if
                 name in j and '.html' in j and 'txt' not in j]
         if urls==[]:
-            urls=[f'{frontend}{j}' for j in [str(i.get('href')) for i in soup.find_all('a')]]
+            if 'sj.uukanshu' in link:
+                surl='/sj.uukanshu.com/'
+                urls=[f'{frontend}{surl}{j}' for j in [str(i.get('href')) for i in soup.find_all('a')] if
+                    name in j and '.html' in j and 'txt' not in j]
+            else:
+                urls=[f'{frontend}{j}' for j in [str(i.get('href')) for i in soup.find_all('a')]]
             print(urls)
         self.bot.crawler[ctx.author.id] = f'0/{len(urls)}'
         # print(urls)
