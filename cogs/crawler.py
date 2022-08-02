@@ -140,7 +140,8 @@ class Crawler(commands.Cog):
         soup1 = BeautifulSoup(data, 'lxml')
         self.titlecss=findchptitlecss(link)
         maintitleCSS=self.titlecss[0]
-        title_name = str(soup1.select(maintitleCSS)[0])
+        title_name = str(soup1.select(maintitleCSS,limit=1))
+
         print('titlename'+title_name)
         self.chptitlecss=self.titlecss[1]
         title_name=GoogleTranslator(source='auto',target='english').translate(title_name)
