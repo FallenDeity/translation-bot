@@ -37,7 +37,7 @@ def findURLCSS(link):
     if 'sj.uukanshu' in link:
         return 'p ::text'
     if 'uukanshu.cc' in link:
-        return 'font ::text'
+        return '.bbb.font-normal.readcotent ::text'
     if 'biqugeabc' in link:
         return '.text_row_txt >p ::text'
     if 'uuks' in link:
@@ -48,21 +48,21 @@ def findURLCSS(link):
 
 def findchptitlecss(link):
     if 'trxs' in link:
-        return ['h1', '']
+        return [".infos>h1:first-child", '']
     if 'tongrenquan' in link:
         return [".infos>h1:first-child", '']
     if 'bixiange' in link:
-        return ['h1', '']
+        return [".infos>h1:first-child", '']
     if 'qbtr' in link:
-        return ['h1', '']
+        return [".infos>h1:first-child", '']
     if 'jpxs' in link:
-        return ['h1', '']
+        return [".infos>h1:first-child", '']
     if 'powanjuan' in link:
-        return ['h1', '']
+        return [".desc >h1", '']
     if 'ffxs' in link:
-        return ['h1', '']
+        return [".desc >h1", '']
     if 'sjks' in link:
-        return ['h1', '']
+        return [".box-artic>h1", '']
     if 'sj.uukanshu' in link:
         return ['.bookname', '#divContent >h3 ::text']
     if 'uukanshu.cc' in link:
