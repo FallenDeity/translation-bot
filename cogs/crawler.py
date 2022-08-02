@@ -154,6 +154,7 @@ class Crawler(commands.Cog):
         name = str(link.split('/')[-1].replace('.html', ''))
         frontend_part = link.replace(f'/{name}', '').split('/')[-1]
         frontend = link.replace(f'/{name}', '').replace(f'/{frontend_part}', '')
+        print(frontend)
         urls = [f'{frontend}{j}' for j in [str(i.get('href')) for i in soup.find_all('a')] if
                 name in j and '.html' in j and 'txt' not in j]
         if urls==[]:
