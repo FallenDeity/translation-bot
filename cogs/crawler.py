@@ -144,6 +144,7 @@ class Crawler(commands.Cog):
         title_name = str(soup1.find(maintitleCSS))
         # print('titlename'+title_name)
         self.chptitlecss = self.titlecss[1]
+        print(title_name)
         if title_name == '' or title_name == 'None' or title_name is None:
             title = f"{ctx.author.id}_crawl"
         else:
@@ -153,7 +154,6 @@ class Crawler(commands.Cog):
         print('translated' + title_name)
         # print(self.urlcss)
         name = str(link.split('/')[-1].replace('.html', ''))
-        print(name)
         frontend_part = link.replace(f'/{name}', '').split('/')[-1]
         frontend = link.replace(f'/{name}', '').replace(f'/{frontend_part}', '')
         # print(frontend)
@@ -167,9 +167,8 @@ class Crawler(commands.Cog):
             else:
                 urls = [f'{frontend}{j}' for j in [str(i.get('href')) for i in soup.find_all('a')] if
                         name in j and 'txt' not in j]
-            print(urls)
+            # print(urls)
         self.bot.crawler[ctx.author.id] = f'0/{len(urls)}'
-        # print(urls)
         await ctx.reply(f"> **✔Crawl started.**")
         book = await self.bot.loop.run_in_executor(None, self.direct, urls, novel, ctx.author.id)
         parsed = {k: v for k, v in sorted(book.items(), key=lambda item: item[0])}
