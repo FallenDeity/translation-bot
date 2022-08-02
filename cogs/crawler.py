@@ -1,6 +1,8 @@
 import discord
 import aiofiles
 import requests
+
+import parsel
 from bs4 import BeautifulSoup
 import concurrent.futures
 import os
@@ -9,24 +11,61 @@ import typing as t
 from core.bot import Raizel
 from discord.ext import commands
 
+headers = {
+ 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.142 Safari/537.36'
+}
+
+
+def findURLCSS(link):
+    if 'trxs' in link:
+        return '.read_chapterDetail p ::text'
+    if 'tongrenquan' in link:
+        return '.read_chapterDetail p ::text'
+    if 'bixiange' in link:
+        return '.read_chapterDetail p ::text'
+    if 'qbtr' in link:
+        return '.read_chapterDetail p ::text'
+    if 'jpxs' in link:
+        return '.read_chapterDetail p ::text'
+    if 'powanjuan' in link:
+        return '.content p::text'
+    if 'ffxs' in link:
+        return '.content p::text'
+    if 'sjks' in link:
+        return '.content p::text'
+    if 'sj.uukanshu' in link:
+        return 'p ::text'
+    if 'uukanshu.cc' in link:
+        return 'font ::text'
+    if 'biqugeabc' in link:
+        return '.text_row_txt >p ::text'
+    else:
+        return '*::text'
+
 
 class Crawler(commands.Cog):
 
     def __init__(self, bot: Raizel) -> None:
+        self.urlcss = None
         self.bot = bot
 
     @staticmethod
-    def easy(nums: int, links: str) -> t.Tuple[int, str]:
-        blacklist = ['[document]', 'noscript', 'header', 'html', 'meta', 'head', 'input', 'script']
-        data = requests.get(links)
-        soup = BeautifulSoup(data.content, 'lxml')
-        text = soup.find_all(text=True)
-        full = ''.join([i for i in text if i not in blacklist])
+    def easy(nums: int, links: str,css) -> t.Tuple[int, str]:
+        response = requests.get(links, headers=headers)
+        response.encoding = response.apparent_encoding
+        html = response.text
+        sel = parsel.Selector(html)
+        text=sel.css(css).extract()
+        # print(css)
+        if text==[]:
+            return nums,''
+        full="\n".join(text)
+        full=full+"\n\n"
         return nums, full
 
     def direct(self, urls: t.List[str], novel: t.Dict[int, str], name: int) -> dict:
         with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
-            futures = [executor.submit(self.easy, i, j) for i, j in enumerate(urls)]
+            futures = [executor.submit(self.easy, i, j,self.urlcss) for i, j in enumerate(urls)]
             for future in concurrent.futures.as_completed(futures):
                 novel[future.result()[0]] = future.result()[1]
                 self.bot.crawler[name] = f'{len(novel)}/{len(urls)}'
@@ -65,6 +104,8 @@ class Crawler(commands.Cog):
             title = f"{ctx.author.id}_crawl"
         else:
             title=title_name
+        self.urlcss=findURLCSS(link)
+        print(self.urlcss)
         name = str(link.split('/')[-1].replace('.html', ''))
         frontend_part = link.replace(f'/{name}', '').split('/')[-1]
         frontend = link.replace(f'/{name}', '').replace(f'/{frontend_part}', '')

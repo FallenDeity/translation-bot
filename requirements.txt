@@ -8,3 +8,4 @@ discord-ext-menus @ git+https://github.com/Rapptz/discord-ext-menus@8686b5d1bbc1
 discord.py @ git+https://github.com/Rapptz/discord.py@863df7d04970afe02b227f79e13a6e630c6ce591
 docx==0.2.4
 python-docx==0.8.11
+parsel==1.6.0
