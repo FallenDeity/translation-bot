@@ -158,6 +158,7 @@ class Crawler(commands.Cog):
                 name in j and '.html' in j and 'txt' not in j]
         if urls==[]:
             urls=soup.find_all('a')
+            print(urls)
         self.bot.crawler[ctx.author.id] = f'0/{len(urls)}'
         # print(urls)
         await ctx.reply(f"> **✔Crawl started.**")
