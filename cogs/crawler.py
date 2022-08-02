@@ -93,7 +93,7 @@ class Crawler(commands.Cog):
         full=''
         if not chptitleCSS=='':
             chpTitle=sel.css(chptitleCSS).extract_first()
-            print('chp'+chpTitle)
+            print('chp'+str(chpTitle))
             full+=chpTitle+"\n\n"
         # print(css)
         if text==[]:
@@ -164,7 +164,8 @@ class Crawler(commands.Cog):
                 urls=[f'{frontend}{surl}{j}' for j in [str(i.get('href')) for i in soup.find_all('a')] if
                     name in j  and 'txt' not in j]
             else:
-                urls=[f'{frontend}{j}' for j in [str(i.get('href')) for i in soup.find_all('a')]]
+                urls=[f'{frontend}{j}' for j in [str(i.get('href')) for i in soup.find_all('a')]if
+                    name in j  and 'txt' not in j]
             print(urls)
         self.bot.crawler[ctx.author.id] = f'0/{len(urls)}'
         # print(urls)
