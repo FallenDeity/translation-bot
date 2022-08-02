@@ -112,6 +112,7 @@ class Crawler(commands.Cog):
         urls = [f'{frontend}{j}' for j in [str(i.get('href')) for i in soup.find_all('a')] if
                 name in j and '.html' in j and 'txt' not in j]
         self.bot.crawler[ctx.author.id] = f'0/{len(urls)}'
+        print(urls)
         await ctx.reply(f"> **✔Crawl started.**")
         book = await self.bot.loop.run_in_executor(None, self.direct, urls, novel, ctx.author.id)
         parsed = {k: v for k, v in sorted(book.items(), key=lambda item: item[0])}
