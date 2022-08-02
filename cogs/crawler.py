@@ -93,7 +93,7 @@ class Crawler(commands.Cog):
         full=''
         if not chptitleCSS=='':
             chpTitle=sel.css(chptitleCSS).extract_first()
-            print(chpTitle)
+            print('chp'+chpTitle)
             full+=chpTitle+"\n\n"
         # print(css)
         if text==[]:
@@ -141,6 +141,7 @@ class Crawler(commands.Cog):
         self.titlecss=findchptitlecss(link)
         maintitleCSS=self.titlecss[0]
         title_name = str(soup1.select(maintitleCSS)[0])
+        print('titlename'+title_name)
         self.chptitlecss=self.titlecss[1]
         title_name=GoogleTranslator(source='auto',target='english').translate(title_name)
         if title_name=='':
@@ -148,7 +149,7 @@ class Crawler(commands.Cog):
         else:
             title=title_name
         self.urlcss=findURLCSS(link)
-        print(title_name)
+        print('translated'+title_name)
         # print(self.urlcss)
         name = str(link.split('/')[-1].replace('.html', ''))
         frontend_part = link.replace(f'/{name}', '').split('/')[-1]
