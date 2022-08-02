@@ -162,7 +162,7 @@ class Crawler(commands.Cog):
             if 'sj.uukanshu' in link:
                 surl='/sj.uukanshu.com/'
                 urls=[f'{frontend}{surl}{j}' for j in [str(i.get('href')) for i in soup.find_all('a')] if
-                    name in j  and 'txt' not in j]
+                    'read.aspx?tid' in j  and 'txt' not in j]
             else:
                 urls=[f'{frontend}{j}' for j in [str(i.get('href')) for i in soup.find_all('a')]if
                     name in j  and 'txt' not in j]
