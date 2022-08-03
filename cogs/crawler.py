@@ -175,11 +175,12 @@ class Crawler(commands.Cog):
                 surl = '/sj.uukanshu.com/'
                 urls = [f'{frontend}{surl}{j}' for j in [str(i.get('href')) for i in soup.find_all('a')] if
                         'read.aspx?tid' in j and 'txt' not in j]
-            else:
+            elif 'uuks' in link:
                 print(frontend)
+                name=name.replace('all','')
                 print(name)
                 urls = [f'{frontend}{j}' for j in [str(i.get('href')) for i in soup.find_all('a')] if
-                        name in j and 'txt' not in j]
+                        '/b/' in j and 'txt' not in j]
 
         if 'uukanshu' in link and 'sj.uukanshu' not in link and 't.uukanshu' not in link and not urls ==[]:
             urls=urls.reverse()
