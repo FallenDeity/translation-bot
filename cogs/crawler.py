@@ -34,14 +34,16 @@ def findURLCSS(link):
         return '.content p::text'
     if 'sjks' in link:
         return '.content p::text'
-    if 'sj.uukanshu' in link:
-        return 'p ::text'
+    if 'sj.uukanshu' in link or 't.uukanshu' in link:
+        return '#read-page p ::text'
     if 'uukanshu.cc' in link:
         return '.bbb.font-normal.readcotent ::text'
     if 'biqugeabc' in link:
         return '.text_row_txt >p ::text'
     if 'uuks' in link:
         return 'div#contentbox > p ::text'
+    if 'uukanshu' in link:
+        return '.contentbox ::text'
     else:
         return '*::text'
 
@@ -63,7 +65,7 @@ def findchptitlecss(link):
         return [".desc >h1", '']
     if 'sjks' in link:
         return [".box-artic>h1", '']
-    if 'sj.uukanshu' in link:
+    if 'sj.uukanshu' in link or 't.uukanshu' in link:
         return ['.bookname', '#divContent >h3 ::text']
     if 'uukanshu.cc' in link:
         return ['.booktitle', 'h1 ::text']
@@ -71,6 +73,8 @@ def findchptitlecss(link):
         return [".top>h1", '.reader-main .title ::text']
     if 'uuks' in link:
         return [".jieshao_content>h1", 'h1#timu ::text']
+    if 'uukanshu' in link:
+        return ['title','h1#timu ::text']
     else:
         return ['title', '']
 
@@ -158,6 +162,8 @@ class Crawler(commands.Cog):
         self.urlcss = findURLCSS(link)
         # print('translated' + title_name)
         # print(self.urlcss)
+        if 'm.uuks.org' in link:
+            link=link+'all.html'
         name = str(link.split('/')[-1].replace('.html', ''))
         frontend_part = link.replace(f'/{name}', '').split('/')[-1]
         frontend = link.replace(f'/{name}', '').replace(f'/{frontend_part}', '')
@@ -171,6 +177,8 @@ class Crawler(commands.Cog):
             else:
                 urls = [f'{frontend}{j}' for j in [str(i.get('href')) for i in soup.find_all('a')] if
                         name in j and 'txt' not in j]
+        if 'uukanshu' in link and 'sj.uukanshu' not in link and 't.uukanshu' not in link:
+            urls=urls.reverse()
         self.bot.crawler[ctx.author.id] = f'0/{len(urls)}'
         await ctx.reply(f"> **✔Crawl started.**")
         book = await self.bot.loop.run_in_executor(None, self.direct, urls, novel, ctx.author.id)
