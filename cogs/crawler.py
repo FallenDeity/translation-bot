@@ -175,8 +175,11 @@ class Crawler(commands.Cog):
                 urls = [f'{frontend}{surl}{j}' for j in [str(i.get('href')) for i in soup.find_all('a')] if
                         'read.aspx?tid' in j and 'txt' not in j]
             else:
+                print(frontend)
+                print(name)
                 urls = [f'{frontend}{j}' for j in [str(i.get('href')) for i in soup.find_all('a')] if
                         name in j and 'txt' not in j]
+
         if 'uukanshu' in link and 'sj.uukanshu' not in link and 't.uukanshu' not in link:
             urls=urls.reverse()
         self.bot.crawler[ctx.author.id] = f'0/{len(urls)}'
