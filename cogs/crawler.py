@@ -10,9 +10,10 @@ import zipfile
 import typing as t
 from core.bot import Raizel
 from discord.ext import commands
+from deep_translator import GoogleTranslator
 
 headers = {
- 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.142 Safari/537.36'
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.142 Safari/537.36'
 }
 
 
@@ -33,39 +34,85 @@ def findURLCSS(link):
         return '.content p::text'
     if 'sjks' in link:
         return '.content p::text'
-    if 'sj.uukanshu' in link:
-        return 'p ::text'
+    if 'sj.uukanshu' in link or 't.uukanshu' in link:
+        return '#read-page p ::text'
     if 'uukanshu.cc' in link:
-        return 'font ::text'
+        return '.bbb.font-normal.readcotent ::text'
     if 'biqugeabc' in link:
         return '.text_row_txt >p ::text'
+    if 'uuks' in link:
+        return 'div#contentbox > p ::text'
+    if 'uukanshu' in link:
+        return '.contentbox ::text'
     else:
         return '*::text'
+
+
+def findchptitlecss(link):
+    if 'trxs' in link:
+        return [".infos>h1:first-child", '']
+    if 'tongrenquan' in link:
+        return [".infos>h1:first-child", '']
+    if 'bixiange' in link:
+        return [".infos>h1:first-child", '']
+    if 'qbtr' in link:
+        return [".infos>h1:first-child", '']
+    if 'jpxs' in link:
+        return [".infos>h1:first-child", '']
+    if 'powanjuan' in link:
+        return [".desc >h1", '']
+    if 'ffxs' in link:
+        return [".desc >h1", '']
+    if 'sjks' in link:
+        return [".box-artic>h1", '']
+    if 'sj.uukanshu' in link or 't.uukanshu' in link:
+        return ['.bookname', '#divContent >h3 ::text']
+    if 'uukanshu.cc' in link:
+        return ['.booktitle', 'h1 ::text']
+    if 'biqugeabc' in link:
+        return [".top>h1", '.reader-main .title ::text']
+    if 'uuks' in link:
+        return [".jieshao_content>h1", 'h1#timu ::text']
+    if 'uukanshu' in link:
+        return ['title','h1#timu ::text']
+    else:
+        return ['title', '']
 
 
 class Crawler(commands.Cog):
 
     def __init__(self, bot: Raizel) -> None:
+        self.titlecss = None
+        self.chptitlecss = None
         self.urlcss = None
         self.bot = bot
 
     @staticmethod
-    def easy(nums: int, links: str,css) -> t.Tuple[int, str]:
+    def easy(nums: int, links: str, css, chptitleCSS) -> t.Tuple[int, str]:
         response = requests.get(links, headers=headers)
         response.encoding = response.apparent_encoding
         html = response.text
         sel = parsel.Selector(html)
-        text=sel.css(css).extract()
+        text = sel.css(css).extract()
+        full = ''
+        if not chptitleCSS == '':
+            try:
+                chpTitle = sel.css(chptitleCSS).extract_first()
+            except:
+                chpTitle = None
+            # print('chp' + str(chpTitle))
+            if not chpTitle is None:
+                full += str(chpTitle) + "\n\n"
         # print(css)
-        if text==[]:
-            return nums,''
-        full="\n".join(text)
-        full=full+"\n\n"
+        if text == []:
+            return nums, ''
+        full = full + "\n".join(text)
+        full = full + "\n\n"
         return nums, full
 
     def direct(self, urls: t.List[str], novel: t.Dict[int, str], name: int) -> dict:
         with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
-            futures = [executor.submit(self.easy, i, j,self.urlcss) for i, j in enumerate(urls)]
+            futures = [executor.submit(self.easy, i, j, self.urlcss, self.chptitlecss) for i, j in enumerate(urls)]
             for future in concurrent.futures.as_completed(futures):
                 novel[future.result()[0]] = future.result()[1]
                 self.bot.crawler[name] = f'{len(novel)}/{len(urls)}'
@@ -78,7 +125,7 @@ class Crawler(commands.Cog):
         await ctx.send(f"> **🚄`{self.bot.crawler[ctx.author.id]}`**")
 
     @commands.command(
-        help='Crawls other sites for novels. Currently available trxs, tongrenquan, ffxs, bixiange, powanjuan, biqugeabc.')
+        help='Crawls other sites for novels. Currently available trxs, tongrenquan, ffxs, bixiange, powanjuan, biqugeabc, uuks')
     async def crawl(self, ctx, link=None):
         if ctx.author.id in self.bot.crawler:
             return await ctx.reply("> **❌You cannot crawl two novels at the same time.**")
@@ -99,18 +146,44 @@ class Crawler(commands.Cog):
         soup = BeautifulSoup(await res.read(), 'html.parser')
         data = await res.read()
         soup1 = BeautifulSoup(data, 'lxml')
-        title_name = str(soup1.find('title').string)
-        if title_name=='':
+        self.titlecss = findchptitlecss(link)
+        maintitleCSS = self.titlecss[0]
+        try:
+            title_name = str(soup1.select(maintitleCSS)[0].text)
+        except:
+            title_name = f"{ctx.author.id}_crawl"
+        # print('titlename'+title_name)
+        self.chptitlecss = self.titlecss[1]
+        if title_name == '' or title_name == 'None' or title_name is None :
             title = f"{ctx.author.id}_crawl"
         else:
-            title=title_name
-        self.urlcss=findURLCSS(link)
-        print(self.urlcss)
+            title_name = GoogleTranslator(source='auto', target='english').translate(title_name)
+            title = str(title_name)
+        self.urlcss = findURLCSS(link)
+        # print('translated' + title_name)
+        # print(self.urlcss)
         name = str(link.split('/')[-1].replace('.html', ''))
+        # name=name.replace('all','')
         frontend_part = link.replace(f'/{name}', '').split('/')[-1]
         frontend = link.replace(f'/{name}', '').replace(f'/{frontend_part}', '')
         urls = [f'{frontend}{j}' for j in [str(i.get('href')) for i in soup.find_all('a')] if
                 name in j and '.html' in j and 'txt' not in j]
+        if urls == []:
+            if 'sj.uukanshu' in link:
+                surl = '/sj.uukanshu.com/'
+                urls = [f'{frontend}{surl}{j}' for j in [str(i.get('href')) for i in soup.find_all('a')] if
+                        'read.aspx?tid' in j and 'txt' not in j]
+            elif 'uuks' in link:
+                print(frontend)
+                name=name.replace('all','')
+                print(name)
+                urls = [f'{frontend}{j}' for j in [str(i.get('href')) for i in soup.find_all('a')] if
+                        '/b/' in j and 'txt' not in j]
+                print(urls)
+
+        if 'uukanshu' in link and 'sj.uukanshu' not in link and 't.uukanshu' not in link and not urls ==[]:
+            urls=reversed(urls)
+            print(urls)
         self.bot.crawler[ctx.author.id] = f'0/{len(urls)}'
         await ctx.reply(f"> **✔Crawl started.**")
         book = await self.bot.loop.run_in_executor(None, self.direct, urls, novel, ctx.author.id)

@@ -42,7 +42,7 @@ class Raizel(commands.Bot):
 
     async def setup_hook(self) -> None:
         await self._load_cogs()
-        self.allowed = ['trxs', 'tongrenquan', 'ffxs', 'bixiange', 'powanjuan', 'biqugeabc', 'uukanshu', 'qbtr', 'sjks88']
+        self.allowed = ['trxs', 'tongrenquan', 'ffxs', 'bixiange', 'powanjuan', 'biqugeabc', 'uukanshu', 'qbtr', 'sjks88','uuks']
         self.drive = Client(os.getenv('FILE'))
         await self.load_extension("jishaku")
         return await super().setup_hook()
