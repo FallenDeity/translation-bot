@@ -107,7 +107,7 @@ class Crawler(commands.Cog):
         if text == []:
             return nums, ''
         full = full + "\n".join(text)
-        full = full + "\n\n"
+        full = full + "\n---------------------xxx---------------------\n"
         return nums, full
 
     def direct(self, urls: t.List[str], novel: t.Dict[int, str], name: int) -> dict:
