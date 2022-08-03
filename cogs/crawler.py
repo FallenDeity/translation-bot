@@ -179,10 +179,10 @@ class Crawler(commands.Cog):
                 print(name)
                 urls = [f'{frontend}{j}' for j in [str(i.get('href')) for i in soup.find_all('a')] if
                         '/b/' in j and 'txt' not in j]
-                print(urls)
+                # print(urls)
 
         if 'uukanshu' in link and 'sj.uukanshu' not in link and 't.uukanshu' not in link and not urls ==[]:
-            urls=urls[:-1]
+            urls=urls[::-1]
             print(urls)
         self.bot.crawler[ctx.author.id] = f'0/{len(urls)}'
         await ctx.reply(f"> **✔Crawl started.**")
