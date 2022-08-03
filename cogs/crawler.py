@@ -107,7 +107,7 @@ class Crawler(commands.Cog):
         if text == []:
             return nums, ''
         full = full + "\n".join(text)
-        full = full + "\n\n"
+        full = full + "\n---------------------xxx---------------------\n"
         return nums, full
 
     def direct(self, urls: t.List[str], novel: t.Dict[int, str], name: int) -> dict:
@@ -140,6 +140,8 @@ class Crawler(commands.Cog):
             return await ctx.reply(f"> **❌We currently crawl only from {', '.join(allowed)}**")
         if link[-1] == '/':
             link = link[:-1]
+        if 'm.uuks' in  link:
+            link=link.replace('m.','')
         await ctx.typing()
         res = await self.bot.con.get(link)
         novel = {}
@@ -174,16 +176,16 @@ class Crawler(commands.Cog):
                 urls = [f'{frontend}{surl}{j}' for j in [str(i.get('href')) for i in soup.find_all('a')] if
                         'read.aspx?tid' in j and 'txt' not in j]
             elif 'uuks' in link:
-                print(frontend)
+                # print(frontend)
                 name=name.replace('all','')
-                print(name)
+                # print(name)
                 urls = [f'{frontend}{j}' for j in [str(i.get('href')) for i in soup.find_all('a')] if
                         '/b/' in j and 'txt' not in j]
-                print(urls)
+                # print(urls)
 
         if 'uukanshu' in link and 'sj.uukanshu' not in link and 't.uukanshu' not in link and not urls ==[]:
-            urls=reversed(urls)
-            print(urls)
+            urls=urls[::-1]
+            # print(urls)
         self.bot.crawler[ctx.author.id] = f'0/{len(urls)}'
         await ctx.reply(f"> **✔Crawl started.**")
         book = await self.bot.loop.run_in_executor(None, self.direct, urls, novel, ctx.author.id)
