@@ -165,6 +165,7 @@ class Crawler(commands.Cog):
         if 'm.uuks.org' in link:
             link=link+'all.html'
         name = str(link.split('/')[-1].replace('.html', ''))
+        name=name.replace('all','')
         frontend_part = link.replace(f'/{name}', '').split('/')[-1]
         frontend = link.replace(f'/{name}', '').replace(f'/{frontend_part}', '')
         urls = [f'{frontend}{j}' for j in [str(i.get('href')) for i in soup.find_all('a')] if
@@ -180,7 +181,7 @@ class Crawler(commands.Cog):
                 urls = [f'{frontend}{j}' for j in [str(i.get('href')) for i in soup.find_all('a')] if
                         name in j and 'txt' not in j]
 
-        if 'uukanshu' in link and 'sj.uukanshu' not in link and 't.uukanshu' not in link:
+        if 'uukanshu' in link and 'sj.uukanshu' not in link and 't.uukanshu' not in link and not urls ==[]:
             urls=urls.reverse()
         self.bot.crawler[ctx.author.id] = f'0/{len(urls)}'
         await ctx.reply(f"> **✔Crawl started.**")
