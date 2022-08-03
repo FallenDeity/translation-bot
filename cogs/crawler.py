@@ -141,6 +141,8 @@ class Crawler(commands.Cog):
         if link[-1] == '/':
             link = link[:-1]
         await ctx.typing()
+        if 'm.uuks.org' in link:
+            link = link + 'all.html'
         res = await self.bot.con.get(link)
         novel = {}
         soup = BeautifulSoup(await res.read(), 'html.parser')
@@ -162,8 +164,6 @@ class Crawler(commands.Cog):
         self.urlcss = findURLCSS(link)
         # print('translated' + title_name)
         # print(self.urlcss)
-        if 'm.uuks.org' in link:
-            link=link+'all.html'
         name = str(link.split('/')[-1].replace('.html', ''))
         # name=name.replace('all','')
         frontend_part = link.replace(f'/{name}', '').split('/')[-1]
@@ -184,8 +184,8 @@ class Crawler(commands.Cog):
                 print(urls)
 
         if 'uukanshu' in link and 'sj.uukanshu' not in link and 't.uukanshu' not in link and not urls ==[]:
-            print(urls)
             urls=urls.reverse()
+            print(urls)
         self.bot.crawler[ctx.author.id] = f'0/{len(urls)}'
         await ctx.reply(f"> **✔Crawl started.**")
         book = await self.bot.loop.run_in_executor(None, self.direct, urls, novel, ctx.author.id)
