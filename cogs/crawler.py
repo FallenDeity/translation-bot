@@ -182,7 +182,7 @@ class Crawler(commands.Cog):
                 print(urls)
 
         if 'uukanshu' in link and 'sj.uukanshu' not in link and 't.uukanshu' not in link and not urls ==[]:
-            urls=reversed(urls)
+            urls=urls[:-1]
             print(urls)
         self.bot.crawler[ctx.author.id] = f'0/{len(urls)}'
         await ctx.reply(f"> **✔Crawl started.**")
