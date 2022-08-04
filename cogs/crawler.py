@@ -114,6 +114,10 @@ class Crawler(commands.Cog):
         # print(css)
         if text == []:
             return nums, ''
+        if 'ptwxz' in links:
+            while full[0] != 'GetFont();':
+                full.pop(0)
+            full.pop(0)
         full = full + "\n".join(text)
         full = full + "\n---------------------xxx---------------------\n"
         return nums, full
@@ -180,8 +184,9 @@ class Crawler(commands.Cog):
         print(frontend)
         print([str(i.get('href')) for i in soup.find_all('a')])
         if '69shu' in link:
+            soup = BeautifulSoup(res.content, 'html.parser')
             urls=[f'{j}' for j in [str(i.get('href')) for i in soup.find_all('a')] if
-                name in j]
+                name in j  and 'http' in j]
         elif 'ptwxz' in link:
             frontend=link+'/'
             urls = [f'{frontend}{j}' for j in [str(i.get('href')) for i in soup.find_all('a')] if
