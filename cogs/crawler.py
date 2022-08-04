@@ -178,6 +178,7 @@ class Crawler(commands.Cog):
         frontend = link.replace(f'/{name}', '').replace(f'/{frontend_part}', '')
         print(name)
         print(frontend)
+        print([str(i.get('href')) for i in soup.find_all('a')])
         if '69shu' in link:
             urls=[f'{j}' for j in [str(i.get('href')) for i in soup.find_all('a')] if
                 name in j ]
