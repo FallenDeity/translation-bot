@@ -176,16 +176,18 @@ class Crawler(commands.Cog):
         # name=name.replace('all','')
         frontend_part = link.replace(f'/{name}', '').split('/')[-1]
         frontend = link.replace(f'/{name}', '').replace(f'/{frontend_part}', '')
-        if 'ptwxz' in link:
-            frontend=link
         print(name)
         print(frontend)
         if '69shu' in link:
             urls=[f'{j}' for j in [str(i.get('href')) for i in soup.find_all('a')] if
-                name in j and '/txt/' in j]
+                name in j ]
+        elif 'ptwxz' in link:
+            frontend=link
+            urls = [f'{frontend}{j}' for j in [str(i.get('href')) for i in soup.find_all('a')] if
+                 '.html' in j and 'txt' not in j]
         else:
             urls = [f'{frontend}{j}' for j in [str(i.get('href')) for i in soup.find_all('a')] if
-                name in j and '.html' in j and 'txt' not in j]
+                    name in j and '.html' in j and 'txt' not in j]
         if urls == []:
             if 'sj.uukanshu' in link:
                 surl = '/sj.uukanshu.com/'
