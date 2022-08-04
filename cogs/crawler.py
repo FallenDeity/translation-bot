@@ -218,6 +218,7 @@ class Crawler(commands.Cog):
         book = await self.bot.loop.run_in_executor(None, self.direct, urls, novel, ctx.author.id)
         parsed = {k: v for k, v in sorted(book.items(), key=lambda item: item[0])}
         whole = [i for i in list(parsed.values())]
+        whole='\ncrawled from : '+str(link)+'\n\n'+ whole
         async with aiofiles.open(f'{title}.txt', 'w', encoding='utf-8') as f:
             await f.write("\n".join(whole))
         if os.path.getsize(f"{title}.txt") > 8 * 10 ** 6:
