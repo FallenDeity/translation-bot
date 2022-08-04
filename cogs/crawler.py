@@ -150,16 +150,16 @@ class Crawler(commands.Cog):
                 num += 1
         if num == len(allowed):
             return await ctx.reply(f"> **❌We currently crawl only from {', '.join(allowed)}**")
+        if '69shu' in link and 'txt' in link:
+            link=link.replace('/txt','')
+            link=link.replace('.htm','/')
+        if 'ptwxz' in link and 'bookinfo' in link:
+            link=link.replace('bookinfo','html')
+            link=link.replace('.html','/')
         if link[-1] == '/' and '69shu' not in link:
             link = link[:-1]
         if 'm.uuks' in  link:
             link=link.replace('m.','')
-        if '69shu' in link and 'txt' in link:
-            link=link.replace('/txt','')
-            link=link.replace('.htm','')
-        if 'ptwxz' in link and 'bookinfo' in link:
-            link=link.replace('bookinfo','html')
-            link=link.replace('.html','/')
         await ctx.typing()
         res = await self.bot.con.get(link)
         novel = {}
