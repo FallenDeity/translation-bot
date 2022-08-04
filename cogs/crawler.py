@@ -47,7 +47,7 @@ def findURLCSS(link):
     if '69shu' in link:
         return '.txtnav ::text'
     if 'ptwxz' in link:
-        return 'div#content ::text'
+        return '* ::text'
     else:
         return '*::text'
 
