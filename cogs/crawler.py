@@ -183,7 +183,7 @@ class Crawler(commands.Cog):
             urls=[f'{j}' for j in [str(i.get('href')) for i in soup.find_all('a')] if
                 name in j]
         elif 'ptwxz' in link:
-            frontend=link
+            frontend=link+'/'
             urls = [f'{frontend}{j}' for j in [str(i.get('href')) for i in soup.find_all('a')] if
                  'html' in j and 'txt' not in j and 'http' not in j and 'javascript' not in j
                     and 'modules' not in j]
