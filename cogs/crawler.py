@@ -150,7 +150,7 @@ class Crawler(commands.Cog):
                 num += 1
         if num == len(allowed):
             return await ctx.reply(f"> **❌We currently crawl only from {', '.join(allowed)}**")
-        if link[-1] == '/':
+        if link[-1] == '/' and '69shu' not in link:
             link = link[:-1]
         if 'm.uuks' in  link:
             link=link.replace('m.','')
@@ -186,7 +186,7 @@ class Crawler(commands.Cog):
         if '69shu' in link:
             soup = BeautifulSoup(res.content, 'html.parser')
             urls=[f'{j}' for j in [str(i.get('href')) for i in soup.find_all('a')] if
-                name in j  and 'http' in j]
+                name in j and 'http' in j]
         elif 'ptwxz' in link:
             frontend=link+'/'
             urls = [f'{frontend}{j}' for j in [str(i.get('href')) for i in soup.find_all('a')] if
