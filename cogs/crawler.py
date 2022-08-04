@@ -154,6 +154,12 @@ class Crawler(commands.Cog):
             link = link[:-1]
         if 'm.uuks' in  link:
             link=link.replace('m.','')
+        if '69shu' in link and 'txt' in link:
+            link=link.replace('/txt','')
+            link=link.replace('.htm','')
+        if 'ptwxz' in link and 'bookinfo' in link:
+            link=link.replace('bookinfo','html')
+            link=link.replace('.html','/')
         await ctx.typing()
         res = await self.bot.con.get(link)
         novel = {}
