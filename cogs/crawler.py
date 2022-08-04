@@ -23,7 +23,7 @@ def findURLCSS(link):
     if 'tongrenquan' in link:
         return '.read_chapterDetail p ::text'
     if 'bixiange' in link:
-        return '.read_chapterDetail p ::text'
+        return 'p ::text'
     if 'qbtr' in link:
         return '.read_chapterDetail p ::text'
     if 'jpxs' in link:
@@ -44,6 +44,10 @@ def findURLCSS(link):
         return 'div#contentbox > p ::text'
     if 'uukanshu' in link:
         return '.contentbox ::text'
+    if '69shu' in link:
+        return '.txtnav ::text'
+    if 'ptwxz' in link:
+        return '* ::text'
     else:
         return '*::text'
 
@@ -54,7 +58,7 @@ def findchptitlecss(link):
     if 'tongrenquan' in link:
         return [".infos>h1:first-child", '']
     if 'bixiange' in link:
-        return [".infos>h1:first-child", '']
+        return [".desc>h1:first-child", '']
     if 'qbtr' in link:
         return [".infos>h1:first-child", '']
     if 'jpxs' in link:
@@ -75,6 +79,10 @@ def findchptitlecss(link):
         return [".jieshao_content>h1", 'h1#timu ::text']
     if 'uukanshu' in link:
         return ['title','h1#timu ::text']
+    if '69shu' in link:
+        return ['.bread>a:nth-of-type(3)','']
+    if 'ptwxz' in link:
+        return ['.title','']
     else:
         return ['title', '']
 
@@ -106,6 +114,10 @@ class Crawler(commands.Cog):
         # print(css)
         if text == []:
             return nums, ''
+        if 'ptwxz' in links:
+            while text[0] != 'GetFont();':
+                text.pop(0)
+            text.pop(0)
         full = full + "\n".join(text)
         full = full + "\n---------------------xxx---------------------\n"
         return nums, full
@@ -138,7 +150,13 @@ class Crawler(commands.Cog):
                 num += 1
         if num == len(allowed):
             return await ctx.reply(f"> **❌We currently crawl only from {', '.join(allowed)}**")
-        if link[-1] == '/':
+        if '69shu' in link and 'txt' in link:
+            link=link.replace('/txt','')
+            link=link.replace('.htm','/')
+        if 'ptwxz' in link and 'bookinfo' in link:
+            link=link.replace('bookinfo','html')
+            link=link.replace('.html','/')
+        if link[-1] == '/' and '69shu' not in link:
             link = link[:-1]
         if 'm.uuks' in  link:
             link=link.replace('m.','')
@@ -168,8 +186,17 @@ class Crawler(commands.Cog):
         # name=name.replace('all','')
         frontend_part = link.replace(f'/{name}', '').split('/')[-1]
         frontend = link.replace(f'/{name}', '').replace(f'/{frontend_part}', '')
-        urls = [f'{frontend}{j}' for j in [str(i.get('href')) for i in soup.find_all('a')] if
-                name in j and '.html' in j and 'txt' not in j]
+        if '69shu' in link:
+            urls=[f'{j}' for j in [str(i.get('href')) for i in soup.find_all('a')] if
+                name in j and 'http' in j]
+        elif 'ptwxz' in link:
+            frontend=link+'/'
+            urls = [f'{frontend}{j}' for j in [str(i.get('href')) for i in soup.find_all('a')] if
+                 'html' in j and 'txt' not in j and 'http' not in j and 'javascript' not in j
+                    and 'modules' not in j]
+        else:
+            urls = [f'{frontend}{j}' for j in [str(i.get('href')) for i in soup.find_all('a')] if
+                    name in j and '.html' in j and 'txt' not in j]
         if urls == []:
             if 'sj.uukanshu' in link:
                 surl = '/sj.uukanshu.com/'
@@ -177,7 +204,7 @@ class Crawler(commands.Cog):
                         'read.aspx?tid' in j and 'txt' not in j]
             elif 'uuks' in link:
                 # print(frontend)
-                name=name.replace('all','')
+                # name=name.replace('all','')
                 # print(name)
                 urls = [f'{frontend}{j}' for j in [str(i.get('href')) for i in soup.find_all('a')] if
                         '/b/' in j and 'txt' not in j]
@@ -191,6 +218,7 @@ class Crawler(commands.Cog):
         book = await self.bot.loop.run_in_executor(None, self.direct, urls, novel, ctx.author.id)
         parsed = {k: v for k, v in sorted(book.items(), key=lambda item: item[0])}
         whole = [i for i in list(parsed.values())]
+        whole.insert(0,'\ncrawled from : '+str(link)+'\n\n')
         async with aiofiles.open(f'{title}.txt', 'w', encoding='utf-8') as f:
             await f.write("\n".join(whole))
         if os.path.getsize(f"{title}.txt") > 8 * 10 ** 6:
