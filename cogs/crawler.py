@@ -115,9 +115,9 @@ class Crawler(commands.Cog):
         if text == []:
             return nums, ''
         if 'ptwxz' in links:
-            while full[0] != 'GetFont();':
-                full.pop(0)
-            full.pop(0)
+            while text[0] != 'GetFont();':
+                text.pop(0)
+            text.pop(0)
         full = full + "\n".join(text)
         full = full + "\n---------------------xxx---------------------\n"
         return nums, full
