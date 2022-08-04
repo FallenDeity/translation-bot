@@ -23,7 +23,7 @@ def findURLCSS(link):
     if 'tongrenquan' in link:
         return '.read_chapterDetail p ::text'
     if 'bixiange' in link:
-        return '.read_chapterDetail p ::text'
+        return '.content p ::text'
     if 'qbtr' in link:
         return '.read_chapterDetail p ::text'
     if 'jpxs' in link:
@@ -44,6 +44,10 @@ def findURLCSS(link):
         return 'div#contentbox > p ::text'
     if 'uukanshu' in link:
         return '.contentbox ::text'
+    if '69shu' in link:
+        return '.txtnav ::text'
+    if 'ptwxz' in link:
+        return 'div#content ::text'
     else:
         return '*::text'
 
@@ -54,7 +58,7 @@ def findchptitlecss(link):
     if 'tongrenquan' in link:
         return [".infos>h1:first-child", '']
     if 'bixiange' in link:
-        return [".infos>h1:first-child", '']
+        return [".desc>h1:first-child", '']
     if 'qbtr' in link:
         return [".infos>h1:first-child", '']
     if 'jpxs' in link:
@@ -75,6 +79,10 @@ def findchptitlecss(link):
         return [".jieshao_content>h1", 'h1#timu ::text']
     if 'uukanshu' in link:
         return ['title','h1#timu ::text']
+    if '69shu' in link:
+        return ['.bread>a:nth-of-type(3)','']
+    if 'ptwxz' in link:
+        return ['.title','']
     else:
         return ['title', '']
 
@@ -168,7 +176,13 @@ class Crawler(commands.Cog):
         # name=name.replace('all','')
         frontend_part = link.replace(f'/{name}', '').split('/')[-1]
         frontend = link.replace(f'/{name}', '').replace(f'/{frontend_part}', '')
-        urls = [f'{frontend}{j}' for j in [str(i.get('href')) for i in soup.find_all('a')] if
+        print(name)
+        print(frontend)
+        if '69shu' in link:
+            urls=[f'{j}' for j in [str(i.get('href')) for i in soup.find_all('a')] if
+                name in j and '.html' in j ]
+        else:
+            urls = [f'{frontend}{j}' for j in [str(i.get('href')) for i in soup.find_all('a')] if
                 name in j and '.html' in j and 'txt' not in j]
         if urls == []:
             if 'sj.uukanshu' in link:
