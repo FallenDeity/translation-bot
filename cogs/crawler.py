@@ -176,11 +176,13 @@ class Crawler(commands.Cog):
         # name=name.replace('all','')
         frontend_part = link.replace(f'/{name}', '').split('/')[-1]
         frontend = link.replace(f'/{name}', '').replace(f'/{frontend_part}', '')
+        if 'ptwxz' in link:
+            frontend=link
         print(name)
         print(frontend)
         if '69shu' in link:
             urls=[f'{j}' for j in [str(i.get('href')) for i in soup.find_all('a')] if
-                name in j and '.html' in j ]
+                name in j and '/txt/' in j]
         else:
             urls = [f'{frontend}{j}' for j in [str(i.get('href')) for i in soup.find_all('a')] if
                 name in j and '.html' in j and 'txt' not in j]
@@ -191,7 +193,7 @@ class Crawler(commands.Cog):
                         'read.aspx?tid' in j and 'txt' not in j]
             elif 'uuks' in link:
                 # print(frontend)
-                name=name.replace('all','')
+                # name=name.replace('all','')
                 # print(name)
                 urls = [f'{frontend}{j}' for j in [str(i.get('href')) for i in soup.find_all('a')] if
                         '/b/' in j and 'txt' not in j]
@@ -200,6 +202,7 @@ class Crawler(commands.Cog):
         if 'uukanshu' in link and 'sj.uukanshu' not in link and 't.uukanshu' not in link and not urls ==[]:
             urls=urls[::-1]
             # print(urls)
+        print(urls)
         self.bot.crawler[ctx.author.id] = f'0/{len(urls)}'
         await ctx.reply(f"> **✔Crawl started.**")
         book = await self.bot.loop.run_in_executor(None, self.direct, urls, novel, ctx.author.id)
