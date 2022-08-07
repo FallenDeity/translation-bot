@@ -151,7 +151,7 @@ class Translator(commands.Cog):
                 button = discord.ui.Button(label="Novel", style=discord.ButtonStyle.link, url=filelnk.url,
                                            emoji="📔")
                 view1.add_item(button)
-                await channel.send(f"> {name} \nuploaded by {user} ", view=view1)
+                await channel.send(f"> {name.replace('_',' ')} \nuploaded by {user} language: {language}", view=view1)
 
             except Exception as e:
                 print(e)
@@ -162,7 +162,7 @@ class Translator(commands.Cog):
             await ctx.reply("**🎉Here is your translated novel**", file=file)
             channel=self.bot.get_channel(1005668482475643050)
             user=str(ctx.author)
-            await channel.send(f'{name} \nUploaded by @{user}',file=discord.File(f"{ctx.author.id}.txt", f"{name}.txt"))
+            await channel.send(f'> {name.replace("_"," ")} \nUploaded by {user} language: {language}',file=discord.File(f"{ctx.author.id}.txt", f"{name}.txt"))
         os.remove(f"{ctx.author.id}.txt")
         del self.bot.translator[ctx.author.id]
 
