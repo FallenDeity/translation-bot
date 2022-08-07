@@ -81,10 +81,11 @@ class Crawler(commands.Cog):
 
     @staticmethod
     def easy(nums: int, links: str, css, chptitleCSS) -> t.Tuple[int, str]:
+        response=None
         try:
             response = requests.get(links, headers=headers,timeout=10)
         except:
-            pass
+            return nums,''
         response.encoding = response.apparent_encoding
         html = response.text
         sel = parsel.Selector(html)
