@@ -11,6 +11,18 @@ from core.bot import Raizel
 from discord.ext import commands
 
 
+def checkName(name):
+    spl = name.split('_')
+    segment = 0
+    for t in spl:
+        if t[:-1].isalpha() and len(t)>2:
+            if len(t) > 4 or segment == 2:
+                return True
+            else:
+                segment += 1
+    return False
+
+
 class Translator(commands.Cog):
 
     def __init__(self, bot: Raizel) -> None:
@@ -80,6 +92,10 @@ class Translator(commands.Cog):
             file_type = 'docx'
         else:
             return await ctx.send('> **❌Only .docx and .txt supported**')
+        nameBool=checkName(name)
+        print(nameBool)
+        if nameBool is False:
+            return await ctx.reply(f'> **❌{name} is not a valid novel name. please provide a valid name to filename before translating. **')
         data = await resp.read()
         async with aiofiles.open(f'{ctx.author.id}.{file_type}', 'wb') as f:
             await f.write(data)
@@ -129,12 +145,24 @@ class Translator(commands.Cog):
                                            emoji="📔")
                 view.add_item(button)
                 await ctx.reply(f"> **✔{ctx.author.mention} your novel {name} is ready.**", view=view)
-            except:
+                channel = self.bot.get_channel(1005668482475643050)
+                user = str(ctx.author)
+                view1 = discord.ui.View()
+                button = discord.ui.Button(label="Novel", style=discord.ButtonStyle.link, url=filelnk.url,
+                                           emoji="📔")
+                view1.add_item(button)
+                await channel.send(f"> {name} \nuploaded by{user} ", view=view1)
+
+            except Exception as e:
+                print(e)
                 await ctx.reply("**Sorry your file was too big please split it and try again.**")
             os.remove(f"{ctx.author.id}.zip")
         else:
             file = discord.File(f"{ctx.author.id}.txt", f"{name}.txt")
             await ctx.reply("**🎉Here is your translated novel**", file=file)
+            channel=self.bot.get_channel(1005668482475643050)
+            user=str(ctx.author)
+            await channel.send(f'{name} \nUploaded by @{user}',file=discord.File(f"{ctx.author.id}.txt", f"{name}.txt"))
         os.remove(f"{ctx.author.id}.txt")
         del self.bot.translator[ctx.author.id]
 
