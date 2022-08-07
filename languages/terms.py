@@ -2,7 +2,7 @@
 def terms(value):
     term_dict={}
     if (value.isnumeric()):
-        if (value == '1'):
+        if (value == '1' or str(value).lower()=='naruto'):
             print('You have selected Naruto Terms')
             term_dict = {'迪达拉': 'Deidara', '宁次': 'Neji', '小李': 'Lee', '天天': 'Tenten', '阿凯': 'Guy',
                        '波之国': 'Land of Waves',
@@ -49,7 +49,7 @@ def terms(value):
                        '水户门炎': 'Homura Mitokado', '新之助': 'Shinnonuske', '辕飞': 'Sarutobi',
                        '猿飞琵琶湖': 'Sarutobi Biwako',
                        '日斩': 'Hiruzen'}
-        elif (value == '2'):
+        elif (value == '2'or str(value).lower()=='one-piece' or str(value).lower()=='onepiece'):
           print('You have selected One-Piece terms')
           term_dict = {'岚脚': 'Rankyaku', '武装色霸气': 'Armament Haki', '月步': 'Moon Step', '见闻色霸气': 'Observation Haki',
                        '卡普': 'Garp',
@@ -116,7 +116,7 @@ def terms(value):
                        '纸绘': 'Kami-e', '流樱': 'Flowing Sakura', '芭卡拉': 'Baccarat', '波尼斯': 'Bonez', '光月': 'Kozuki',
                        '御田': 'Oden'}
 
-        elif (value == '3'):
+        elif (value == '3'or str(value).lower()=='pokemon'):
           print('You have selected Pokemon terms')
           term_dict = {'妙蛙种子': 'Bulbasaur', '妙蛙草': 'Ivysaur', '妙蛙花': 'Venusaur\t', '小火龙': 'Charmander\t',
                        '火恐龙': 'Charmeleon\t',
@@ -1013,7 +1013,7 @@ def terms(value):
                        '蜂后': 'Vespiquen'}
 
 
-        elif (value == '4'):
+        elif (value == '4' or str(value).lower()=='mixed'):
           print('You have selected Mixed anime terms')
           term_dict = {'迪达拉': 'Deidara', '哈比': 'Happy', '宁次': 'Neji', '小李': 'Lee', '天天': 'Tenten', '阿凯': 'Guy',
                        '波之国': 'Land of Waves', '凯班': 'Team Guy', '诺': 'Say', '造桥专家': 'Bridge Building Expert',
@@ -1461,7 +1461,7 @@ def terms(value):
                        '转寝小春': 'Koharu Utatane', '水户门炎': 'Homura Mitokado', '新之助': 'Shinnonuske', '辕飞': 'Sarutobi',
                        '猿飞琵琶湖': 'Sarutobi Biwako', '日斩': 'Hiruzen', '郁文': 'Cena', '凯撒': 'Caesar', '楚': 'John'}
 
-        elif (value == '5'):
+        elif (value == '5'or 'marvel' in str(value).lower()):
           print('You have selected prince of Tennis terms')
           term_dict = {'御狐神': 'Miketsukami', '双炽': 'Soushi', '霓虹': 'Japan', '克洛伊': 'Chloe', '渡边': 'Watanabe',
                        '越智月光': 'Tsukimitsu Ochi', '平等院凤凰': 'Byōdōin Hōō', '阿修罗神道': 'Asura Shinto',
@@ -1500,7 +1500,7 @@ def terms(value):
                        '白龙': 'White Dragon', '赫卡通克瑞斯之守卫': 'Gate Keeper of Hecatoncheires', '星花火': 'Star Fireworks',
                        '心眼': 'Closed Eye', '景吾': 'Keigo', '狐神': 'Miketsukami'}
 
-        elif (value == '6'):
+        elif (value == '6' or 'marvel' in str(value).lower() or 'dc' in str(value).lower()):
           print('You have selected Anime + Marvel + DC terms')
           term_dict = {'月步': 'Geppo', '见闻色霸气': 'Observation Haki', '武装色霸气': 'Armament Haki', '卡普': 'Garp',
                        '诺琪高': 'Nojiko',
@@ -2325,7 +2325,7 @@ def terms(value):
                        '古米尔': 'Comil', '洛亚': 'Roya', '龙威': 'Dragon Aura', '蒂奇': 'Teach'}
 
 
-        elif (value == '7'):
+        elif (value == '7' or str(value).lower()=='xianxia'):
           print('You have selected Xianxia cultivation terms')
           term_dict = {'道友': 'Fellow Daoist', '灵皇': 'Spirit Sovereign', '后期': 'late stage', '真君': 'True Monarch',
                        '中期': 'middle stage', '初期': 'early stage', '行者': 'practitioner', '尊者': 'Venerable',
