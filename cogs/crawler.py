@@ -18,55 +18,39 @@ headers = {
 
 
 def findURLCSS(link):
-    if 'trxs' in link:
-        return '.read_chapterDetail p ::text'
-    if 'tongrenquan' in link:
-        return '.read_chapterDetail p ::text'
     if 'bixiange' in link:
         return 'p ::text'
-    if 'qbtr' in link:
-        return '.read_chapterDetail p ::text'
-    if 'jpxs' in link:
-        return '.read_chapterDetail p ::text'
-    if 'powanjuan' in link:
-        return '.content p::text'
-    if 'ffxs' in link:
-        return '.content p::text'
-    if 'sjks' in link:
-        return '.content p::text'
-    if 'sj.uukanshu' in link or 't.uukanshu' in link:
+    elif 'sj.uukanshu' in link or 't.uukanshu' in link:
         return '#read-page p ::text'
-    if 'uukanshu.cc' in link:
+    elif 'uukanshu.cc' in link:
         return '.bbb.font-normal.readcotent ::text'
-    if 'biqugeabc' in link:
-        return '.text_row_txt >p ::text'
-    if 'uuks' in link:
-        return 'div#contentbox > p ::text'
-    if 'uukanshu' in link:
+    elif 'uukanshu' in link:
         return '.contentbox ::text'
-    if '69shu' in link:
+    elif 'trxs.me' in link or 'trxs.cc' in link or 'qbtr' in link or 'tongrenquan' in link :
+        return '.read_chapterDetail p ::text'
+    elif 'biqugeabc' in link:
+        return '.text_row_txt >p ::text'
+    elif 'uuks' in link:
+        return 'div#contentbox > p ::text'
+    elif 'jpxs' in link:
+        return '.read_chapterDetail p ::text'
+    elif 'powanjuan' in link or'ffxs' in link or 'sjks' in link:
+        return '.content p::text'
+    elif '69shu' in link:
         return '.txtnav ::text'
-    if 'ptwxz' in link:
+    elif 'ptwxz' in link:
         return '* ::text'
     else:
         return '*::text'
 
 
 def findchptitlecss(link):
-    if 'trxs' in link:
-        return [".infos>h1:first-child", '']
-    if 'tongrenquan' in link:
+    if 'trxs.me' in link or 'trxs.cc' in link or 'tongrenquan' in link or 'qbtr' in link or 'jpxs' in link:
         return [".infos>h1:first-child", '']
     if 'bixiange' in link:
-        return [".desc>h1:first-child", '']
-    if 'qbtr' in link:
-        return [".infos>h1:first-child", '']
-    if 'jpxs' in link:
-        return [".infos>h1:first-child", '']
-    if 'powanjuan' in link:
-        return [".desc >h1", '']
-    if 'ffxs' in link:
-        return [".desc >h1", '']
+        return [".desc>h1", '']
+    if 'powanjuan' in link or 'ffxs' in link:
+        return ["title", '']
     if 'sjks' in link:
         return [".box-artic>h1", '']
     if 'sj.uukanshu' in link or 't.uukanshu' in link:
@@ -97,7 +81,7 @@ class Crawler(commands.Cog):
 
     @staticmethod
     def easy(nums: int, links: str, css, chptitleCSS) -> t.Tuple[int, str]:
-        response = requests.get(links, headers=headers)
+        response = requests.get(links, headers=headers,timeout=10)
         response.encoding = response.apparent_encoding
         html = response.text
         sel = parsel.Selector(html)
@@ -209,7 +193,10 @@ class Crawler(commands.Cog):
                 urls = [f'{frontend}{j}' for j in [str(i.get('href')) for i in soup.find_all('a')] if
                         '/b/' in j and 'txt' not in j]
                 # print(urls)
-
+            elif 't.uukanshu' in link:
+                    surl = '/t.uukanshu.com/'
+                    urls = [f'{frontend}{surl}{j}' for j in [str(i.get('href')) for i in soup.find_all('a')] if
+                            'read.aspx?tid' in j and 'txt' not in j]
         if 'uukanshu' in link and 'sj.uukanshu' not in link and 't.uukanshu' not in link and not urls ==[]:
             urls=urls[::-1]
             # print(urls)
@@ -218,7 +205,7 @@ class Crawler(commands.Cog):
         book = await self.bot.loop.run_in_executor(None, self.direct, urls, novel, ctx.author.id)
         parsed = {k: v for k, v in sorted(book.items(), key=lambda item: item[0])}
         whole = [i for i in list(parsed.values())]
-        whole.insert(0,'\ncrawled from : '+str(link)+'\n\n')
+        whole.insert(0,'\nsource : '+str(link)+'\n\n')
         async with aiofiles.open(f'{title}.txt', 'w', encoding='utf-8') as f:
             await f.write("\n".join(whole))
         if os.path.getsize(f"{title}.txt") > 8 * 10 ** 6:
