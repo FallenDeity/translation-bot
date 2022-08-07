@@ -93,7 +93,7 @@ class Translator(commands.Cog):
         else:
             return await ctx.send('> **❌Only .docx and .txt supported**')
         nameBool=checkName(name)
-        print(nameBool)
+        # print(nameBool)
         if nameBool is False:
             return await ctx.reply(f'> **❌{name} is not a valid novel name. please provide a valid name to filename before translating. **')
         data = await resp.read()
@@ -151,7 +151,7 @@ class Translator(commands.Cog):
                 button = discord.ui.Button(label="Novel", style=discord.ButtonStyle.link, url=filelnk.url,
                                            emoji="📔")
                 view1.add_item(button)
-                await channel.send(f"> {name} \nuploaded by{user} ", view=view1)
+                await channel.send(f"> {name} \nuploaded by {user} ", view=view1)
 
             except Exception as e:
                 print(e)
