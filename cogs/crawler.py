@@ -81,7 +81,10 @@ class Crawler(commands.Cog):
 
     @staticmethod
     def easy(nums: int, links: str, css, chptitleCSS) -> t.Tuple[int, str]:
-        response = requests.get(links, headers=headers,timeout=10)
+        try:
+            response = requests.get(links, headers=headers,timeout=10)
+        except:
+            pass
         response.encoding = response.apparent_encoding
         html = response.text
         sel = parsel.Selector(html)
@@ -140,7 +143,7 @@ class Crawler(commands.Cog):
         if 'ptwxz' in link and 'bookinfo' in link:
             link=link.replace('bookinfo','html')
             link=link.replace('.html','/')
-        if link[-1] == '/' and '69shu' not in link:
+        if link[-1] == '/' and '69shu' not in link and 'uukanshu.cc' not in link:
             link = link[:-1]
         if 'm.uuks' in  link:
             link=link.replace('m.','')
@@ -178,6 +181,10 @@ class Crawler(commands.Cog):
             urls = [f'{frontend}{j}' for j in [str(i.get('href')) for i in soup.find_all('a')] if
                  'html' in j and 'txt' not in j and 'http' not in j and 'javascript' not in j
                     and 'modules' not in j]
+        elif 'uukanshu.cc' in link:
+            frontend = 'https://uukanshu.cc/'
+            urls = [f'{frontend}{j}' for j in [str(i.get('href')) for i in soup.find_all('a')] if
+                    '/book' in j and name in j and 'txt' not in j]
         else:
             urls = [f'{frontend}{j}' for j in [str(i.get('href')) for i in soup.find_all('a')] if
                     name in j and '.html' in j and 'txt' not in j]
