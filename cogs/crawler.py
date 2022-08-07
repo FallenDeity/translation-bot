@@ -85,7 +85,7 @@ class Crawler(commands.Cog):
         try:
             response = requests.get(links, headers=headers,timeout=10)
         except:
-            return nums,''
+            return nums,f"\ncouldn't get connection to {links}\n"
         response.encoding = response.apparent_encoding
         html = response.text
         sel = parsel.Selector(html)
