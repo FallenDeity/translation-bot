@@ -187,7 +187,7 @@ class Crawler(commands.Cog):
                 title_name = GoogleTranslator(source='auto', target='english').translate(title_name)
             except:
                 pass
-        title = str(title_name)
+        title = str(title_name[:100])
         self.urlcss = findURLCSS(link)
         # print('translated' + title_name)
         # print(self.urlcss)
