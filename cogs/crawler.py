@@ -1,4 +1,3 @@
-import chardet
 import discord
 import aiofiles
 import requests
