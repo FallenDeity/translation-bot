@@ -1,3 +1,4 @@
+import chardet
 import discord
 import aiofiles
 import requests
@@ -158,15 +159,36 @@ class Crawler(commands.Cog):
         maintitleCSS = self.titlecss[0]
         try:
             title_name = str(soup1.select(maintitleCSS)[0].text)
-        except:
-            title_name = f"{ctx.author.id}_crawl"
+        except Exception as e:
+            print(e)
+            try:
+                title_name=''
+                response = requests.get(link, headers=headers)
+                response.encoding = response.apparent_encoding
+                html = response.text
+                sel = parsel.Selector(html)
+                try:
+                    title_name = sel.css(maintitleCSS+" ::text").extract_first()
+                except:
+                    pass
+                if title_name =='' or title_name is None:
+                    title_name=sel.css('title ::text').extract_first()
+                # print(title)
+
+
+            except Exception as ex:
+                print(ex)
+                title_name = f"{ctx.author.id}_crl"
         # print('titlename'+title_name)
         self.chptitlecss = self.titlecss[1]
         if title_name == '' or title_name == 'None' or title_name is None :
-            title = f"{ctx.author.id}_crawl"
+            title = f"{ctx.author.id}_crl"
         else:
-            title_name = GoogleTranslator(source='auto', target='english').translate(title_name)
-            title = str(title_name)
+            try:
+                title_name = GoogleTranslator(source='auto', target='english').translate(title_name)
+            except:
+                pass
+        title = str(title_name)
         self.urlcss = findURLCSS(link)
         # print('translated' + title_name)
         # print(self.urlcss)
