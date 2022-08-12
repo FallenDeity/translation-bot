@@ -1,8 +1,10 @@
 import random
-from core.bot import Raizel
 import traceback
+
 import discord
 from discord.ext import commands
+
+from core.bot import Raizel
 
 
 class ErrorHandler(commands.Cog):

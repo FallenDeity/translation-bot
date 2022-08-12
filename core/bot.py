@@ -1,33 +1,38 @@
 import datetime
 import os
-import discord
 import typing as t
-from languages.languages import choices
-from filestack import Client
+
+import discord
 from discord.ext import commands
+from filestack import Client
+
+from languages.languages import choices
 
 
 class Raizel(commands.Bot):
     boot: datetime.datetime.utcnow()
+    allowed: list[str]
+    drive: Client
 
     def __init__(self) -> None:
         intents = discord.Intents.all()
         self.translator: t.Dict[int, str] = {}
         self.crawler: t.Dict[int, str] = {}
         self.languages = choices
-        super().__init__(command_prefix=commands.when_mentioned_or('.t'),
-                         intents=intents,
-                         strip_after_prefix=True,
-                         case_insensitive=True,
-                         help_command=None,
-                         )
+        super().__init__(
+            command_prefix=commands.when_mentioned_or(".t"),
+            intents=intents,
+            strip_after_prefix=True,
+            case_insensitive=True,
+            help_command=None,
+        )
 
     async def _load_cogs(self, reload_if_loaded=False) -> None:
         if not reload_if_loaded:
             for extension in os.listdir("cogs"):
                 if extension.endswith(".py") and extension[:2] != "__":
                     await self.load_extension(f"cogs.{extension[:-3]}")
-                    print(f'Loaded {extension}')
+                    print(f"Loaded {extension}")
             return
         for extension in os.listdir("cogs"):
             if extension.endswith(".py") and extension[:2] != "__":
@@ -42,13 +47,27 @@ class Raizel(commands.Bot):
 
     async def setup_hook(self) -> None:
         await self._load_cogs()
-        self.allowed = ['trxs', 'tongrenquan', 'ffxs', 'bixiange', 'powanjuan', 'biqugeabc', 'uukanshu', 'qbtr', 'sjks88','uuks','69shu','ptwxz','jpxs']
-        self.drive = Client(os.getenv('FILE'))
+        self.allowed = [
+            "trxs",
+            "tongrenquan",
+            "ffxs",
+            "bixiange",
+            "powanjuan",
+            "biqugeabc",
+            "uukanshu",
+            "qbtr",
+            "sjks88",
+            "uuks",
+            "69shu",
+            "ptwxz",
+            "jpxs",
+        ]
+        self.drive = Client(os.getenv("FILE"))
         await self.load_extension("jishaku")
         return await super().setup_hook()
 
     async def start(self) -> None:
-        return await super().start(os.getenv('TOKEN'), reconnect=True)
+        return await super().start(os.getenv("TOKEN"), reconnect=True)
 
     @property
     def uptime(self) -> datetime.timedelta:

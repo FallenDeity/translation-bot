@@ -1,8 +1,10 @@
 from itertools import chain, starmap
+
 import discord
 from discord import ui
-from core.bot import Raizel
 from discord.ext import commands, menus
+
+from core.bot import Raizel
 
 
 class MyMenuPages(ui.View, menus.MenuPages):
