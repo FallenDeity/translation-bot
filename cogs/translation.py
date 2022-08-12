@@ -7,8 +7,8 @@ from discord.ext import commands
 
 from core.bot import Raizel
 from core.views.linkview import LinkView
-from utils.translate import Translator
 from utils.handler import FileHandler
+from utils.translate import Translator
 
 
 class Translate(commands.Cog):
@@ -37,8 +37,17 @@ class Translate(commands.Cog):
             )
         await ctx.send(f"> **🚄`{self.bot.translator[ctx.author.id]}`**")
 
-    @commands.hybrid_command(help="Send file to be translated with the command. For large files use temp.sh.", aliases=["t"])
-    async def translate(self, ctx, language: str = "english", link: str = None, file: discord.Attachment = None):
+    @commands.hybrid_command(
+        help="Send file to be translated with the command. For large files use temp.sh.",
+        aliases=["t"],
+    )
+    async def translate(
+        self,
+        ctx,
+        language: str = "english",
+        link: str = None,
+        file: discord.Attachment = None,
+    ):
         file = link or file
         if file and link:
             return await ctx.reply(f"> **❌Send only an attachment or only a link.**")
@@ -57,7 +66,7 @@ class Translate(commands.Cog):
                 link = file.url
             else:
                 link = file
-        if 'discord' in link:
+        if "discord" in link:
             resp = await self.bot.con.get(link)
             name = (
                 ctx.message.attachments[0]
@@ -94,7 +103,7 @@ class Translate(commands.Cog):
         novel = await FileHandler().read_file(ctx)
         await ctx.reply(f"> **✅Translation started. Translating to {language}.**")
         os.remove(f"{ctx.author.id}.txt")
-        liz = [novel[i: i + 1800] for i in range(0, len(novel), 1800)]
+        liz = [novel[i : i + 1800] for i in range(0, len(novel), 1800)]
         self.bot.translator[ctx.author.id] = f"0/{len(liz)}"
         translate = Translator(self.bot, ctx.author.id, language)
         story = await translate.start(liz)
@@ -103,7 +112,9 @@ class Translate(commands.Cog):
         await FileHandler.distribute(self.bot, ctx, name, language)
 
     @translate.autocomplete("language")
-    async def translate_complete(self, inter: discord.Interaction, language: str) -> list[app_commands.Choice]:
+    async def translate_complete(
+        self, inter: discord.Interaction, language: str
+    ) -> list[app_commands.Choice]:
         lst = [i for i in self.bot.all_langs if i.lower() in language.lower()][:25]
         return [app_commands.Choice(name=i, value=i) for i in lst]
 

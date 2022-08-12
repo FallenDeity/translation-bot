@@ -1,11 +1,11 @@
 import os
-import chardet
 import typing
-
-import discord
 import zipfile
-import docx
+
 import aiofiles
+import chardet
+import discord
+import docx
 from discord.ext import commands
 
 from core.bot import Raizel
@@ -37,13 +37,13 @@ class FileHandler:
         await ctx.typing()
         doc = docx.Document(f"{ctx.author.id}.{file_type}")
         string = "\n".join([para.text for para in doc.paragraphs])
-        async with aiofiles.open(
-                f"{ctx.author.id}.txt", "w", encoding="utf-8"
-        ) as f:
+        async with aiofiles.open(f"{ctx.author.id}.txt", "w", encoding="utf-8") as f:
             await f.write(string)
         os.remove(f"{ctx.author.id}.docx")
 
-    async def read_file(self, ctx: commands.Context) -> typing.Union[str, discord.Message]:
+    async def read_file(
+        self, ctx: commands.Context
+    ) -> typing.Union[str, discord.Message]:
         novel = None
         for i, j in enumerate(self.ENCODING):
             try:
@@ -73,7 +73,9 @@ class FileHandler:
         return novel
 
     @staticmethod
-    async def distribute(bot: Raizel, ctx: commands.Context, name: str, language: str) -> None:
+    async def distribute(
+        bot: Raizel, ctx: commands.Context, name: str, language: str
+    ) -> None:
         if os.path.getsize(f"{ctx.author.id}.txt") > 8 * 10**6:
             try:
                 with zipfile.ZipFile(f"{ctx.author.id}.zip", "w") as jungle_zip:
