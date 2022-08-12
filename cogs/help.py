@@ -105,7 +105,7 @@ class HelpPageSource(menus.ListPageSource):
         embed.set_footer(
             text=f"{page + 1}/{max_page} | Requested by {author.name}",
             icon_url=author.display_avatar,
-        )  # author.avatar in 2.0
+        )
         return embed
 
 

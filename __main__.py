@@ -1,6 +1,5 @@
 import asyncio
 
-import aiohttp
 import discord
 from discord.ext import tasks
 
@@ -11,7 +10,6 @@ bot = Raizel()
 
 @tasks.loop(seconds=120)
 async def census():
-    await bot.wait_until_ready()
     await bot.change_presence(
         activity=discord.Activity(
             type=discord.ActivityType.listening,
@@ -21,17 +19,22 @@ async def census():
     )
 
 
+@census.before_loop
+async def before_census():
+    await bot.wait_until_ready()
+
+
 @bot.event
 async def on_ready():
     print(f"Running as {bot.user}")
+    await bot.tree.sync()
     census.start()
 
 
 async def main():
-    async with aiohttp.ClientSession() as session:
-        async with bot:
-            bot.con = session
-            await bot.start()
+    async with bot:
+        await bot.start()
 
 
-asyncio.run(main())
+if __name__ == "__main__":
+    asyncio.run(main())

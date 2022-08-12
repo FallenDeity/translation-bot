@@ -7,11 +7,12 @@ import aiofiles
 import chardet
 import discord
 import docx
-from deep_translator import GoogleTranslator
 from discord.ext import commands
 
 from core.bot import Raizel
+from core.views.linkview import LinkView
 from languages.terms import terms
+from utils.translate import Translator
 
 
 def checkName(name):
@@ -36,28 +37,6 @@ class Termer(commands.Cog):
             text = text.replace(t, term_dict[t])
         return text
 
-    def translates(
-        self, liz: t.List[str], order: t.Dict[int, str], author: int, lang: str
-    ) -> t.Dict[int, str]:
-        with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
-            futures = [
-                executor.submit(self.download_image, [url], num, lang)
-                for num, url in enumerate(liz)
-            ]
-            for future in concurrent.futures.as_completed(futures):
-                order[future.result()[0]] = future.result()[1]
-                self.bot.translator[author] = f"{len(order)}/{len(liz)}"
-            return order
-
-    @staticmethod
-    def download_image(
-        img_url: t.List[str], num: int, lang: str
-    ) -> t.Tuple[int, t.List[str]]:
-        translated = GoogleTranslator(source="auto", target=lang).translate_batch(
-            img_url
-        )
-        return num, translated
-
     @commands.command(
         help="Send along with ur novel txt or doc or link to auto translate. Currently supports only https://temp.sh",
         aliases=["term"],
@@ -70,7 +49,6 @@ class Termer(commands.Cog):
             ["".join(string[i : i + 3]) for i in range(0, len(string), 3)]
         )
         total = []
-        term_dict = {}
         for k, v in self.bot.languages.items():
             total.append(k)
             total.append(v)
@@ -118,14 +96,7 @@ class Termer(commands.Cog):
                     ]
                 )
             except:
-                view = discord.ui.View()
-                button = discord.ui.Button(
-                    label="link",
-                    style=discord.ButtonStyle.link,
-                    url="https://temp.sh",
-                    emoji="📨",
-                )
-                view.add_item(button)
+                view = LinkView({"Storage": ["https://temp.sh", "📨"]})
                 return await ctx.send(
                     "> **❌Currently this link is not supported.**", view=view
                 )
@@ -193,15 +164,11 @@ class Termer(commands.Cog):
         )
         os.remove(f"{ctx.author.id}.txt")
         liz = [novel[i : i + 1800] for i in range(0, len(novel), 1800)]
-        order = {}
         self.bot.translator[ctx.author.id] = f"0/{len(liz)}"
-        translated = await self.bot.loop.run_in_executor(
-            None, self.translates, liz, order, ctx.author.id, language
-        )
-        comp = {k: v for k, v in sorted(translated.items(), key=lambda item: item[0])}
-        full = [i[0] for i in list(comp.values()) if i[0] is not None]
+        translate = Translator(self.bot, ctx.author.id, language)
+        story = await translate.start(liz)
         async with aiofiles.open(f"{ctx.author.id}.txt", "w", encoding="utf-8") as f:
-            await f.write(" ".join(full))
+            await f.write(story)
         if os.path.getsize(f"{ctx.author.id}.txt") > 8 * 10**6:
             try:
                 with zipfile.ZipFile(f"{ctx.author.id}.zip", "w") as jungle_zip:
@@ -209,31 +176,16 @@ class Termer(commands.Cog):
                         f"{ctx.author.id}.txt", compress_type=zipfile.ZIP_DEFLATED
                     )
                 filelnk = self.bot.drive.upload(filepath=f"{ctx.author.id}.zip")
-                view = discord.ui.View()
-                button = discord.ui.Button(
-                    label="Novel",
-                    style=discord.ButtonStyle.link,
-                    url=filelnk.url,
-                    emoji="📔",
-                )
-                view.add_item(button)
+                view = LinkView({"Novel": [filelnk.url, "📔"]})
                 await ctx.reply(
                     f"> **✔{ctx.author.mention} your novel {name} is ready.**",
                     view=view,
                 )
                 channel = self.bot.get_channel(1005668482475643050)
                 user = str(ctx.author)
-                view1 = discord.ui.View()
-                button = discord.ui.Button(
-                    label="Novel",
-                    style=discord.ButtonStyle.link,
-                    url=filelnk.url,
-                    emoji="📔",
-                )
-                view1.add_item(button)
                 await channel.send(
                     f"> {name.replace('_',' ')} \nuploaded by {user} Termed novel: {term} language: {language}",
-                    view=view1,
+                    view=view,
                 )
             except:
                 await ctx.reply(

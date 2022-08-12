@@ -2,14 +2,17 @@ import datetime
 import os
 import typing as t
 
+import aiohttp
 import discord
 from discord.ext import commands
 from filestack import Client
 
 from languages.languages import choices
+from languages.sites import sites
 
 
 class Raizel(commands.Bot):
+    con: aiohttp.ClientSession
     boot: datetime.datetime.utcnow()
     allowed: list[str]
     drive: Client
@@ -41,29 +44,13 @@ class Raizel(commands.Bot):
                 except commands.ExtensionAlreadyLoaded:
                     await self.reload_extension(f"cogs.{extension[:-3]}")
 
-    async def on_ready(self) -> None:
-        print("Bot is online!")
-        await self.setup_hook()
-
     async def setup_hook(self) -> None:
         await self._load_cogs()
-        self.allowed = [
-            "trxs",
-            "tongrenquan",
-            "ffxs",
-            "bixiange",
-            "powanjuan",
-            "biqugeabc",
-            "uukanshu",
-            "qbtr",
-            "sjks88",
-            "uuks",
-            "69shu",
-            "ptwxz",
-            "jpxs",
-        ]
-        self.drive = Client(os.getenv("FILE"))
         await self.load_extension("jishaku")
+        self.allowed = sites
+        self.con = aiohttp.ClientSession()
+        self.drive = Client(os.getenv("FILE"))
+        # await self.tree.sync()
         return await super().setup_hook()
 
     async def start(self) -> None:
@@ -76,3 +63,16 @@ class Raizel(commands.Bot):
     @property
     def invite_url(self) -> str:
         return f"https://discord.com/api/oauth2/authorize?client_id={self.user.id}&permissions=8&scope=bot%20applications.commands"
+
+    @property
+    def display_langs(self) -> str:
+        string = ["{0: ^17}".format(f"{k} --> {v}") for k, v in self.languages.items()]
+        string = "\n".join(
+            ["".join(string[i : i + 3]) for i in range(0, len(string), 3)]
+        )
+        return string
+
+    @property
+    def all_langs(self) -> list[str]:
+        langs = list(self.languages.keys()) + list(self.languages.values())
+        return langs
