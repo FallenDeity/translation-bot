@@ -1,5 +1,6 @@
 import concurrent.futures
 import os
+import typing
 import typing as t
 import zipfile
 
@@ -13,6 +14,7 @@ from discord.ext import commands
 
 from core.bot import Raizel
 from core.views.linkview import LinkView
+from utils.handler import FileHandler
 
 headers = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.142 Safari/537.36"
@@ -133,18 +135,16 @@ class Crawler(commands.Cog):
                 self.bot.crawler[name] = f"{len(novel)}/{len(urls)}"
             return novel
 
-    @commands.command(help="Gives progress of novel crawling", aliases=["cp"])
-    async def crawled(self, ctx):
+    @commands.hybrid_command(help="Gives progress of novel crawling", aliases=["cp"])
+    async def crawled(self, ctx: commands.Context) -> typing.Optional[discord.Message]:
         if ctx.author.id not in self.bot.crawler:
             return await ctx.send(
                 "> **❌You have no novel deposited for crawling currently.**"
             )
         await ctx.send(f"> **🚄`{self.bot.crawler[ctx.author.id]}`**")
 
-    @commands.command(
-        help="Crawls other sites for novels. Currently available trxs, tongrenquan, ffxs, bixiange, powanjuan, biqugeabc, uuks"
-    )
-    async def crawl(self, ctx, link=None):
+    @commands.hybrid_command(help="Crawls other sites for novels.")
+    async def crawl(self, ctx: commands.Context, link: str = None) -> typing.Optional[discord.Message]:
         if ctx.author.id in self.bot.crawler:
             return await ctx.reply(
                 "> **❌You cannot crawl two novels at the same time.**"
@@ -291,30 +291,12 @@ class Crawler(commands.Cog):
         whole.insert(0, "\nsource : " + str(link) + "\n\n")
         async with aiofiles.open(f"{title}.txt", "w", encoding="utf-8") as f:
             await f.write("\n".join(whole))
-        if os.path.getsize(f"{title}.txt") > 8 * 10**6:
-            try:
-                with zipfile.ZipFile(f"{title}.zip", "w") as jungle_zip:
-                    jungle_zip.write(f"{title}.txt", compress_type=zipfile.ZIP_DEFLATED)
-                filelnk = self.bot.drive.upload(filepath=f"{title}.zip")
-                view = LinkView({"Novel": [filelnk.url, "📔"]})
-                await ctx.reply(
-                    f"> **✔{ctx.author.mention} your novel {title_name} is ready.**",
-                    view=view,
-                )
-            except Exception as e:
-                print(e)
-                await ctx.reply("> **❌Sorry the file is too big to send.**")
-            os.remove(f"{title}.zip")
-        else:
-            file = discord.File(f"{title}.txt", f"{title_name}.txt")
-            await ctx.reply("**🎉Here is your crawled novel**", file=file)
-        os.remove(f"{title}.txt")
-        del self.bot.crawler[ctx.author.id]
+        await FileHandler().crawlnsend(ctx, self.bot, title, title_name)
 
-    @commands.command(
+    @commands.hybrid_command(
         help="Clears any stagnant novels which were deposited for crawling."
     )
-    async def cclear(self, ctx):
+    async def cclear(self, ctx: commands.Context):
         if ctx.author.id in self.bot.crawler:
             del self.bot.crawler[ctx.author.id]
         files = os.listdir()

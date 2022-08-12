@@ -4530,7 +4530,7 @@ def terms(value):
             "楚": "John",
         }
 
-    elif value == "5" or "marvel" in str(value).lower():
+    elif value == "5" or "prince-of-tennis" in str(value).lower():
         print("You have selected prince of Tennis terms")
         term_dict = {
             "御狐神": "Miketsukami",

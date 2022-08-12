@@ -1,61 +1,57 @@
-import concurrent.futures
 import os
-import typing as t
-import zipfile
 
 import aiofiles
-import chardet
 import discord
-import docx
+from discord import app_commands
 from discord.ext import commands
 
 from core.bot import Raizel
 from core.views.linkview import LinkView
 from languages.terms import terms
+from utils.handler import FileHandler
 from utils.translate import Translator
-
-
-def checkName(name):
-    spl = name.split("_")
-    segment = 0
-    for t in spl:
-        if t[:-1].isalpha() and len(t) > 2:
-            if len(t) > 4 or segment == 2:
-                return True
-            else:
-                segment += 1
-    return False
 
 
 class Termer(commands.Cog):
     def __init__(self, bot: Raizel) -> None:
         self.bot = bot
 
-    def term_raw(self, text, term_dict):
-        # global term_dict
-        for t in term_dict:
-            text = text.replace(t, term_dict[t])
+    @staticmethod
+    def term_raw(text, term_dict):
+        for i in term_dict:
+            text = text.replace(i, term_dict[i])
         return text
 
-    @commands.command(
-        help="Send along with ur novel txt or doc or link to auto translate. Currently supports only https://temp.sh",
+    @commands.hybrid_command(
+        help="Replace terms in a text with the command. For large files use temp.sh.",
         aliases=["term"],
     )
-    async def termer(self, ctx, term, language: str = "english", *, link: str = None):
-        string = [
-            "{0: ^17}".format(f"{k} --> {v}") for k, v in self.bot.languages.items()
-        ]
-        string = "\n".join(
-            ["".join(string[i : i + 3]) for i in range(0, len(string), 3)]
-        )
-        total = []
-        for k, v in self.bot.languages.items():
-            total.append(k)
-            total.append(v)
-        if link and ctx.message.attachments:
+    async def termer(
+        self,
+        ctx,
+        term: str = None,
+        language: str = "english",
+        link: str = None,
+        file: discord.Attachment = None,
+    ):
+        file = link or file
+        if file and link:
             return await ctx.reply(f"> **❌Send only an attachment or only a link.**")
+        if language not in self.bot.all_langs and "http" not in language:
+            return await ctx.reply(
+                f"**❌We have the following languages in our db.**\n```ini\n{self.bot.display_langs}```"
+            )
+        if ctx.author.id in self.bot.translator:
+            return await ctx.send("> **❌You cannot translate two novels at a time.**")
+        if not ctx.message.attachments and not file:
+            return await ctx.send("> **❌You must add a novel/link to translate**")
         if ctx.message.attachments:
-            link = None
+            link = ctx.message.attachments[0].url
+        else:
+            if isinstance(file, discord.Attachment):
+                link = file.url
+            else:
+                link = file
         if term is None:
             return await ctx.reply(
                 f"**Please Choose the validterms to be applied :\n\t"
@@ -71,92 +67,41 @@ class Termer(commands.Cog):
                 f"1 : Naruto \n\t2 : One-Piece \n\t3 : Pokemon\n\t4 : Mixed anime terms\n\t"
                 f"5 : Prince of Tennis\n\t6 : Anime + Marvel + DC\n\t7 : Cultivation terms\n\t"
             )
-            # return await ctx.reply(f"select valid term")
-        if language not in total and "http" not in language:
-            return await ctx.reply(
-                f"**❌We have the following languages in our db.**\n```ini\n{string}```"
-            )
-        if ctx.author.id in self.bot.translator:
-            return await ctx.send("> **❌You cannot translate two novels at a time.**")
-        if not ctx.message.attachments and not link:
-            if language != "english":
-                link = language
-                language = "english"
-            else:
-                return await ctx.send("> **❌You must add a novel/link to translate**")
-        await ctx.typing()
-        if link:
+        if "discord" in link:
             resp = await self.bot.con.get(link)
-            try:
-                file_type = "".join(
-                    [
-                        i
-                        for i in resp.headers["Content-Disposition"].split(".")[-1]
-                        if i.isalnum()
-                    ]
-                )
-            except:
-                view = LinkView({"Storage": ["https://temp.sh", "📨"]})
-                return await ctx.send(
-                    "> **❌Currently this link is not supported.**", view=view
-                )
-            name = link.split("/")[-1].replace(".txt", "").replace(".docx", "")
-        else:
             name = (
                 ctx.message.attachments[0]
                 .filename.replace(".txt", "")
                 .replace(".docx", "")
             )
-            resp = await self.bot.con.get(ctx.message.attachments[0].url)
             file_type = resp.headers["content-type"].split("/")[-1]
+        else:
+            resp = await self.bot.con.get(link)
+            try:
+                file_type = FileHandler.get_headers(resp)
+            except KeyError:
+                view = LinkView({"Storage": ["https://temp.sh", "📨"]})
+                return await ctx.send(
+                    "> **❌Currently this link is not supported.**", view=view
+                )
+            name = link.split("/")[-1].replace(".txt", "").replace(".docx", "")
         if "plain" in file_type.lower() or "txt" in file_type.lower():
             file_type = "txt"
         elif "document" in file_type.lower() or "docx" in file_type.lower():
             file_type = "docx"
         else:
             return await ctx.send("> **❌Only .docx and .txt supported**")
+        namecheck = FileHandler.checkname(name)
+        if not namecheck:
+            return await ctx.reply(
+                f"> **❌{name} is not a valid novel name. please provide a valid name to filename before translating. **"
+            )
         data = await resp.read()
         async with aiofiles.open(f"{ctx.author.id}.{file_type}", "wb") as f:
             await f.write(data)
         if "docx" in file_type:
-            await ctx.reply(
-                "> **✔Docx file detected please wait while we finish converting.**"
-            )
-            await ctx.typing()
-            doc = docx.Document(f"{ctx.author.id}.{file_type}")
-            string = "\n".join([para.text for para in doc.paragraphs])
-            async with aiofiles.open(
-                f"{ctx.author.id}.txt", "w", encoding="utf-8"
-            ) as f:
-                await f.write(string)
-            os.remove(f"{ctx.author.id}.docx")
-        encoding = ["utf-8", "cp936", "utf-16", "cp949"]
-        for i, j in enumerate(encoding):
-            try:
-                async with aiofiles.open(f"{ctx.author.id}.txt", "r", encoding=j) as f:
-                    novel = await f.read()
-                    break
-            except:
-                if i + 1 == len(encoding):
-                    try:
-                        await ctx.send(
-                            "> **✔Encoding not in db trying to auto detect please be patient.**"
-                        )
-                        async with aiofiles.open(f"{ctx.author.id}.txt", "rb") as f:
-                            novel = await f.read()
-                        async with aiofiles.open(
-                            f"{ctx.author.id}.txt",
-                            "r",
-                            encoding=chardet.detect(novel[:500])["encoding"],
-                            errors="ignore",
-                        ) as f:
-                            novel = await f.read()
-                    except Exception as e:
-                        print(e)
-                        return await ctx.reply(
-                            "> **❌Currently we are only translating korean and chinese.**"
-                        )
-                continue
+            await FileHandler.docx_to_txt(ctx, file_type)
+        novel = await FileHandler().read_file(ctx)
         await ctx.reply(f"> **✅Terming started. **")
         novel = self.term_raw(novel, term_dict)
         await ctx.reply(
@@ -169,42 +114,32 @@ class Termer(commands.Cog):
         story = await translate.start(liz)
         async with aiofiles.open(f"{ctx.author.id}.txt", "w", encoding="utf-8") as f:
             await f.write(story)
-        if os.path.getsize(f"{ctx.author.id}.txt") > 8 * 10**6:
-            try:
-                with zipfile.ZipFile(f"{ctx.author.id}.zip", "w") as jungle_zip:
-                    jungle_zip.write(
-                        f"{ctx.author.id}.txt", compress_type=zipfile.ZIP_DEFLATED
-                    )
-                filelnk = self.bot.drive.upload(filepath=f"{ctx.author.id}.zip")
-                view = LinkView({"Novel": [filelnk.url, "📔"]})
-                await ctx.reply(
-                    f"> **✔{ctx.author.mention} your novel {name} is ready.**",
-                    view=view,
-                )
-                channel = self.bot.get_channel(1005668482475643050)
-                user = str(ctx.author)
-                await channel.send(
-                    f"> {name.replace('_',' ')} \nuploaded by {user} Termed novel: {term} language: {language}",
-                    view=view,
-                )
-            except:
-                await ctx.reply(
-                    "**Sorry your file was too big please split it and try again.**"
-                )
-            os.remove(f"{ctx.author.id}.zip")
-        else:
-            file = discord.File(f"{ctx.author.id}.txt", f"{name}.txt")
-            await ctx.reply("**🎉Here is your translated novel**", file=file)
-            channel = self.bot.get_channel(1005668482475643050)
-            user = str(ctx.author)
-            await channel.send(
-                f'> {name.replace("_"," ")} \nUploaded by {user} termed novel : {term} language: {language}',
-                file=discord.File(f"{ctx.author.id}.txt", f"{name}.txt"),
-            )
-        os.remove(f"{ctx.author.id}.txt")
-        del self.bot.translator[ctx.author.id]
+        await FileHandler().distribute(self.bot, ctx, name, language)
 
-    @commands.command(
+    @termer.autocomplete("language")
+    async def translate_complete(
+        self, inter: discord.Interaction, language: str
+    ) -> list[app_commands.Choice]:
+        lst = [i for i in self.bot.all_langs if language.lower() in i.lower()][:25]
+        return [app_commands.Choice(name=i, value=i) for i in lst]
+
+    @termer.autocomplete("term")
+    async def translate_complete(
+        self, inter: discord.Interaction, term: str
+    ) -> list[app_commands.Choice]:
+        lst = [
+            "naruto",
+            "one-piece",
+            "pokemon",
+            "mixed",
+            "prince-of-tennis",
+            "marvel",
+            "dc",
+            "xianxia",
+        ] + list(map(str, range(1, 8)))
+        return [app_commands.Choice(name=i, value=i) for i in lst]
+
+    @commands.hybrid_command(
         help="Clears any stagnant novels which were deposited for translation."
     )
     async def termclear(self, ctx):

@@ -9,3 +9,7 @@ discord.py @ git+https://github.com/Rapptz/discord.py@863df7d04970afe02b227f79e1
 docx==0.2.4
 python-docx==0.8.11
 parsel==1.6.0
+motor==3.0.0
+reactionmenu @ git+https://github.com/Defxult/reactionmenu@11b6f4822bd4f764c946824fa7e2ffae14abe005
+textblob==0.17.1
+dnspython==2.2.1

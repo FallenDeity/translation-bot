@@ -1,3 +1,4 @@
+import datetime
 import os
 import typing
 import zipfile
@@ -7,15 +8,23 @@ import chardet
 import discord
 import docx
 from discord.ext import commands
+from textblob import TextBlob
 
 from core.bot import Raizel
 from core.views.linkview import LinkView
+from databases.data import Novel
 
 
 class FileHandler:
 
     ENCODING: list[str] = ["utf-8", "cp936", "utf-16", "cp949"]
     TOTAL: int = len(ENCODING)
+
+    @staticmethod
+    def get_tags(text: str) -> list[str]:
+        text = TextBlob(text)
+        print(text.noun_phrases)
+        return text.noun_phrases
 
     @staticmethod
     def checkname(name):
@@ -73,10 +82,21 @@ class FileHandler:
         return novel
 
     @staticmethod
+    def get_headers(response) -> str:
+        string = "".join(
+            [
+                i
+                for i in response.headers["Content-Disposition"].split(".")[-1]
+                if i.isalnum()
+            ]
+        )
+        return string
+
     async def distribute(
-        bot: Raizel, ctx: commands.Context, name: str, language: str
+        self, bot: Raizel, ctx: commands.Context, name: str, language: str
     ) -> None:
-        if os.path.getsize(f"{ctx.author.id}.txt") > 8 * 10**6:
+        download_url = None
+        if (size := os.path.getsize(f"{ctx.author.id}.txt")) > 8 * 10**6:
             try:
                 with zipfile.ZipFile(f"{ctx.author.id}.zip", "w") as jungle_zip:
                     jungle_zip.write(
@@ -94,7 +114,7 @@ class FileHandler:
                     f"> {name.replace('_',' ')} \nuploaded by {user} language: {language}",
                     view=view,
                 )
-
+                download_url = filelnk.url
             except Exception as e:
                 print(e)
                 await ctx.reply(
@@ -106,9 +126,66 @@ class FileHandler:
             await ctx.reply("**🎉Here is your translated novel**", file=file)
             channel = bot.get_channel(1005668482475643050)
             user = str(ctx.author)
-            await channel.send(
+            msg = await channel.send(
                 f'> {name.replace("_"," ")} \nUploaded by {user} language: {language}',
                 file=discord.File(f"{ctx.author.id}.txt", f"{name}.txt"),
             )
+            download_url = msg.attachments[0].url
+        if download_url:
+            novel_data = [
+                await bot.mongo.library.next_number,
+                name,
+                "",
+                0,
+                language,
+                self.get_tags(name),
+                download_url,
+                size,
+                ctx.author.id,
+                datetime.datetime.utcnow().timestamp(),
+            ]
+            data = Novel(*novel_data)
+            await bot.mongo.library.add_novel(data)
         os.remove(f"{ctx.author.id}.txt")
         del bot.translator[ctx.author.id]
+
+    async def crawlnsend(
+        self, ctx: commands.Context, bot: Raizel, title: str, title_name: str
+    ) -> None:
+        download_url = None
+        if (size := os.path.getsize(f"{title}.txt")) > 8 * 10**6:
+            try:
+                with zipfile.ZipFile(f"{title}.zip", "w") as jungle_zip:
+                    jungle_zip.write(f"{title}.txt", compress_type=zipfile.ZIP_DEFLATED)
+                filelnk = bot.drive.upload(filepath=f"{title}.zip")
+                view = LinkView({"Novel": [filelnk.url, "📔"]})
+                await ctx.reply(
+                    f"> **✔{ctx.author.mention} your novel {title_name} is ready.**",
+                    view=view,
+                )
+                download_url = filelnk.url
+            except Exception as e:
+                print(e)
+                await ctx.reply("> **❌Sorry the file is too big to send.**")
+            os.remove(f"{title}.zip")
+        else:
+            file = discord.File(f"{title}.txt", f"{title_name}.txt")
+            msg = await ctx.reply("**🎉Here is your crawled novel**", file=file)
+            download_url = msg.attachments[0].url
+        if download_url:
+            novel_data = [
+                await bot.mongo.library.next_number,
+                title_name,
+                "",
+                0,
+                "chinese (simplified)",
+                self.get_tags(title_name),
+                download_url,
+                size,
+                ctx.author.id,
+                datetime.datetime.utcnow().timestamp(),
+            ]
+            data = Novel(*novel_data)
+            await bot.mongo.library.add_novel(data)
+        os.remove(f"{title}.txt")
+        del bot.crawler[ctx.author.id]

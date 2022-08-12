@@ -153,6 +153,7 @@ class ErrorHandler(commands.Cog):
                 )
             )
         else:
+            print(error)
             await ctx.send(
                 "An unexpected error occurred! Reporting this to my developer..."
             )

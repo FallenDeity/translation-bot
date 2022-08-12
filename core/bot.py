@@ -3,12 +3,14 @@ import os
 import typing as t
 
 import aiohttp
+import nltk
 import discord
 from discord.ext import commands
 from filestack import Client
 
 from languages.languages import choices
 from languages.sites import sites
+from utils.connector import Mongo
 
 
 class Raizel(commands.Bot):
@@ -16,6 +18,7 @@ class Raizel(commands.Bot):
     boot: datetime.datetime.utcnow()
     allowed: list[str]
     drive: Client
+    mongo: Mongo
 
     def __init__(self) -> None:
         intents = discord.Intents.all()
@@ -45,11 +48,13 @@ class Raizel(commands.Bot):
                     await self.reload_extension(f"cogs.{extension[:-3]}")
 
     async def setup_hook(self) -> None:
+        nltk.download("brown")
         await self._load_cogs()
         await self.load_extension("jishaku")
         self.allowed = sites
         self.con = aiohttp.ClientSession()
         self.drive = Client(os.getenv("FILE"))
+        self.mongo = Mongo()
         # await self.tree.sync()
         return await super().setup_hook()
 

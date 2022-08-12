@@ -15,21 +15,10 @@ class Translate(commands.Cog):
     def __init__(self, bot: Raizel) -> None:
         self.bot = bot
 
-    @staticmethod
-    def get_headers(response) -> str:
-        string = "".join(
-            [
-                i
-                for i in response.headers["Content-Disposition"].split(".")[-1]
-                if i.isalnum()
-            ]
-        )
-        return string
-
     @commands.hybrid_command(
         help="Gives progress of novel translation.", aliases=["now", "n", "p"]
     )
-    async def progress(self, ctx):
+    async def progress(self, ctx: commands.Context):
         if ctx.author.id not in self.bot.translator:
             return await ctx.send(
                 "> **❌You have no novel deposited for translation currently.**",
@@ -43,7 +32,7 @@ class Translate(commands.Cog):
     )
     async def translate(
         self,
-        ctx,
+        ctx: commands.Context,
         language: str = "english",
         link: str = None,
         file: discord.Attachment = None,
@@ -77,7 +66,7 @@ class Translate(commands.Cog):
         else:
             resp = await self.bot.con.get(link)
             try:
-                file_type = self.get_headers(resp)
+                file_type = FileHandler.get_headers(resp)
             except KeyError:
                 view = LinkView({"Storage": ["https://temp.sh", "📨"]})
                 return await ctx.send(
@@ -109,19 +98,19 @@ class Translate(commands.Cog):
         story = await translate.start(liz)
         async with aiofiles.open(f"{ctx.author.id}.txt", "w", encoding="utf-8") as f:
             await f.write(story)
-        await FileHandler.distribute(self.bot, ctx, name, language)
+        await FileHandler().distribute(self.bot, ctx, name, language)
 
     @translate.autocomplete("language")
     async def translate_complete(
         self, inter: discord.Interaction, language: str
     ) -> list[app_commands.Choice]:
-        lst = [i for i in self.bot.all_langs if i.lower() in language.lower()][:25]
+        lst = [i for i in self.bot.all_langs if language.lower() in i.lower()][:25]
         return [app_commands.Choice(name=i, value=i) for i in lst]
 
     @commands.hybrid_command(
         help="Clears any stagnant novels which were deposited for translation."
     )
-    async def tclear(self, ctx):
+    async def tclear(self, ctx: commands.Context):
         if ctx.author.id in self.bot.translator:
             del self.bot.translator[ctx.author.id]
         files = os.listdir()
