@@ -14,6 +14,8 @@ class Library(commands.Cog):
 
     @staticmethod
     def common_elements_finder(*args):
+        if len(args) == 1:
+            return list(set(args[0]))
         initial = set(args[0])
         for arg in args[1:]:
             initial = initial.intersection(set(arg))
@@ -112,17 +114,28 @@ class Library(commands.Cog):
             novels = await self.bot.mongo.library.get_all_novels
             await self.buttons(await self.make_list_embed(novels), ctx)
             return
+        valid = []
         if _id:
             _id = [await self.bot.mongo.library.get_novel_by_id(_id)]
+            if _id:
+                valid.append(_id)
         elif title:
             title = await self.bot.mongo.library.get_novel_by_name(title)
+            if title:
+                valid.append(title)
         elif tags:
             tags = await self.bot.mongo.library.get_novel_by_tags(tags)
+            if tags:
+                valid.append(tags)
         elif language:
             language = await self.bot.mongo.library.get_novel_by_language(language)
+            if language:
+                valid.append(language)
         elif rating:
             rating = await self.bot.mongo.library.get_novel_by_rating(rating)
-        allnovels = self.common_elements_finder(_id, title, tags, language, rating)
+            if rating:
+                valid.append(rating)
+        allnovels = self.common_elements_finder(*valid)
         if not allnovels:
             await ctx.send("No novels found.")
             return
