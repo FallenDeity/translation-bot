@@ -49,6 +49,8 @@ class Raizel(commands.Bot):
 
     async def setup_hook(self) -> None:
         nltk.download("brown")
+        nltk.download("punkt")
+        nltk.download("popular")
         await self._load_cogs()
         await self.load_extension("jishaku")
         self.allowed = sites
