@@ -23,8 +23,7 @@ class FileHandler:
     @staticmethod
     def get_tags(text: str) -> list[str]:
         text = TextBlob(text)
-        print(text.noun_phrases)
-        return text.noun_phrases
+        return list(set(text.noun_phrases))
 
     @staticmethod
     def checkname(name):
