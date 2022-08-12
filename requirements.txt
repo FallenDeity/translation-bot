@@ -1,3 +1,4 @@
+
 aiofiles==0.8.0
 jishaku==2.5.0
 filestack-python==3.5.0
@@ -10,6 +11,6 @@ docx==0.2.4
 python-docx==0.8.11
 parsel==1.6.0
 motor==3.0.0
-reactionmenu @ git+https://github.com/Defxult/reactionmenu@11b6f4822bd4f764c946824fa7e2ffae14abe005
+reactionmenu==3.0.1
 textblob==0.17.1
 dnspython==2.2.1
