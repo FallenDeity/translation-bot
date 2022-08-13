@@ -37,7 +37,7 @@ class Library(Database):
         return [Novel(**novel) for novel in novels] if novels else None
 
     async def get_novel_by_rating(self, rating: int) -> list[Novel]:
-        novels = await self.library.find({"$gte": {"rating": rating}}).to_list(None)
+        novels = await self.library.find({"rating": {"$gte": rating - 1}}).to_list(None)
         return [Novel(**novel) for novel in novels] if novels else None
 
     @property

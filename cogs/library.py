@@ -15,11 +15,11 @@ class Library(commands.Cog):
     @staticmethod
     def common_elements_finder(*args):
         if len(args) == 1:
-            return list(set(args[0]))
-        initial = set(args[0])
+            return args[0]
+        initial = args[0]
         for arg in args[1:]:
-            initial = initial.intersection(set(arg))
-        return list(initial)
+            initial = [i for i in initial for j in arg if i._id == j._id]
+        return initial
 
     @staticmethod
     async def buttons(lst: list[discord.Embed], ctx: commands.Context) -> None:
@@ -119,26 +119,26 @@ class Library(commands.Cog):
             _id = [await self.bot.mongo.library.get_novel_by_id(_id)]
             if _id:
                 valid.append(_id)
-        elif title:
+        if title:
             title = await self.bot.mongo.library.get_novel_by_name(title)
             if title:
                 valid.append(title)
-        elif tags:
+        if tags:
             tags = await self.bot.mongo.library.get_novel_by_tags(tags)
             if tags:
                 valid.append(tags)
-        elif language:
+        if language:
             language = await self.bot.mongo.library.get_novel_by_language(language)
             if language:
                 valid.append(language)
-        elif rating:
-            rating = await self.bot.mongo.library.get_novel_by_rating(rating)
+        if rating:
+            rating = await self.bot.mongo.library.get_novel_by_rating(int(rating))
             if rating:
                 valid.append(rating)
-        allnovels = self.common_elements_finder(*valid)
-        if not allnovels:
-            await ctx.send("No novels found.")
+        if not valid:
+            await ctx.send("No results found.")
             return
+        allnovels = self.common_elements_finder(*valid)
         await self.buttons(await self.make_list_embed(allnovels), ctx)
 
     @search.autocomplete("language")

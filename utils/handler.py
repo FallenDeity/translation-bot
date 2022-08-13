@@ -22,6 +22,7 @@ class FileHandler:
 
     @staticmethod
     def get_tags(text: str) -> list[str]:
+        text = text.replace("_", " ")
         text = TextBlob(text)
         return list(set(text.noun_phrases))
 
