@@ -40,6 +40,12 @@ class Library(Database):
         novels = await self.library.find({"rating": {"$gte": rating - 1}}).to_list(None)
         return [Novel(**novel) for novel in novels] if novels else None
 
+    async def update_rating(self, _id: int, rating: int) -> None:
+        await self.library.update_one({"_id": _id}, {"$set": {"rating": rating}})
+
+    async def update_description(self, _id: int, description: str) -> None:
+        await self.library.update_one({"_id": _id}, {"$set": {"description": description}})
+
     @property
     async def next_number(self) -> int:
         return await self.get_total_novels + 1

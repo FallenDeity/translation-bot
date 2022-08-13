@@ -171,6 +171,19 @@ class Library(commands.Cog):
         embed = await self.make_base_embed(novel)
         await ctx.send(embed=embed)
 
+    @library.command(name="review", help="reviews a novel.")
+    async def review(self, ctx: commands.Context, _id: int, rating: int, summary: str) -> None:
+        if not 0 <= rating <= 5:
+            await ctx.send("Rating must be between 0 and 5.")
+            return
+        novel = await self.bot.mongo.library.get_novel_by_id(_id)
+        if not novel:
+            await ctx.send("No novel found.")
+            return
+        await self.bot.mongo.library.update_description(novel._id, summary + f" • Reviewed by {ctx.author}")
+        await self.bot.mongo.library.update_rating(novel._id, rating)
+        await ctx.send("Novel reviewed.")
+
 
 async def setup(bot: Raizel) -> None:
     await bot.add_cog(Library(bot))
