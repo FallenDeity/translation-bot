@@ -152,6 +152,13 @@ class ErrorHandler(commands.Cog):
                     color=discord.Color.red(),
                 )
             )
+        elif isinstance(error, commands.MissingRequiredAttachment):
+            await ctx.send(
+                embed=discord.Embed(
+                    description=f"You need to provide an attachment to use this command",
+                    color=discord.Color.red(),
+                )
+            )
         else:
             print(error)
             await ctx.send(
