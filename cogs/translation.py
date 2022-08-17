@@ -36,7 +36,7 @@ class Translate(commands.Cog):
         language: str = "english",
         link: str = None,
         file: discord.Attachment = None,
-        _id: str=None,
+        messageid: str = None,
     ):
         file = link or file
         if file and link:
@@ -52,8 +52,8 @@ class Translate(commands.Cog):
         if ctx.message.attachments:
             link = ctx.message.attachments[0].url
         else:
-            if _id is not None:
-                messageId = _id.split('/')[len(_id.split('/')) - 1];
+            if messageid is not None:
+                messageId = messageid.split('/')[len(messageid.split('/')) - 1];
                 print(messageId)
                 channel = self.bot.get_channel(ctx.channel.id)
                 resolvedMessage = await channel.fetch_message(messageId)
