@@ -55,7 +55,7 @@ class Translate(commands.Cog):
         else:
             if messageid is not None:
                 messageId = messageid.split('/')[len(messageid.split('/')) - 1];
-                print(messageId)
+                # print(messageId)
                 channel = self.bot.get_channel(ctx.channel.id)
                 resolvedMessage = await channel.fetch_message(messageId)
                 msg=resolvedMessage
