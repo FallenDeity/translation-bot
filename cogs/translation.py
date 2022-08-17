@@ -47,7 +47,7 @@ class Translate(commands.Cog):
             )
         if ctx.author.id in self.bot.translator:
             return await ctx.send("> **❌You cannot translate two novels at a time.**")
-        if not ctx.message.attachments and not file and  _id is None:
+        if not ctx.message.attachments and not file and messageid is None:
             return await ctx.send("> **❌You must add a novel/link to translate**")
         if ctx.message.attachments:
             link = ctx.message.attachments[0].url
