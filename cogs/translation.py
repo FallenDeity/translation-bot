@@ -36,6 +36,7 @@ class Translate(commands.Cog):
         language: str = "english",
         link: str = None,
         file: discord.Attachment = None,
+        messageid: str = None,
     ):
         file = link or file
         if file and link:
@@ -46,19 +47,29 @@ class Translate(commands.Cog):
             )
         if ctx.author.id in self.bot.translator:
             return await ctx.send("> **❌You cannot translate two novels at a time.**")
-        if not ctx.message.attachments and not file:
+        if not ctx.message.attachments and not file and messageid is None:
             return await ctx.send("> **❌You must add a novel/link to translate**")
+        msg=None
         if ctx.message.attachments:
             link = ctx.message.attachments[0].url
         else:
-            if isinstance(file, discord.Attachment):
+            if messageid is not None:
+                messageId = messageid.split('/')[len(messageid.split('/')) - 1];
+                # print(messageId)
+                channel = self.bot.get_channel(ctx.channel.id)
+                resolvedMessage = await channel.fetch_message(messageId)
+                msg=resolvedMessage
+                link = resolvedMessage.attachments[0].url
+            elif isinstance(file, discord.Attachment):
                 link = file.url
             else:
                 link = file
-        if "discord" in link:
+        if "discord" in link :
             resp = await self.bot.con.get(link)
+            if msg is None:
+                msg=ctx.message
             name = (
-                ctx.message.attachments[0]
+                msg.attachments[0]
                 .filename.replace(".txt", "")
                 .replace(".docx", "")
             )
