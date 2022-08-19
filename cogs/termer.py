@@ -29,7 +29,7 @@ class Termer(commands.Cog):
     )
     async def termer(
         self,
-        ctx,
+        ctx: commands.Context,
         term: str = None,
         link: str = None,
         file: Optional[discord.Attachment] = None,
@@ -51,16 +51,23 @@ class Termer(commands.Cog):
         novel = None
         file_type = None
         name = None
+        await ctx.send("Please wait.. Translation will began soon",delete_after=5)
         if ctx.message.attachments:
             link = ctx.message.attachments[0].url
-        elif "mega.nz" in link:
-            await ctx.reply("Mega link found.... downloading from mega")
+        elif messageid is None and "mega.nz" in link:
+            await ctx.send("Mega link found.... downloading from mega", delete_after=5)
+            info = self.bot.mega.get_public_url_info(link)
+            size = int(info.get("size")) / 1000
+            if size >= 15 * 1000:
+                return await ctx.reply(
+                    "> **❌ File size is too big... Please split the file and translate"
+                )
             path = self.bot.mega.download_url(link)
             file_type = path.suffix.replace(".", "")
             name = path.name.replace(".txt", "").replace(".docx", "").replace(" ", "_")
             if "txt" not in file_type and "docx" not in file_type:
                 os.remove(path)
-                ctx.send("> **❌Only .docx and .txt supported**")
+                return await ctx.send("> **❌Only .docx and .txt supported**")
             name = bytes(name, encoding="raw_unicode_escape").decode()
             os.rename(path, f"{ctx.author.id}.{file_type}")
             if "docx" in file_type:
@@ -86,6 +93,7 @@ class Termer(commands.Cog):
                 f"8 : encoding converter \t"
             )
         else:
+            await ctx.send(f"> **✅Terming started. **", delete_after=5)
             term_dict = terms(term)
         if term_dict == {}:
             return await ctx.reply(
@@ -97,11 +105,7 @@ class Termer(commands.Cog):
             if msg is None:
                 msg = ctx.message
             resp = await self.bot.con.get(link)
-            name = (
-                msg.attachments[0]
-                .filename.replace(".txt", "")
-                .replace(".docx", "")
-            )
+            name = msg.attachments[0].filename.replace(".txt", "").replace(".docx", "")
             file_type = resp.headers["content-type"].split("/")[-1]
         elif novel is None:
             resp = await self.bot.con.get(link)
@@ -131,7 +135,6 @@ class Termer(commands.Cog):
             if "docx" in file_type:
                 await FileHandler.docx_to_txt(ctx, file_type)
             novel = await FileHandler().read_file(ctx)
-        await ctx.reply(f"> **✅Terming started. **")
         novel = self.term_raw(novel, term_dict)
         await ctx.reply(
             f"> **✅Terming completed ..Translation started. Translating to {language}.**"

@@ -141,6 +141,10 @@ class FileHandler:
                 f'> {name.replace("_"," ")} \nUploaded by {user} language: {language}',
                 file=discord.File(f"{ctx.author.id}.txt", f"{name}.txt"),
             )
+            try:
+                file.close()
+            except:
+                pass
             download_url = msg.attachments[0].url
         if download_url:
             novel_data = [
@@ -182,6 +186,10 @@ class FileHandler:
             file = discord.File(f"{title}.txt", f"{title_name}.txt")
             msg = await ctx.reply("**🎉Here is your crawled novel**", file=file)
             download_url = msg.attachments[0].url
+            try:
+                file.close()
+            except:
+                pass
         if download_url:
             novel_data = [
                 await bot.mongo.library.next_number,

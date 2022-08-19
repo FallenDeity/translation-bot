@@ -50,19 +50,24 @@ class Translate(commands.Cog):
             return await ctx.send("> **❌You cannot translate two novels at a time.**")
         if not ctx.message.attachments and not file and messageid is None:
             return await ctx.send("> **❌You must add a novel/link to translate**")
+        await ctx.send('Please wait.. Translation will began soon',delete_after=5)
         msg = None
         novel = None
         file_type = None
         name = None
         if ctx.message.attachments:
             link = ctx.message.attachments[0].url
-        elif "mega.nz" in link:
-            await ctx.reply("Mega link found.... downloading from mega")
+        elif messageid is None and "mega.nz" in link:
+            await ctx.send("Mega link found.... downloading from mega",delete_after=5)
+            info = self.bot.mega.get_public_url_info(link)
+            size = int(info.get('size')) / 1000
+            if size>=15*1000:
+                return await ctx.reply("> **❌ File size is too big... Please split the file and translate")
             path = self.bot.mega.download_url(link)
             file_type = path.suffix.replace(".", "")
             if "txt" not in file_type and "docx" not in file_type:
                 os.remove(path)
-                ctx.send("> **❌Only .docx and .txt supported**")
+                return await ctx.send("> **❌Only .docx and .txt supported**")
             name = path.name.replace(".txt", "").replace(".docx", "").replace(" ", "_")
             name = bytes(name, encoding="raw_unicode_escape").decode()
             os.rename(path, f"{ctx.author.id}.{file_type}")
