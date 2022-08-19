@@ -1,4 +1,5 @@
 import os
+import typing
 
 import aiofiles
 import discord
@@ -31,7 +32,7 @@ class Termer(commands.Cog):
         ctx: commands.Context,
         term: str = None,
         link: str = None,
-        file: discord.Attachment = None,
+        file: typing.Optional[discord.Attachment] = None,
         messageid: str = None,
         language: str = "english",
     ):
