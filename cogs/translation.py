@@ -60,6 +60,9 @@ class Translate(commands.Cog):
             await ctx.reply("Mega link found.... downloading from mega")
             path = self.bot.mega.download_url(link)
             file_type = path.suffix.replace(".", "")
+            if "txt" not in file_type and "docx" not in file_type:
+                os.remove(path)
+                ctx.send("> **❌Only .docx and .txt supported**")
             name = path.name.replace(".txt", "").replace(".docx", "").replace(" ", "_")
             name = bytes(name, encoding="raw_unicode_escape").decode()
             os.rename(path, f"{ctx.author.id}.{file_type}")
