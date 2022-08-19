@@ -32,12 +32,12 @@ class Translate(commands.Cog):
         aliases=["t"],
     )
     async def translate(
-            self,
-            ctx: commands.Context,
-            link: str = None,
-            file: Optional[discord.Attachment] = None,
-            messageid: str = None,
-            language: str = "english",
+        self,
+        ctx: commands.Context,
+        link: str = None,
+        file: Optional[discord.Attachment] = None,
+        messageid: str = None,
+        language: str = "english",
     ):
         file = link or file
         if not file and not messageid:
@@ -53,17 +53,17 @@ class Translate(commands.Cog):
         msg = None
         novel = None
         file_type = None
-        name=None
+        name = None
         if ctx.message.attachments:
             link = ctx.message.attachments[0].url
-        elif 'mega.nz' in link:
-            await ctx.reply('Mega link found.... downloading from mega')
+        elif "mega.nz" in link:
+            await ctx.reply("Mega link found.... downloading from mega")
             path = self.bot.mega.download_url(link)
-            file_type = path.suffix.replace('.', '')
-            name = path.name.replace('.txt', '').replace('.docx', '').replace(' ', '_')
+            file_type = path.suffix.replace(".", "")
+            name = path.name.replace(".txt", "").replace(".docx", "").replace(" ", "_")
             name = bytes(name, encoding="raw_unicode_escape").decode()
             os.rename(path, f"{ctx.author.id}.{file_type}")
-            if 'docx' in file_type:
+            if "docx" in file_type:
                 await FileHandler.docx_to_txt(ctx, file_type)
             novel = await FileHandler.read_file(FileHandler, ctx=ctx)
         else:

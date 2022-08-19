@@ -33,7 +33,7 @@ class FileHandler:
         dictionary = PyDictionary()
         segment = 0
         for t in spl:
-            if t=='' or t is None:
+            if t == "" or t is None:
                 continue
             if not t[-1].isalpha():
                 t = t[:-1]
@@ -108,8 +108,10 @@ class FileHandler:
         download_url = None
         if (size := os.path.getsize(f"{ctx.author.id}.txt")) > 8 * 10**6:
             try:
-                ctx.send('Translation Completed... Your novel is too big.We are uploading to Mega.. Please wait')
-                os.rename(f'{ctx.author.id}.txt',f'{name}.txt')
+                ctx.send(
+                    "Translation Completed... Your novel is too big.We are uploading to Mega.. Please wait"
+                )
+                os.rename(f"{ctx.author.id}.txt", f"{name}.txt")
                 file = bot.mega.upload(f"{name}.txt")
                 filelnk = bot.mega.get_upload_link(file)
                 view = LinkView({"Novel": [filelnk, "📔"]})
@@ -165,7 +167,7 @@ class FileHandler:
         if (size := os.path.getsize(f"{title}.txt")) > 8 * 10**6:
             try:
                 file = bot.mega.upload(f"{title}.txt")
-                filelnk=bot.mega.get_upload_link(file)
+                filelnk = bot.mega.get_upload_link(file)
                 view = LinkView({"Novel": [filelnk, "📔"]})
                 await ctx.reply(
                     f"> **✔{ctx.author.mention} your novel {title_name} is ready.**",

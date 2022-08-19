@@ -22,7 +22,7 @@ class Raizel(commands.Bot):
     mongo: Mongo
 
     def __init__(self) -> None:
-        self.mega=Mega()
+        self.mega = Mega()
         intents = discord.Intents.all()
         self.translator: t.Dict[int, str] = {}
         self.crawler: t.Dict[int, str] = {}
@@ -59,7 +59,7 @@ class Raizel(commands.Bot):
         self.con = aiohttp.ClientSession()
         self.drive = Client(os.getenv("FILE"))
         self.mongo = Mongo()
-        self.mega=Mega().login('frrhkpjgc@laste.ml', 'dummy123')
+        self.mega = Mega().login("frrhkpjgc@laste.ml", "dummy123")
         # await self.tree.sync()
         return await super().setup_hook()
 
