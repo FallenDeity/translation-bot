@@ -1,7 +1,8 @@
 import os
 
-from databases.data import Novel
 from motor import motor_asyncio
+
+from databases.data import Novel
 
 
 class Database:
@@ -44,7 +45,9 @@ class Library(Database):
         await self.library.update_one({"_id": _id}, {"$set": {"rating": rating}})
 
     async def update_description(self, _id: int, description: str) -> None:
-        await self.library.update_one({"_id": _id}, {"$set": {"description": description}})
+        await self.library.update_one(
+            {"_id": _id}, {"$set": {"description": description}}
+        )
 
     @property
     async def next_number(self) -> int:

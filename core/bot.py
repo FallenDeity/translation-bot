@@ -3,8 +3,8 @@ import os
 import typing as t
 
 import aiohttp
-import nltk
 import discord
+import nltk
 from discord.ext import commands
 from filestack import Client
 

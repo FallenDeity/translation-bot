@@ -30,13 +30,13 @@ class Termer(commands.Cog):
         self,
         ctx,
         term: str = None,
-        language: str = "english",
         link: str = None,
         file: discord.Attachment = None,
+        language: str = "english",
     ):
         file = link or file
-        if file and link:
-            return await ctx.reply(f"> **❌Send only an attachment or only a link.**")
+        if not file:
+            return await ctx.reply(f"> **❌Send an attachment or a link.**")
         if language not in self.bot.all_langs and "http" not in language:
             return await ctx.reply(
                 f"**❌We have the following languages in our db.**\n```ini\n{self.bot.display_langs}```"

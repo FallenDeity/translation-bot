@@ -144,7 +144,9 @@ class Crawler(commands.Cog):
         await ctx.send(f"> **🚄`{self.bot.crawler[ctx.author.id]}`**")
 
     @commands.hybrid_command(help="Crawls other sites for novels.")
-    async def crawl(self, ctx: commands.Context, link: str = None) -> typing.Optional[discord.Message]:
+    async def crawl(
+        self, ctx: commands.Context, link: str = None
+    ) -> typing.Optional[discord.Message]:
         if ctx.author.id in self.bot.crawler:
             return await ctx.reply(
                 "> **❌You cannot crawl two novels at the same time.**"

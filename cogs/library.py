@@ -1,7 +1,8 @@
-import discord
 import datetime
-from discord.ext import commands
+
+import discord
 from discord import app_commands
+from discord.ext import commands
 from reactionmenu import ViewButton, ViewMenu
 
 from core.bot import Raizel
@@ -143,23 +144,31 @@ class Library(commands.Cog):
 
     @search.autocomplete("language")
     async def translate_complete(
-            self, inter: discord.Interaction, language: str
+        self, inter: discord.Interaction, language: str
     ) -> list[app_commands.Choice]:
         lst = [i for i in self.bot.all_langs if language.lower() in i.lower()][:25]
         return [app_commands.Choice(name=i, value=i) for i in lst]
 
     @search.autocomplete("tags")
     async def translate_complete(
-            self, inter: discord.Interaction, tag: str
+        self, inter: discord.Interaction, tag: str
     ) -> list[app_commands.Choice]:
-        lst = [i for i in await self.bot.mongo.library.get_all_tags if tag.lower() in i.lower()][:25]
+        lst = [
+            i
+            for i in await self.bot.mongo.library.get_all_tags
+            if tag.lower() in i.lower()
+        ][:25]
         return [app_commands.Choice(name=i, value=i) for i in lst]
 
     @search.autocomplete("title")
     async def translate_complete(
-            self, inter: discord.Interaction, title: str
+        self, inter: discord.Interaction, title: str
     ) -> list[app_commands.Choice]:
-        lst = [i for i in await self.bot.mongo.library.get_all_titles if title.lower() in i.lower()][:25]
+        lst = [
+            i
+            for i in await self.bot.mongo.library.get_all_titles
+            if title.lower() in i.lower()
+        ][:25]
         return [app_commands.Choice(name=i, value=i) for i in lst]
 
     @library.command(name="info", help="shows info about a novel.")
@@ -172,7 +181,9 @@ class Library(commands.Cog):
         await ctx.send(embed=embed)
 
     @library.command(name="review", help="reviews a novel.")
-    async def review(self, ctx: commands.Context, _id: int, rating: int, summary: str) -> None:
+    async def review(
+        self, ctx: commands.Context, _id: int, rating: int, summary: str
+    ) -> None:
         if not 0 <= rating <= 5:
             await ctx.send("Rating must be between 0 and 5.")
             return
@@ -180,7 +191,9 @@ class Library(commands.Cog):
         if not novel:
             await ctx.send("No novel found.")
             return
-        await self.bot.mongo.library.update_description(novel._id, summary + f" • Reviewed by {ctx.author}")
+        await self.bot.mongo.library.update_description(
+            novel._id, summary + f" • Reviewed by {ctx.author}"
+        )
         await self.bot.mongo.library.update_rating(novel._id, rating)
         await ctx.send("Novel reviewed.")
 
