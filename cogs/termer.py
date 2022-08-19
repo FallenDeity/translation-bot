@@ -51,7 +51,7 @@ class Termer(commands.Cog):
         novel = None
         file_type = None
         name = None
-        await ctx.send("Please wait.. Translation will began soon",delete_after=5)
+        await ctx.send("Please wait.. Translation will began soon", delete_after=5)
         if ctx.message.attachments:
             link = ctx.message.attachments[0].url
         elif messageid is None and "mega.nz" in link:
@@ -62,14 +62,19 @@ class Termer(commands.Cog):
                 return await ctx.reply(
                     "> **❌ File size is too big... Please split the file and translate"
                 )
-            path = self.bot.mega.download_url(link)
+            name = info.get("name")
+            name = bytes(name, encoding="raw_unicode_escape", errors="ignore").decode()
+            file_type = name.split(".")[-1]
+            path = self.bot.mega.download_url(
+                link, dest_filename=f"{ctx.author.id}.{file_type}"
+            )
             file_type = path.suffix.replace(".", "")
-            name = path.name.replace(".txt", "").replace(".docx", "").replace(" ", "_")
+            name = name.replace(".txt", "").replace(".docx", "").replace(" ", "_")
             if "txt" not in file_type and "docx" not in file_type:
                 os.remove(path)
                 return await ctx.send("> **❌Only .docx and .txt supported**")
-            name = bytes(name, encoding="raw_unicode_escape").decode()
-            os.rename(path, f"{ctx.author.id}.{file_type}")
+            name = name[:100]
+            # os.rename(path, f"{ctx.author.id}.{file_type}")
             if "docx" in file_type:
                 await FileHandler.docx_to_txt(ctx, file_type)
             novel = await FileHandler.read_file(FileHandler, ctx=ctx)
