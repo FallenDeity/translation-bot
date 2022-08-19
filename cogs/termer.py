@@ -24,7 +24,7 @@ class Termer(commands.Cog):
         return text
 
     @commands.hybrid_command(
-        help="Replace terms in a text with the command. For large files use temp.sh.",
+        help="Replace terms in a text with the command. For large files use temp.sh. or mega.nz",
         aliases=["term"],
     )
     async def termer(

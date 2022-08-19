@@ -28,7 +28,7 @@ class Translate(commands.Cog):
         await ctx.send(f"> **🚄`{self.bot.translator[ctx.author.id]}`**")
 
     @commands.hybrid_command(
-        help="Send file to be translated with the command. For large files use temp.sh.",
+        help="Send file to be translated with the command. For large files use temp.sh. or mega.nz",
         aliases=["t"],
     )
     async def translate(
