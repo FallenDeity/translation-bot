@@ -1,4 +1,5 @@
 import os
+import typing
 
 import aiofiles
 import discord
@@ -34,7 +35,7 @@ class Translate(commands.Cog):
         self,
         ctx: commands.Context,
         link: str = None,
-        file: discord.Attachment = None,
+        file: typing.Optional[discord.Attachment] = None,
         messageid: str = None,
         language: str = "english",
     ):
