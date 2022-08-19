@@ -33,6 +33,8 @@ class FileHandler:
         dictionary = PyDictionary()
         segment = 0
         for t in spl:
+            if t=='' or t is None:
+                continue
             if not t[-1].isalpha():
                 t = t[:-1]
             if (
@@ -106,12 +108,11 @@ class FileHandler:
         download_url = None
         if (size := os.path.getsize(f"{ctx.author.id}.txt")) > 8 * 10**6:
             try:
-                with zipfile.ZipFile(f"{ctx.author.id}.zip", "w") as jungle_zip:
-                    jungle_zip.write(
-                        f"{ctx.author.id}.txt", compress_type=zipfile.ZIP_DEFLATED
-                    )
-                filelnk = bot.drive.upload(filepath=f"{ctx.author.id}.zip")
-                view = LinkView({"Novel": [filelnk.url, "📔"]})
+                ctx.send('Translation Completed... Your novel is too big.We are uploading to Mega.. Please wait')
+                os.rename(f'{ctx.author.id}.txt',f'{name}.txt')
+                file = bot.mega.upload(f"{name}.txt")
+                filelnk = bot.mega.get_upload_link(file)
+                view = LinkView({"Novel": [filelnk, "📔"]})
                 await ctx.reply(
                     f"> **✔{ctx.author.mention} your novel {name} is ready.**",
                     view=view,
@@ -122,13 +123,13 @@ class FileHandler:
                     f"> {name.replace('_',' ')} \nuploaded by {user} language: {language}",
                     view=view,
                 )
-                download_url = filelnk.url
+                download_url = filelnk
             except Exception as e:
                 print(e)
                 await ctx.reply(
                     "**Sorry your file was too big please split it and try again.**"
                 )
-            os.remove(f"{ctx.author.id}.zip")
+            os.remove(f"{ctx.author.id}.txt")
         else:
             file = discord.File(f"{ctx.author.id}.txt", f"{name}.txt")
             await ctx.reply("**🎉Here is your translated novel**", file=file)
@@ -163,19 +164,18 @@ class FileHandler:
         download_url = None
         if (size := os.path.getsize(f"{title}.txt")) > 8 * 10**6:
             try:
-                with zipfile.ZipFile(f"{title}.zip", "w") as jungle_zip:
-                    jungle_zip.write(f"{title}.txt", compress_type=zipfile.ZIP_DEFLATED)
-                filelnk = bot.drive.upload(filepath=f"{title}.zip")
-                view = LinkView({"Novel": [filelnk.url, "📔"]})
+                file = bot.mega.upload(f"{title}.txt")
+                filelnk=bot.mega.get_upload_link(file)
+                view = LinkView({"Novel": [filelnk, "📔"]})
                 await ctx.reply(
                     f"> **✔{ctx.author.mention} your novel {title_name} is ready.**",
                     view=view,
                 )
-                download_url = filelnk.url
+                download_url = filelnk
             except Exception as e:
                 print(e)
                 await ctx.reply("> **❌Sorry the file is too big to send.**")
-            os.remove(f"{title}.zip")
+            os.remove(f"{title}.txt")
         else:
             file = discord.File(f"{title}.txt", f"{title_name}.txt")
             msg = await ctx.reply("**🎉Here is your crawled novel**", file=file)
