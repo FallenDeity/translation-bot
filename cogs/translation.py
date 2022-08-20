@@ -155,6 +155,18 @@ class Translate(commands.Cog):
                 os.remove(i)
         await ctx.reply("> **✔Cleared all records.**")
 
+    @commands.hybrid_command(
+        help="start mega", aliases=["mega"]
+    )
+    async def mega(self, ctx: commands.Context):
+        self.bot.mega.login(os.getenv("USER"),os.getenv("PWD"))
+        # if ctx.author.id not in self.bot.translator:
+        #     return await ctx.send(
+        #         "> **❌You have no novel deposited for translation currently.**",
+        #         delete_after=5,
+        #     )
+        await ctx.send(f"> **🚄`{self.bot.translator[ctx.author.id]}`**")
+
 
 async def setup(bot):
     await bot.add_cog(Translate(bot))

@@ -59,7 +59,8 @@ class Raizel(commands.Bot):
         self.con = aiohttp.ClientSession()
         self.drive = Client(os.getenv("FILE"))
         self.mongo = Mongo()
-        self.mega = Mega().login(os.getenv("USER"), os.getenv("PWD"))
+        self.mega = Mega()
+        # self.mega = Mega().login(os.getenv("USER"), os.getenv("PWD"))
         # await self.tree.sync()
         return await super().setup_hook()
 
