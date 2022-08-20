@@ -157,25 +157,25 @@ class Translate(commands.Cog):
                 os.remove(i)
         await ctx.reply("> **✔Cleared all records.**")
 
-    @commands.hybrid_command(help="start mega", aliases=["start"])
-    async def mega(self, ctx: commands.Context):
-        try:
-            # print("userpwd:" + str(os.getenv("USER")) + str(os.getenv("MEGA")) + "'")
-            self.bot.mega = Mega().login(
-                email=os.getenv("USER").strip(), password=os.getenv("MEGA").strip()
-            )
-            await ctx.send("Mega login as user was successful")
-            # user = self.bot.mega.get_user()
-            # await ctx.send(str(user))
-        except Exception as e:
-            print(e)
-            print(e.__traceback__.__str__())
-            try:
-                await ctx.send("login using mega failed. try logging inn anonymously")
-                self.bot.mega = Mega().login()
-            except:
-                await ctx.send("Mega connection failed")
-        await ctx.send(f"> **🚄`mega started`**")
+    # @commands.hybrid_command(help="start mega", aliases=["start"])
+    # async def mega(self, ctx: commands.Context):
+    #     try:
+    #         # print("userpwd:" + str(os.getenv("USER")) + str(os.getenv("MEGA")) + "'")
+    #         self.bot.mega = Mega().login(
+    #             email=os.getenv("USER").strip(), password=os.getenv("MEGA").strip()
+    #         )
+    #         await ctx.send("Mega login as user was successful")
+    #         # user = self.bot.mega.get_user()
+    #         # await ctx.send(str(user))
+    #     except Exception as e:
+    #         print(e)
+    #         print(e.__traceback__.__str__())
+    #         try:
+    #             await ctx.send("login using mega failed. try logging inn anonymously")
+    #             self.bot.mega = Mega().login()
+    #         except:
+    #             await ctx.send("Mega connection failed")
+    #     await ctx.send(f"> **🚄`mega started`**")
 
 
 async def setup(bot):
