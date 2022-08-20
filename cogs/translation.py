@@ -162,7 +162,9 @@ class Translate(commands.Cog):
     async def mega(self, ctx: commands.Context):
         try:
             self.bot.mega = Mega().login(os.getenv("USER"), os.getenv("PWD"))
-        except:
+        except Exception as e:
+            print(e)
+            print(e.__traceback__)
             try:
                 await ctx.send('login using mega failed. try logging inn anonymously')
                 self.bot.mega=Mega().login()
