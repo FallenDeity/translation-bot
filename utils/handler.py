@@ -111,7 +111,7 @@ class FileHandler:
         download_url = None
         if (size := os.path.getsize(f"{ctx.author.id}.txt")) > 8 * 10**6:
             try:
-                ctx.send(
+                await ctx.send(
                     "Translation Completed... Your novel is too big.We are uploading to Mega.. Please wait",
                     delete_after=5,
                 )
