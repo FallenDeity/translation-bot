@@ -142,6 +142,7 @@ class FileHandler:
                 f'> {name.replace("_"," ")} \nUploaded by {user} language: {language}',
                 file=discord.File(f"{ctx.author.id}.txt", f"{name}.txt"),
             )
+            os.remove(f"{ctx.author.id}.txt")
             try:
                 file.close()
             except:
@@ -162,7 +163,6 @@ class FileHandler:
             ]
             data = Novel(*novel_data)
             await bot.mongo.library.add_novel(data)
-        os.remove(f"{ctx.author.id}.txt")
         del bot.translator[ctx.author.id]
 
     async def crawlnsend(
@@ -191,6 +191,7 @@ class FileHandler:
             file = discord.File(f"{title}.txt", f"{title_name}.txt")
             msg = await ctx.reply("**🎉Here is your crawled novel**", file=file)
             download_url = msg.attachments[0].url
+            os.remove(f"{title}.txt")
             try:
                 file.close()
             except:
@@ -210,5 +211,4 @@ class FileHandler:
             ]
             data = Novel(*novel_data)
             await bot.mongo.library.add_novel(data)
-        os.remove(f"{title}.txt")
         del bot.crawler[ctx.author.id]
