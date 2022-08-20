@@ -5,6 +5,7 @@ import aiofiles
 import discord
 from discord import app_commands
 from discord.ext import commands
+from mega import Mega
 
 from core.bot import Raizel
 from core.views.linkview import LinkView
@@ -28,7 +29,7 @@ class Translate(commands.Cog):
         await ctx.send(f"> **🚄`{self.bot.translator[ctx.author.id]}`**")
 
     @commands.hybrid_command(
-        help="Send file to be translated with the command. For large files use temp.sh.",
+        help="Send file to be translated with the command. For large files use temp.sh. or mega.nz",
         aliases=["t"],
     )
     async def translate(
@@ -51,8 +52,35 @@ class Translate(commands.Cog):
         if not ctx.message.attachments and not file and messageid is None:
             return await ctx.send("> **❌You must add a novel/link to translate**")
         msg = None
+        novel = None
+        file_type = None
+        name = None
+        await ctx.send("Please wait.. Translation will began soon", delete_after=5)
         if ctx.message.attachments:
             link = ctx.message.attachments[0].url
+        elif messageid is None and ("mega.nz" in link or "mega.co.nz" in link):
+            await ctx.send("Mega link found.... downloading from mega", delete_after=5)
+            info = self.bot.mega.get_public_url_info(link)
+            size = int(info.get("size")) / 1000
+            if size >= 15 * 1000:
+                return await ctx.reply(
+                    "> **❌ File size is too big... Please split the file and translate"
+                )
+            name = info.get("name")
+            name = bytes(name, encoding="raw_unicode_escape", errors="ignore").decode()
+            file_type = name.split(".")[-1]
+            path = self.bot.mega.download_url(
+                link, dest_filename=f"{ctx.author.id}.{file_type}"
+            )
+            if "txt" not in file_type and "docx" not in file_type:
+                os.remove(path)
+                return await ctx.send("> **❌Only .docx and .txt supported**")
+            name = name.replace(".txt", "").replace(".docx", "").replace(" ", "_")
+            name = name[:100]
+            # os.rename(path, f"{ctx.author.id}.{file_type}")
+            if "docx" in file_type:
+                await FileHandler.docx_to_txt(ctx, file_type)
+            novel = await FileHandler.read_file(FileHandler, ctx=ctx)
         else:
             if messageid is not None:
                 messageId = messageid.split("/")[len(messageid.split("/")) - 1]
@@ -71,7 +99,7 @@ class Translate(commands.Cog):
                 msg = ctx.message
             name = msg.attachments[0].filename.replace(".txt", "").replace(".docx", "")
             file_type = resp.headers["content-type"].split("/")[-1]
-        else:
+        elif novel is None:
             resp = await self.bot.con.get(link)
             try:
                 file_type = FileHandler.get_headers(resp)
@@ -81,6 +109,7 @@ class Translate(commands.Cog):
                     "> **❌Currently this link is not supported.**", view=view
                 )
             name = link.split("/")[-1].replace(".txt", "").replace(".docx", "")
+            name = name.replace("%20", " ")
         if "plain" in file_type.lower() or "txt" in file_type.lower():
             file_type = "txt"
         elif "document" in file_type.lower() or "docx" in file_type.lower():
@@ -92,12 +121,13 @@ class Translate(commands.Cog):
             return await ctx.reply(
                 f"> **❌{name} is not a valid novel name. please provide a valid name to filename before translating. **"
             )
-        data = await resp.read()
-        async with aiofiles.open(f"{ctx.author.id}.{file_type}", "wb") as f:
-            await f.write(data)
-        if "docx" in file_type:
-            await FileHandler.docx_to_txt(ctx, file_type)
-        novel = await FileHandler().read_file(ctx)
+        if novel is None:
+            data = await resp.read()
+            async with aiofiles.open(f"{ctx.author.id}.{file_type}", "wb") as f:
+                await f.write(data)
+            if "docx" in file_type:
+                await FileHandler.docx_to_txt(ctx, file_type)
+            novel = await FileHandler().read_file(ctx)
         await ctx.reply(f"> **✅Translation started. Translating to {language}.**")
         os.remove(f"{ctx.author.id}.txt")
         liz = [novel[i : i + 1800] for i in range(0, len(novel), 1800)]
@@ -126,6 +156,26 @@ class Translate(commands.Cog):
             if str(ctx.author.id) in str(i) and "crawl" not in i:
                 os.remove(i)
         await ctx.reply("> **✔Cleared all records.**")
+
+    # @commands.hybrid_command(help="start mega", aliases=["start"])
+    # async def mega(self, ctx: commands.Context):
+    #     try:
+    #         # print("userpwd:" + str(os.getenv("USER")) + str(os.getenv("MEGA")) + "'")
+    #         self.bot.mega = Mega().login(
+    #             email=os.getenv("USER").strip(), password=os.getenv("MEGA").strip()
+    #         )
+    #         await ctx.send("Mega login as user was successful")
+    #         # user = self.bot.mega.get_user()
+    #         # await ctx.send(str(user))
+    #     except Exception as e:
+    #         print(e)
+    #         print(e.__traceback__.__str__())
+    #         try:
+    #             await ctx.send("login using mega failed. try logging inn anonymously")
+    #             self.bot.mega = Mega().login()
+    #         except:
+    #             await ctx.send("Mega connection failed")
+    #     await ctx.send(f"> **🚄`mega started`**")
 
 
 async def setup(bot):
