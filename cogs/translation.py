@@ -161,7 +161,8 @@ class Translate(commands.Cog):
     )
     async def mega(self, ctx: commands.Context):
         try:
-            self.bot.mega = Mega().login(email='9g2sq2es@freeml.net',password='dummy123')
+            self.bot.mega = Mega().login(email=os.getenv("USER"), password=os.getenv('PSW'))
+            # self.bot.mega = Mega().login(email='9g2sq2es@freeml.net',password='dummy123')
             await ctx.send('Mega login as user was successful')
             user=self.bot.mega.get_user()
             await ctx.send(str(user))
