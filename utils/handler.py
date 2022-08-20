@@ -175,7 +175,7 @@ class FileHandler:
         if (size := os.path.getsize(f"{title}.txt")) > 8 * 10**6:
             try:
                 file = bot.mega.upload(f"{title}.txt")
-                ctx.send(
+                await ctx.send(
                     "Crawling Completed... Your novel is too big.We are uploading to Mega.. Please wait",
                     delete_after=5,
                 )
