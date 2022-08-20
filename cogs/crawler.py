@@ -73,7 +73,7 @@ def findchptitlecss(link):
     if "uukanshu.cc" in link:
         return [".booktitle", "h1 ::text"]
     if "biqugeabc" in link:
-        return ["h2", ".reader-main .title ::text"]
+        return ["title", ".reader-main .title ::text"]
     if "uuks" in link:
         return [".jieshao_content>h1", "h1#timu ::text"]
     if "uukanshu" in link:
@@ -182,19 +182,24 @@ class Crawler(commands.Cog):
         maintitleCSS = self.titlecss[0]
         try:
             title_name = str(soup1.select(maintitleCSS)[0].text)
+            if title_name == "" or title_name is None:
+                raise Exception
         except Exception as e:
             print(e)
             try:
                 title_name = ""
                 response = requests.get(link, headers=headers)
-                response.encoding = response.apparent_encoding
+                if "biqueabc" in link:
+                    response.encoding = "UTF-8"
+                else:
+                    response.encoding = response.apparent_encoding
                 html = response.text
                 sel = parsel.Selector(html)
                 try:
                     title_name = sel.css(maintitleCSS + " ::text").extract_first()
-                except:
-                    pass
-                if title_name == "" or title_name is None:
+                except Exception as e:
+                    print("error at 200" + str(e))
+                if title_name.strip() == "" or title_name is None:
                     title_name = sel.css("title ::text").extract_first()
                 # print(title)
 
@@ -279,6 +284,7 @@ class Crawler(commands.Cog):
             "uukanshu" in link
             and "sj.uukanshu" not in link
             and "t.uukanshu" not in link
+            and "uukanshu.cc" not in link
             and not urls == []
         ):
             urls = urls[::-1]
