@@ -32,12 +32,12 @@ class Translate(commands.Cog):
         aliases=["t"],
     )
     async def translate(
-        self,
-        ctx: commands.Context,
-        link: str = None,
-        file: typing.Optional[discord.Attachment] = None,
-        messageid: str = None,
-        language: str = "english",
+            self,
+            ctx: commands.Context,
+            link: str = None,
+            file: typing.Optional[discord.Attachment] = None,
+            messageid: str = None,
+            language: str = "english",
     ):
         file = link or file
         if not file and not messageid:
@@ -128,7 +128,7 @@ class Translate(commands.Cog):
             novel = await FileHandler().read_file(ctx)
         await ctx.reply(f"> **✅Translation started. Translating to {language}.**")
         os.remove(f"{ctx.author.id}.txt")
-        liz = [novel[i : i + 1800] for i in range(0, len(novel), 1800)]
+        liz = [novel[i: i + 1800] for i in range(0, len(novel), 1800)]
         self.bot.translator[ctx.author.id] = f"0/{len(liz)}"
         translate = Translator(self.bot, ctx.author.id, language)
         story = await translate.start(liz)
@@ -138,7 +138,7 @@ class Translate(commands.Cog):
 
     @translate.autocomplete("language")
     async def translate_complete(
-        self, inter: discord.Interaction, language: str
+            self, inter: discord.Interaction, language: str
     ) -> list[app_commands.Choice]:
         lst = [i for i in self.bot.all_langs if language.lower() in i.lower()][:25]
         return [app_commands.Choice(name=i, value=i) for i in lst]
@@ -156,16 +156,16 @@ class Translate(commands.Cog):
         await ctx.reply("> **✔Cleared all records.**")
 
     @commands.hybrid_command(
-        help="start mega", aliases=["mega"]
+        help="start mega", aliases=["start"]
     )
     async def mega(self, ctx: commands.Context):
-        self.bot.mega.login(os.getenv("USER"),os.getenv("PWD"))
+        self.bot.mega = self.bot.mega.login(os.getenv("USER"), os.getenv("PWD"))
         # if ctx.author.id not in self.bot.translator:
         #     return await ctx.send(
         #         "> **❌You have no novel deposited for translation currently.**",
         #         delete_after=5,
         #     )
-        await ctx.send(f"> **🚄`{self.bot.translator[ctx.author.id]}`**")
+        await ctx.send(f"> **🚄`mega startes`**")
 
 
 async def setup(bot):
