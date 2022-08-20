@@ -36,8 +36,6 @@ class FileHandler:
         dictionary = PyDictionary()
         segment = 0
         for t in spl:
-            if t == "" or t is None:
-                continue
             if not t[-1].isalpha():
                 t = t[:-1]
             if (
@@ -129,7 +127,7 @@ class FileHandler:
                     f"> {name.replace('_',' ')} \nuploaded by {user} language: {language}",
                     view=view,
                 )
-                download_url = filelnk
+                download_url = filelnk.url
             except Exception as e:
                 print(e)
                 await ctx.reply(
@@ -185,11 +183,11 @@ class FileHandler:
                     f"> **✔{ctx.author.mention} your novel {title_name} is ready.**",
                     view=view,
                 )
-                download_url = filelnk
+                download_url = filelnk.url
             except Exception as e:
                 print(e)
                 await ctx.reply("> **❌Sorry the file is too big to send.**")
-            os.remove(f"{title}.txt")
+            os.remove(f"{title}.zip")
         else:
             file = discord.File(f"{title}.txt", f"{title_name}.txt")
             msg = await ctx.reply("**🎉Here is your crawled novel**", file=file)

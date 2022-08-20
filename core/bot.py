@@ -7,7 +7,6 @@ import discord
 import nltk
 from discord.ext import commands
 from filestack import Client
-from mega import Mega
 
 from languages.languages import choices
 from languages.sites import sites
@@ -22,7 +21,7 @@ class Raizel(commands.Bot):
     mongo: Mongo
 
     def __init__(self) -> None:
-        self.mega: Mega
+        self.mega: Mega 
         intents = discord.Intents.all()
         self.translator: t.Dict[int, str] = {}
         self.crawler: t.Dict[int, str] = {}
