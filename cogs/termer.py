@@ -122,6 +122,7 @@ class Termer(commands.Cog):
                     "> **❌Currently this link is not supported.**", view=view
                 )
             name = link.split("/")[-1].replace(".txt", "").replace(".docx", "")
+            name = name.replace("%20", " ")
         if "plain" in file_type.lower() or "txt" in file_type.lower():
             file_type = "txt"
         elif "document" in file_type.lower() or "docx" in file_type.lower():
