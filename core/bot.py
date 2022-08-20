@@ -7,6 +7,7 @@ import discord
 import nltk
 from discord.ext import commands
 from filestack import Client
+from mega import Mega
 
 from languages.languages import choices
 from languages.sites import sites
