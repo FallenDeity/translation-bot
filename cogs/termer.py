@@ -54,7 +54,7 @@ class Termer(commands.Cog):
         await ctx.send("Please wait.. Translation will began soon", delete_after=5)
         if ctx.message.attachments:
             link = ctx.message.attachments[0].url
-        elif messageid is None and "mega.nz" in link:
+        elif messageid is None and ("mega.nz" in link or "mega.co.nz" in link):
             await ctx.send("Mega link found.... downloading from mega", delete_after=5)
             info = self.bot.mega.get_public_url_info(link)
             size = int(info.get("size")) / 1000
