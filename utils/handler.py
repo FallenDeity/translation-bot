@@ -29,9 +29,9 @@ class FileHandler:
 
     @staticmethod
     def checkname(name):
-        name=name.replace("-","_")
-        name=name.replace(" ","_")
-        name=name.replace("%20",'_')
+        name = name.replace("-", "_")
+        name = name.replace(" ", "_")
+        name = name.replace("%20", "_")
         spl = name.split("_")
         dictionary = PyDictionary()
         segment = 0
