@@ -162,9 +162,12 @@ class Translate(commands.Cog):
     async def mega(self, ctx: commands.Context):
         try:
             self.bot.mega = Mega()._login_user(email='9g2sq2es@freeml.net',password='dummy123')
+            await ctx.send('Mega login as user was successful')
+            user=self.bot.mega.get_user()
+            await ctx.send(str(user))
         except Exception as e:
             print(e)
-            print(e.__traceback__)
+            print(e.__traceback__.__str__())
             try:
                 await ctx.send('login using mega failed. try logging inn anonymously')
                 self.bot.mega=Mega().login()
