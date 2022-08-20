@@ -5,6 +5,7 @@ import aiofiles
 import discord
 from discord import app_commands
 from discord.ext import commands
+from mega import Mega
 
 from core.bot import Raizel
 from core.views.linkview import LinkView
@@ -160,10 +161,11 @@ class Translate(commands.Cog):
     )
     async def mega(self, ctx: commands.Context):
         try:
-            self.bot.mega = self.bot.mega.login(os.getenv("USER"), os.getenv("PWD"))
+            self.bot.mega = Mega().login(os.getenv("USER"), os.getenv("PWD"))
         except:
             try:
-                self.bot.mega=self.bot.mega.login()
+                await ctx.send('login using mega failed. try logging inn anonymously')
+                self.bot.mega=Mega().login()
             except:
                 await ctx.send('Mega connection failed')
         # if ctx.author.id not in self.bot.translator:
@@ -171,7 +173,7 @@ class Translate(commands.Cog):
         #         "> **❌You have no novel deposited for translation currently.**",
         #         delete_after=5,
         #     )
-        await ctx.send(f"> **🚄`mega startes`**")
+        await ctx.send(f"> **🚄`mega started`**")
 
 
 async def setup(bot):
