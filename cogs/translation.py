@@ -159,7 +159,13 @@ class Translate(commands.Cog):
         help="start mega", aliases=["start"]
     )
     async def mega(self, ctx: commands.Context):
-        self.bot.mega = self.bot.mega.login(os.getenv("USER"), os.getenv("PWD"))
+        try:
+            self.bot.mega = self.bot.mega.login(os.getenv("USER"), os.getenv("PWD"))
+        except:
+            try:
+                self.bot.mega=self.bot.mega.login()
+            except:
+                await ctx.send('Mega connection failed')
         # if ctx.author.id not in self.bot.translator:
         #     return await ctx.send(
         #         "> **❌You have no novel deposited for translation currently.**",
