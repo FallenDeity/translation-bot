@@ -106,11 +106,11 @@ class FileHandler:
         self, bot: Raizel, ctx: commands.Context, name: str, language: str
     ) -> None:
         download_url = None
-        # if (size := os.path.getsize(f"{ctx.author.id}.txt")) > 8 * 10**6:
-        if True:
+        if (size := os.path.getsize(f"{ctx.author.id}.txt")) > 8 * 10**6:
             try:
                 ctx.send(
-                    "Translation Completed... Your novel is too big.We are uploading to Mega.. Please wait",delete_after=5
+                    "Translation Completed... Your novel is too big.We are uploading to Mega.. Please wait",
+                    delete_after=5,
                 )
                 os.rename(f"{ctx.author.id}.txt", f"{name}.txt")
                 file = bot.mega.upload(f"{name}.txt")
@@ -169,13 +169,12 @@ class FileHandler:
         self, ctx: commands.Context, bot: Raizel, title: str, title_name: str
     ) -> None:
         download_url = None
-        # if (size := os.path.getsize(f"{title}.txt")) > 8 * 10**6:
-        if True:
+        if (size := os.path.getsize(f"{title}.txt")) > 8 * 10**6:
             try:
                 file = bot.mega.upload(f"{title}.txt")
                 ctx.send(
                     "Crawling Completed... Your novel is too big.We are uploading to Mega.. Please wait",
-                    delete_after=5
+                    delete_after=5,
                 )
                 filelnk = bot.mega.get_upload_link(file)
                 view = LinkView({"Novel": [filelnk, "📔"]})

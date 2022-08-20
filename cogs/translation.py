@@ -33,12 +33,12 @@ class Translate(commands.Cog):
         aliases=["t"],
     )
     async def translate(
-            self,
-            ctx: commands.Context,
-            link: str = None,
-            file: typing.Optional[discord.Attachment] = None,
-            messageid: str = None,
-            language: str = "english",
+        self,
+        ctx: commands.Context,
+        link: str = None,
+        file: typing.Optional[discord.Attachment] = None,
+        messageid: str = None,
+        language: str = "english",
     ):
         file = link or file
         if not file and not messageid:
@@ -129,7 +129,7 @@ class Translate(commands.Cog):
             novel = await FileHandler().read_file(ctx)
         await ctx.reply(f"> **✅Translation started. Translating to {language}.**")
         os.remove(f"{ctx.author.id}.txt")
-        liz = [novel[i: i + 1800] for i in range(0, len(novel), 1800)]
+        liz = [novel[i : i + 1800] for i in range(0, len(novel), 1800)]
         self.bot.translator[ctx.author.id] = f"0/{len(liz)}"
         translate = Translator(self.bot, ctx.author.id, language)
         story = await translate.start(liz)
@@ -139,7 +139,7 @@ class Translate(commands.Cog):
 
     @translate.autocomplete("language")
     async def translate_complete(
-            self, inter: discord.Interaction, language: str
+        self, inter: discord.Interaction, language: str
     ) -> list[app_commands.Choice]:
         lst = [i for i in self.bot.all_langs if language.lower() in i.lower()][:25]
         return [app_commands.Choice(name=i, value=i) for i in lst]
@@ -156,30 +156,24 @@ class Translate(commands.Cog):
                 os.remove(i)
         await ctx.reply("> **✔Cleared all records.**")
 
-    @commands.hybrid_command(
-        help="start mega", aliases=["start"]
-    )
+    @commands.hybrid_command(help="start mega", aliases=["start"])
     async def mega(self, ctx: commands.Context):
         try:
-            print("userpwd:"+str(os.getenv("USER"))+str(os.getenv('MEGA'))+"'")
-            self.bot.mega = Mega().login(email=os.getenv("USER").strip(), password=os.getenv("MEGA").strip())
-            # self.bot.mega = Mega().login(email='9g2sq2es@freeml.net',password='dummy123')
-            await ctx.send('Mega login as user was successful')
-            user=self.bot.mega.get_user()
-            await ctx.send(str(user))
+            # print("userpwd:" + str(os.getenv("USER")) + str(os.getenv("MEGA")) + "'")
+            self.bot.mega = Mega().login(
+                email=os.getenv("USER").strip(), password=os.getenv("MEGA").strip()
+            )
+            await ctx.send("Mega login as user was successful")
+            # user = self.bot.mega.get_user()
+            # await ctx.send(str(user))
         except Exception as e:
             print(e)
             print(e.__traceback__.__str__())
             try:
-                await ctx.send('login using mega failed. try logging inn anonymously')
-                self.bot.mega=Mega().login()
+                await ctx.send("login using mega failed. try logging inn anonymously")
+                self.bot.mega = Mega().login()
             except:
-                await ctx.send('Mega connection failed')
-        # if ctx.author.id not in self.bot.translator:
-        #     return await ctx.send(
-        #         "> **❌You have no novel deposited for translation currently.**",
-        #         delete_after=5,
-        #     )
+                await ctx.send("Mega connection failed")
         await ctx.send(f"> **🚄`mega started`**")
 
 
