@@ -1,7 +1,9 @@
+import os
 import random
 import traceback
 
 import discord
+import heroku3
 from discord.ext import commands
 
 from core.bot import Raizel
@@ -159,6 +161,17 @@ class ErrorHandler(commands.Cog):
                     color=discord.Color.red(),
                 )
             )
+        elif "TooManyRequests" in str(error):
+            await ctx.send(
+                embed=discord.Embed(
+                    description=f"Google translate limit reached. Try restarting server",
+                    color=discord.Color.red(),
+                ),
+            )
+            h = heroku3.from_key(os.getenv("APIKEY"))
+            app = h.app(os.getenv("APPNAME"))
+            await ctx.send("> Bot is restarting... please wait....")
+            app.restart()
         else:
             print(error)
             await ctx.send(
