@@ -96,7 +96,6 @@ class Library(commands.Cog):
     async def search(
         self,
         ctx: commands.Context,
-        _id: int = None,
         title: str = None,
         language: str = None,
         rating: int = None,
@@ -106,7 +105,6 @@ class Library(commands.Cog):
         await ctx.send("Searching...", delete_after=5)
         tags = [i.strip() for i in tags.split() if i] if tags else None
         if (
-            _id is None
             and title is None
             and language is None
             and rating is None
@@ -116,10 +114,6 @@ class Library(commands.Cog):
             await self.buttons(await self.make_list_embed(novels), ctx)
             return
         valid = []
-        if _id:
-            _id = [await self.bot.mongo.library.get_novel_by_id(_id)]
-            if _id:
-                valid.append(_id)
         if title:
             title = await self.bot.mongo.library.get_novel_by_name(title)
             if title:
