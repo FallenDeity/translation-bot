@@ -105,7 +105,7 @@ class Library(commands.Cog):
         await ctx.send("Searching...", delete_after=5)
         tags = [i.strip() for i in tags.split() if i] if tags else None
         if (
-            and title is None
+            title is None
             and language is None
             and rating is None
             and tags is None
