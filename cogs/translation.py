@@ -121,6 +121,9 @@ class Translate(commands.Cog):
             return await ctx.reply(
                 f"> **❌{name} is not a valid novel name. please provide a valid name to filename before translating. **"
             )
+        for tag in ['/', '\\', '<', '>', "'", '"', ':', ";", '?', '|', '*', ';']:
+            name = name.replace(tag, '').strip()
+        name = name.replace('_', ' ')
         if novel is None:
             data = await resp.read()
             async with aiofiles.open(f"{ctx.author.id}.{file_type}", "wb") as f:
