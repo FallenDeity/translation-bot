@@ -214,10 +214,13 @@ class Crawler(commands.Cog):
             try:
                 title_name = GoogleTranslator(
                     source="auto", target="english"
-                ).translate(title_name)
+                ).translate(title_name).strip()
             except:
                 pass
         title = str(title_name[:100])
+        for tag in ['/', '\\', '<', '>', "'", '"', ':', ";", '?', '|', '*', ';']:
+            title = title.replace(tag, '')
+        title = title.replace('_', ' ')
         self.urlcss = findURLCSS(link)
         # print('translated' + title_name)
         # print(self.urlcss)

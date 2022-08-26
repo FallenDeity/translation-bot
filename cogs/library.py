@@ -115,6 +115,7 @@ class Library(commands.Cog):
             return
         valid = []
         if title:
+            title = title.replace('_', ' ')
             title = await self.bot.mongo.library.get_novel_by_name(title)
             if title:
                 valid.append(title)
