@@ -139,7 +139,8 @@ class FileHandler:
         else:
             file = discord.File(f"{ctx.author.id}.txt", f"{name}.txt")
             await ctx.reply("**🎉Here is your translated novel**", file=file)
-            channel = bot.get_channel(1005668482475643050)
+            guild=bot.get_guild(940866934214373376)
+            channel = guild.get_channel(1005668482475643050)
             user = str(ctx.author)
             msg = await channel.send(
                 f'> {name.replace("_"," ")} \nUploaded by {user} language: {language}',
@@ -199,7 +200,7 @@ class FileHandler:
                 file.close()
             except:
                 pass
-        if download_url:
+        if False and download_url:
             novel_data = [
                 await bot.mongo.library.next_number,
                 title_name,

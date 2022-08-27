@@ -209,7 +209,7 @@ class Crawler(commands.Cog):
         # print('titlename'+title_name)
         self.chptitlecss = self.titlecss[1]
         if title_name == "" or title_name == "None" or title_name is None:
-            title = f"{ctx.author.id}_crl"
+            title_name = f"{ctx.author.id}_crl"
         else:
             try:
                 title_name = GoogleTranslator(
