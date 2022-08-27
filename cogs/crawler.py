@@ -266,15 +266,15 @@ class Crawler(commands.Cog):
                     for j in [str(i.get("href")) for i in soup.find_all("a")]
                     if "read.aspx?tid" in j and "txt" not in j
                 ]
-            elif "uuks" in link:
-                # print(frontend)
-                # name=name.replace('all','')
-                # print(name)
-                urls = [
-                    f"{frontend}{j}"
-                    for j in [str(i.get("href")) for i in soup.find_all("a")]
-                    if "/b/" in j and "txt" not in j
-                ]
+            # elif "uuks" in link:
+            #     # print(frontend)
+            #     # name=name.replace('all','')
+            #     # print(name)
+            #     urls = [
+            #         f"{frontend}{j}"
+            #         for j in [str(i.get("href")) for i in soup.find_all("a")]
+            #         if "/b/" in j and "txt" not in j
+            #     ]
                 # print(urls)
             elif "t.uukanshu" in link:
                 surl = "/t.uukanshu.com/"

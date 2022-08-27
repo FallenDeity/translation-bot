@@ -10,7 +10,6 @@ sites = [
     "uukanshu",
     "qbtr",
     "sjks88",
-    "uuks",
     "69shu",
     "ptwxz",
     "jpxs",
