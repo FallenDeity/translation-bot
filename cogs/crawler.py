@@ -209,19 +209,7 @@ class Crawler(commands.Cog):
                 title_name = f"{ctx.author.id}_crl"
         # print('titlename'+title_name)
         self.chptitlecss = self.titlecss[1]
-        if title_name == "" or title_name == "None" or title_name is None:
-            title_name = f"{ctx.author.id}_crl"
-        else:
-            try:
-                title_name = GoogleTranslator(
-                    source="auto", target="english"
-                ).translate(title_name).strip()
-            except:
-                pass
-        title = str(title_name[:100])
-        for tag in ['/', '\\', '<', '>', "'", '"', ':', ";", '?', '|', '*', ';', '\r', '\n', '\t', '\\\\']:
-            title = title.replace(tag, '')
-        title = title.replace('_', ' ')
+
         if selector is None:
             self.urlcss = findURLCSS(link)
         else:
@@ -304,14 +292,42 @@ class Crawler(commands.Cog):
                 for j in [str(i.get("href")) for i in soup.find_all("a")]
                 if name in j and "txt" not in j
             ]
+        if urls == [] or len(urls) < 30:
+            link=link+'/'
+
+            try:
+                response = requests.get(link, headers=headers, timeout=10)
+            except:
+                print('error')
+            response.encoding = response.apparent_encoding
+            html = response.text
+            sel = parsel.Selector(html)
+            urls = [
+                f"{frontend}{j}"
+                for j in sel.css('a ::attr(href)').extract()
+                if name in j and "txt" not in j
+            ]
+            title_name = sel.css(maintitleCSS + " ::text").extract_first()
+            # print(urls)
         if len(urls)<30:
-            print(urls)
-            print(soup)
             return await ctx.reply(
                f"> **❌Currently this link is not supported.**"
             )
         self.bot.crawler[ctx.author.id] = f"0/{len(urls)}"
         await ctx.reply(f"> **✔Crawl started.**")
+        if title_name == "" or title_name == "None" or title_name is None:
+            title_name = f"{ctx.author.id}_crl"
+        else:
+            try:
+                title_name = GoogleTranslator(
+                    source="auto", target="english"
+                ).translate(title_name).strip()
+            except:
+                pass
+        title = str(title_name[:100])
+        for tag in ['/', '\\', '<', '>', "'", '"', ':', ";", '?', '|', '*', ';', '\r', '\n', '\t', '\\\\']:
+            title = title.replace(tag, '')
+        title = title.replace('_', ' ')
         book = await self.bot.loop.run_in_executor(
             None, self.direct, urls, novel, ctx.author.id
         )
