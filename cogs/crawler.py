@@ -83,7 +83,7 @@ def findchptitlecss(link):
     if "ptwxz" in link:
         return [".title", ""]
     else:
-        return ["title", ""]
+        return ["title", "title"]
 
 
 class Crawler(commands.Cog):
@@ -145,7 +145,7 @@ class Crawler(commands.Cog):
 
     @commands.hybrid_command(help="Crawls other sites for novels.")
     async def crawl(
-        self, ctx: commands.Context, link: str = None, selector: str = None
+        self, ctx: commands.Context, link: str = None, selector: str = None, reverse: str = None
     ) -> typing.Optional[discord.Message]:
         if ctx.author.id in self.bot.crawler:
             return await ctx.reply(
@@ -329,6 +329,8 @@ class Crawler(commands.Cog):
             return await ctx.reply(
                f"> **❌Currently this link is not supported.**"
             )
+        if reverse is not None:
+            urls.reverse()
         self.bot.crawler[ctx.author.id] = f"0/{len(urls)}"
         await ctx.reply(f"> **✔Crawl started.**")
         if title_name == "" or title_name == "None" or title_name is None:
