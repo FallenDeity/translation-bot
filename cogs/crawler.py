@@ -15,7 +15,7 @@ from discord.ext import commands
 from core.bot import Raizel
 from core.views.linkview import LinkView
 from utils.handler import FileHandler
-
+from urllib.parse import urljoin
 headers = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.142 Safari/537.36"
 }
@@ -49,6 +49,8 @@ def findURLCSS(link):
         return ".txtnav ::text"
     elif "ptwxz" in link:
         return "* ::text"
+    elif "shu05" in link:
+        return "#htmlContent ::text"
     else:
         return "*::text"
 
@@ -83,7 +85,7 @@ def findchptitlecss(link):
     if "ptwxz" in link:
         return [".title", ""]
     else:
-        return ["title", ""]
+        return ["title", "title"]
 
 
 class Crawler(commands.Cog):
@@ -143,9 +145,9 @@ class Crawler(commands.Cog):
             )
         await ctx.send(f"> **🚄`{self.bot.crawler[ctx.author.id]}`**")
 
-    @commands.hybrid_command(help="Crawls other sites for novels.")
+    @commands.hybrid_command(help="Crawls other sites for novels. \nselector: give the css selector for the content page.\n Reverse: give any value if TOC is reversed")
     async def crawl(
-        self, ctx: commands.Context, link: str = None, selector: str = None
+        self, ctx: commands.Context, link: str = None, selector: str = None, reverse: str = None
     ) -> typing.Optional[discord.Message]:
         if ctx.author.id in self.bot.crawler:
             return await ctx.reply(
@@ -155,10 +157,10 @@ class Crawler(commands.Cog):
         if link is None:
             return await ctx.reply(f"> **❌Enter a link for crawling.**")
         await ctx.send('Started crawling please wait',delete_after=10)
-        # num = 0
-        # for i in allowed:
-        #     if i not in link:
-        #         num += 1
+        num = 0
+        for i in allowed:
+            if i not in link:
+                num += 1
         # if num == len(allowed):
         #     return await ctx.reply(
         #         f"> **❌We currently crawl only from {', '.join(allowed)}**"
@@ -220,6 +222,7 @@ class Crawler(commands.Cog):
         # print(self.urlcss)
         name = str(link.split("/")[-1].replace(".html", ""))
         # name=name.replace('all','')
+        urls=[]
         frontend_part = link.replace(f"/{name}", "").split("/")[-1]
         frontend = link.replace(f"/{name}", "").replace(f"/{frontend_part}", "")
         if "69shu" in link:
@@ -285,13 +288,16 @@ class Crawler(commands.Cog):
             and not urls == []
         ):
             urls = urls[::-1]
-            # print(urls)
-        if urls==[] or len(urls)<30:
+        if urls == [] or num == len(allowed) or len(urls)<30:
             urls = [
-                f"{frontend}{j}"
+                f"{j}"
                 for j in [str(i.get("href")) for i in soup.find_all("a")]
                 if name in j and "txt" not in j
             ]
+            utemp = []
+            for url in urls:
+                utemp.append(urljoin(link, url))
+            urls = utemp
         if urls == [] or len(urls) < 30:
             link=link+'/'
 
@@ -303,16 +309,23 @@ class Crawler(commands.Cog):
             html = response.text
             sel = parsel.Selector(html)
             urls = [
-                f"{frontend}{j}"
+                f"{j}"
                 for j in sel.css('a ::attr(href)').extract()
                 if name in j and "txt" not in j
             ]
+            utemp=[]
+            for url in urls:
+                utemp.append(urljoin(link, url))
+            urls=utemp
+            # print(urls)
             title_name = sel.css(maintitleCSS + " ::text").extract_first()
             # print(urls)
         if len(urls)<30:
             return await ctx.reply(
                f"> **❌Currently this link is not supported.**"
             )
+        if reverse is not None:
+            urls.reverse()
         self.bot.crawler[ctx.author.id] = f"0/{len(urls)}"
         await ctx.reply(f"> **✔Crawl started.**")
         if title_name == "" or title_name == "None" or title_name is None:
