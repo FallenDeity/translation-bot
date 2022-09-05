@@ -35,6 +35,8 @@ class FileHandler:
         spl = name.split("_")
         dictionary = PyDictionary()
         segment = 0
+        if len(spl)==1:
+            return False
         for t in spl:
             if t is None or t == "":
                 continue
@@ -42,10 +44,10 @@ class FileHandler:
                 t = t[:-1]
             if (
                 t[:-1].isalpha()
-                and len(t) > 2
+                and len(t) > 3
                 and bool(dictionary.meaning(str(t), disable_errors=True))
             ):
-                if len(t) > 4 or segment == 2:
+                if len(t) > 6 or segment == 2:
                     return True
                 else:
                     segment += 1

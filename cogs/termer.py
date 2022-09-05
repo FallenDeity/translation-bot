@@ -35,6 +35,7 @@ class Termer(commands.Cog):
         file: typing.Optional[discord.Attachment] = None,
         messageid: str = None,
         language: str = "english",
+        novelname: str = None,
     ):
         file = link or file
         if not file and not messageid:
@@ -129,8 +130,10 @@ class Termer(commands.Cog):
             file_type = "docx"
         else:
             return await ctx.send("> **❌Only .docx and .txt supported**")
-        namecheck = FileHandler.checkname(name)
-        if not namecheck:
+        if novelname is not None:
+            name = novelname
+        name_check = FileHandler.checkname(name)
+        if not name_check:
             return await ctx.reply(
                 f"> **❌{name} is not a valid novel name. please provide a valid name to filename before translating. **"
             )
