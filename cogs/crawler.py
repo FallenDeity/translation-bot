@@ -145,7 +145,7 @@ class Crawler(commands.Cog):
 
     @commands.hybrid_command(help="Crawls other sites for novels.")
     async def crawl(
-        self, ctx: commands.Context, link: str = None
+        self, ctx: commands.Context, link: str = None, selector: str = None
     ) -> typing.Optional[discord.Message]:
         if ctx.author.id in self.bot.crawler:
             return await ctx.reply(
@@ -154,14 +154,15 @@ class Crawler(commands.Cog):
         allowed = self.bot.allowed
         if link is None:
             return await ctx.reply(f"> **❌Enter a link for crawling.**")
-        num = 0
-        for i in allowed:
-            if i not in link:
-                num += 1
-        if num == len(allowed):
-            return await ctx.reply(
-                f"> **❌We currently crawl only from {', '.join(allowed)}**"
-            )
+        await ctx.send('Started crawling please wait',delete_after=10)
+        # num = 0
+        # for i in allowed:
+        #     if i not in link:
+        #         num += 1
+        # if num == len(allowed):
+        #     return await ctx.reply(
+        #         f"> **❌We currently crawl only from {', '.join(allowed)}**"
+        #     )
         if "69shu" in link and "txt" in link:
             link = link.replace("/txt", "")
             link = link.replace(".htm", "/")
@@ -218,10 +219,15 @@ class Crawler(commands.Cog):
             except:
                 pass
         title = str(title_name[:100])
-        for tag in ['/', '\\', '<', '>', "'", '"', ':', ";", '?', '|', '*', ';']:
+        for tag in ['/', '\\', '<', '>', "'", '"', ':', ";", '?', '|', '*', ';', '\r', '\n', '\t', '\\\\']:
             title = title.replace(tag, '')
         title = title.replace('_', ' ')
-        self.urlcss = findURLCSS(link)
+        if selector is None:
+            self.urlcss = findURLCSS(link)
+        else:
+            if not '::text' in selector:
+                selector=selector+" ::text"
+            self.urlcss = selector
         # print('translated' + title_name)
         # print(self.urlcss)
         name = str(link.split("/")[-1].replace(".html", ""))
@@ -292,6 +298,18 @@ class Crawler(commands.Cog):
         ):
             urls = urls[::-1]
             # print(urls)
+        if urls==[] or len(urls)<30:
+            urls = [
+                f"{frontend}{j}"
+                for j in [str(i.get("href")) for i in soup.find_all("a")]
+                if name in j and "txt" not in j
+            ]
+        if len(urls)<30:
+            print(urls)
+            print(soup)
+            return await ctx.reply(
+               f"> **❌Currently this link is not supported.**"
+            )
         self.bot.crawler[ctx.author.id] = f"0/{len(urls)}"
         await ctx.reply(f"> **✔Crawl started.**")
         book = await self.bot.loop.run_in_executor(
