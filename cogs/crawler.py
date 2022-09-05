@@ -49,6 +49,8 @@ def findURLCSS(link):
         return ".txtnav ::text"
     elif "ptwxz" in link:
         return "* ::text"
+    elif "shu05" in link:
+        return "#htmlContent ::text"
     else:
         return "*::text"
 
@@ -143,7 +145,7 @@ class Crawler(commands.Cog):
             )
         await ctx.send(f"> **🚄`{self.bot.crawler[ctx.author.id]}`**")
 
-    @commands.hybrid_command(help="Crawls other sites for novels.")
+    @commands.hybrid_command(help="Crawls other sites for novels. \nselector: give the css selector for the content page.\n Reverse: give any value if TOC is reversed")
     async def crawl(
         self, ctx: commands.Context, link: str = None, selector: str = None, reverse: str = None
     ) -> typing.Optional[discord.Message]:
@@ -286,13 +288,6 @@ class Crawler(commands.Cog):
             and not urls == []
         ):
             urls = urls[::-1]
-            # print(urls)
-        # if urls==[] or len(urls)<30:
-        #     urls = [
-        #         f"{frontend}{j}"
-        #         for j in [str(i.get("href")) for i in soup.find_all("a")]
-        #         if name in j and "txt" not in j
-        #     ]
         if urls == [] or num == len(allowed) or len(urls)<30:
             urls = [
                 f"{j}"
