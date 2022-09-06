@@ -159,9 +159,9 @@ class Crawler(commands.Cog):
         await ctx.send(f"> **🚄`{self.bot.crawler[ctx.author.id]}`**")
 
     @commands.hybrid_command(
-        help="Crawls other sites for novels. \nselector: give the css selector for the content page. It will try to auto select if not given\n Reverse: give any value if TOC is reversed")
+        help="Crawls other sites for novels. \nselector: give the css selector for the content page. It will try to auto select if not given\n Reverse: give any value if Table of Content is reversed in the given link(or if crawled novel needs to be reversed)")
     async def crawl(
-            self, ctx: commands.Context, link: str = None, selector: str = None, reverse: str = None
+            self, ctx: commands.Context, link: str = None, reverse: str = None, selector: str = None
     ) -> typing.Optional[discord.Message]:
         if ctx.author.id in self.bot.crawler:
             return await ctx.reply(
@@ -206,10 +206,7 @@ class Crawler(commands.Cog):
             try:
                 title_name = ""
                 response = requests.get(link, headers=headers)
-                if "biqueabc" in link:
-                    response.encoding = "UTF-8"
-                else:
-                    response.encoding = response.apparent_encoding
+                response.encoding = response.apparent_encoding
                 html = response.text
                 sel = parsel.Selector(html)
                 try:
