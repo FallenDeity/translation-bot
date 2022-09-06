@@ -16,6 +16,8 @@ from core.bot import Raizel
 from core.views.linkview import LinkView
 from utils.handler import FileHandler
 from urllib.parse import urljoin
+from dragnet import extract_content
+
 headers = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.142 Safari/537.36"
 }
@@ -52,7 +54,7 @@ def findURLCSS(link):
     elif "shu05" in link:
         return "#htmlContent ::text"
     else:
-        return "*::text"
+        return "* ::text"
 
 
 def findchptitlecss(link):
@@ -81,11 +83,11 @@ def findchptitlecss(link):
     if "uukanshu" in link:
         return ["title", "h1#timu ::text"]
     if "69shu" in link:
-        return [".bread>a:nth-of-type(3)", ""]
+        return [".bread>a:nth-of-type(3)", "title ::text"]
     if "ptwxz" in link:
-        return [".title", ""]
+        return [".title", "title ::text"]
     else:
-        return ["title", "title"]
+        return ["title", "title ::text"]
 
 
 class Crawler(commands.Cog):

@@ -17,3 +17,6 @@ dnspython==2.2.1
 PyDictionary==2.0.1
 mega.py @git+https://github.com/Ajurahul/mega.py@c3836facd07dba9b396982afd988ed2b2be93163
 heroku3==5.1.4
+numpy==1.23.2
+Cython==0.29.32
+dragnet==2.0.4
