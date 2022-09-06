@@ -11,12 +11,12 @@ import requests
 from bs4 import BeautifulSoup
 from deep_translator import GoogleTranslator
 from discord.ext import commands
+from readabilipy import simple_json_from_html_string
 
 from core.bot import Raizel
 from core.views.linkview import LinkView
 from utils.handler import FileHandler
 from urllib.parse import urljoin
-from dragnet import extract_content
 
 headers = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.142 Safari/537.36"
@@ -105,26 +105,37 @@ class Crawler(commands.Cog):
         except:
             return nums, f"\ncouldn't get connection to {links}\n"
         response.encoding = response.apparent_encoding
-        html = response.text
-        sel = parsel.Selector(html)
-        text = sel.css(css).extract()
         full = ""
-        if not chptitleCSS == "":
-            try:
-                chpTitle = sel.css(chptitleCSS).extract_first()
-            except:
-                chpTitle = None
-            # print('chp' + str(chpTitle))
-            if not chpTitle is None:
-                full += str(chpTitle) + "\n\n"
-        # print(css)
-        if text == []:
-            return nums, ""
-        if "ptwxz" in links:
-            while text[0] != "GetFont();":
+        if '*' in css:
+            article = simple_json_from_html_string(response.text)
+            text = article['plain_text']
+            chpTitle = article['title']
+            # print(chpTitle)
+            full += str(chpTitle) + "\n\n"
+            for i in text:
+                full += i['text'] + "\n"
+
+        else:
+            html = response.text
+            sel = parsel.Selector(html)
+            text = sel.css(css).extract()
+
+            if not chptitleCSS == "":
+                try:
+                    chpTitle = sel.css(chptitleCSS).extract_first()
+                except:
+                    chpTitle = None
+                # print('chp' + str(chpTitle))
+                if not chpTitle is None:
+                    full += str(chpTitle) + "\n\n"
+            # print(css)
+            if text == []:
+                return nums, ""
+            if "ptwxz" in links:
+                while text[0] != "GetFont();":
+                    text.pop(0)
                 text.pop(0)
-            text.pop(0)
-        full = full + "\n".join(text)
+            full = full + "\n".join(text)
         full = full + "\n---------------------xxx---------------------\n"
         return nums, full
 
@@ -147,9 +158,10 @@ class Crawler(commands.Cog):
             )
         await ctx.send(f"> **🚄`{self.bot.crawler[ctx.author.id]}`**")
 
-    @commands.hybrid_command(help="Crawls other sites for novels. \nselector: give the css selector for the content page.\n Reverse: give any value if TOC is reversed")
+    @commands.hybrid_command(
+        help="Crawls other sites for novels. \nselector: give the css selector for the content page. It will try to auto select if not given\n Reverse: give any value if TOC is reversed")
     async def crawl(
-        self, ctx: commands.Context, link: str = None, selector: str = None, reverse: str = None
+            self, ctx: commands.Context, link: str = None, selector: str = None, reverse: str = None
     ) -> typing.Optional[discord.Message]:
         if ctx.author.id in self.bot.crawler:
             return await ctx.reply(
@@ -158,7 +170,7 @@ class Crawler(commands.Cog):
         allowed = self.bot.allowed
         if link is None:
             return await ctx.reply(f"> **❌Enter a link for crawling.**")
-        await ctx.send('Started crawling please wait',delete_after=10)
+        await ctx.send('Started crawling please wait', delete_after=10)
         num = 0
         for i in allowed:
             if i not in link:
@@ -218,13 +230,13 @@ class Crawler(commands.Cog):
             self.urlcss = findURLCSS(link)
         else:
             if not '::text' in selector:
-                selector=selector+" ::text"
+                selector = selector + " ::text"
             self.urlcss = selector
         # print('translated' + title_name)
         # print(self.urlcss)
         name = str(link.split("/")[-1].replace(".html", ""))
         # name=name.replace('all','')
-        urls=[]
+        urls = []
         frontend_part = link.replace(f"/{name}", "").split("/")[-1]
         frontend = link.replace(f"/{name}", "").replace(f"/{frontend_part}", "")
         if "69shu" in link:
@@ -239,10 +251,10 @@ class Crawler(commands.Cog):
                 f"{frontend}{j}"
                 for j in [str(i.get("href")) for i in soup.find_all("a")]
                 if "html" in j
-                and "txt" not in j
-                and "http" not in j
-                and "javascript" not in j
-                and "modules" not in j
+                   and "txt" not in j
+                   and "http" not in j
+                   and "javascript" not in j
+                   and "modules" not in j
             ]
         elif "uukanshu.cc" in link:
             frontend = "https://uukanshu.cc/"
@@ -290,7 +302,7 @@ class Crawler(commands.Cog):
             and not urls == []
         ):
             urls = urls[::-1]
-        if urls == [] or num == len(allowed) or len(urls)<30:
+        if urls == [] or num == len(allowed) or len(urls) < 30:
             urls = [
                 f"{j}"
                 for j in [str(i.get("href")) for i in soup.find_all("a")]
@@ -301,7 +313,7 @@ class Crawler(commands.Cog):
                 utemp.append(urljoin(link, url))
             urls = utemp
         if urls == [] or len(urls) < 30:
-            link=link+'/'
+            link = link + '/'
 
             try:
                 response = requests.get(link, headers=headers, timeout=10)
@@ -315,16 +327,16 @@ class Crawler(commands.Cog):
                 for j in sel.css('a ::attr(href)').extract()
                 if name in j and "txt" not in j
             ]
-            utemp=[]
+            utemp = []
             for url in urls:
                 utemp.append(urljoin(link, url))
-            urls=utemp
+            urls = utemp
             # print(urls)
             title_name = sel.css(maintitleCSS + " ::text").extract_first()
             # print(urls)
-        if len(urls)<30:
+        if len(urls) < 30:
             return await ctx.reply(
-               f"> **❌Currently this link is not supported.**"
+                f"> **❌Currently this link is not supported.**"
             )
         if reverse is not None:
             urls.reverse()
