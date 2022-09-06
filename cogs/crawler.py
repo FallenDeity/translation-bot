@@ -98,7 +98,7 @@ class Crawler(commands.Cog):
         self.bot = bot
 
     @staticmethod
-    def easy(nums: int, links: str, css, chptitleCSS) -> t.Tuple[int, str]:
+    def easy(nums: int, links: str, css: str, chptitleCSS) -> t.Tuple[int, str]:
         response = None
         try:
             response = requests.get(links, headers=headers, timeout=10)
@@ -106,7 +106,7 @@ class Crawler(commands.Cog):
             return nums, f"\ncouldn't get connection to {links}\n"
         response.encoding = response.apparent_encoding
         full = ""
-        if '*' in css:
+        if '* ::text' == css or css is None or css.strip() == '':
             article = simple_json_from_html_string(response.text)
             text = article['plain_text']
             chpTitle = article['title']
