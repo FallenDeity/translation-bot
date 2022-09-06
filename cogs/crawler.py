@@ -77,7 +77,7 @@ def findchptitlecss(link):
     if "uukanshu.cc" in link:
         return [".booktitle", "h1 ::text"]
     if "biqugeabc" in link:
-        return ["title", ".reader-main .title ::text"]
+        return ["title", "title ::text"]
     if "uuks" in link:
         return [".jieshao_content>h1", "h1#timu ::text"]
     if "uukanshu" in link:
