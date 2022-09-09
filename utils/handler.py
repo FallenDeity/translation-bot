@@ -161,12 +161,12 @@ class FileHandler:
                 "",
                 0,
                 language,
-                original_language,
                 self.get_tags(name),
                 download_url,
                 size,
                 ctx.author.id,
                 datetime.datetime.utcnow().timestamp(),
+                original_language,
             ]
             data = Novel(*novel_data)
             await bot.mongo.library.add_novel(data)
