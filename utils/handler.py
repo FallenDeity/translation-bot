@@ -108,7 +108,7 @@ class FileHandler:
         return string
 
     async def distribute(
-        self, bot: Raizel, ctx: commands.Context, name: str, language: str
+        self, bot: Raizel, ctx: commands.Context, name: str, language: str, original_language: str
     ) -> None:
         download_url = None
         if (size := os.path.getsize(f"{ctx.author.id}.txt")) > 8 * 10**6:
@@ -128,7 +128,7 @@ class FileHandler:
                 channel = bot.get_channel(1005668482475643050)
                 user = str(ctx.author)
                 await channel.send(
-                    f"> {name.replace('_',' ')} \nuploaded by {user} language: {language}",
+                    f"> {name.replace('_',' ')} \nuploaded by {user} Translated from: {original_language} to: {language}",
                     view=view,
                 )
                 download_url = filelnk
@@ -145,7 +145,7 @@ class FileHandler:
             channel = guild.get_channel(1005668482475643050)
             user = str(ctx.author)
             msg = await channel.send(
-                f'> {name.replace("_"," ")} \nUploaded by {user} language: {language}',
+                f'> {name.replace("_"," ")} \nUploaded by {user} Translated from: {original_language} to: {language}',
                 file=discord.File(f"{ctx.author.id}.txt", f"{name}.txt"),
             )
             os.remove(f"{ctx.author.id}.txt")
@@ -161,6 +161,7 @@ class FileHandler:
                 "",
                 0,
                 language,
+                original_language,
                 self.get_tags(name),
                 download_url,
                 size,

@@ -9,6 +9,7 @@ class Novel:
     description: str
     rating: float
     language: str
+    org_language: str
     tags: list[str]
     download: str
     size: float

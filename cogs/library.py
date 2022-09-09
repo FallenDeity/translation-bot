@@ -69,6 +69,7 @@ class Library(commands.Cog):
             color=discord.Color.blue(),
         )
         embed.add_field(name="Tags", value=f'```yaml\n{", ".join(data.tags)}```')
+        embed.add_field(name="Original Language", value=data.language)
         embed.add_field(name="Language", value=data.language)
         embed.add_field(name="Size", value=f"{round(data.size/(1024**2), 2)} MB")
         uploader = self.bot.get_user(data.uploader) or await self.bot.fetch_user(

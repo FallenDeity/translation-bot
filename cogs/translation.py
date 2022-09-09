@@ -1,14 +1,16 @@
 import os
+import random
 import typing
 
 import aiofiles
 import discord
+from deep_translator import single_detection
 from discord import app_commands
 from discord.ext import commands
-from mega import Mega
 
 from core.bot import Raizel
 from core.views.linkview import LinkView
+from languages import languages
 from utils.handler import FileHandler
 from utils.translate import Translator
 
@@ -135,6 +137,17 @@ class Translate(commands.Cog):
                 await FileHandler.docx_to_txt(ctx, file_type)
             novel = await FileHandler().read_file(ctx)
         await ctx.reply(f"> **✅Translation started. Translating to {language}.**")
+        api_keys=['8ca7a29f3b7c8ac85487451129f35c89', '1c2d644450cb8923818607150e7766d4', '5cd7b28759bb7aafe9b1d395824e7a67']
+        lang_code = single_detection(novel[100:200].__str__(), api_key=random.choice(api_keys))
+        if lang_code == 'zh':
+            original_Language = ['chinese']
+        else:
+            lang = languages.choices
+            original_Language = {i for i in lang if lang[i] == lang_code}
+        try:
+            original_Language = original_Language.pop()
+        except:
+            pass
         os.remove(f"{ctx.author.id}.txt")
         liz = [novel[i : i + 1800] for i in range(0, len(novel), 1800)]
         self.bot.translator[ctx.author.id] = f"0/{len(liz)}"
@@ -142,7 +155,7 @@ class Translate(commands.Cog):
         story = await translate.start(liz)
         async with aiofiles.open(f"{ctx.author.id}.txt", "w", encoding="utf-8") as f:
             await f.write(story)
-        await FileHandler().distribute(self.bot, ctx, name, language)
+        await FileHandler().distribute(self.bot, ctx, name, language, original_Language)
 
     @translate.autocomplete("language")
     async def translate_complete(
