@@ -4431,7 +4431,6 @@ def terms(value):
             "清浦刹那": "Kiyoura Setsuna",
             "甘露寺": "Kanroji",
             "加藤": "Katou",
-            "心": "Kokoro",
             "西园寺世界": "Saionji Sekai",
             "踊子": "Youko",
             "桂真奈美": "Katsura Manami",
