@@ -173,7 +173,7 @@ class FileHandler:
         del bot.translator[ctx.author.id]
 
     async def crawlnsend(
-        self, ctx: commands.Context, bot: Raizel, title: str, title_name: str
+        self, ctx: commands.Context, bot: Raizel, title: str, title_name: str, originallanguage: str
     ) -> None:
         download_url = None
         if (size := os.path.getsize(f"{title}.txt")) > 8 * 10**6:
@@ -215,6 +215,7 @@ class FileHandler:
                 size,
                 ctx.author.id,
                 datetime.datetime.utcnow().timestamp(),
+                originallanguage,
             ]
             data = Novel(*novel_data)
             await bot.mongo.library.add_novel(data)

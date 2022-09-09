@@ -38,6 +38,10 @@ class Library(Database):
         novels = await self.library.find({"language": language}).to_list(None)
         return [Novel(**novel) for novel in novels] if novels else None
 
+    async def get_novel_by_rawlanguage(self, rawlanguage: str) -> list[Novel]:
+        novels = await self.library.find({"org_language": rawlanguage}).to_list(None)
+        return [Novel(**novel) for novel in novels] if novels else None
+
     async def get_novel_by_rating(self, rating: int) -> list[Novel]:
         novels = await self.library.find({"rating": {"$gte": rating - 1}}).to_list(None)
         return [Novel(**novel) for novel in novels] if novels else None

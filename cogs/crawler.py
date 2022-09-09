@@ -1,5 +1,6 @@
 import concurrent.futures
 import os
+import random
 import typing
 import typing as t
 import zipfile
@@ -9,11 +10,12 @@ import discord
 import parsel
 import requests
 from bs4 import BeautifulSoup
-from deep_translator import GoogleTranslator
+from deep_translator import GoogleTranslator, single_detection
 from discord.ext import commands
 
 from core.bot import Raizel
 from core.views.linkview import LinkView
+from languages import languages
 from utils.handler import FileHandler
 
 headers = {
@@ -334,9 +336,22 @@ class Crawler(commands.Cog):
         parsed = {k: v for k, v in sorted(book.items(), key=lambda item: item[0])}
         whole = [i for i in list(parsed.values())]
         whole.insert(0, "\nsource : " + str(link) + "\n\n")
+        text = "\n".join(whole)
+        api_keys = ['8ca7a29f3b7c8ac85487451129f35c89', '1c2d644450cb8923818607150e7766d4',
+                    '5cd7b28759bb7aafe9b1d395824e7a67']
+        lang_code = single_detection(text[100:210].__str__(), api_key=random.choice(api_keys))
+        if lang_code == 'zh':
+            original_Language = ['chinese']
+        else:
+            lang = languages.choices
+            original_Language = {i for i in lang if lang[i] == lang_code}
+        try:
+            original_Language = original_Language.pop()
+        except:
+            pass
         async with aiofiles.open(f"{title}.txt", "w", encoding="utf-8") as f:
-            await f.write("\n".join(whole))
-        await FileHandler().crawlnsend(ctx, self.bot, title, title_name)
+            await f.write(text)
+        await FileHandler().crawlnsend(ctx, self.bot, title, title_name, original_Language)
 
     @commands.hybrid_command(
         help="Clears any stagnant novels which were deposited for crawling."
