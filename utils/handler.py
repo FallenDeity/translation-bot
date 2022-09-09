@@ -108,7 +108,7 @@ class FileHandler:
         return string
 
     async def distribute(
-        self, bot: Raizel, ctx: commands.Context, name: str, language: str
+        self, bot: Raizel, ctx: commands.Context, name: str, language: str, original_language: str
     ) -> None:
         download_url = None
         if (size := os.path.getsize(f"{ctx.author.id}.txt")) > 8 * 10**6:
@@ -128,7 +128,7 @@ class FileHandler:
                 channel = bot.get_channel(1005668482475643050)
                 user = str(ctx.author)
                 await channel.send(
-                    f"> {name.replace('_',' ')} \nuploaded by {user} language: {language}",
+                    f"> {name.replace('_',' ')} \nuploaded by {user} Translated from: {original_language} to: {language}",
                     view=view,
                 )
                 download_url = filelnk
@@ -145,7 +145,7 @@ class FileHandler:
             channel = guild.get_channel(1005668482475643050)
             user = str(ctx.author)
             msg = await channel.send(
-                f'> {name.replace("_"," ")} \nUploaded by {user} language: {language}',
+                f'> {name.replace("_"," ")} \nUploaded by {user} Translated from: {original_language} to: {language}',
                 file=discord.File(f"{ctx.author.id}.txt", f"{name}.txt"),
             )
             os.remove(f"{ctx.author.id}.txt")
@@ -166,13 +166,14 @@ class FileHandler:
                 size,
                 ctx.author.id,
                 datetime.datetime.utcnow().timestamp(),
+                original_language,
             ]
             data = Novel(*novel_data)
             await bot.mongo.library.add_novel(data)
         del bot.translator[ctx.author.id]
 
     async def crawlnsend(
-        self, ctx: commands.Context, bot: Raizel, title: str, title_name: str
+        self, ctx: commands.Context, bot: Raizel, title: str, title_name: str, originallanguage: str
     ) -> None:
         download_url = None
         if (size := os.path.getsize(f"{title}.txt")) > 8 * 10**6:
@@ -211,12 +212,13 @@ class FileHandler:
                 title_name,
                 "",
                 0,
-                "chinese (simplified)",
+                "NA",
                 self.get_tags(title_name),
                 download_url,
                 size,
                 ctx.author.id,
                 datetime.datetime.utcnow().timestamp(),
+                originallanguage,
             ]
             data = Novel(*novel_data)
             await bot.mongo.library.add_novel(data)

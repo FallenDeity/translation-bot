@@ -14,3 +14,4 @@ class Novel:
     size: float
     uploader: int
     date: datetime.datetime.timestamp
+    org_language: str = 'NA'

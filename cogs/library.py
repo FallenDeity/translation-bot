@@ -69,6 +69,7 @@ class Library(commands.Cog):
             color=discord.Color.blue(),
         )
         embed.add_field(name="Tags", value=f'```yaml\n{", ".join(data.tags)}```')
+        embed.add_field(name="Raw Language", value=data.org_language)
         embed.add_field(name="Language", value=data.language)
         embed.add_field(name="Size", value=f"{round(data.size/(1024**2), 2)} MB")
         uploader = self.bot.get_user(data.uploader) or await self.bot.fetch_user(
@@ -101,6 +102,7 @@ class Library(commands.Cog):
         rating: int = None,
         *,
         tags: str = None,
+        raw_language: str = None,
     ) -> None:
         await ctx.send("Searching...", delete_after=5)
         tags = [i.strip() for i in tags.split() if i] if tags else None
@@ -109,6 +111,7 @@ class Library(commands.Cog):
             and language is None
             and rating is None
             and tags is None
+            and raw_language is None
         ):
             novels = await self.bot.mongo.library.get_all_novels
             await self.buttons(await self.make_list_embed(novels), ctx)
@@ -131,6 +134,10 @@ class Library(commands.Cog):
             rating = await self.bot.mongo.library.get_novel_by_rating(int(rating))
             if rating:
                 valid.append(rating)
+        if raw_language:
+            raw_language = await self.bot.mongo.library.get_novel_by_rawlanguage(raw_language)
+            if raw_language:
+                valid.append(raw_language)
         if not valid:
             await ctx.send("No results found.")
             return
