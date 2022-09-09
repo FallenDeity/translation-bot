@@ -9,9 +9,9 @@ class Novel:
     description: str
     rating: float
     language: str
-    org_language: str
     tags: list[str]
     download: str
     size: float
     uploader: int
     date: datetime.datetime.timestamp
+    org_language: str = 'NA'
