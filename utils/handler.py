@@ -209,7 +209,7 @@ class FileHandler:
                 title_name,
                 "",
                 0,
-                "chinese (simplified)",
+                "NA",
                 self.get_tags(title_name),
                 download_url,
                 size,
