@@ -1,24 +1,21 @@
 import concurrent.futures
 import os
-import random
 import typing
 import typing as t
-import zipfile
+from urllib.parse import urljoin
+from urllib.parse import urlparse
 
 import aiofiles
 import discord
 import parsel
 import requests
 from bs4 import BeautifulSoup
-from deep_translator import GoogleTranslator, single_detection
+from deep_translator import GoogleTranslator
 from discord.ext import commands
 from readabilipy import simple_json_from_html_string
 
 from core.bot import Raizel
-from core.views.linkview import LinkView
-from languages import languages
 from utils.handler import FileHandler
-from urllib.parse import urljoin
 
 headers = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.142 Safari/537.36"
@@ -307,10 +304,18 @@ class Crawler(commands.Cog):
                 for j in [str(i.get("href")) for i in soup.find_all("a")]
                 if name in j and "txt" not in j
             ]
+            host = urlparse(link).netloc
+            if urls == [] or len(urls) < 30:
+
+                urls = [
+                    f"{j}"
+                    for j in [str(i.get("href")) for i in soup.find_all("a")]
+                    if "txt" not in j
+                ]
             utemp = []
             for url in urls:
                 utemp.append(urljoin(link, url))
-            urls = utemp
+            urls = [u for u in utemp if host in u]
         if urls == [] or len(urls) < 30:
             link = link + '/'
 
@@ -326,10 +331,19 @@ class Crawler(commands.Cog):
                 for j in sel.css('a ::attr(href)').extract()
                 if name in j and "txt" not in j
             ]
+            host = urlparse(link).netloc
+            if urls == [] or len(urls) < 30:
+
+                urls = [
+                    f"{j}"
+                    for j in sel.css('a ::attr(href)').extract()
+                    if "txt" not in j
+                ]
+
             utemp = []
             for url in urls:
                 utemp.append(urljoin(link, url))
-            urls = utemp
+            urls = [u for u in utemp if host in u]
             # print(urls)
             title_name = sel.css(maintitleCSS + " ::text").extract_first()
             # print(urls)
@@ -361,18 +375,7 @@ class Crawler(commands.Cog):
         whole = [i for i in list(parsed.values())]
         whole.insert(0, "\nsource : " + str(link) + "\n\n")
         text = "\n".join(whole)
-        api_keys = ['8ca7a29f3b7c8ac85487451129f35c89', '1c2d644450cb8923818607150e7766d4',
-                    '5cd7b28759bb7aafe9b1d395824e7a67']
-        lang_code = single_detection(text[100:210].__str__(), api_key=random.choice(api_keys))
-        if lang_code == 'zh':
-            original_Language = ['chinese']
-        else:
-            lang = languages.choices
-            original_Language = {i for i in lang if lang[i] == lang_code}
-        try:
-            original_Language = original_Language.pop()
-        except:
-            pass
+        original_Language = FileHandler.find_language(text)
         async with aiofiles.open(f"{title}.txt", "w", encoding="utf-8") as f:
             await f.write(text)
         await FileHandler().crawlnsend(ctx, self.bot, title, title_name, original_Language)
