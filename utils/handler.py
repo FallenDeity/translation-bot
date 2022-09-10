@@ -32,7 +32,7 @@ class FileHandler:
     @staticmethod
     def find_language(text: str) -> str:
         api_keys = ['8ca7a29f3b7c8ac85487451129f35c89', '1c2d644450cb8923818607150e7766d4',
-                    '5cd7b28759bb7aafe9b1d395824e7a67']
+                    '5cd7b28759bb7aafe9b1d395824e7a67', 'af207e865e0277f375348293a30bcc5e']
         try:
             lang_code = single_detection(text[100:200].__str__(), api_key=random.choice(api_keys))
         except:
