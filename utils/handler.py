@@ -1,19 +1,21 @@
 import datetime
 import os
+import random
 import typing
-import zipfile
 
 import aiofiles
 import chardet
 import discord
 import docx
-from discord.ext import commands
 from PyDictionary import PyDictionary
+from deep_translator import single_detection
+from discord.ext import commands
 from textblob import TextBlob
 
 from core.bot import Raizel
 from core.views.linkview import LinkView
 from databases.data import Novel
+from languages import languages
 
 
 class FileHandler:
@@ -26,6 +28,30 @@ class FileHandler:
         text = text.replace("_", " ")
         text = TextBlob(text)
         return list(set(text.noun_phrases))
+
+    @staticmethod
+    def find_language(text: str) -> str:
+        api_keys = ['8ca7a29f3b7c8ac85487451129f35c89', '1c2d644450cb8923818607150e7766d4',
+                    '5cd7b28759bb7aafe9b1d395824e7a67', 'af207e865e0277f375348293a30bcc5e']
+        try:
+            lang_code = single_detection(text[100:200].__str__(), api_key=random.choice(api_keys))
+        except:
+            try:
+                lang_code = single_detection(text[500:600].__str__(), api_key=random.choice(api_keys))
+            except:
+                lang_code = 'NA'
+        if lang_code == 'zh':
+            original_Language = ['chinese']
+        elif lang_code == 'NA':
+            original_Language = ['NA']
+        else:
+            lang = languages.choices
+            original_Language = {i for i in lang if lang[i] == lang_code}
+        try:
+            original_Language = original_Language.pop()
+        except:
+            pass
+        return original_Language
 
     @staticmethod
     def checkname(name):
@@ -154,7 +180,7 @@ class FileHandler:
             except:
                 pass
             download_url = msg.attachments[0].url
-        if download_url and size> 100000:
+        if download_url and size> 0.3 * 10**6:
             novel_data = [
                 await bot.mongo.library.next_number,
                 name,
@@ -206,13 +232,13 @@ class FileHandler:
                 file.close()
             except:
                 pass
-        if download_url and size> 100000:
+        if download_url and size> 0.3 * 10**6:
             novel_data = [
                 await bot.mongo.library.next_number,
                 title_name,
                 "",
                 0,
-                "NA",
+                originallanguage,
                 self.get_tags(title_name),
                 download_url,
                 size,
