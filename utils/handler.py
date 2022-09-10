@@ -180,7 +180,7 @@ class FileHandler:
             except:
                 pass
             download_url = msg.attachments[0].url
-        if download_url and size> 100000:
+        if download_url and size> 0.3 * 10**6:
             novel_data = [
                 await bot.mongo.library.next_number,
                 name,
@@ -232,13 +232,13 @@ class FileHandler:
                 file.close()
             except:
                 pass
-        if download_url and size> 100000:
+        if download_url and size> 0.3 * 10**6:
             novel_data = [
                 await bot.mongo.library.next_number,
                 title_name,
                 "",
                 0,
-                "NA",
+                originallanguage,
                 self.get_tags(title_name),
                 download_url,
                 size,
