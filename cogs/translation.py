@@ -55,7 +55,7 @@ class Translate(commands.Cog):
         novel = None
         file_type = None
         name = None
-        await ctx.send("Please wait.. Translation will began soon", delete_after=5)
+        rep_msg = await ctx.reply("Please wait.. Translation will began soon")
         if ctx.message.attachments:
             link = ctx.message.attachments[0].url
         elif messageid is None and ("mega.nz" in link or "mega.co.nz" in link):
@@ -63,6 +63,7 @@ class Translate(commands.Cog):
             info = self.bot.mega.get_public_url_info(link)
             size = int(info.get("size")) / 1000
             if size >= 15 * 1000:
+                await rep_msg.delete()
                 return await ctx.reply(
                     "> **❌ File size is too big... Please split the file and translate"
                 )
@@ -74,6 +75,7 @@ class Translate(commands.Cog):
             )
             if "txt" not in file_type and "docx" not in file_type:
                 os.remove(path)
+                await rep_msg.delete()
                 return await ctx.send("> **❌Only .docx and .txt supported**")
             name = name.replace(".txt", "").replace(".docx", "").replace(" ", "_")
             name = name[:100]
@@ -105,6 +107,7 @@ class Translate(commands.Cog):
                 file_type = FileHandler.get_headers(resp)
             except KeyError:
                 view = LinkView({"Storage": ["https://temp.sh", "📨"]})
+                await rep_msg.delete()
                 return await ctx.send(
                     "> **❌Currently this link is not supported.**", view=view
                 )
@@ -118,8 +121,9 @@ class Translate(commands.Cog):
             return await ctx.send("> **❌Only .docx and .txt supported**")
         if novelname is not None:
             name = novelname
-        name_check = FileHandler.checkname(name)
+        name_check = FileHandler.checkname(name, self.bot)
         if not name_check:
+            await rep_msg.delete()
             return await ctx.reply(
                 f"> **❌{name} is not a valid novel name. please provide a valid name to filename before translating. **"
             )
@@ -133,7 +137,7 @@ class Translate(commands.Cog):
             if "docx" in file_type:
                 await FileHandler.docx_to_txt(ctx, file_type)
             novel = await FileHandler().read_file(ctx)
-        await ctx.reply(f"> **✅Translation started. Translating to {language}.**")
+        await rep_msg.edit(content=f"> **✅Translation started. Translating to {language}.**")
         original_Language = FileHandler.find_language(novel)
         os.remove(f"{ctx.author.id}.txt")
         liz = [novel[i : i + 1800] for i in range(0, len(novel), 1800)]

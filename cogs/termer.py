@@ -52,7 +52,7 @@ class Termer(commands.Cog):
         novel = None
         file_type = None
         name = None
-        await ctx.send("Please wait.. Translation will began soon", delete_after=5)
+        rep_msg = await ctx.reply("Please wait.. Translation will began soon")
         if ctx.message.attachments:
             link = ctx.message.attachments[0].url
         elif messageid is None and ("mega.nz" in link or "mega.co.nz" in link):
@@ -60,6 +60,7 @@ class Termer(commands.Cog):
             info = self.bot.mega.get_public_url_info(link)
             size = int(info.get("size")) / 1000
             if size >= 15 * 1000:
+                await rep_msg.delete()
                 return await ctx.reply(
                     "> **❌ File size is too big... Please split the file and translate"
                 )
@@ -73,6 +74,7 @@ class Termer(commands.Cog):
             name = name.replace(".txt", "").replace(".docx", "").replace(" ", "_")
             if "txt" not in file_type and "docx" not in file_type:
                 os.remove(path)
+                await rep_msg.delete()
                 return await ctx.send("> **❌Only .docx and .txt supported**")
             name = name[:100]
             # os.rename(path, f"{ctx.author.id}.{file_type}")
@@ -99,11 +101,11 @@ class Termer(commands.Cog):
                 f"8 : encoding converter \t"
             )
         else:
-            await ctx.send(f"> **✅Terming started. **", delete_after=5)
+            rep_msg = await rep_msg.edit(content=f"> **✅Terming started. **")
             term_dict = terms(term)
         if term_dict == {}:
             return await ctx.reply(
-                f"**Please Choose the validterms to be applied :\n\t"
+                f"**Please try again with the validterms to be applied :\n\t"
                 f"1 : Naruto \n\t2 : One-Piece \n\t3 : Pokemon\n\t4 : Mixed anime terms\n\t"
                 f"5 : Prince of Tennis\n\t6 : Anime + Marvel + DC\n\t7 : Cultivation terms\n\t"
             )
@@ -119,6 +121,7 @@ class Termer(commands.Cog):
                 file_type = FileHandler.get_headers(resp)
             except KeyError:
                 view = LinkView({"Storage": ["https://temp.sh", "📨"]})
+                await rep_msg.delete()
                 return await ctx.send(
                     "> **❌Currently this link is not supported.**", view=view
                 )
@@ -132,8 +135,9 @@ class Termer(commands.Cog):
             return await ctx.send("> **❌Only .docx and .txt supported**")
         if novelname is not None:
             name = novelname
-        name_check = FileHandler.checkname(name)
+        name_check = FileHandler.checkname(name, self.bot)
         if not name_check:
+            await rep_msg.delete()
             return await ctx.reply(
                 f"> **❌{name} is not a valid novel name. please provide a valid name to filename before translating. **"
             )
@@ -147,9 +151,9 @@ class Termer(commands.Cog):
             if "docx" in file_type:
                 await FileHandler.docx_to_txt(ctx, file_type)
             novel = await FileHandler().read_file(ctx)
-        await ctx.reply(f"> **✅Terming started. **")
+        rep_msg = await rep_msg.edit(content=f"> **✅Terming started. **")
         novel = self.term_raw(novel, term_dict)
-        await ctx.reply(
+        await rep_msg.edit(
             f"> **✅Terming completed ..Translation started. Translating to {language}.**"
         )
         os.remove(f"{ctx.author.id}.txt")
