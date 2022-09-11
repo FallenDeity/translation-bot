@@ -161,6 +161,13 @@ class ErrorHandler(commands.Cog):
                     color=discord.Color.red(),
                 )
             )
+        elif isinstance(error, commands.BadArgument):
+            await ctx.send(
+                embed=discord.Embed(
+                    description=f"You have provided wrong values in bot command. please use .thelp for help\n{str(error)}",
+                    color=discord.Color.red(),
+                )
+            )
         elif "TooManyRequests" in str(error):
             await ctx.send(
                 embed=discord.Embed(
