@@ -164,13 +164,27 @@ class ErrorHandler(commands.Cog):
         elif "TooManyRequests" in str(error):
             await ctx.send(
                 embed=discord.Embed(
-                    description=f"Google translate limit reached. Try restarting server",
+                    description=f"Google translate limit reached. Trying to restart server",
                     color=discord.Color.red(),
                 ),
             )
             h = heroku3.from_key(os.getenv("APIKEY"))
             app = h.app(os.getenv("APPNAME"))
-            await ctx.send("> Bot is restarting... please wait....")
+            await ctx.send("> Bot is restarting... please try after 30 sec....")
+            app.restart()
+        elif "Error R14" in str(error):
+            try:
+             await ctx.send(
+                embed=discord.Embed(
+                    description=f"Ram is overloaded .. trying to restart.",
+                    color=discord.Color.red(),
+                ),
+             )
+            except:
+                pass
+            h = heroku3.from_key(os.getenv("APIKEY"))
+            app = h.app(os.getenv("APPNAME"))
+            await ctx.send("> Bot is restarting... please try after 30 sec....")
             app.restart()
         else:
             print(error)
