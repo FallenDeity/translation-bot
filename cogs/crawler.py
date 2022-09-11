@@ -169,7 +169,7 @@ class Crawler(commands.Cog):
         allowed = self.bot.allowed
         if link is None:
             return await ctx.reply(f"> **❌Enter a link for crawling.**")
-        await ctx.send('Started crawling please wait', delete_after=10)
+        msg = await ctx.reply('Started crawling please wait')
         num = 0
         for i in allowed:
             if i not in link:
@@ -354,7 +354,7 @@ class Crawler(commands.Cog):
         if reverse is not None:
             urls.reverse()
         self.bot.crawler[ctx.author.id] = f"0/{len(urls)}"
-        await ctx.reply(f"> **✔Crawl started.**")
+        await msg.edit(content="> **✔Crawl started.**")
         if title_name == "" or title_name == "None" or title_name is None:
             title_name = f"{ctx.author.id}_crl"
         else:
