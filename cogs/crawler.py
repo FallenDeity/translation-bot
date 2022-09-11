@@ -184,7 +184,7 @@ class Crawler(commands.Cog):
         if "ptwxz" in link and "bookinfo" in link:
             link = link.replace("bookinfo", "html")
             link = link.replace(".html", "/")
-        if link[-1] == "/" and "69shu" not in link and "uukanshu.cc" not in link:
+        if link[-1] == "/" and "69shu" not in link and "uukanshu.cc" not in link and not num == len(allowed):
             link = link[:-1]
         if "m.uuks" in link:
             link = link.replace("m.", "")
@@ -317,7 +317,7 @@ class Crawler(commands.Cog):
                 utemp.append(urljoin(link, url))
             urls = [u for u in utemp if host in u]
         if urls == [] or len(urls) < 30:
-            link = link + '/'
+            link = link[:-1]
 
             try:
                 response = requests.get(link, headers=headers, timeout=10)
