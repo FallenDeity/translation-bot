@@ -154,7 +154,7 @@ class Termer(commands.Cog):
         rep_msg = await rep_msg.edit(content=f"> **✅Terming started. **")
         novel = self.term_raw(novel, term_dict)
         await rep_msg.edit(
-            f"> **✅Terming completed ..Translation started. Translating to {language}.**"
+            content=f"> **✅Terming completed ..Translation started. Translating to {language}.**"
         )
         os.remove(f"{ctx.author.id}.txt")
         original_Language = FileHandler.find_language(novel)
