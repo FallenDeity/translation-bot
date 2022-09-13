@@ -493,7 +493,7 @@ class Crawler(commands.Cog):
                     psrt = url
             if psrt == '':
                 await msg.delete()
-                await ctx.send("We couldn't find the selector for next chapter. Please check the links or provide the css selector")
+                return await ctx.send("We couldn't find the selector for next chapter. Please check the links or provide the css selector")
             href = [i for i in soup.find_all("a") if i.get("href") == psrt]
             # print(href)
             path = self.xpath_soup(href[0])
@@ -501,7 +501,7 @@ class Crawler(commands.Cog):
         chp_count = 1
         # print(title)
         current_link = firstchplink
-        full_text = ''
+        full_text = "Source : " + firstchplink + "\n\n"
         no_of_tries = 0
         await msg.edit(content="> Crawling started")
         for i in range(1, noofchapters):
