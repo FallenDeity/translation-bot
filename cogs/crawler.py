@@ -152,17 +152,20 @@ class Crawler(commands.Cog):
                 self.bot.crawler[name] = f"{len(novel)}/{len(urls)}"
             return novel
 
-    def getcoontent(self, links: str, css: str, next_xpath, bot):
+    async def getcoontent(self, links: str, css: str, next_xpath, bot):
         try:
-            response = requests.get(links, headers=headers, timeout=10)
+            response = await bot.con.get(links)
+            soup = BeautifulSoup(await response.read(), "html.parser",from_encoding=response.get_encoding())
+            # response = requests.get(links, headers=headers, timeout=10)
         except:
             return ['error', links]
-        if response.status_code == 404:
+        if response.status == 404:
             return ['error', links]
-        response.encoding = response.apparent_encoding
-        chp_html = response.text
-        sel = parsel.Selector(chp_html)
-        article = simple_json_from_html_string(response.text)
+
+        # response.encoding = response.apparent_encoding
+        # chp_html = response.text
+        sel = parsel.Selector(str(soup))
+        article = simple_json_from_html_string(str(soup))
         chpTitle = article['title']
         full_chp = ""
         if '* ::text' == css or css is None or css.strip() == '':
@@ -440,8 +443,8 @@ class Crawler(commands.Cog):
                 os.remove(i)
         await ctx.reply("> **✔Cleared all records.**")
 
-    @commands.hybrid_command(help="Crawls sites if given first,second(or next page css selector) and last page(or no of chapters max)")
-    async def cra(
+    @commands.hybrid_command(help="Crawls if given 1st,2nd(or nextpage selector) and lastpage(or max chps).use it when there is no TOC page")
+    async def crawler(
             self, ctx: commands.Context, firstchplink: str, secondchplink: str = None, lastchplink: str = None, nextselector: str = None, noofchapters: int = None,
             cssselector: str = None
     ) -> typing.Optional[discord.Message]:
@@ -472,28 +475,29 @@ class Crawler(commands.Cog):
             urls = sel.css('a ::attr(href)').extract()
 
             psrt = ''
-            for t in urls:
-                full_url = urljoin(firstchplink, t)
+            for url in urls:
+                full_url = urljoin(firstchplink, url)
                 if full_url == secondchplink:
-                    psrt = t
+                    psrt = url
             href = [i for i in soup.find_all("a") if i.get("href") == psrt]
-            print(href)
+            # print(href)
             path = self.xpath_soup(href[0])
         title = sel.css('title ::text').extract_first()
         chp_count = 1
-        print(title)
+        # print(title)
         current_link = firstchplink
         full_text = ''
         no_of_tries = 0
         await msg.edit(content="> Crawling started")
         for i in range(1, noofchapters):
             self.bot.crawler[ctx.author.id] = f"{i}/{noofchapters}"
-            output = self.getcoontent(current_link, css, path, self.bot)
+            output = await self.getcoontent(current_link, css, path, self.bot)
             chp_text = output[0]
+            # print(i)
             if chp_text =='error':
                 no_of_tries += 1
                 chp_text = ''
-                if no_of_tries > 20:
+                if no_of_tries > 30:
                     del self.bot.translator[ctx.author.id]
                     await ctx.send('Error occured when crawling. Please Report to my developer')
             full_text += chp_text
