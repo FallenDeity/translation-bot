@@ -176,8 +176,12 @@ class Crawler(commands.Cog):
             if text == []:
                 return ""
             full_chp = full_chp + "\n".join(text)
-        next_href = sel.xpath(next_xpath + '/@href').extract()[0]
-        next_href = urljoin(links, next_href)
+        try:
+            next_href = sel.xpath(next_xpath + '/@href').extract()[0]
+            next_href = urljoin(links, next_href)
+        except:
+            next_href = None
+
         full_chp = full_chp + "\n---------------------xxx---------------------\n"
 
         return [full_chp, next_href]
@@ -493,7 +497,7 @@ class Crawler(commands.Cog):
                     del self.bot.translator[ctx.author.id]
                     await ctx.send('Error occured when crawling. Please Report to my developer')
             full_text += chp_text
-            if current_link == last or i >= no_of_chapters:
+            if current_link == last or i >= no_of_chapters or output[1] is None:
                 print('break')
                 break
             chp_count += 1
