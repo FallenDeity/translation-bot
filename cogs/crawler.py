@@ -183,7 +183,12 @@ class Crawler(commands.Cog):
             next_href = sel.xpath(next_xpath + '/@href').extract()[0]
             next_href = urljoin(links, next_href)
         except:
-            next_href = None
+            try:
+                #if css selector is given it will come here due to exception
+                next_href = sel.css(next_xpath).extract
+                next_href = urljoin(links, next_href)
+            except:
+                next_href = None
 
         full_chp = full_chp + "\n---------------------xxx---------------------\n"
 
@@ -221,7 +226,7 @@ class Crawler(commands.Cog):
         allowed = self.bot.allowed
         if link is None:
             return await ctx.reply(f"> **❌Enter a link for crawling.**")
-        await ctx.send('Started crawling please wait', delete_after=10)
+        msg = await ctx.send('Started crawling please wait')
         num = 0
         for i in allowed:
             if i not in link:
@@ -241,7 +246,12 @@ class Crawler(commands.Cog):
         if "m.uuks" in link:
             link = link.replace("m.", "")
         await ctx.typing()
-        res = await self.bot.con.get(link)
+        try:
+            res = await self.bot.con.get(link)
+        except Exception as e:
+            print(e)
+            await msg.delete()
+            return await ctx.send("We couldn't connect to the provided link. Please check the link")
         novel = {}
         soup = BeautifulSoup(await res.read(), "html.parser")
         data = await res.read()
@@ -443,7 +453,7 @@ class Crawler(commands.Cog):
                 os.remove(i)
         await ctx.reply("> **✔Cleared all records.**")
 
-    @commands.hybrid_command(help="Crawls if given 1st,2nd(or nextpage selector) and lastpage(or max chps).use it when there is no TOC page")
+    @commands.hybrid_command(help="Crawls if given 1st,2nd(or selector) and lastpage(or maxchps).use it when there is no TOC page")
     async def crawler(
             self, ctx: commands.Context, firstchplink: str, secondchplink: str = None, lastchplink: str = None, nextselector: str = None, noofchapters: int = None,
             cssselector: str = None
@@ -457,6 +467,8 @@ class Crawler(commands.Cog):
         msg = await ctx.send("Crawling will be started soon")
         if cssselector:
             css = cssselector
+            if '::text' not in css:
+                css += ' ::text'
         else:
             css = '* ::text'
         if noofchapters is None:
@@ -479,6 +491,9 @@ class Crawler(commands.Cog):
                 full_url = urljoin(firstchplink, url)
                 if full_url == secondchplink:
                     psrt = url
+            if psrt == '':
+                await msg.delete()
+                await ctx.send("We couldn't find the selector for next chapter. Please check the links or provide the css selector")
             href = [i for i in soup.find_all("a") if i.get("href") == psrt]
             # print(href)
             path = self.xpath_soup(href[0])
@@ -498,8 +513,9 @@ class Crawler(commands.Cog):
                 no_of_tries += 1
                 chp_text = ''
                 if no_of_tries > 30:
-                    del self.bot.translator[ctx.author.id]
-                    await ctx.send('Error occured when crawling. Please Report to my developer')
+                    await msg.delete()
+                    del self.bot.crawler[ctx.author.id]
+                    return await ctx.send('Error occured when crawling. Please Report to my developer')
             full_text += chp_text
             if current_link == lastchplink or i >= noofchapters or output[1] is None:
                 print('break')
@@ -507,8 +523,8 @@ class Crawler(commands.Cog):
             chp_count += 1
             current_link = output[1]
             if current_link == firstchplink:
-                del self.bot.translator[ctx.author.id]
-                await ctx.reply('Error occured . Some problem in the site. please try with second and third chapter')
+                del self.bot.crawler[ctx.author.id]
+                await ctx.reply('Error occurred . Some problem in the site. please try with second and third chapter or give valid css selector for next page button')
                 return None
             # input('g')
         try:
