@@ -1,4 +1,5 @@
 import concurrent.futures
+import itertools
 import os
 import typing
 import typing as t
@@ -103,6 +104,8 @@ class Crawler(commands.Cog):
             response = requests.get(links, headers=headers, timeout=10)
         except:
             return nums, f"\ncouldn't get connection to {links}\n"
+        if response.status_code == 404:
+            return nums, ""
         response.encoding = response.apparent_encoding
         full = ""
         if '* ::text' == css or css is None or css.strip() == '':
@@ -148,6 +151,48 @@ class Crawler(commands.Cog):
                 novel[future.result()[0]] = future.result()[1]
                 self.bot.crawler[name] = f"{len(novel)}/{len(urls)}"
             return novel
+
+    def getcoontent(self, links: str, css: str, next_xpath):
+        try:
+            response = requests.get(links, headers=headers, timeout=10)
+        except:
+            return ['error', links]
+        if response.status_code == 404:
+            return ['error', links]
+        response.encoding = response.apparent_encoding
+        chp_html = response.text
+        sel = parsel.Selector(chp_html)
+        article = simple_json_from_html_string(response.text)
+        chpTitle = article['title']
+        full_chp = ""
+        if '* ::text' == css or css is None or css.strip() == '':
+            text = article['plain_text']
+            full_chp += str(chpTitle) + "\n\n"
+            for i in text:
+                full_chp += i['text'] + "\n"
+        else:
+            text = sel.css(css).extract()
+            # print(css)
+            if text == []:
+                return ""
+            full_chp = full_chp + "\n".join(text)
+        next_href = sel.xpath(next_xpath + '/@href').extract()[0]
+        next_href = urljoin(links, next_href)
+        full_chp = full_chp + "\n---------------------xxx---------------------\n"
+
+        return [full_chp, next_href]
+
+    def xpath_soup(self, element):
+        components = []
+        child = element if element.name else element.parent
+        for parent in child.parents:
+            previous = itertools.islice(parent.children, 0, parent.contents.index(child))
+            xpath_tag = child.name
+            xpath_index = sum(1 for i in previous if i.name == xpath_tag) + 1
+            components.append(xpath_tag if xpath_index == 1 else '%s[%d]' % (xpath_tag, xpath_index))
+            child = parent
+        components.reverse()
+        return '/%s' % '/'.join(components)
 
     @commands.hybrid_command(help="Gives progress of novel crawling", aliases=["cp"])
     async def crawled(self, ctx: commands.Context) -> typing.Optional[discord.Message]:
@@ -306,7 +351,6 @@ class Crawler(commands.Cog):
             ]
             host = urlparse(link).netloc
             if urls == [] or len(urls) < 30:
-
                 urls = [
                     f"{j}"
                     for j in [str(i.get("href")) for i in soup.find_all("a")]
@@ -317,7 +361,8 @@ class Crawler(commands.Cog):
                 utemp.append(urljoin(link, url))
             urls = [u for u in utemp if host in u]
         if urls == [] or len(urls) < 30:
-            link = link + '/'
+            if link[-1] == '/':
+                link = link[:-1]
 
             try:
                 response = requests.get(link, headers=headers, timeout=10)
@@ -333,7 +378,6 @@ class Crawler(commands.Cog):
             ]
             host = urlparse(link).netloc
             if urls == [] or len(urls) < 30:
-
                 urls = [
                     f"{j}"
                     for j in sel.css('a ::attr(href)').extract()
@@ -392,6 +436,87 @@ class Crawler(commands.Cog):
                 os.remove(i)
         await ctx.reply("> **✔Cleared all records.**")
 
+    @commands.hybrid_command(help="Crawls sites if given first,second(or next page css selector) and last page(or no of chapters max)")
+    async def crawlnext(
+            self, ctx: commands.Context, first: str, second: str = None, last: str = None, next_selector: str = None, no_of_chapters: int = None,
+            cssSelector: str = None
+    ) -> typing.Optional[discord.Message]:
+        if ctx.author.id in self.bot.crawler:
+            return await ctx.reply(
+                "> **❌You cannot crawl two novels at the same time.**"
+            )
+        if second is None and next_selector is None:
+            return await ctx.send("You must givve second chapter link or next page css selector")
+        msg = await ctx.send("Crawling will be started soon")
+        if cssSelector:
+            css = cssSelector
+        else:
+            css = '* ::text'
+        if no_of_chapters is None:
+            no_of_chapters = 2000
+        if next_selector:
+            path = next_selector
+        else:
+            try:
+                response = requests.get(first, headers=headers, timeout=10)
+            except:
+                pass
+            response.encoding = response.apparent_encoding
+            soup = BeautifulSoup(response.content, 'html5lib')
+            htm = response.text
+            sel = parsel.Selector(htm)
+            urls = sel.css('a ::attr(href)').extract()
+
+            psrt = ''
+            for t in urls:
+                full_url = urljoin(first, t)
+                if full_url == second:
+                    psrt = t
+            href = [i for i in soup.find_all("a") if i.get("href") == psrt]
+            print(href)
+            path = self.xpath_soup(href[0])
+        title = sel.css('title ::text').extract_first()
+        chp_count = 1
+        print(title)
+        current_link = first
+        full_text = ''
+        no_of_tries = 0
+        await msg.edit(content="> Crawling started")
+        for i in range(1, no_of_chapters):
+            self.bot.crawler[ctx.author.id] = f"{i}/{no_of_chapters}"
+            output = self.getcoontent(current_link, css, path)
+            chp_text = output[0]
+            if chp_text =='error':
+                no_of_tries += 1
+                chp_text = ''
+                if no_of_tries > 20:
+                    del self.bot.translator[ctx.author.id]
+                    await ctx.send('Error occured when crawling. Please Report to my developer')
+            full_text += chp_text
+            if current_link == last or i >= no_of_chapters:
+                print('break')
+                break
+            chp_count += 1
+            current_link = output[1]
+            if current_link == first:
+                del self.bot.translator[ctx.author.id]
+                await ctx.reply('Error occured . Some problem in the site. please try with second and third chapter')
+                return None
+            # input('g')
+        try:
+            title = GoogleTranslator(
+                source="auto", target="english"
+            ).translate(title).strip()
+        except:
+            pass
+        title_name = title
+        title = str(title[:100])
+        for tag in ['/', '\\', '<', '>', "'", '"', ':', ";", '?', '|', '*', ';', '\r', '\n', '\t', '\\\\']:
+            title = title.replace(tag, '')
+        with open(title + '.txt', 'w', encoding='utf-8') as f:
+            f.write(full_text)
+        original_Language = FileHandler.find_language(full_text)
+        return await FileHandler().crawlnsend(ctx, self.bot, title, title_name, original_Language)
 
 async def setup(bot: Raizel) -> None:
     await bot.add_cog(Crawler(bot))
