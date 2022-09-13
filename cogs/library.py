@@ -105,7 +105,7 @@ class Library(commands.Cog):
         tags: str = None,
         raw_language: str = None,
     ) -> None:
-        await ctx.send("Searching...", delete_after=5)
+        msg = await ctx.send("Searching...")
         tags = [i.strip() for i in tags.split() if i] if tags else None
         if (
             title is None
@@ -141,9 +141,12 @@ class Library(commands.Cog):
                 valid.append(raw_language)
         if not valid:
             await ctx.send("No results found.")
+            await msg.delete()
             return
         allnovels = self.common_elements_finder(*valid)
-        await self.buttons(await self.make_list_embed(allnovels), ctx)
+        embeds = await self.make_list_embed(allnovels)
+        await msg.edit(content=f"> Found {len(embeds)} novels")
+        await self.buttons(embeds, ctx)
 
     @search.autocomplete("language")
     async def translate_complete(

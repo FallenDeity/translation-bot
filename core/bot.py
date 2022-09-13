@@ -11,6 +11,7 @@ from mega import Mega
 
 from languages.languages import choices
 from languages.sites import sites
+from languages.terms import get_dictionary
 from utils.connector import Mongo
 
 
@@ -27,6 +28,7 @@ class Raizel(commands.Bot):
         self.translator: t.Dict[int, str] = {}
         self.crawler: t.Dict[int, str] = {}
         self.languages = choices
+        self.dictionary: str = get_dictionary()
         super().__init__(
             command_prefix=commands.when_mentioned_or(".t"),
             intents=intents,

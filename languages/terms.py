@@ -7669,3 +7669,12 @@ def terms(value):
         print("Please enter valid option")
 
     return term_dict
+
+
+def get_dictionary() -> list[str]:
+    temp = [terms(str(i)).values() for i in range(1, 8)]
+    dictionary = []
+    for i in temp:
+        for j in i:
+            dictionary.append(j.lower())
+    return dictionary
