@@ -152,7 +152,7 @@ class Crawler(commands.Cog):
                 self.bot.crawler[name] = f"{len(novel)}/{len(urls)}"
             return novel
 
-    def getcoontent(self, links: str, css: str, next_xpath):
+    def getcoontent(self, links: str, css: str, next_xpath, bot):
         try:
             response = requests.get(links, headers=headers, timeout=10)
         except:
@@ -441,28 +441,28 @@ class Crawler(commands.Cog):
         await ctx.reply("> **✔Cleared all records.**")
 
     @commands.hybrid_command(help="Crawls sites if given first,second(or next page css selector) and last page(or no of chapters max)")
-    async def crawlnext(
-            self, ctx: commands.Context, first: str, second: str = None, last: str = None, next_selector: str = None, no_of_chapters: int = None,
-            cssSelector: str = None
+    async def cra(
+            self, ctx: commands.Context, firstchplink: str, secondchplink: str = None, lastchplink: str = None, nextselector: str = None, noofchapters: int = None,
+            cssselector: str = None
     ) -> typing.Optional[discord.Message]:
         if ctx.author.id in self.bot.crawler:
             return await ctx.reply(
                 "> **❌You cannot crawl two novels at the same time.**"
             )
-        if second is None and next_selector is None:
+        if secondchplink is None and nextselector is None:
             return await ctx.send("You must givve second chapter link or next page css selector")
         msg = await ctx.send("Crawling will be started soon")
-        if cssSelector:
-            css = cssSelector
+        if cssselector:
+            css = cssselector
         else:
             css = '* ::text'
-        if no_of_chapters is None:
-            no_of_chapters = 2000
-        if next_selector:
-            path = next_selector
+        if noofchapters is None:
+            noofchapters = 2000
+        if nextselector:
+            path = nextselector
         else:
             try:
-                response = requests.get(first, headers=headers, timeout=10)
+                response = requests.get(firstchplink, headers=headers, timeout=10)
             except:
                 pass
             response.encoding = response.apparent_encoding
@@ -473,8 +473,8 @@ class Crawler(commands.Cog):
 
             psrt = ''
             for t in urls:
-                full_url = urljoin(first, t)
-                if full_url == second:
+                full_url = urljoin(firstchplink, t)
+                if full_url == secondchplink:
                     psrt = t
             href = [i for i in soup.find_all("a") if i.get("href") == psrt]
             print(href)
@@ -482,13 +482,13 @@ class Crawler(commands.Cog):
         title = sel.css('title ::text').extract_first()
         chp_count = 1
         print(title)
-        current_link = first
+        current_link = firstchplink
         full_text = ''
         no_of_tries = 0
         await msg.edit(content="> Crawling started")
-        for i in range(1, no_of_chapters):
-            self.bot.crawler[ctx.author.id] = f"{i}/{no_of_chapters}"
-            output = self.getcoontent(current_link, css, path)
+        for i in range(1, noofchapters):
+            self.bot.crawler[ctx.author.id] = f"{i}/{noofchapters}"
+            output = self.getcoontent(current_link, css, path, self.bot)
             chp_text = output[0]
             if chp_text =='error':
                 no_of_tries += 1
@@ -497,12 +497,12 @@ class Crawler(commands.Cog):
                     del self.bot.translator[ctx.author.id]
                     await ctx.send('Error occured when crawling. Please Report to my developer')
             full_text += chp_text
-            if current_link == last or i >= no_of_chapters or output[1] is None:
+            if current_link == lastchplink or i >= noofchapters or output[1] is None:
                 print('break')
                 break
             chp_count += 1
             current_link = output[1]
-            if current_link == first:
+            if current_link == firstchplink:
                 del self.bot.translator[ctx.author.id]
                 await ctx.reply('Error occured . Some problem in the site. please try with second and third chapter')
                 return None
