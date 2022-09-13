@@ -104,6 +104,7 @@ class Library(commands.Cog):
         *,
         tags: str = None,
         raw_language: str = None,
+        size: float = None,
     ) -> None:
         msg = await ctx.send("Searching...")
         tags = [i.strip() for i in tags.split() if i] if tags else None
@@ -113,6 +114,7 @@ class Library(commands.Cog):
             and rating is None
             and tags is None
             and raw_language is None
+            and size is None
         ):
             novels = await self.bot.mongo.library.get_all_novels
             await self.buttons(await self.make_list_embed(novels), ctx)
@@ -139,6 +141,11 @@ class Library(commands.Cog):
             raw_language = await self.bot.mongo.library.get_novel_by_rawlanguage(raw_language)
             if raw_language:
                 valid.append(raw_language)
+        if size:
+            # print(size)
+            size = await self.bot.mongo.library.get_novel_by_size(size)
+            if size:
+                valid.append(size)
         if not valid:
             await ctx.send("No results found.")
             await msg.delete()
