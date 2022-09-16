@@ -51,6 +51,10 @@ class Library(Database):
         novels = await self.library.find({"size": {"$gte": size}}).to_list(None)
         return [Novel(**novel) for novel in novels] if novels else None
 
+    async def get_novel_by_uploader(self, uploader: int) -> list[Novel]:
+        novels = await self.library.find({"uploader": uploader}).to_list(None)
+        return [Novel(**novel) for novel in novels] if novels else None
+
     async def update_rating(self, _id: int, rating: int) -> None:
         await self.library.update_one({"_id": _id}, {"$set": {"rating": rating}})
 

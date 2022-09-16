@@ -196,7 +196,7 @@ class FileHandler:
             ]
             data = Novel(*novel_data)
             await bot.mongo.library.add_novel(data)
-        del bot.translator[ctx.author.id]
+
 
     async def crawlnsend(
         self, ctx: commands.Context, bot: Raizel, title: str, title_name: str, originallanguage: str
@@ -248,4 +248,4 @@ class FileHandler:
             ]
             data = Novel(*novel_data)
             await bot.mongo.library.add_novel(data)
-        del bot.crawler[ctx.author.id]
+

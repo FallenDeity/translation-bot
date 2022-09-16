@@ -156,15 +156,20 @@ class Termer(commands.Cog):
         await rep_msg.edit(
             content=f"> **✅Terming completed ..Translation started. Translating to {language}.**"
         )
-        os.remove(f"{ctx.author.id}.txt")
-        original_Language = FileHandler.find_language(novel)
-        liz = [novel[i: i + 1800] for i in range(0, len(novel), 1800)]
-        self.bot.translator[ctx.author.id] = f"0/{len(liz)}"
-        translate = Translator(self.bot, ctx.author.id, language)
-        story = await translate.start(liz)
-        async with aiofiles.open(f"{ctx.author.id}.txt", "w", encoding="utf-8") as f:
-            await f.write(story)
-        await FileHandler().distribute(self.bot, ctx, name, language, original_Language)
+        try:
+            os.remove(f"{ctx.author.id}.txt")
+            original_Language = FileHandler.find_language(novel)
+            liz = [novel[i: i + 1800] for i in range(0, len(novel), 1800)]
+            self.bot.translator[ctx.author.id] = f"0/{len(liz)}"
+            translate = Translator(self.bot, ctx.author.id, language)
+            story = await translate.start(liz)
+            async with aiofiles.open(f"{ctx.author.id}.txt", "w", encoding="utf-8") as f:
+                await f.write(story)
+            await FileHandler().distribute(self.bot, ctx, name, language, original_Language)
+        except Exception as e:
+            raise Exception
+        finally:
+            del self.bot.translator[ctx.author.id]
 
     @termer.autocomplete("language")
     async def translate_complete(
