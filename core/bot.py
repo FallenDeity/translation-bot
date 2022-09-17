@@ -23,6 +23,7 @@ class Raizel(commands.Bot):
     mongo: Mongo
 
     def __init__(self) -> None:
+        self.blocked = None
         self.mega: Mega 
         intents = discord.Intents.all()
         self.translator: t.Dict[int, str] = {}
@@ -61,6 +62,7 @@ class Raizel(commands.Bot):
         self.con = aiohttp.ClientSession()
         self.drive = Client(os.getenv("FILE"))
         self.mongo = Mongo()
+        self.blocked: list[int] = await self.mongo.blocker.get_all_banned_users()
         try:
             self.mega = Mega().login(os.getenv("USER"), os.getenv("MEGA"))
         except:

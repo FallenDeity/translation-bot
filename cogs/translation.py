@@ -41,6 +41,10 @@ class Translate(commands.Cog):
             novelname: str = None,
     ):
         file = link or file
+        if ctx.author.id in self.bot.blocked:
+            reason = await self.bot.mongo.blocker.get_banned_user_reason(ctx.author.id)
+            reason = reason['reason']
+            return await ctx.reply(content=f"You have been blocked by admins for improper usage of bot. Please contact admin \nReason : {reason}")
         if not file and not messageid:
             return await ctx.reply(f"> **❌Send an attachment or a link.**")
         if language not in self.bot.all_langs and "http" not in language:

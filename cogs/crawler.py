@@ -509,7 +509,6 @@ class Crawler(commands.Cog):
                     psrt = url
             if psrt == '':
                 await msg.delete()
-
                 await ctx.send(
                     "We couldn't find the selector for next chapter. Please check the links or provide the css selector")
             href = [i for i in soup.find_all("a") if i.get("href") == psrt]
