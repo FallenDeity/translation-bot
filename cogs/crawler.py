@@ -432,7 +432,7 @@ class Crawler(commands.Cog):
                 except:
                     pass
             title = str(title_name[:100])
-            for tag in ['/', '\\', '<', '>', "'", '"', ':', ";", '?', '|', '*', ';', '\r', '\n', '\t', '\\\\']:
+            for tag in ['/', '\\', '!', '<', '>', "'", '"', ':', ";", '?', '|', '*', ';', '\r', '\n', '\t', '\\\\']:
                 title = title.replace(tag, '')
             title = title.replace('_', ' ')
             book = await self.bot.loop.run_in_executor(
