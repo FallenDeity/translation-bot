@@ -74,6 +74,12 @@ class Admin(commands.Cog):
         ))
 
     @commands.has_role(1020638168237740042)
+    @commands.hybrid_command(help="send warning to user")
+    async def get_id(self, ctx: commands.Context, name: str, discriminator: str):
+        user = discord.utils.get(self.bot.get_all_members(), name=name, discriminator=discriminator)
+        await ctx.send(f"{user.id}")
+
+    @commands.has_role(1020638168237740042)
     @commands.hybrid_command()
     async def restart(self, ctx: commands.Context):
         await ctx.send(
