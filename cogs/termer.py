@@ -43,7 +43,8 @@ class Termer(commands.Cog):
         if ctx.author.id in self.bot.blocked:
             reason = await self.bot.mongo.blocker.get_banned_user_reason(ctx.author.id)
             reason = reason['reason']
-            return await ctx.reply(content=f"You have been blocked by admins for improper usage of bot. Please contact admin \nReason : {reason}")
+            return await ctx.reply(
+                content=f"You have been blocked by admins for improper usage of bot. Please contact admin \nReason : {reason}")
         if language not in self.bot.all_langs and "http" not in language:
             return await ctx.reply(
                 f"**❌We have the following languages in our db.**\n```ini\n{self.bot.display_langs}```"
@@ -87,10 +88,17 @@ class Termer(commands.Cog):
             novel = await FileHandler.read_file(FileHandler, ctx=ctx)
         else:
             if messageid is not None:
-                messageId = messageid.split("/")[len(messageid.split("/")) - 1]
-                # print(messageId)
-                channel = self.bot.get_channel(ctx.channel.id)
-                resolvedMessage = await channel.fetch_message(messageId)
+                if 'discord' in messageid:
+                    spl_link = messageid.split('/')
+                    server_id = int(spl_link[4])
+                    channel_id = int(spl_link[5])
+                    msg_id = int(spl_link[6])
+                    server = self.bot.get_guild(server_id)
+                    channel = server.get_channel(channel_id)
+                    resolvedMessage = await channel.fetch_message(msg_id)
+                else:
+                    channel = self.bot.get_channel(ctx.channel.id)
+                    resolvedMessage = await channel.fetch_message(messageid)
                 msg = resolvedMessage
                 link = resolvedMessage.attachments[0].url
             elif isinstance(file, discord.Attachment):
@@ -177,7 +185,7 @@ class Termer(commands.Cog):
 
     @termer.autocomplete("language")
     async def translate_complete(
-        self, inter: discord.Interaction, language: str
+            self, inter: discord.Interaction, language: str
     ) -> list[app_commands.Choice]:
         lst = [i for i in self.bot.all_langs if language.lower() in i.lower()][:25]
         return [app_commands.Choice(name=i, value=i) for i in lst]
