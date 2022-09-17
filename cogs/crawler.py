@@ -416,7 +416,7 @@ class Crawler(commands.Cog):
                 f"> **❌Currently this link is not supported.**"
             )
         if 'b.faloo' in link or 'wap.faloo' in link:
-            urls = urls[:120]
+            urls = urls[:200]
         if reverse is not None:
             urls.reverse()
         try:
