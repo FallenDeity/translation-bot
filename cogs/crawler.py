@@ -174,6 +174,7 @@ class Crawler(commands.Cog):
             for i in text:
                 full_chp += i['text'] + "\n"
         else:
+            full_chp += str(chpTitle) + "\n\n"
             text = sel.css(css).extract()
             # print(css)
             if text == []:
@@ -414,6 +415,8 @@ class Crawler(commands.Cog):
             return await ctx.reply(
                 f"> **❌Currently this link is not supported.**"
             )
+        if 'b.faloo' in link or 'wap.faloo' in link:
+            urls = urls[:120]
         if reverse is not None:
             urls.reverse()
         try:
@@ -509,7 +512,7 @@ class Crawler(commands.Cog):
                     psrt = url
             if psrt == '':
                 await msg.delete()
-                await ctx.send(
+                return await ctx.send(
                     "We couldn't find the selector for next chapter. Please check the links or provide the css selector")
             href = [i for i in soup.find_all("a") if i.get("href") == psrt]
             # print(href)
