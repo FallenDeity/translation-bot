@@ -3,6 +3,7 @@ import re
 
 from motor import motor_asyncio
 
+from databases.blocked import User
 from databases.data import Novel
 
 
@@ -47,7 +48,7 @@ class Library(Database):
         return [Novel(**novel) for novel in novels] if novels else None
 
     async def get_novel_by_size(self, size: float) -> list[Novel]:
-        size = int(size * 1024**2)
+        size = int(size * 1024 ** 2)
         novels = await self.library.find({"size": {"$gte": size}}).to_list(None)
         return [Novel(**novel) for novel in novels] if novels else None
 
@@ -85,3 +86,33 @@ class Library(Database):
     @property
     async def get_total_novels(self) -> int:
         return await self.library.count_documents({})
+
+
+class Blocker(Database):
+    def __init__(self) -> None:
+        super().__init__()
+        self.blocker = self.db["Blocker"]["blocked"]
+
+    async def deleteall(self):
+        await self.blocker.delete_many({'userid': {'$gte': 1000}})
+        print('deleted all')
+
+    async def ban(self, user: User) -> None:
+        print(user)
+        i = await self.blocker.insert_one(user.__dict__)
+        print(i)
+        print('user banned')
+
+    async def unban(self, userid: int) -> None:
+        await self.blocker.delete_one({"userid": userid})
+
+    async def get_banned_user_reason(self, userid: int):
+        temp = await self.blocker.find_one({"userid": userid})
+        print(temp)
+        return temp
+
+    async def get_all_banned_users(self) -> list[int]:
+        users = await self.blocker.find().to_list(length=await self.blocker.count_documents({}))
+        users_id = [i['userid'] for i in users]
+        return users_id
+
