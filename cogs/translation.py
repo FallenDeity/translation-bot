@@ -32,13 +32,13 @@ class Translate(commands.Cog):
         aliases=["t"],
     )
     async def translate(
-        self,
-        ctx: commands.Context,
-        link: str = None,
-        file: typing.Optional[discord.Attachment] = None,
-        messageid: str = None,
-        language: str = "english",
-        novelname: str = None,
+            self,
+            ctx: commands.Context,
+            link: str = None,
+            file: typing.Optional[discord.Attachment] = None,
+            messageid: str = None,
+            language: str = "english",
+            novelname: str = None,
     ):
         file = link or file
         if not file and not messageid:
@@ -138,19 +138,24 @@ class Translate(commands.Cog):
                 await FileHandler.docx_to_txt(ctx, file_type)
             novel = await FileHandler().read_file(ctx)
         await rep_msg.edit(content=f"> **✅Translation started. Translating to {language}.**")
-        original_Language = FileHandler.find_language(novel)
-        os.remove(f"{ctx.author.id}.txt")
-        liz = [novel[i : i + 1800] for i in range(0, len(novel), 1800)]
-        self.bot.translator[ctx.author.id] = f"0/{len(liz)}"
-        translate = Translator(self.bot, ctx.author.id, language)
-        story = await translate.start(liz)
-        async with aiofiles.open(f"{ctx.author.id}.txt", "w", encoding="utf-8") as f:
-            await f.write(story)
-        await FileHandler().distribute(self.bot, ctx, name, language, original_Language)
+        try:
+            original_Language = FileHandler.find_language(novel)
+            os.remove(f"{ctx.author.id}.txt")
+            liz = [novel[i: i + 1800] for i in range(0, len(novel), 1800)]
+            self.bot.translator[ctx.author.id] = f"0/{len(liz)}"
+            translate = Translator(self.bot, ctx.author.id, language)
+            story = await translate.start(liz)
+            async with aiofiles.open(f"{ctx.author.id}.txt", "w", encoding="utf-8") as f:
+                await f.write(story)
+            await FileHandler().distribute(self.bot, ctx, name, language, original_Language)
+        except Exception as e:
+            raise Exception
+        finally:
+            del self.bot.translator[ctx.author.id]
 
     @translate.autocomplete("language")
     async def translate_complete(
-        self, inter: discord.Interaction, language: str
+            self, inter: discord.Interaction, language: str
     ) -> list[app_commands.Choice]:
         lst = [i for i in self.bot.all_langs if language.lower() in i.lower()][:25]
         return [app_commands.Choice(name=i, value=i) for i in lst]
@@ -166,26 +171,6 @@ class Translate(commands.Cog):
             if str(ctx.author.id) in str(i) and "crawl" not in i:
                 os.remove(i)
         await ctx.reply("> **✔Cleared all records.**")
-
-    # @commands.hybrid_command(help="start mega", aliases=["start"])
-    # async def mega(self, ctx: commands.Context):
-    #     try:
-    #         # print("userpwd:" + str(os.getenv("USER")) + str(os.getenv("MEGA")) + "'")
-    #         self.bot.mega = Mega().login(
-    #             email=os.getenv("USER").strip(), password=os.getenv("MEGA").strip()
-    #         )
-    #         await ctx.send("Mega login as user was successful")
-    #         # user = self.bot.mega.get_user()
-    #         # await ctx.send(str(user))
-    #     except Exception as e:
-    #         print(e)
-    #         print(e.__traceback__.__str__())
-    #         try:
-    #             await ctx.send("login using mega failed. try logging inn anonymously")
-    #             self.bot.mega = Mega().login()
-    #         except:
-    #             await ctx.send("Mega connection failed")
-    #     await ctx.send(f"> **🚄`mega started`**")
 
 
 async def setup(bot):
