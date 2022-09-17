@@ -89,10 +89,17 @@ class Translate(commands.Cog):
             novel = await FileHandler.read_file(FileHandler, ctx=ctx)
         else:
             if messageid is not None:
-                messageId = messageid.split("/")[len(messageid.split("/")) - 1]
-                # print(messageId)
-                channel = self.bot.get_channel(ctx.channel.id)
-                resolvedMessage = await channel.fetch_message(messageId)
+                if 'discord' in messageid:
+                    spl_link = messageid.split('/')
+                    server_id = int(spl_link[4])
+                    channel_id = int(spl_link[5])
+                    msg_id = int(spl_link[6])
+                    server = self.bot.get_guild(server_id)
+                    channel = server.get_channel(channel_id)
+                    resolvedMessage = await channel.fetch_message(msg_id)
+                else:
+                    channel = self.bot.get_channel(ctx.channel.id)
+                    resolvedMessage = await channel.fetch_message(messageid)
                 msg = resolvedMessage
                 link = resolvedMessage.attachments[0].url
             elif isinstance(file, discord.Attachment):
