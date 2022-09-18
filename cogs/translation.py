@@ -3,6 +3,7 @@ import typing
 
 import aiofiles
 import discord
+from deep_translator import GoogleTranslator
 from discord import app_commands
 from discord.ext import commands
 
@@ -134,6 +135,15 @@ class Translate(commands.Cog):
         if novelname is not None:
             name = novelname
         name_check = FileHandler.checkname(name, self.bot)
+        if rawname is not None:
+            if not name_check:
+                try:
+                    name = GoogleTranslator(
+                        source="auto", target="english"
+                    ).translate(rawname).strip()
+                    name_check = FileHandler.checkname(name, self.bot)
+                except:
+                    pass
         if not name_check:
             await rep_msg.delete()
             return await ctx.reply(
