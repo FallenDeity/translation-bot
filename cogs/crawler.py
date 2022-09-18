@@ -452,6 +452,7 @@ class Crawler(commands.Cog):
                 await f.write(text)
             await FileHandler().crawlnsend(ctx, self.bot, title, title_name, original_Language)
         except Exception as e:
+            await ctx.send("> Error occurred .Please report to admin +\n" + str(e))
             raise e
         finally:
             del self.bot.crawler[ctx.author.id]
@@ -565,7 +566,7 @@ class Crawler(commands.Cog):
                 chp_count += 1
                 current_link = output[1]
             original_Language = FileHandler.find_language(full_text)
-            if title == "" or title == "None" or title is None:
+            if title is None or str(title).strip() == "" or title == "None":
                 title = f"{ctx.author.id}_crl"
                 title_name = firstchplink
             else:
@@ -580,13 +581,17 @@ class Crawler(commands.Cog):
                     except:
                         pass
                     title_name = title + "__" + title_name
-                    title = str(title[:100])
+                    try:
+                        title = str(title[:100])
+                    except:
+                        pass
                 for tag in ['/', '\\', '<', '>', "'", '"', ':', ";", '?', '|', '*', ';', '\r', '\n', '\t', '\\\\']:
                     title = title.replace(tag, '')
             with open(title + '.txt', 'w', encoding='utf-8') as f:
                 f.write(full_text)
             return await FileHandler().crawlnsend(ctx, self.bot, title, title_name, original_Language)
         except Exception as e:
+            await ctx.send("> Error occurred .Please report to admin +\n"+str(e))
             raise e
         finally:
             del self.bot.crawler[ctx.author.id]

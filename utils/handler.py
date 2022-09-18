@@ -150,7 +150,8 @@ class FileHandler:
                     f"> **✔{ctx.author.mention} your novel {name} is ready.**",
                     view=view,
                 )
-                channel = bot.get_channel(1005668482475643050)
+                guild = bot.get_guild(940866934214373376)
+                channel = guild.get_channel(1005668482475643050)
                 user = str(ctx.author)
                 await channel.send(
                     f"> {name.replace('_', ' ')} \nuploaded by {user} Translated from: {original_language} to: {language}",
@@ -218,6 +219,13 @@ class FileHandler:
                     f"> **✔{ctx.author.mention} your novel {title_name} is ready.**",
                     view=view,
                 )
+                guild = bot.get_guild(940866934214373376)
+                channel = guild.get_channel(1020980703229382706)
+                user = str(ctx.author)
+                await channel.send(
+                    f"> {title_name} \nCrawled by {user} Source language : {originallanguage}",
+                    view=view,
+                )
                 download_url = filelnk
             except Exception as e:
                 print(e)
@@ -225,7 +233,14 @@ class FileHandler:
             os.remove(f"{title}.txt")
         else:
             file = discord.File(f"{title}.txt", f"{title_name}.txt")
-            msg = await ctx.reply("**🎉Here is your crawled novel**", file=file)
+            await ctx.reply("**🎉Here is your crawled novel**", file=file)
+            guild = bot.get_guild(940866934214373376)
+            channel = guild.get_channel(1020980703229382706)
+            user = str(ctx.author)
+            msg = await channel.send(
+                f'> {title_name} \nCrawled by {user} Source language : {originallanguage} ',
+                file=discord.File(f"{title}.txt"),
+            )
             download_url = msg.attachments[0].url
             os.remove(f"{title}.txt")
             try:
