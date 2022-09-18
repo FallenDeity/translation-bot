@@ -443,7 +443,7 @@ class Crawler(commands.Cog):
                         ).translate(title_name).strip()
                     except:
                         pass
-                    title_name = title + title_name
+                    title_name = title + "__" + title_name
                     title = str(title[:100])
                 for tag in ['/', '\\', '!', '<', '>', "'", '"', ':', ";", '?', '|', '*', ';', '\r', '\n', '\t', '\\\\']:
                     title = title.replace(tag, '')
