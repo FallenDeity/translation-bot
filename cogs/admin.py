@@ -45,7 +45,7 @@ class Admin(commands.Cog):
         return await ctx.send(self.bot.blocked)
 
     @commands.has_role(1020638168237740042)
-    @commands.hybrid_command(help="ban user.. Admin only command")
+    @commands.hybrid_command(help="Unban user.. Admin only command")
     async def unban(self, ctx: commands.Context, id: str):
         id = int(id)
         user = self.bot.get_user(id)
@@ -95,6 +95,14 @@ class Admin(commands.Cog):
         h = heroku3.from_key(os.getenv("APIKEY"))
         app = h.app(os.getenv("APPNAME"))
         app.restart()
+
+    @commands.has_role(1020638168237740042)
+    @commands.hybrid_command(help="Gives the logger for debug")
+    async def logger(self, ctx: commands.Context, lines: int = 20):
+        h = heroku3.from_key(os.getenv("APIKEY"))
+        log = h.get_app_log(os.getenv("APPNAME"), lines=lines, timeout=10)
+        return await ctx.send(embed=discord.Embed(title="Logs", description=str(log)))
+        # app = h.app(os.getenv("APPNAME"))
 
 
 async def setup(bot):

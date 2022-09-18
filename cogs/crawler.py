@@ -422,19 +422,6 @@ class Crawler(commands.Cog):
         try:
             self.bot.crawler[ctx.author.id] = f"0/{len(urls)}"
             await msg.edit(content="> **✔Crawl started.**")
-            if title_name == "" or title_name == "None" or title_name is None:
-                title_name = f"{ctx.author.id}_crl"
-            else:
-                try:
-                    title_name = GoogleTranslator(
-                        source="auto", target="english"
-                    ).translate(title_name).strip()
-                except:
-                    pass
-            title = str(title_name[:100])
-            for tag in ['/', '\\', '!', '<', '>', "'", '"', ':', ";", '?', '|', '*', ';', '\r', '\n', '\t', '\\\\']:
-                title = title.replace(tag, '')
-            title = title.replace('_', ' ')
             book = await self.bot.loop.run_in_executor(
                 None, self.direct, urls, novel, ctx.author.id
             )
@@ -443,6 +430,24 @@ class Crawler(commands.Cog):
             whole.insert(0, "\nsource : " + str(link) + "\n\n")
             text = "\n".join(whole)
             original_Language = FileHandler.find_language(text)
+            if title_name == "" or title_name == "None" or title_name is None:
+                title = f"{ctx.author.id}_crl"
+                title_name = link
+            else:
+                if original_Language == 'english':
+                    title = str(title_name[:100])
+                else:
+                    try:
+                        title = GoogleTranslator(
+                            source="auto", target="english"
+                        ).translate(title_name).strip()
+                    except:
+                        pass
+                    title_name = title + "__" + title_name
+                    title = str(title[:100])
+                for tag in ['/', '\\', '!', '<', '>', "'", '"', ':', ";", '?', '|', '*', ';', '\r', '\n', '\t', '\\\\']:
+                    title = title.replace(tag, '')
+                title = title.replace('_', ' ')
             async with aiofiles.open(f"{title}.txt", "w", encoding="utf-8") as f:
                 await f.write(text)
             await FileHandler().crawlnsend(ctx, self.bot, title, title_name, original_Language)
@@ -488,7 +493,9 @@ class Crawler(commands.Cog):
         try:
             response = requests.get(firstchplink, headers=headers, timeout=10)
         except:
-            pass
+            return await ctx.reply("> Couldn't connect to the provided link.... Please check the link")
+        if response.status_code == 404:
+            return await ctx.reply("> Provided link gives 404 error... Please check the link")
         response.encoding = response.apparent_encoding
         soup = BeautifulSoup(response.content, 'html5lib')
         htm = response.text
@@ -557,19 +564,27 @@ class Crawler(commands.Cog):
                     break
                 chp_count += 1
                 current_link = output[1]
-            try:
-                title = GoogleTranslator(
-                    source="auto", target="english"
-                ).translate(title).strip()
-            except:
-                pass
-            title_name = title
-            title = str(title[:100])
-            for tag in ['/', '\\', '<', '>', "'", '"', ':', ";", '?', '|', '*', ';', '\r', '\n', '\t', '\\\\']:
-                title = title.replace(tag, '')
+            original_Language = FileHandler.find_language(full_text)
+            if title == "" or title == "None" or title is None:
+                title = f"{ctx.author.id}_crl"
+                title_name = firstchplink
+            else:
+                title_name = title
+                if original_Language == 'english':
+                    title = str(title[:100])
+                else:
+                    try:
+                        title = GoogleTranslator(
+                            source="auto", target="english"
+                        ).translate(title).strip()
+                    except:
+                        pass
+                    title_name = title + "__" + title_name
+                    title = str(title[:100])
+                for tag in ['/', '\\', '<', '>', "'", '"', ':', ";", '?', '|', '*', ';', '\r', '\n', '\t', '\\\\']:
+                    title = title.replace(tag, '')
             with open(title + '.txt', 'w', encoding='utf-8') as f:
                 f.write(full_text)
-            original_Language = FileHandler.find_language(full_text)
             return await FileHandler().crawlnsend(ctx, self.bot, title, title_name, original_Language)
         except Exception as e:
             raise e
