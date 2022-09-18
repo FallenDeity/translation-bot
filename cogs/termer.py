@@ -36,6 +36,7 @@ class Termer(commands.Cog):
         messageid: str = None,
         language: str = "english",
         novelname: str = None,
+        rawname: str = None
     ):
         file = link or file
         if not file and not messageid:
@@ -177,7 +178,7 @@ class Termer(commands.Cog):
             story = await translate.start(liz)
             async with aiofiles.open(f"{ctx.author.id}.txt", "w", encoding="utf-8") as f:
                 await f.write(story)
-            await FileHandler().distribute(self.bot, ctx, name, language, original_Language)
+            await FileHandler().distribute(self.bot, ctx, name, language, original_Language, raw_name=rawname)
         except Exception as e:
             raise Exception
         finally:
