@@ -33,7 +33,7 @@ class ErrorHandler(commands.Cog):
 
     @staticmethod
     def perms_parser(perms: list) -> str:
-        return f"`{'` , `'.join(perms).title().replace('guild','server').replace('_',' ')}`"
+        return f"`{'` , `'.join(perms).title().replace('guild', 'server').replace('_', ' ')}`"
 
     @commands.Cog.listener()
     async def on_command_error(self, ctx, error: Exception):
@@ -181,12 +181,12 @@ class ErrorHandler(commands.Cog):
             app.restart()
         elif "Error R14" in str(error):
             try:
-             await ctx.send(
-                embed=discord.Embed(
-                    description=f"Ram is overloaded .. trying to restart.",
-                    color=discord.Color.red(),
-                ),
-             )
+                await ctx.send(
+                    embed=discord.Embed(
+                        description=f"Ram is overloaded .. trying to restart.",
+                        color=discord.Color.red(),
+                    ),
+                )
             except:
                 pass
             h = heroku3.from_key(os.getenv("APIKEY"))
@@ -201,9 +201,13 @@ class ErrorHandler(commands.Cog):
             channel = self.bot.get_channel(
                 991911644831678484
             ) or await self.bot.fetch_channel(991911644831678484)
-            await channel.send(
-                f"```yaml\n{''.join(traceback.format_exception(error, error, error.__traceback__))}\n```"
-            )
+            try:
+                await channel.send(
+                    f"```yaml\n{''.join(traceback.format_exception(error, error, error.__traceback__))}\n```"
+                )
+            except:
+                await channel.send(str(error))
+                await channel.send(error.__traceback__[:4000])
             raise error
 
 
