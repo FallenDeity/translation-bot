@@ -171,7 +171,7 @@ class Translate(commands.Cog):
                 await f.write(story)
             await FileHandler().distribute(self.bot, ctx, name, language, original_Language, rawname)
         except Exception as e:
-            raise Exception
+            raise e
         finally:
             del self.bot.translator[ctx.author.id]
 
