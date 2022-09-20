@@ -161,6 +161,23 @@ class Library(commands.Cog):
         embeds = await self.make_list_embed(allnovels)
         await msg.edit(content=f"> Found {len(embeds)} novels")
         await self.buttons(embeds, ctx)
+    
+    @library.command(name="random", help="Gives 10 random novel in library.")
+    async def random(
+            self,
+            ctx: commands.Context,
+    ) -> None:
+        await ctx.send("Getting random novels")
+        random_ids = random.sample(list(range(1, await self.bot.mongo.library.next_number)), 10)
+        novels = []
+        for r in random_ids:
+            try:
+                novels.append(await self.bot.mongo.library.get_novel_by_id(r))
+            except:
+                pass
+        await self.buttons(await self.make_list_embed(novels), ctx)
+        return
+
 
     @search.autocomplete("language")
     async def translate_complete(
