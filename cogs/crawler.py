@@ -109,15 +109,18 @@ class Crawler(commands.Cog):
         response.encoding = response.apparent_encoding
         full = ""
         if '* ::text' == css or css is None or css.strip() == '':
-            article = simple_json_from_html_string(response.text)
-            text = article['plain_text']
-            chpTitle = article['title']
-            # print(chpTitle)
-            full += str(chpTitle) + "\n\n"
-            for i in text:
-                full += i['text'] + "\n"
+            try:
+                article = simple_json_from_html_string(response.text)
+                text = article['plain_text']
+                chpTitle = article['title']
+                # print(chpTitle)
+                full += str(chpTitle) + "\n\n"
+                for i in text:
+                    full += i['text'] + "\n"
+            except:
+                full = ""
 
-        else:
+        if full == "":
             html = response.text
             sel = parsel.Selector(html)
             text = sel.css(css).extract()
