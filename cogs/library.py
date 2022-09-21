@@ -233,6 +233,7 @@ class Library(commands.Cog):
             for i in self.bot.titles
             if title.lower() in i.lower()
         ][:25]
+        print(lst)
         return [app_commands.Choice(name=i, value=i) for i in lst]
 
     @library.command(name="info", help="shows info about a novel.")
