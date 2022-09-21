@@ -90,6 +90,27 @@ class Library(commands.Cog):
             embeds.append(await self.make_base_embed(novel))
         return embeds
 
+    async def make_base_list_embed(self, data: list[Novel], page: int) -> discord.Embed:
+        output = [
+            f"**#{novel._id}\t💠\t[{novel.title.split('__')[0].replace('.txt', '').replace('.docx', '')}]({novel.download})**\n💠\tSize: **{round(novel.size / (1024 ** 2), 2)} MB**\t💠\tLanguage:** {novel.language}** "
+            for novel in data]
+        out_str = ""
+        for out in output:
+            out_str += out + "\n\n"
+        embed = discord.Embed(title=f"**Page {page}**",
+                              description=out_str)
+        return embed
+
+    async def make_list_embed_list(self, data: list[Novel]) -> list[discord.Embed]:
+        embeds = []
+        n = 5
+        final = [data[i * n:(i + 1) * n] for i in range((len(data) + n - 1) // n)]
+        page = 1
+        for novel in final:
+            embeds.append(await self.make_base_list_embed(novel, page))
+            page += 1
+        return embeds
+
     @commands.hybrid_group()
     async def library(self, ctx: commands.Context) -> None:
         if ctx.invoked_subcommand is None:
@@ -102,6 +123,7 @@ class Library(commands.Cog):
         title: str = None,
         language: str = None,
         rating: int = None,
+        show_list: bool = False,
         *,
         tags: str = None,
         raw_language: str = None,
@@ -159,9 +181,14 @@ class Library(commands.Cog):
             await msg.delete()
             return
         allnovels = self.common_elements_finder(*valid)
-        embeds = await self.make_list_embed(allnovels)
-        await msg.edit(content=f"> Found {len(embeds)} novels")
-        await self.buttons(embeds, ctx)
+        if show_list:
+            embeds = await self.make_list_embed_list(allnovels)
+            await msg.edit(content=f"> Found {len(allnovels)} novels")
+            await self.buttons(embeds, ctx)
+        else:
+            embeds = await self.make_list_embed(allnovels)
+            await msg.edit(content=f"> Found {len(embeds)} novels")
+            await self.buttons(embeds, ctx)
     
     @library.command(name="random", help="Gives 10 random novel in library.")
     async def random(
@@ -178,7 +205,6 @@ class Library(commands.Cog):
                 pass
         await self.buttons(await self.make_list_embed(novels), ctx)
         return
-
 
     @search.autocomplete("language")
     async def translate_complete(
@@ -203,10 +229,11 @@ class Library(commands.Cog):
         self, inter: discord.Interaction, title: str
     ) -> list[app_commands.Choice]:
         lst = [
-            i
-            for i in await self.bot.mongo.library.get_all_titles
+            str(i[:90]).split("__")[0]
+            for i in self.bot.titles
             if title.lower() in i.lower()
         ][:25]
+        print(lst)
         return [app_commands.Choice(name=i, value=i) for i in lst]
 
     @library.command(name="info", help="shows info about a novel.")
