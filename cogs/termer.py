@@ -1,4 +1,6 @@
+import asyncio
 import os
+import random
 import typing
 
 import aiofiles
@@ -7,6 +9,7 @@ from deep_translator import GoogleTranslator
 from discord import app_commands
 from discord.ext import commands
 
+from cogs.library import Library
 from core.bot import Raizel
 from core.views.linkview import LinkView
 from languages.terms import terms
@@ -29,15 +32,15 @@ class Termer(commands.Cog):
         aliases=["term"],
     )
     async def termer(
-        self,
-        ctx: commands.Context,
-        term: str = None,
-        link: str = None,
-        file: typing.Optional[discord.Attachment] = None,
-        messageid: str = None,
-        language: str = "english",
-        novelname: str = None,
-        rawname: str = None
+            self,
+            ctx: commands.Context,
+            term: str = None,
+            link: str = None,
+            file: typing.Optional[discord.Attachment] = None,
+            messageid: str = None,
+            language: str = "english",
+            novelname: str = None,
+            rawname: str = None
     ):
         file = link or file
         if not file and not messageid:
@@ -51,6 +54,7 @@ class Termer(commands.Cog):
             return await ctx.reply(
                 f"**❌We have the following languages in our db.**\n```ini\n{self.bot.display_langs}```"
             )
+        language = FileHandler.get_language(language)
         if ctx.author.id in self.bot.translator:
             return await ctx.send("> **❌You cannot translate two novels at a time.**")
         if not ctx.message.attachments and not file and messageid is None:
@@ -164,9 +168,56 @@ class Termer(commands.Cog):
             return await ctx.reply(
                 f"> **❌{name} is not a valid novel name. please provide a valid name to filename before translating. **"
             )
-        for tag in ['/', '\\', '<', '>', "'", '"', ':', ";", '?', '|', '*', ';']:
+        for tag in ['/', '\\', '<', '>', "'", '"', ':', ";", '?', '|', '*', ';', '!']:
             name = name.replace(tag, '').strip()
         name = name.replace('_', ' ')
+        if name in self.bot.titles:
+            await ctx.send("here")
+            novel_data = list(await self.bot.mongo.library.get_novel_by_name(name))
+            ids = []
+            lang_check = False
+            for n in novel_data:
+                ids.append(n._id)
+                if language == n.language:
+                    lang_check = True
+            if lang_check:
+                chk_msg = await ctx.send(embed=discord.Embed(
+                    description=f"This novel is already in our library...  Do you want to search in library ...react with in this message 🇾  ...\n If you want to continue translation react with 🇳"))
+                await chk_msg.add_reaction('🇾')
+                await chk_msg.add_reaction('🇳')
+
+                def check(reaction, user):
+                    return reaction.message.id == chk_msg.id and (
+                                str(reaction.emoji) == '🇾' or str(reaction.emoji) == '🇳') and user == ctx.author
+
+                try:
+                    res = await self.bot.wait_for(
+                        "reaction_add",
+                        check=check,
+                        timeout=10.0,
+                    )
+                except asyncio.TimeoutError:
+                    print('error')
+                    try:
+                        os.remove(f"{ctx.author.id}.txt")
+                    except:
+                        pass
+                    await ctx.send("No response detected. sending novels in library", delete_after=10)
+                    ctx.command = await self.bot.get_command("library search").callback(Library(self.bot), ctx, name,
+                                                                                        language)
+                    return None
+                else:
+                    await ctx.send("Reaction received", delete_after=10)
+                    if res[0] == '🇳':
+                        pass
+                    else:
+                        try:
+                            os.remove(f"{ctx.author.id}.txt")
+                        except:
+                            pass
+                        ctx.command = await self.bot.get_command("library search").callback(Library(self.bot), ctx,
+                                                                                            name, language)
+                        return None
         if novel is None:
             data = await resp.read()
             async with aiofiles.open(f"{ctx.author.id}.{file_type}", "wb") as f:
@@ -193,6 +244,8 @@ class Termer(commands.Cog):
             raise Exception
         finally:
             del self.bot.translator[ctx.author.id]
+            self.bot.titles = await self.mongo.library.get_all_titles
+            self.bot.titles = random.sample(self.bot.titles, len(self.bot.titles))
 
     @termer.autocomplete("language")
     async def translate_complete(
@@ -203,18 +256,18 @@ class Termer(commands.Cog):
 
     @termer.autocomplete("term")
     async def translate_complete(
-        self, inter: discord.Interaction, term: str
+            self, inter: discord.Interaction, term: str
     ) -> list[app_commands.Choice]:
         lst = [
-            "naruto",
-            "one-piece",
-            "pokemon",
-            "mixed",
-            "prince-of-tennis",
-            "marvel",
-            "dc",
-            "xianxia",
-        ] + list(map(str, range(1, 8)))
+                  "naruto",
+                  "one-piece",
+                  "pokemon",
+                  "mixed",
+                  "prince-of-tennis",
+                  "marvel",
+                  "dc",
+                  "xianxia",
+              ] + list(map(str, range(1, 8)))
         return [app_commands.Choice(name=i, value=i) for i in lst]
 
     @commands.hybrid_command(

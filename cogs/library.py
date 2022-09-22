@@ -92,7 +92,7 @@ class Library(commands.Cog):
 
     async def make_base_list_embed(self, data: list[Novel], page: int) -> discord.Embed:
         output = [
-            f"**#{novel._id}\t💠\t[{novel.title.split('__')[0].replace('.txt', '').replace('.docx', '')}]({novel.download})**\n💠\tSize: **{round(novel.size / (1024 ** 2), 2)} MB**\t💠\tLanguage:** {novel.language}** "
+            f"**#{novel._id}\t💠\t[{novel.title.split('__')[0].replace('.txt', '').replace('.docx', '').replace('.epub', '').strip()}]({novel.download})**\n💠\tSize: **{round(novel.size / (1024 ** 2), 2)} MB**\t💠\tLanguage:** {novel.language}** "
             for novel in data]
         out_str = ""
         for out in output:
@@ -103,7 +103,7 @@ class Library(commands.Cog):
 
     async def make_list_embed_list(self, data: list[Novel]) -> list[discord.Embed]:
         embeds = []
-        n = 5
+        n = 6
         final = [data[i * n:(i + 1) * n] for i in range((len(data) + n - 1) // n)]
         page = 1
         for novel in final:
@@ -142,7 +142,14 @@ class Library(commands.Cog):
             and uploader is None
         ):
             novels = await self.bot.mongo.library.get_all_novels
-            await self.buttons(await self.make_list_embed(novels), ctx)
+            if show_list:
+                embeds = await self.make_list_embed_list(novels)
+                await msg.edit(content=f"> Found {len(novels)} novels")
+                await self.buttons(embeds, ctx)
+            else:
+                embeds = await self.make_list_embed(novels)
+                await msg.edit(content=f"> Found {len(embeds)} novels")
+                await self.buttons(embeds, ctx)
             return
         valid = []
         if title:
@@ -229,7 +236,7 @@ class Library(commands.Cog):
         self, inter: discord.Interaction, title: str
     ) -> list[app_commands.Choice]:
         lst = [
-            str(i[:90]).split("__")[0]
+            str(i[:90]).replace(".docx", "").replace(".txt", "").replace(".epub", "").strip()
             for i in self.bot.titles
             if title.lower() in i.lower()
         ][:25]
