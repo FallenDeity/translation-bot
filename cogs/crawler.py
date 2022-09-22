@@ -1,6 +1,8 @@
+import asyncio
 import concurrent.futures
 import itertools
 import os
+import random
 import typing
 import typing as t
 from urllib.parse import urljoin
@@ -15,6 +17,7 @@ from deep_translator import GoogleTranslator
 from discord.ext import commands
 from readabilipy import simple_json_from_html_string
 
+from cogs.library import Library
 from core.bot import Raizel
 from utils.handler import FileHandler
 
@@ -53,6 +56,8 @@ def findURLCSS(link):
         return "* ::text"
     elif "shu05" in link:
         return "#htmlContent ::text"
+    elif "readwn" in link:
+        return ".chapter-content"
     else:
         return "* ::text"
 
@@ -155,7 +160,7 @@ class Crawler(commands.Cog):
                 self.bot.crawler[name] = f"{len(novel)}/{len(urls)}"
             return novel
 
-    async def getcoontent(self, links: str, css: str, next_xpath, bot, tag):
+    async def getcontent(self, links: str, css: str, next_xpath, bot, tag):
         try:
             response = await bot.con.get(links)
             soup = BeautifulSoup(await response.read(), "html.parser", from_encoding=response.get_encoding())
@@ -422,6 +427,48 @@ class Crawler(commands.Cog):
             urls = urls[:200]
         if reverse is not None:
             urls.reverse()
+        for tag in ['/', '\\', '!', '<', '>', "'", '"', ':', ";", '?', '|', '*', ';', '\r', '\n', '\t', '\\\\']:
+            title_name = title_name.replace(tag, '')
+        title_name = title_name.replace('_', ' ')
+        if title_name in self.bot.titles:
+            # await ctx.send("here")
+            novel_data = list(await self.bot.mongo.library.get_novel_by_name(name))
+            ids = []
+            for n in novel_data:
+                ids.append(n._id)
+            if True:
+                chk_msg = await ctx.send(embed=discord.Embed(description=f"This novel is already in our library...  Do you want to search in library ...react with in this message 🇾  ...\n If you want to continue crawling react with 🇳"))
+                await chk_msg.add_reaction('🇾')
+                await chk_msg.add_reaction('🇳')
+
+                def check(reaction, user):
+                    return reaction.message.id == chk_msg.id and (str(reaction.emoji) == '🇾' or str(reaction.emoji) == '🇳') and user == ctx.author
+                try:
+                    res = await self.bot.wait_for(
+                        "reaction_add",
+                        check=check,
+                        timeout=10.0,
+                    )
+                except asyncio.TimeoutError:
+                    print(' Timeout error')
+                    try:
+                        os.remove(f"{ctx.author.id}.txt")
+                    except:
+                        pass
+                    await ctx.send("No response detected. sending novels in library", delete_after=10)
+                    ctx.command = await self.bot.get_command("library search").callback(Library(self.bot), ctx, title_name)
+                    return None
+                else:
+                    await ctx.send("Reaction received", delete_after=10)
+                    if res[0] == '🇳':
+                        pass
+                    else:
+                        try:
+                            os.remove(f"{ctx.author.id}.txt")
+                        except:
+                            pass
+                        ctx.command = await self.bot.get_command("library search").callback(Library(self.bot), ctx, title_name)
+                        return None
         try:
             self.bot.crawler[ctx.author.id] = f"0/{len(urls)}"
             await msg.edit(content="> **✔Crawl started.**")
@@ -448,9 +495,7 @@ class Crawler(commands.Cog):
                         pass
                     title_name = title + "__" + title_name
                     title = str(title[:100])
-                for tag in ['/', '\\', '!', '<', '>', "'", '"', ':', ";", '?', '|', '*', ';', '\r', '\n', '\t', '\\\\']:
-                    title = title.replace(tag, '')
-                title = title.replace('_', ' ')
+
             async with aiofiles.open(f"{title}.txt", "w", encoding="utf-8") as f:
                 await f.write(text)
             await FileHandler().crawlnsend(ctx, self.bot, title, title_name, original_Language)
@@ -459,6 +504,8 @@ class Crawler(commands.Cog):
             raise e
         finally:
             del self.bot.crawler[ctx.author.id]
+            self.bot.titles = await self.mongo.library.get_all_titles
+            self.bot.titles = random.sample(self.bot.titles, len(self.bot.titles))
 
     @commands.hybrid_command(
         help="Clears any stagnant novels which were deposited for crawling."
@@ -551,7 +598,7 @@ class Crawler(commands.Cog):
                         return await ctx.send(" There is some problem with the provided selector")
                     else:
                         return await ctx.send(" There is some problem with the detected selector")
-                output = await self.getcoontent(current_link, css, path, self.bot, sel_tag)
+                output = await self.getcontent(current_link, css, path, self.bot, sel_tag)
                 chp_text = output[0]
                 # print(i)
                 if chp_text == 'error':

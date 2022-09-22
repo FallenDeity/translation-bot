@@ -29,11 +29,20 @@ class FileHandler:
         return list(set(text.noun_phrases))
 
     @staticmethod
+    def get_language(lang_code: str) -> str:
+        lang = languages.choices
+        if lang_code in lang:
+            language = {lang_code}
+        else:
+            language = {i for i in lang if lang[i] == lang_code}
+        return language.pop()
+
+    @staticmethod
     def find_language(text: str) -> str:
         api_keys = ['8ca7a29f3b7c8ac85487451129f35c89', '1c2d644450cb8923818607150e7766d4',
                     '5cd7b28759bb7aafe9b1d395824e7a67', 'af207e865e0277f375348293a30bcc5e']
         try:
-            lang_code = single_detection(text[100:200].__str__(), api_key=random.choice(api_keys))
+            lang_code = single_detection(text[100:270].__str__(), api_key=random.choice(api_keys))
         except:
             try:
                 lang_code = single_detection(text[500:600].__str__(), api_key=random.choice(api_keys))
