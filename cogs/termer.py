@@ -82,7 +82,7 @@ class Termer(commands.Cog):
                 link, dest_filename=f"{ctx.author.id}.{file_type}"
             )
             file_type = path.suffix.replace(".", "")
-            name = name.replace(".txt", "").replace(".docx", "").replace(" ", "_")
+            name = name.replace(".txt", "").replace(".docx", "")
             if "txt" not in file_type and "docx" not in file_type:
                 os.remove(path)
                 await rep_msg.delete()
@@ -171,8 +171,9 @@ class Termer(commands.Cog):
         for tag in ['/', '\\', '<', '>', "'", '"', ':', ";", '?', '|', '*', ';', '!']:
             name = name.replace(tag, '').strip()
         name = name.replace('_', ' ')
-        if name in self.bot.titles:
-            novel_data = list(await self.bot.mongo.library.get_novel_by_name(name))
+        novel_data = await self.bot.mongo.library.get_novel_by_name(name)
+        if novel_data is not None:
+            novel_data = list(novel_data)
             ids = []
             lang_check = False
             for n in novel_data:
@@ -180,8 +181,9 @@ class Termer(commands.Cog):
                 if language == n.language:
                     lang_check = True
             if lang_check:
+                ids = ids[:20]
                 chk_msg = await ctx.send(embed=discord.Embed(
-                    description=f"This novel is already in our library...  Do you want to search in library ...react with in this message 🇾  ...\n If you want to continue translation react with 🇳"))
+                    description=f"This novel is already in our library... \nDo you want to search in library with ids {str(ids)}...react to this message with 🇾  ...\n If you want to continue translation react with 🇳"))
                 await chk_msg.add_reaction('🇾')
                 await chk_msg.add_reaction('🇳')
 
@@ -244,7 +246,7 @@ class Termer(commands.Cog):
             raise Exception
         finally:
             del self.bot.translator[ctx.author.id]
-            self.bot.titles = await self.mongo.library.get_all_titles
+            self.bot.titles.append(name)
             self.bot.titles = random.sample(self.bot.titles, len(self.bot.titles))
 
     @termer.autocomplete("language")

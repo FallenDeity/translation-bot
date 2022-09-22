@@ -87,7 +87,7 @@ class Translate(commands.Cog):
                 os.remove(path)
                 await rep_msg.delete()
                 return await ctx.send("> **❌Only .docx and .txt supported**")
-            name = name.replace(".txt", "").replace(".docx", "").replace(" ", "_")
+            name = name.replace(".txt", "").replace(".docx", "")
             name = name[:100]
             # os.rename(path, f"{ctx.author.id}.{file_type}")
             if "docx" in file_type:
@@ -163,8 +163,9 @@ class Translate(commands.Cog):
             if "docx" in file_type:
                 await FileHandler.docx_to_txt(ctx, file_type)
             novel = await FileHandler().read_file(ctx)
-        if name in self.bot.titles:
-            novel_data = list(await self.bot.mongo.library.get_novel_by_name(name))
+        novel_data = await self.bot.mongo.library.get_novel_by_name(name)
+        if novel_data is not None:
+            novel_data = list(novel_data)
             ids = []
             lang_check = False
             for n in novel_data:
@@ -172,7 +173,8 @@ class Translate(commands.Cog):
                 if language == n.language:
                     lang_check = True
             if lang_check:
-                chk_msg = await ctx.send(embed=discord.Embed(description=f"This novel is already in our library...  Do you want to search in library ...react with in this message 🇾  ...\n If you want to continue translation react with 🇳"))
+                ids = ids[:20]
+                chk_msg = await ctx.send(embed=discord.Embed(description=f"This novel is already in our library with ids {str(ids)}...  \nDo you want to search in library...react to this message with 🇾  ...\nIf you want to continue translation react with 🇳"))
                 await chk_msg.add_reaction('🇾')
                 await chk_msg.add_reaction('🇳')
 
@@ -224,7 +226,8 @@ class Translate(commands.Cog):
             raise e
         finally:
             del self.bot.translator[ctx.author.id]
-            self.bot.titles = await self.bot.mongo.library.get_all_titles
+            self.bot.titles.append(name)
+            print(self.bot.titles[-1])
             self.bot.titles = random.sample(self.bot.titles, len(self.bot.titles))
 
     @translate.autocomplete("language")
