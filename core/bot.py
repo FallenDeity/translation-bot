@@ -1,5 +1,6 @@
 import datetime
 import os
+import random
 import typing as t
 
 import aiohttp
@@ -65,6 +66,7 @@ class Raizel(commands.Bot):
         self.mongo = Mongo()
         self.blocked: list[int] = await self.mongo.blocker.get_all_banned_users()
         self.titles = await self.mongo.library.get_all_titles
+        self.titles = random.sample(self.titles, len(self.titles))
         try:
             self.mega = Mega().login(os.getenv("USER"), os.getenv("MEGA"))
         except:
