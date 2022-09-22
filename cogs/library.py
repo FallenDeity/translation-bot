@@ -62,7 +62,7 @@ class Library(commands.Cog):
 
     async def make_base_embed(self, data: Novel) -> discord.Embed:
         embed = discord.Embed(
-            title=f"**#{data._id} \t•\t {data.title}**",
+            title=f"**#{data._id} \t•\t {data.title.strip()}**",
             url=data.download,
             description=f"*{data.description}*"
             if data.description
@@ -92,7 +92,7 @@ class Library(commands.Cog):
 
     async def make_base_list_embed(self, data: list[Novel], page: int) -> discord.Embed:
         output = [
-            f"**#{novel._id}\t💠\t[{novel.title.split('__')[0].replace('.txt', '').replace('.docx', '').replace('.epub', '').strip()}]({novel.download})**\n💠\tSize: **{round(novel.size / (1024 ** 2), 2)} MB**\t💠\tLanguage:** {novel.language}** "
+            f"**#{novel._id}\t💠\t[{novel.title.split('__')[0].strip()}]({novel.download})**\n💠\tSize: **{round(novel.size / (1024 ** 2), 2)} MB**\t💠\tLanguage:** {novel.language}** "
             for novel in data]
         out_str = ""
         for out in output:
@@ -236,7 +236,7 @@ class Library(commands.Cog):
         self, inter: discord.Interaction, title: str
     ) -> list[app_commands.Choice]:
         lst = [
-            str(i[:90]).replace(".docx", "").replace(".txt", "").replace(".epub", "").strip()
+            str(i[:90]).strip()
             for i in self.bot.titles
             if title.lower() in i.lower()
         ][:25]
