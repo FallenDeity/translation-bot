@@ -101,7 +101,7 @@ class Admin(commands.Cog):
     async def logger(self, ctx: commands.Context, lines: int = 20):
         h = heroku3.from_key(os.getenv("APIKEY"))
         log = h.get_app_log(os.getenv("APPNAME"), lines=lines, timeout=10)
-        return await ctx.send(embed=discord.Embed(title="Logs", description=str(log)))
+        return await ctx.send(embed=discord.Embed(title=f"Logs of {os.getenv('APPNAME')}", description=str(log)[:3500]))
         # app = h.app(os.getenv("APPNAME"))
 
 
