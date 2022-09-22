@@ -224,7 +224,7 @@ class Translate(commands.Cog):
             raise e
         finally:
             del self.bot.translator[ctx.author.id]
-            self.bot.titles = await self.mongo.library.get_all_titles
+            self.bot.titles = await self.bot.mongo.library.get_all_titles
             self.bot.titles = random.sample(self.bot.titles, len(self.bot.titles))
 
     @translate.autocomplete("language")

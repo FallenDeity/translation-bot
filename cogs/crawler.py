@@ -504,7 +504,7 @@ class Crawler(commands.Cog):
             raise e
         finally:
             del self.bot.crawler[ctx.author.id]
-            self.bot.titles = await self.mongo.library.get_all_titles
+            self.bot.titles = await self.bot.mongo.library.get_all_titles
             self.bot.titles = random.sample(self.bot.titles, len(self.bot.titles))
 
     @commands.hybrid_command(
