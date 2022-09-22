@@ -430,13 +430,15 @@ class Crawler(commands.Cog):
         for tag in ['/', '\\', '!', '<', '>', "'", '"', ':', ";", '?', '|', '*', ';', '\r', '\n', '\t', '\\\\']:
             title_name = title_name.replace(tag, '')
         title_name = title_name.replace('_', ' ')
-        if title_name in self.bot.titles:
-            novel_data = list(await self.bot.mongo.library.get_novel_by_name(name))
+        novel_data = await self.bot.mongo.library.get_novel_by_name(name)
+        if novel_data is not None:
+            novel_data = list(novel_data)
             ids = []
             for n in novel_data:
                 ids.append(n._id)
             if True:
-                chk_msg = await ctx.send(embed=discord.Embed(description=f"This novel is already in our library...  Do you want to search in library ...react with in this message 🇾  ...\n If you want to continue crawling react with 🇳"))
+                ids = ids[:20]
+                chk_msg = await ctx.send(embed=discord.Embed(description=f"This novel is already in our library with ids {ids.__str__()}...  \nDo you want to search in library...React to this message with 🇾  ...\nIf you want to continue crawling react with 🇳"))
                 await chk_msg.add_reaction('🇾')
                 await chk_msg.add_reaction('🇳')
 
@@ -504,7 +506,7 @@ class Crawler(commands.Cog):
             raise e
         finally:
             del self.bot.crawler[ctx.author.id]
-            self.bot.titles = await self.bot.mongo.library.get_all_titles
+            self.bot.titles.append(name)
             self.bot.titles = random.sample(self.bot.titles, len(self.bot.titles))
 
     @commands.hybrid_command(
