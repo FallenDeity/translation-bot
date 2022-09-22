@@ -164,7 +164,6 @@ class Translate(commands.Cog):
                 await FileHandler.docx_to_txt(ctx, file_type)
             novel = await FileHandler().read_file(ctx)
         if name in self.bot.titles:
-            await ctx.send("here")
             novel_data = list(await self.bot.mongo.library.get_novel_by_name(name))
             ids = []
             lang_check = False
@@ -183,7 +182,7 @@ class Translate(commands.Cog):
                     res = await self.bot.wait_for(
                         "reaction_add",
                         check=check,
-                        timeout=10.0,
+                        timeout=15.0,
                     )
                 except asyncio.TimeoutError:
                     print('error')
@@ -196,7 +195,8 @@ class Translate(commands.Cog):
                     return None
                 else:
                     await ctx.send("Reaction received", delete_after=10)
-                    if res[0] == '🇳':
+                    if str(res[0]) == '🇳':
+                        await chk_msg.delete()
                         pass
                     else:
                         try:

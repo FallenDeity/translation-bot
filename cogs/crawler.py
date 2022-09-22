@@ -431,7 +431,6 @@ class Crawler(commands.Cog):
             title_name = title_name.replace(tag, '')
         title_name = title_name.replace('_', ' ')
         if title_name in self.bot.titles:
-            # await ctx.send("here")
             novel_data = list(await self.bot.mongo.library.get_novel_by_name(name))
             ids = []
             for n in novel_data:
@@ -460,7 +459,8 @@ class Crawler(commands.Cog):
                     return None
                 else:
                     await ctx.send("Reaction received", delete_after=10)
-                    if res[0] == '🇳':
+                    if str(res[0]) == '🇳':
+                        await chk_msg.delete()
                         pass
                     else:
                         try:
