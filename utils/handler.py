@@ -49,7 +49,7 @@ class FileHandler:
             except:
                 lang_code = 'NA'
         if lang_code == 'zh':
-            original_Language = ['chinese']
+            original_Language = ['chinese (simplified)']
         elif lang_code == 'NA':
             original_Language = ['NA']
         else:
