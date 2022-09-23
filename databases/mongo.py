@@ -14,11 +14,14 @@ class Database:
 
 def get_regex_from_name(title: str) -> str:
     output = ''
+    prev_check = True
     for i in title:
         if i.isalpha():
             output += i
-        else:
+            prev_check = True
+        elif prev_check:
             output += ".*"
+            prev_check = False
     return output
 
 
