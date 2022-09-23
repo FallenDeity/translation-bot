@@ -227,7 +227,7 @@ class Translate(commands.Cog):
         finally:
             del self.bot.translator[ctx.author.id]
             self.bot.titles.append(name)
-            print(self.bot.titles[-1])
+            # print(self.bot.titles[-1])
             self.bot.titles = random.sample(self.bot.titles, len(self.bot.titles))
 
     @translate.autocomplete("language")
