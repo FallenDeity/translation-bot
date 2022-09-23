@@ -559,7 +559,7 @@ class Crawler(commands.Cog):
             sel_tag = True
             if '::attr(href)' not in nextselector:
                 nextselector += ' ::attr(href)'
-            print(nextselector)
+            # print(nextselector)
             path = nextselector
         else:
 

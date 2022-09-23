@@ -12,6 +12,19 @@ class Database:
         self.db = motor_asyncio.AsyncIOMotorClient(os.getenv("DATABASE"))
 
 
+def get_regex_from_name(title: str) -> str:
+    output = ''
+    prev_check = True
+    for i in title:
+        if i.isalpha():
+            output += i
+            prev_check = True
+        elif prev_check:
+            output += ".*"
+            prev_check = False
+    return output
+
+
 class Library(Database):
     def __init__(self) -> None:
         super().__init__()
@@ -28,6 +41,7 @@ class Library(Database):
         await self.library.update_one({"_id": novel._id}, {"$set": novel.__dict__})
 
     async def get_novel_by_name(self, name: str) -> list[Novel]:
+        name = get_regex_from_name(name)
         novels = await self.library.find({"title": re.compile(name, re.IGNORECASE)}).to_list(None)
         return [Novel(**novel) for novel in novels] if novels else None
 

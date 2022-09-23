@@ -153,7 +153,6 @@ class Library(commands.Cog):
             return
         valid = []
         if title:
-            title = title.replace('__', '$*$').replace('_', ' ').replace('$*$', '__')
             title = await self.bot.mongo.library.get_novel_by_name(title)
             if title:
                 valid.append(title)
@@ -240,7 +239,7 @@ class Library(commands.Cog):
             for i in self.bot.titles
             if title.lower() in i.lower()
         ][:25]
-        print(lst)
+        # print(lst)
         return [app_commands.Choice(name=i, value=i) for i in lst]
 
     @library.command(name="info", help="shows info about a novel.")
