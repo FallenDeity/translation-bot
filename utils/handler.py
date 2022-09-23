@@ -108,7 +108,7 @@ class FileHandler:
                 async with aiofiles.open(f"{ctx.author.id}.txt", "r", encoding=j) as f:
                     novel = await f.read()
                     break
-            except UnicodeDecodeError:
+            except (UnicodeDecodeError, UnicodeError):
                 if i == self.TOTAL - 1:
                     try:
                         await ctx.send(
