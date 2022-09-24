@@ -73,7 +73,11 @@ class Raizel(commands.Bot):
             self.mega = Mega().login(os.getenv("USER"), os.getenv("MEGA"))
             print("Connected to Mega")
         except Exception as e:
-            print("mega connection failed")
+            try:
+                self.mega = Mega().login()
+                print("mega connection failed... connected anonymously")
+            except:
+                print("mega login anonymouly failed ..Please check pasword or account status")
             print(e)
         # await self.tree.sync()
         return await super().setup_hook()
