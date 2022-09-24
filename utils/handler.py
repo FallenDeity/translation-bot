@@ -53,7 +53,7 @@ class FileHandler:
             except:
                 lang_code = 'NA'
         if lang_code == 'zh':
-            original_Language = ['chinese']
+            original_Language = ['chinese (simplified)']
         elif lang_code == 'NA':
             original_Language = ['NA']
         else:
@@ -112,7 +112,7 @@ class FileHandler:
                 async with aiofiles.open(f"{ctx.author.id}.txt", "r", encoding=j) as f:
                     novel = await f.read()
                     break
-            except UnicodeDecodeError:
+            except (UnicodeDecodeError, UnicodeError):
                 if i == self.TOTAL - 1:
                     try:
                         await ctx.send(
