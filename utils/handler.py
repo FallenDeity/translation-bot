@@ -42,7 +42,11 @@ class FileHandler:
         api_keys = ['8ca7a29f3b7c8ac85487451129f35c89', '1c2d644450cb8923818607150e7766d4',
                     '5cd7b28759bb7aafe9b1d395824e7a67', 'af207e865e0277f375348293a30bcc5e']
         try:
-            lang_code = single_detection(text[100:270].__str__(), api_key=random.choice(api_keys))
+            if "title_name " in text:
+                text = text.replace("title_name ", "")
+                lang_code = single_detection(str(text[:120]), api_keys=random.choice(api_keys))
+            else:
+                lang_code = single_detection(text[200:400].__str__(), api_key=random.choice(api_keys))
         except:
             try:
                 lang_code = single_detection(text[500:600].__str__(), api_key=random.choice(api_keys))

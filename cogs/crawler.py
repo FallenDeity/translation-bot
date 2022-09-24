@@ -430,7 +430,24 @@ class Crawler(commands.Cog):
         for tag in ['/', '\\', '!', '<', '>', "'", '"', ':', ";", '?', '|', '*', ';', '\r', '\n', '\t', '\\\\']:
             title_name = title_name.replace(tag, '')
         title_name = title_name.replace('_', ' ')
-        novel_data = await self.bot.mongo.library.get_novel_by_name(name)
+        original_Language = FileHandler.find_language("title_name "+ title_name)
+        if title_name == "" or title_name == "None" or title_name is None:
+            title = f"{ctx.author.id}_crl"
+            title_name = link
+        else:
+            if original_Language == 'english':
+                title = str(title_name[:100])
+            else:
+                try:
+                    title = GoogleTranslator(
+                        source="auto", target="english"
+                    ).translate(title_name).strip()
+                except:
+                    pass
+                title_name = title + "__" + title_name
+                title = str(title[:100])
+        novel_data = await self.bot.mongo.library.get_novel_by_name(title_name.split('__')[0])
+        # print(title_name)
         if novel_data is not None:
             novel_data = list(novel_data)
             ids = []
@@ -481,22 +498,6 @@ class Crawler(commands.Cog):
             whole = [i for i in list(parsed.values())]
             whole.insert(0, "\nsource : " + str(link) + "\n\n")
             text = "\n".join(whole)
-            original_Language = FileHandler.find_language(text)
-            if title_name == "" or title_name == "None" or title_name is None:
-                title = f"{ctx.author.id}_crl"
-                title_name = link
-            else:
-                if original_Language == 'english':
-                    title = str(title_name[:100])
-                else:
-                    try:
-                        title = GoogleTranslator(
-                            source="auto", target="english"
-                        ).translate(title_name).strip()
-                    except:
-                        pass
-                    title_name = title + "__" + title_name
-                    title = str(title[:100])
 
             async with aiofiles.open(f"{title}.txt", "w", encoding="utf-8") as f:
                 await f.write(text)
