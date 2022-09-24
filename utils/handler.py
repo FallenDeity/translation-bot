@@ -255,9 +255,9 @@ class FileHandler:
                 file=discord.File(f"{title}.txt"),
             )
             download_url = msg.attachments[0].url
-            os.remove(f"{title}.txt")
             try:
                 file.close()
+                os.remove(f"{title}.txt")
             except:
                 pass
         if download_url and size > 0.3 * 10 ** 6:
@@ -276,3 +276,4 @@ class FileHandler:
             ]
             data = Novel(*novel_data)
             await bot.mongo.library.add_novel(data)
+        return download_url
