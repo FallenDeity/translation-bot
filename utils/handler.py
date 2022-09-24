@@ -217,7 +217,7 @@ class FileHandler:
     ) -> str:
         download_url = None
         if (size := os.path.getsize(f"{title}.txt")) > 8 * 10 ** 6:
-            if size > 25 * 10 ** 6 and int(bot.crawler[ctx.author.id].split("/")[1]) > 2000:
+            if size > 25 * 10 ** 6 and int(bot.crawler[ctx.author.id].split("/")[1]) < 2000:
                 os.remove(f"{title}.txt")
                 return await ctx.send('Crawled file is too big. there is some problem in crawler')
             try:
