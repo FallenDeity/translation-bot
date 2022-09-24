@@ -18,6 +18,7 @@ from discord.ext import commands
 from readabilipy import simple_json_from_html_string
 
 from cogs.library import Library
+from cogs.translation import Translate
 from core.bot import Raizel
 from utils.handler import FileHandler
 
@@ -228,7 +229,8 @@ class Crawler(commands.Cog):
     @commands.hybrid_command(
         help="Crawls other sites for novels. \nselector: give the css selector for the content page. It will try to auto select if not given\n Reverse: give any value if Table of Content is reversed in the given link(or if crawled novel needs to be reversed)")
     async def crawl(
-            self, ctx: commands.Context, link: str = None, reverse: str = None, selector: str = None
+            self, ctx: commands.Context, link: str = None, reverse: str = None, selector: str = None,
+            translate_to: str = None
     ) -> typing.Optional[discord.Message]:
         if ctx.author.id in self.bot.crawler:
             return await ctx.reply(
@@ -430,7 +432,24 @@ class Crawler(commands.Cog):
         for tag in ['/', '\\', '!', '<', '>', "'", '"', ':', ";", '?', '|', '*', ';', '\r', '\n', '\t', '\\\\']:
             title_name = title_name.replace(tag, '')
         title_name = title_name.replace('_', ' ')
-        novel_data = await self.bot.mongo.library.get_novel_by_name(name)
+        original_Language = FileHandler.find_language("title_name " + title_name)
+        if title_name == "" or title_name == "None" or title_name is None:
+            title = f"{ctx.author.id}_crl"
+            title_name = link
+        else:
+            if original_Language == 'english':
+                title = str(title_name[:100])
+            else:
+                try:
+                    title = GoogleTranslator(
+                        source="auto", target="english"
+                    ).translate(title_name).strip()
+                except:
+                    pass
+                title_name = title + "__" + title_name
+                title = str(title[:100])
+        novel_data = await self.bot.mongo.library.get_novel_by_name(title_name.split('__')[0])
+        # print(title_name)
         if novel_data is not None:
             novel_data = list(novel_data)
             ids = []
@@ -438,12 +457,15 @@ class Crawler(commands.Cog):
                 ids.append(n._id)
             if True:
                 ids = ids[:20]
-                chk_msg = await ctx.send(embed=discord.Embed(description=f"This novel is already in our library with ids {ids.__str__()}...  \nDo you want to search in library...React to this message with 🇾  ...\nIf you want to continue crawling react with 🇳"))
+                chk_msg = await ctx.send(embed=discord.Embed(
+                    description=f"This novel is already in our library with ids {ids.__str__()}...  \nDo you want to search in library...React to this message with 🇾  ...\nIf you want to continue crawling react with 🇳"))
                 await chk_msg.add_reaction('🇾')
                 await chk_msg.add_reaction('🇳')
 
                 def check(reaction, user):
-                    return reaction.message.id == chk_msg.id and (str(reaction.emoji) == '🇾' or str(reaction.emoji) == '🇳') and user == ctx.author
+                    return reaction.message.id == chk_msg.id and (
+                                str(reaction.emoji) == '🇾' or str(reaction.emoji) == '🇳') and user == ctx.author
+
                 try:
                     res = await self.bot.wait_for(
                         "reaction_add",
@@ -457,7 +479,8 @@ class Crawler(commands.Cog):
                     except:
                         pass
                     await ctx.send("No response detected. sending novels in library", delete_after=10)
-                    ctx.command = await self.bot.get_command("library search").callback(Library(self.bot), ctx, title_name)
+                    ctx.command = await self.bot.get_command("library search").callback(Library(self.bot), ctx,
+                                                                                        title_name)
                     return None
                 else:
                     await ctx.send("Reaction received", delete_after=10)
@@ -469,7 +492,8 @@ class Crawler(commands.Cog):
                             os.remove(f"{ctx.author.id}.txt")
                         except:
                             pass
-                        ctx.command = await self.bot.get_command("library search").callback(Library(self.bot), ctx, title_name)
+                        ctx.command = await self.bot.get_command("library search").callback(Library(self.bot), ctx,
+                                                                                            title_name.split('__')[0])
                         return None
         try:
             self.bot.crawler[ctx.author.id] = f"0/{len(urls)}"
@@ -481,26 +505,10 @@ class Crawler(commands.Cog):
             whole = [i for i in list(parsed.values())]
             whole.insert(0, "\nsource : " + str(link) + "\n\n")
             text = "\n".join(whole)
-            original_Language = FileHandler.find_language(text)
-            if title_name == "" or title_name == "None" or title_name is None:
-                title = f"{ctx.author.id}_crl"
-                title_name = link
-            else:
-                if original_Language == 'english':
-                    title = str(title_name[:100])
-                else:
-                    try:
-                        title = GoogleTranslator(
-                            source="auto", target="english"
-                        ).translate(title_name).strip()
-                    except:
-                        pass
-                    title_name = title + "__" + title_name
-                    title = str(title[:100])
 
             async with aiofiles.open(f"{title}.txt", "w", encoding="utf-8") as f:
                 await f.write(text)
-            await FileHandler().crawlnsend(ctx, self.bot, title, title_name, original_Language)
+            download_url = await FileHandler().crawlnsend(ctx, self.bot, title, title_name, original_Language)
         except Exception as e:
             await ctx.send("> Error occurred .Please report to admin +\n" + str(e))
             raise e
@@ -508,6 +516,11 @@ class Crawler(commands.Cog):
             del self.bot.crawler[ctx.author.id]
             self.bot.titles.append(name)
             self.bot.titles = random.sample(self.bot.titles, len(self.bot.titles))
+        if translate_to is not None and download_url is not None and not download_url.strip() == "":
+            if translate_to not in self.bot.all_langs and original_Language not in ["english", "en"]:
+                translate_to = "english"
+            ctx.command = await self.bot.get_command("translate").callback(Translate(self.bot), ctx, download_url, None, None,
+                                                                           translate_to, title_name)
 
     @commands.hybrid_command(
         help="Clears any stagnant novels which were deposited for crawling."
@@ -643,7 +656,7 @@ class Crawler(commands.Cog):
                 f.write(full_text)
             return await FileHandler().crawlnsend(ctx, self.bot, title, title_name, original_Language)
         except Exception as e:
-            await ctx.send("> Error occurred .Please report to admin +\n"+str(e))
+            await ctx.send("> Error occurred .Please report to admin +\n" + str(e))
             raise e
         finally:
             del self.bot.crawler[ctx.author.id]

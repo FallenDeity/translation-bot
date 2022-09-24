@@ -42,14 +42,18 @@ class FileHandler:
         api_keys = ['8ca7a29f3b7c8ac85487451129f35c89', '1c2d644450cb8923818607150e7766d4',
                     '5cd7b28759bb7aafe9b1d395824e7a67', 'af207e865e0277f375348293a30bcc5e']
         try:
-            lang_code = single_detection(text[100:270].__str__(), api_key=random.choice(api_keys))
+            if "title_name " in text:
+                text = text.replace("title_name ", "")
+                lang_code = single_detection(str(text[:120]), api_keys=random.choice(api_keys))
+            else:
+                lang_code = single_detection(text[200:400].__str__(), api_key=random.choice(api_keys))
         except:
             try:
                 lang_code = single_detection(text[500:600].__str__(), api_key=random.choice(api_keys))
             except:
                 lang_code = 'NA'
         if lang_code == 'zh':
-            original_Language = ['chinese']
+            original_Language = ['chinese (simplified)']
         elif lang_code == 'NA':
             original_Language = ['NA']
         else:
@@ -210,12 +214,12 @@ class FileHandler:
 
     async def crawlnsend(
             self, ctx: commands.Context, bot: Raizel, title: str, title_name: str, originallanguage: str
-    ) -> None:
+    ) -> str:
         download_url = None
         if (size := os.path.getsize(f"{title}.txt")) > 8 * 10 ** 6:
-            if size > 25 * 10 ** 6:
+            if size > 25 * 10 ** 6 and int(bot.crawler[ctx.author.id].split("/")[1]) < 2000:
                 os.remove(f"{title}.txt")
-                await ctx.send('Crawled file is too big. there is some problem in crawler')
+                return await ctx.send('Crawled file is too big. there is some problem in crawler')
             try:
                 file = bot.mega.upload(f"{title}.txt")
                 await ctx.send(
@@ -251,9 +255,9 @@ class FileHandler:
                 file=discord.File(f"{title}.txt"),
             )
             download_url = msg.attachments[0].url
-            os.remove(f"{title}.txt")
             try:
                 file.close()
+                os.remove(f"{title}.txt")
             except:
                 pass
         if download_url and size > 0.3 * 10 ** 6:
@@ -272,3 +276,4 @@ class FileHandler:
             ]
             data = Novel(*novel_data)
             await bot.mongo.library.add_novel(data)
+        return download_url

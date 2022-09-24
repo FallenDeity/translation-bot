@@ -112,7 +112,7 @@ class Translate(commands.Cog):
                 link = file.url
             else:
                 link = file
-        if "discord" in link:
+        if "discord" in link and "cdn.discord" not in link:
             resp = await self.bot.con.get(link)
             if msg is None:
                 msg = ctx.message
