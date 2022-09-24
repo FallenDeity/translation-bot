@@ -64,11 +64,14 @@ class Raizel(commands.Bot):
         self.con = aiohttp.ClientSession()
         self.drive = Client(os.getenv("FILE"))
         self.mongo = Mongo()
+        print("Connected to mongo db")
         self.blocked: list[int] = await self.mongo.blocker.get_all_banned_users()
         self.titles = list(await self.mongo.library.get_all_titles)
+        print("Loaded titles")
         self.titles = random.sample(self.titles, len(self.titles))
         try:
             self.mega = Mega().login(os.getenv("USER"), os.getenv("MEGA"))
+            print("Connected to Mega")
         except:
             pass
         # await self.tree.sync()
