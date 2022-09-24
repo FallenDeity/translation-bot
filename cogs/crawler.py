@@ -228,7 +228,7 @@ class Crawler(commands.Cog):
     @commands.hybrid_command(
         help="Crawls other sites for novels. \nselector: give the css selector for the content page. It will try to auto select if not given\n Reverse: give any value if Table of Content is reversed in the given link(or if crawled novel needs to be reversed)")
     async def crawl(
-            self, ctx: commands.Context, link: str = None, reverse: str = None, selector: str = None
+            self, ctx: commands.Context, link: str = None, reverse: str = None, selector: str = None, translate_to: str = None
     ) -> typing.Optional[discord.Message]:
         if ctx.author.id in self.bot.crawler:
             return await ctx.reply(
@@ -486,7 +486,7 @@ class Crawler(commands.Cog):
                             os.remove(f"{ctx.author.id}.txt")
                         except:
                             pass
-                        ctx.command = await self.bot.get_command("library search").callback(Library(self.bot), ctx, title_name)
+                        ctx.command = await self.bot.get_command("library search").callback(Library(self.bot), ctx, title_name.split('__')[0])
                         return None
         try:
             self.bot.crawler[ctx.author.id] = f"0/{len(urls)}"
