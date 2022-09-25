@@ -1,6 +1,7 @@
 import datetime
 import os
 import random
+import time
 import typing as t
 
 import aiohttp
@@ -32,6 +33,7 @@ class Raizel(commands.Bot):
         self.crawler: t.Dict[int, str] = {}
         self.languages = choices
         self.dictionary: str = get_dictionary()
+        self.boot = datetime.datetime.utcnow()
         super().__init__(
             command_prefix=commands.when_mentioned_or(".t"),
             intents=intents,
@@ -75,15 +77,21 @@ class Raizel(commands.Bot):
         except Exception as e:
             try:
                 self.mega = Mega().login()
-                print("mega connection failed... connected anonymously")
+                print("mega connection failed...connected anonymously....Please check password or account status")
             except:
-                print("mega login anonymouly failed ..Please check pasword or account status")
+                print("mega login anonymously failed ..something wrong with mega")
             print(e)
         # await self.tree.sync()
         return await super().setup_hook()
 
     async def start(self) -> None:
-        return await super().start(os.getenv("TOKEN"), reconnect=True)
+        try:
+            return await super().start(os.getenv("TOKEN"), reconnect=True)
+        except Exception as e:
+            print('error occurred on connecting to Discord client... will try after 60 secs')
+            print(e)
+            time.sleep(60)
+            await self.start()
 
     @property
     def uptime(self) -> datetime.timedelta:
