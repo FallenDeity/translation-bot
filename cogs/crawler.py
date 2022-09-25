@@ -480,7 +480,7 @@ class Crawler(commands.Cog):
                         pass
                     await ctx.send("No response detected. sending novels in library", delete_after=10)
                     ctx.command = await self.bot.get_command("library search").callback(Library(self.bot), ctx,
-                                                                                        title_name)
+                                                                                        title_name.split('__')[0])
                     return None
                 else:
                     await ctx.send("Reaction received", delete_after=10)

@@ -44,7 +44,7 @@ class FileHandler:
         try:
             if "title_name " in text:
                 text = text.replace("title_name ", "")
-                lang_code = single_detection(str(text[:120]), api_keys=random.choice(api_keys))
+                lang_code = single_detection(str(text[:120]), api_key=random.choice(api_keys))
             else:
                 lang_code = single_detection(text[200:400].__str__(), api_key=random.choice(api_keys))
         except:

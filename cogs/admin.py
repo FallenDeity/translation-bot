@@ -9,6 +9,10 @@ from core import Raizel
 from databases.blocked import User
 
 
+def days_hours_minutes(td):
+    return td.days, td.seconds // 3600, (td.seconds // 60) % 60
+
+
 class Admin(commands.Cog):
     def __init__(self, bot: Raizel) -> None:
         self.bot = bot
@@ -103,6 +107,17 @@ class Admin(commands.Cog):
         log = h.get_app_log(os.getenv("APPNAME"), lines=lines, timeout=10)
         return await ctx.send(embed=discord.Embed(title=f"Logs of {os.getenv('APPNAME')}", description=str(log)[:3500]))
         # app = h.app(os.getenv("APPNAME"))
+
+    @commands.hybrid_command(help="Give the latency and uptime of the bot(only for bot-admins)... ")
+    async def ping(self, ctx: commands.Context):
+        # await ctx.send(str(datetime.datetime.utcnow())+".-"+str(ctx.message.created_at))
+        await ctx.send(f"Latency is {round(self.bot.ws.latency, 3)} ms")
+        for roles in ctx.author.roles:
+            if roles.id == 1020638168237740042:
+                td = datetime.datetime.utcnow() - self.bot.boot
+                td = days_hours_minutes(td)
+                await ctx.send(f"Bot is up for {str(td[0])+' days ' if td[0]>0 else ''}{str(td[1])+' hours ' if td[1]>0 else ''}{str(td[2])+' minutes' if td[2]>0 else ''}")
+        return None
 
 
 async def setup(bot):
