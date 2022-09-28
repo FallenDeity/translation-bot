@@ -49,7 +49,7 @@ class FileHandler:
                 lang_code = single_detection(text[200:400].__str__(), api_key=random.choice(api_keys))
         except:
             try:
-                lang_code = single_detection(text[500:600].__str__(), api_key=random.choice(api_keys))
+                lang_code = single_detection(text[500:620].__str__(), api_key=random.choice(api_keys))
             except:
                 lang_code = 'NA'
         if lang_code == 'zh':
@@ -59,7 +59,7 @@ class FileHandler:
         else:
             lang = languages.choices
             original_Language = {i for i in lang if lang[i] == lang_code}
-        if lang == set() or lang == [set()]:
+        if original_Language == set() or original_Language == [set()]:
             original_Language = FileHandler.find_language(text[600:])
         else:
             try:
