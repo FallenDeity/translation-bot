@@ -59,10 +59,13 @@ class FileHandler:
         else:
             lang = languages.choices
             original_Language = {i for i in lang if lang[i] == lang_code}
-        try:
-            original_Language = original_Language.pop()
-        except:
-            pass
+        if lang == set() or lang == [set()]:
+            original_Language = FileHandler.find_language(text[600:])
+        else:
+            try:
+                original_Language = original_Language.pop()
+            except:
+                pass
         return original_Language
 
     @staticmethod
