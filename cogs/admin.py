@@ -145,8 +145,6 @@ class Admin(commands.Cog):
 
     @commands.hybrid_command(help="Give the progress of all current tasks of the bot(only for bot-admins)... ")
     async def tasks(self, ctx: commands.Context):
-        self.bot.crawler[ctx.author.id] = "ni"
-        self.bot.translator[ctx.author.id] = "jj"
         out = "**Crawler Tasks**\n"
         for keys, values in self.bot.crawler.items():
             user = self.bot.get_user(keys)
