@@ -21,6 +21,12 @@ class Admin(commands.Cog):
     @commands.hybrid_command(help="ban user.. Admin only command")
     async def ban(self, ctx: commands.Context, id: str,
                   reason: str = "continuous use of improper names in novel name translation"):
+        if '#' in id:
+            name_spl = id.split('#')
+            name = name_spl[0]
+            discriminator = name_spl[1]
+            user = discord.utils.get(self.bot.get_all_members(), name=name, discriminator=discriminator)
+            id = user.id
         id = int(id)
         user_data = [
             id,
@@ -46,18 +52,35 @@ class Admin(commands.Cog):
         await ctx.send("banned users")
         await self.bot.mongo.blocker.get_all_banned_users()
         self.bot.blocked = await self.bot.mongo.blocker.get_all_banned_users()
-        return await ctx.send(self.bot.blocked)
+        out = '\n'
+        for block in self.bot.blocked:
+            try:
+                print(block)
+                users: discord.User = self.bot.get_user(block)
+                out = out + users.name + "#" + users.discriminator + "\t"
+            except Exception as e:
+                print(e)
+        return await ctx.send("IDS : " + str(self.bot.blocked) + out)
 
     @commands.has_role(1020638168237740042)
     @commands.hybrid_command(help="Unban user.. Admin only command")
     async def unban(self, ctx: commands.Context, id: str):
+        if '#' in id:
+            name_spl = id.split('#')
+            name = name_spl[0]
+            discriminator = name_spl[1]
+            user = discord.utils.get(self.bot.get_all_members(), name=name, discriminator=discriminator)
+            id = user.id
         id = int(id)
-        user = self.bot.get_user(id)
-        await user.send(embed=discord.Embed(
-            title="Congrats",
-            description=f" You have been unbanned by admins. Please follow the guidelines in future",
-            color=discord.Color.blurple(),
-        ))
+        try:
+            user = self.bot.get_user(id)
+            await user.send(embed=discord.Embed(
+                title="Congrats",
+                description=f" You have been unbanned by admins. Please follow the guidelines in future",
+                color=discord.Color.blurple(),
+            ))
+        except:
+            pass
         await self.bot.mongo.blocker.unban(id)
         self.bot.blocked = await self.bot.mongo.blocker.get_all_banned_users()
         return await ctx.send(
@@ -116,8 +139,25 @@ class Admin(commands.Cog):
             if roles.id == 1020638168237740042:
                 td = datetime.datetime.utcnow() - self.bot.boot
                 td = days_hours_minutes(td)
-                await ctx.send(f"Bot is up for {str(td[0])+' days ' if td[0]>0 else ''}{str(td[1])+' hours ' if td[1]>0 else ''}{str(td[2])+' minutes' if td[2]>0 else ''}")
+                await ctx.send(
+                    f"Bot is up for {str(td[0]) + ' days ' if td[0] > 0 else ''}{str(td[1]) + ' hours ' if td[1] > 0 else ''}{str(td[2]) + ' minutes' if td[2] > 0 else ''}")
         return None
+
+    @commands.hybrid_command(help="Give the progress of all current tasks of the bot(only for bot-admins)... ")
+    async def tasks(self, ctx: commands.Context):
+        self.bot.crawler[ctx.author.id] = "ni"
+        self.bot.translator[ctx.author.id] = "jj"
+        out = "**Crawler Tasks**\n"
+        for keys, values in self.bot.crawler.items():
+            user = self.bot.get_user(keys)
+            user = user.name
+            out = f"{out}{user} : {values} \n"
+        out = out +"\n**Translator Tasks**\n"
+        for keys, values in self.bot.translator.items():
+            user = self.bot.get_user(keys)
+            user = user.name
+            out = f"{out}{user} : {values} \n"
+        await ctx.send(embed=discord.Embed(description=out[:3800], colour=discord.Color.random()))
 
 
 async def setup(bot):
