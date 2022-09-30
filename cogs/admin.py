@@ -146,16 +146,22 @@ class Admin(commands.Cog):
     @commands.hybrid_command(help="Give the progress of all current tasks of the bot(only for bot-admins)... ")
     async def tasks(self, ctx: commands.Context):
         out = "**Crawler Tasks**\n"
-        for keys, values in self.bot.crawler.items():
-            user = self.bot.get_user(keys)
-            user = user.name
-            out = f"{out}{user} : {values} \n"
-        out = out +"\n**Translator Tasks**\n"
-        for keys, values in self.bot.translator.items():
-            user = self.bot.get_user(keys)
-            user = user.name
-            out = f"{out}{user} : {values} \n"
-        await ctx.send(embed=discord.Embed(description=out[:3800], colour=discord.Color.random()))
+        if not self.bot.crawler.items():
+            out = out + "No tasks currently\n"
+        else:
+            for keys, values in self.bot.crawler.items():
+                user = self.bot.get_user(keys)
+                user = user.name
+                out = f"{out}{user} : {values} \n"
+        out = out + "\n**Translator Tasks**\n"
+        if not self.bot.translator.items():
+            out = out + "No tasks currently\n"
+        else:
+            for keys, values in self.bot.translator.items():
+                user = self.bot.get_user(keys)
+                user = user.name
+                out = f"{out}{user} : {values} \n"
+        return await ctx.send(embed=discord.Embed(description=out[:3800], colour=discord.Color.random()))
 
 
 async def setup(bot):
