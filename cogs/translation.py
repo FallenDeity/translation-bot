@@ -174,7 +174,7 @@ class Translate(commands.Cog):
                     lang_check = True
             if lang_check:
                 ids = ids[:20]
-                chk_msg = await ctx.send(embed=discord.Embed(description=f"This novel is already in our library with ids {str(ids)}...  \nDo you want to search in library...react to this message with 🇾  ...\nIf you want to continue translation react with 🇳"))
+                chk_msg = await ctx.send(embed=discord.Embed(description=f"This novel is already in our library with ids {str(ids)}...  \nDo you want to search in library...react to this message with 🇾  ...\nIf you want to continue translation react with 🇳 \n\nNote : Some files are in docx format, so file size maybe half the size of txt. and try to minimize translating if its already in library"))
                 await chk_msg.add_reaction('🇾')
                 await chk_msg.add_reaction('🇳')
 
