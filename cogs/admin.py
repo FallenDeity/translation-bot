@@ -91,6 +91,12 @@ class Admin(commands.Cog):
     @commands.hybrid_command(help="send warning to user..Admin only command")
     async def warn(self, ctx: commands.Context, id: str,
                    reason: str = "continuous use of improper names in novel name translation"):
+        if '#' in id:
+            name_spl = id.split('#')
+            name = name_spl[0]
+            discriminator = name_spl[1]
+            user = discord.utils.get(self.bot.get_all_members(), name=name, discriminator=discriminator)
+            id = user.id
         id = int(id)
         user = self.bot.get_user(id)
         await user.send(embed=discord.Embed(
@@ -98,7 +104,7 @@ class Admin(commands.Cog):
             description=f" You have been warned by admins of @JARVIS bot due to {reason}\nIf you continue do so , you will be banned from using bot",
             color=discord.Color.yellow(),
         ))
-        return await ctx.reply(f"Warning has been sent to {user.mention}")
+        return await ctx.reply(content=f"Warning has been sent to {user.mention}")
 
     @commands.has_role(1020638168237740042)
     @commands.hybrid_command(help="get id of the user if name and discriminator provided. Admin only command")
@@ -108,7 +114,7 @@ class Admin(commands.Cog):
             name = name_spl[0]
             discriminator = name_spl[1]
         user = discord.utils.get(self.bot.get_all_members(), name=name, discriminator=discriminator)
-        return await ctx.send(f"{user.id}")
+        return await ctx.send(content=f"{user.id}", ephemeral=True)
 
     @commands.has_role(1020638168237740042)
     @commands.hybrid_command(help="Restart the bot incase of bot crash. Ping any BOT-admins to restart bot")
@@ -128,7 +134,7 @@ class Admin(commands.Cog):
     async def logger(self, ctx: commands.Context, lines: int = 20):
         h = heroku3.from_key(os.getenv("APIKEY"))
         log = h.get_app_log(os.getenv("APPNAME"), lines=lines, timeout=10)
-        return await ctx.send(embed=discord.Embed(title=f"Logs of {os.getenv('APPNAME')}", description=str(log)[:3500]))
+        return await ctx.send(embed=discord.Embed(title=f"Logs of {os.getenv('APPNAME')}", description=str(log)[:3500]), ephemeral=True, delete_after=60)
         # app = h.app(os.getenv("APPNAME"))
 
     @commands.hybrid_command(help="Give the latency and uptime of the bot(only for bot-admins)... ")
@@ -140,7 +146,7 @@ class Admin(commands.Cog):
                 td = datetime.datetime.utcnow() - self.bot.boot
                 td = days_hours_minutes(td)
                 await ctx.send(
-                    f"Bot is up for {str(td[0]) + ' days ' if td[0] > 0 else ''}{str(td[1]) + ' hours ' if td[1] > 0 else ''}{str(td[2]) + ' minutes' if td[2] > 0 else ''}")
+                    f"Bot is up for {str(td[0]) + ' days ' if td[0] > 0 else ''}{str(td[1]) + ' hours ' if td[1] > 0 else ''}{str(td[2]) + ' minutes' if td[2] > 0 else ''}", ephemeral=True)
         return None
 
     @commands.hybrid_command(help="Give the progress of all current tasks of the bot(only for bot-admins)... ")
@@ -161,7 +167,7 @@ class Admin(commands.Cog):
                 user = self.bot.get_user(keys)
                 user = user.name
                 out = f"{out}{user} : {values} \n"
-        return await ctx.send(embed=discord.Embed(description=out[:3800], colour=discord.Color.random()))
+        return await ctx.send(embed=discord.Embed(description=out[:3800], colour=discord.Color.random()), ephemeral=True)
 
 
 async def setup(bot):
