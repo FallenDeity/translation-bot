@@ -196,10 +196,11 @@ class Translate(commands.Cog):
                     ctx.command = await self.bot.get_command("library search").callback(Library(self.bot), ctx, name, language)
                     return None
                 else:
-                    await ctx.send("Reaction received", delete_after=10)
                     if str(res[0]) == '🇳':
-                        pass
+                        await rep_msg.delete()
+                        rep_msg = await ctx.reply("Reaction received.. please wait")
                     else:
+                        await ctx.send("Reaction received", delete_after=10)
                         try:
                             os.remove(f"{ctx.author.id}.txt")
                         except:

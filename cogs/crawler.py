@@ -458,7 +458,7 @@ class Crawler(commands.Cog):
             if True:
                 ids = ids[:20]
                 chk_msg = await ctx.send(embed=discord.Embed(
-                    description=f"This novel is already in our library with ids {ids.__str__()}...  \nDo you want to search in library...React to this message with 🇾  ...\nIf you want to continue crawling react with 🇳"))
+                    description=f"This novel is already in our library with ids {ids.__str__()}...  \nDo you want to search in library...React to this message with 🇾  ...\nIf you want to continue crawling react with 🇳 \n\nNote : Some files are in docx format, so file size maybe half the size of txt. and try to minimize translating if its already in library"))
                 await chk_msg.add_reaction('🇾')
                 await chk_msg.add_reaction('🇳')
 
@@ -470,7 +470,7 @@ class Crawler(commands.Cog):
                     res = await self.bot.wait_for(
                         "reaction_add",
                         check=check,
-                        timeout=10.0,
+                        timeout=15.0,
                     )
                 except asyncio.TimeoutError:
                     print(' Timeout error')
@@ -485,8 +485,10 @@ class Crawler(commands.Cog):
                 else:
                     await ctx.send("Reaction received", delete_after=10)
                     if str(res[0]) == '🇳':
-                        pass
+                        await msg.delete()
+                        msg = await ctx.reply("Reaction received.. please wait")
                     else:
+                        await ctx.send("Reaction received", delete_after=10)
                         try:
                             os.remove(f"{ctx.author.id}.txt")
                         except:
