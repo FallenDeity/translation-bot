@@ -258,7 +258,6 @@ class Crawler(commands.Cog):
             link = link[:-1]
         if "m.uuks" in link:
             link = link.replace("m.", "")
-        await ctx.typing()
         try:
             res = await self.bot.con.get(link)
         except Exception as e:
