@@ -51,16 +51,16 @@ class Translate(commands.Cog):
             reason = reason['reason']
             return await ctx.reply(content=f"You have been blocked by admins for improper usage of bot. Please contact admin \nReason : {reason}")
         if not file and not messageid:
-            return await ctx.reply(f"> **❌Send an attachment or a link.**")
+            return await ctx.reply(f"> **❌Send an attachment or a link.**",)
         if language not in self.bot.all_langs and "http" not in language:
             return await ctx.reply(
                 f"**❌We have the following languages in our db.**\n```ini\n{self.bot.display_langs}```"
             )
         language = FileHandler.get_language(language)
         if ctx.author.id in self.bot.translator:
-            return await ctx.send("> **❌You cannot translate two novels at a time.**")
+            return await ctx.send("> **❌You cannot translate two novels at a time.**", ephemeral=True)
         if not ctx.message.attachments and not file and messageid is None:
-            return await ctx.send("> **❌You must add a novel/link to translate**")
+            return await ctx.send("> **❌You must add a novel/link to translate**", ephemeral=True)
         msg = None
         novel = None
         file_type = None
@@ -69,7 +69,7 @@ class Translate(commands.Cog):
         if ctx.message.attachments:
             link = ctx.message.attachments[0].url
         elif messageid is None and ("mega.nz" in link or "mega.co.nz" in link):
-            await ctx.send("Mega link found.... downloading from mega", delete_after=5)
+            await ctx.send("Mega link found.... downloading from mega", delete_after=10, ephemeral=True)
             info = self.bot.mega.get_public_url_info(link)
             size = int(info.get("size")) / 1000
             if size >= 15 * 1000:
@@ -83,15 +83,17 @@ class Translate(commands.Cog):
             path = self.bot.mega.download_url(
                 link, dest_filename=f"{ctx.author.id}.{file_type}"
             )
-            if "txt" not in file_type and "docx" not in file_type:
+            if "txt" not in file_type and "docx" not in file_type and "epub" not in file_type:
                 os.remove(path)
                 await rep_msg.delete()
-                return await ctx.send("> **❌Only .docx and .txt supported**")
-            name = name.replace(".txt", "").replace(".docx", "")
+                return await ctx.send("> **❌Only .txt, .docx and .epub supported**", ephemeral=True)
+            name = name.replace(".txt", "").replace(".docx", "").replace(".epub", "")
             name = name[:100]
             # os.rename(path, f"{ctx.author.id}.{file_type}")
             if "docx" in file_type:
                 await FileHandler.docx_to_txt(ctx, file_type)
+            if "epub" in file_type:
+                await FileHandler.epub_to_txt(ctx)
             novel = await FileHandler.read_file(FileHandler, ctx=ctx)
         else:
             if messageid is not None:
@@ -116,7 +118,7 @@ class Translate(commands.Cog):
             resp = await self.bot.con.get(link)
             if msg is None:
                 msg = ctx.message
-            name = msg.attachments[0].filename.replace(".txt", "").replace(".docx", "")
+            name = msg.attachments[0].filename.replace(".txt", "").replace(".docx", "").replace(".epub", "")
             file_type = resp.headers["content-type"].split("/")[-1]
         elif novel is None:
             resp = await self.bot.con.get(link)
@@ -134,8 +136,10 @@ class Translate(commands.Cog):
             file_type = "txt"
         elif "document" in file_type.lower() or "docx" in file_type.lower():
             file_type = "docx"
+        elif "epub" in file_type:
+            file_type = "epub"
         else:
-            return await ctx.send("> **❌Only .docx and .txt supported**")
+            return await ctx.send("> **❌Only .txt, .docx and .epub supported**", ephemeral=True)
         if novelname is not None:
             name = novelname
         name_check = FileHandler.checkname(name, self.bot)
@@ -162,6 +166,8 @@ class Translate(commands.Cog):
                 await f.write(data)
             if "docx" in file_type:
                 await FileHandler.docx_to_txt(ctx, file_type)
+            if "epub" in file_type:
+                await FileHandler.epub_to_txt(ctx)
             novel = await FileHandler().read_file(ctx)
         novel_data = await self.bot.mongo.library.get_novel_by_name(name)
         if novel_data is not None:
@@ -174,7 +180,7 @@ class Translate(commands.Cog):
                     lang_check = True
             if lang_check:
                 ids = ids[:20]
-                chk_msg = await ctx.send(embed=discord.Embed(description=f"This novel is already in our library with ids {str(ids)}...  \nDo you want to search in library...react to this message with 🇾  ...\nIf you want to continue translation react with 🇳"))
+                chk_msg = await ctx.send(embed=discord.Embed(description=f"This novel is already in our library with ids {str(ids)}...  \nDo you want to search in library...react to this message with 🇾  ...\nIf you want to continue translation react with 🇳 \n\nNote : Some files are in docx format, so file size maybe half the size of txt. and try to minimize translating if its already in library"))
                 await chk_msg.add_reaction('🇾')
                 await chk_msg.add_reaction('🇳')
 
@@ -196,11 +202,11 @@ class Translate(commands.Cog):
                     ctx.command = await self.bot.get_command("library search").callback(Library(self.bot), ctx, name, language)
                     return None
                 else:
-                    await ctx.send("Reaction received", delete_after=10)
                     if str(res[0]) == '🇳':
-                        await chk_msg.delete()
-                        pass
+                        await rep_msg.delete()
+                        rep_msg = await ctx.reply("Reaction received.. please wait")
                     else:
+                        await ctx.send("Reaction received", delete_after=10)
                         try:
                             os.remove(f"{ctx.author.id}.txt")
                         except:
@@ -244,10 +250,14 @@ class Translate(commands.Cog):
         if ctx.author.id in self.bot.translator:
             del self.bot.translator[ctx.author.id]
         files = os.listdir()
+        try:
+            await ctx.message.delete()
+        except:
+            pass
         for i in files:
             if str(ctx.author.id) in str(i) and "crawl" not in i:
                 os.remove(i)
-        await ctx.reply("> **✔Cleared all records.**")
+        await ctx.send(f">{ctx.author.mention} **✔Cleared all records.**", ephemeral=True, delete_after=10)
 
 
 async def setup(bot):

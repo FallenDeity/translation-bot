@@ -10,6 +10,7 @@ import docx
 from PyDictionary import PyDictionary
 from deep_translator import single_detection
 from discord.ext import commands
+from epub2txt import epub2txt
 from textblob import TextBlob
 
 from core.bot import Raizel
@@ -49,7 +50,7 @@ class FileHandler:
                 lang_code = single_detection(text[200:400].__str__(), api_key=random.choice(api_keys))
         except:
             try:
-                lang_code = single_detection(text[500:600].__str__(), api_key=random.choice(api_keys))
+                lang_code = single_detection(text[500:620].__str__(), api_key=random.choice(api_keys))
             except:
                 lang_code = 'NA'
         if lang_code == 'zh':
@@ -59,10 +60,13 @@ class FileHandler:
         else:
             lang = languages.choices
             original_Language = {i for i in lang if lang[i] == lang_code}
-        try:
-            original_Language = original_Language.pop()
-        except:
-            pass
+        if original_Language == set() or original_Language == [set()]:
+            original_Language = FileHandler.find_language(text[600:])
+        else:
+            try:
+                original_Language = original_Language.pop()
+            except:
+                pass
         return original_Language
 
     @staticmethod
@@ -93,15 +97,24 @@ class FileHandler:
 
     @staticmethod
     async def docx_to_txt(ctx: commands.Context, file_type: str):
-        await ctx.reply(
+        msg = await ctx.reply(
             "> **✔Docx file detected please wait while we finish converting.**"
         )
-        await ctx.typing()
         doc = docx.Document(f"{ctx.author.id}.{file_type}")
         string = "\n".join([para.text for para in doc.paragraphs])
         async with aiofiles.open(f"{ctx.author.id}.txt", "w", encoding="utf-8") as f:
             await f.write(string)
+        await msg.edit("Converted to .txt completed", delete_after=5)
         os.remove(f"{ctx.author.id}.docx")
+
+    @staticmethod
+    async def epub_to_txt(ctx: commands.Context):
+        msg=await ctx.reply("> **Epub file detected please wait till we finish converting to .txt")
+        txt = epub2txt(f"{ctx.author.id}.epub")
+        with open(f"{ctx.author.id}.txt", "w", encoding="utf-8") as f:
+            f.write(txt)
+        await msg.edit("Converted to .txt completed", delete_after=5)
+        os.remove(f"{ctx.author.id}.epub")
 
     async def read_file(
             self, ctx: commands.Context

@@ -82,15 +82,17 @@ class Termer(commands.Cog):
                 link, dest_filename=f"{ctx.author.id}.{file_type}"
             )
             file_type = path.suffix.replace(".", "")
-            name = name.replace(".txt", "").replace(".docx", "")
-            if "txt" not in file_type and "docx" not in file_type:
+            name = name.replace(".txt", "").replace(".docx", "").replace(".epub", "")
+            if "txt" not in file_type and "docx" not in file_type and "epub" not in file_type:
                 os.remove(path)
                 await rep_msg.delete()
-                return await ctx.send("> **❌Only .docx and .txt supported**")
+                return await ctx.send("> **❌Only .epub, .docx and .txt supported**")
             name = name[:100]
             # os.rename(path, f"{ctx.author.id}.{file_type}")
             if "docx" in file_type:
                 await FileHandler.docx_to_txt(ctx, file_type)
+            if "epub" in file_type:
+                await FileHandler.epub_to_txt(ctx)
             novel = await FileHandler.read_file(FileHandler, ctx=ctx)
         else:
             if messageid is not None:
@@ -149,8 +151,10 @@ class Termer(commands.Cog):
             file_type = "txt"
         elif "document" in file_type.lower() or "docx" in file_type.lower():
             file_type = "docx"
+        elif "epub" in file_type:
+            file_type = "epub"
         else:
-            return await ctx.send("> **❌Only .docx and .txt supported**")
+            return await ctx.send("> **❌Only .epub,.docx and .txt supported**")
         if novelname is not None:
             name = novelname
         name_check = FileHandler.checkname(name, self.bot)
@@ -210,7 +214,6 @@ class Termer(commands.Cog):
                 else:
                     await ctx.send("Reaction received", delete_after=10)
                     if str(res[0]) == '🇳':
-                        await chk_msg.delete()
                         pass
                     else:
                         try:
@@ -226,6 +229,8 @@ class Termer(commands.Cog):
                 await f.write(data)
             if "docx" in file_type:
                 await FileHandler.docx_to_txt(ctx, file_type)
+            if "epub" in file_type:
+                await FileHandler.epub_to_txt(ctx)
             novel = await FileHandler().read_file(ctx)
         rep_msg = await rep_msg.edit(content=f"> **✅Terming started. **")
         novel = self.term_raw(novel, term_dict)

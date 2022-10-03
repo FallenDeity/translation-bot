@@ -21,6 +21,12 @@ class Admin(commands.Cog):
     @commands.hybrid_command(help="ban user.. Admin only command")
     async def ban(self, ctx: commands.Context, id: str,
                   reason: str = "continuous use of improper names in novel name translation"):
+        if '#' in id:
+            name_spl = id.split('#')
+            name = name_spl[0]
+            discriminator = name_spl[1]
+            user = discord.utils.get(self.bot.get_all_members(), name=name, discriminator=discriminator)
+            id = user.id
         id = int(id)
         user_data = [
             id,
@@ -46,18 +52,35 @@ class Admin(commands.Cog):
         await ctx.send("banned users")
         await self.bot.mongo.blocker.get_all_banned_users()
         self.bot.blocked = await self.bot.mongo.blocker.get_all_banned_users()
-        return await ctx.send(self.bot.blocked)
+        out = '\n'
+        for block in self.bot.blocked:
+            try:
+                print(block)
+                users: discord.User = self.bot.get_user(block)
+                out = out + users.name + "#" + users.discriminator + "\t"
+            except Exception as e:
+                print(e)
+        return await ctx.send("IDS : " + str(self.bot.blocked) + out)
 
     @commands.has_role(1020638168237740042)
     @commands.hybrid_command(help="Unban user.. Admin only command")
     async def unban(self, ctx: commands.Context, id: str):
+        if '#' in id:
+            name_spl = id.split('#')
+            name = name_spl[0]
+            discriminator = name_spl[1]
+            user = discord.utils.get(self.bot.get_all_members(), name=name, discriminator=discriminator)
+            id = user.id
         id = int(id)
-        user = self.bot.get_user(id)
-        await user.send(embed=discord.Embed(
-            title="Congrats",
-            description=f" You have been unbanned by admins. Please follow the guidelines in future",
-            color=discord.Color.blurple(),
-        ))
+        try:
+            user = self.bot.get_user(id)
+            await user.send(embed=discord.Embed(
+                title="Congrats",
+                description=f" You have been unbanned by admins. Please follow the guidelines in future",
+                color=discord.Color.blurple(),
+            ))
+        except:
+            pass
         await self.bot.mongo.blocker.unban(id)
         self.bot.blocked = await self.bot.mongo.blocker.get_all_banned_users()
         return await ctx.send(
@@ -68,6 +91,12 @@ class Admin(commands.Cog):
     @commands.hybrid_command(help="send warning to user..Admin only command")
     async def warn(self, ctx: commands.Context, id: str,
                    reason: str = "continuous use of improper names in novel name translation"):
+        if '#' in id:
+            name_spl = id.split('#')
+            name = name_spl[0]
+            discriminator = name_spl[1]
+            user = discord.utils.get(self.bot.get_all_members(), name=name, discriminator=discriminator)
+            id = user.id
         id = int(id)
         user = self.bot.get_user(id)
         await user.send(embed=discord.Embed(
@@ -75,7 +104,7 @@ class Admin(commands.Cog):
             description=f" You have been warned by admins of @JARVIS bot due to {reason}\nIf you continue do so , you will be banned from using bot",
             color=discord.Color.yellow(),
         ))
-        return await ctx.reply(f"Warning has been sent to {user.mention}")
+        return await ctx.reply(content=f"Warning has been sent to {user.mention}")
 
     @commands.has_role(1020638168237740042)
     @commands.hybrid_command(help="get id of the user if name and discriminator provided. Admin only command")
@@ -85,7 +114,7 @@ class Admin(commands.Cog):
             name = name_spl[0]
             discriminator = name_spl[1]
         user = discord.utils.get(self.bot.get_all_members(), name=name, discriminator=discriminator)
-        return await ctx.send(f"{user.id}")
+        return await ctx.send(content=f"{user.id}", ephemeral=True)
 
     @commands.has_role(1020638168237740042)
     @commands.hybrid_command(help="Restart the bot incase of bot crash. Ping any BOT-admins to restart bot")
@@ -105,7 +134,7 @@ class Admin(commands.Cog):
     async def logger(self, ctx: commands.Context, lines: int = 20):
         h = heroku3.from_key(os.getenv("APIKEY"))
         log = h.get_app_log(os.getenv("APPNAME"), lines=lines, timeout=10)
-        return await ctx.send(embed=discord.Embed(title=f"Logs of {os.getenv('APPNAME')}", description=str(log)[:3500]))
+        return await ctx.send(embed=discord.Embed(title=f"Logs of {os.getenv('APPNAME')}", description=str(log)[:3500]), ephemeral=True, delete_after=60)
         # app = h.app(os.getenv("APPNAME"))
 
     @commands.hybrid_command(help="Give the latency and uptime of the bot(only for bot-admins)... ")
@@ -116,8 +145,29 @@ class Admin(commands.Cog):
             if roles.id == 1020638168237740042:
                 td = datetime.datetime.utcnow() - self.bot.boot
                 td = days_hours_minutes(td)
-                await ctx.send(f"Bot is up for {str(td[0])+' days ' if td[0]>0 else ''}{str(td[1])+' hours ' if td[1]>0 else ''}{str(td[2])+' minutes' if td[2]>0 else ''}")
+                await ctx.send(
+                    f"Bot is up for {str(td[0]) + ' days ' if td[0] > 0 else ''}{str(td[1]) + ' hours ' if td[1] > 0 else ''}{str(td[2]) + ' minutes' if td[2] > 0 else ''}", ephemeral=True)
         return None
+
+    @commands.hybrid_command(help="Give the progress of all current tasks of the bot(only for bot-admins)... ")
+    async def tasks(self, ctx: commands.Context):
+        out = "**Crawler Tasks**\n"
+        if not self.bot.crawler.items():
+            out = out + "No tasks currently\n"
+        else:
+            for keys, values in self.bot.crawler.items():
+                user = self.bot.get_user(keys)
+                user = user.name
+                out = f"{out}{user} : {values} \n"
+        out = out + "\n**Translator Tasks**\n"
+        if not self.bot.translator.items():
+            out = out + "No tasks currently\n"
+        else:
+            for keys, values in self.bot.translator.items():
+                user = self.bot.get_user(keys)
+                user = user.name
+                out = f"{out}{user} : {values} \n"
+        return await ctx.send(embed=discord.Embed(description=out[:3800], colour=discord.Color.random()), ephemeral=True)
 
 
 async def setup(bot):

@@ -14,6 +14,7 @@ import parsel
 import requests
 from bs4 import BeautifulSoup
 from deep_translator import GoogleTranslator
+from discord import app_commands
 from discord.ext import commands
 from readabilipy import simple_json_from_html_string
 
@@ -59,6 +60,8 @@ def findURLCSS(link):
         return "#htmlContent ::text"
     elif "readwn" in link:
         return ".chapter-content"
+    elif "novelsemperor" in link:
+        return "div.epcontent.entry-content > p"
     else:
         return "* ::text"
 
@@ -258,7 +261,8 @@ class Crawler(commands.Cog):
             link = link[:-1]
         if "m.uuks" in link:
             link = link.replace("m.", "")
-        await ctx.typing()
+        if "novelsemperor" in link:
+            reverse = "true"
         try:
             res = await self.bot.con.get(link)
         except Exception as e:
@@ -458,7 +462,7 @@ class Crawler(commands.Cog):
             if True:
                 ids = ids[:20]
                 chk_msg = await ctx.send(embed=discord.Embed(
-                    description=f"This novel is already in our library with ids {ids.__str__()}...  \nDo you want to search in library...React to this message with 🇾  ...\nIf you want to continue crawling react with 🇳"))
+                    description=f"This novel is already in our library with ids {ids.__str__()}...  \nDo you want to search in library...React to this message with 🇾  ...\nIf you want to continue crawling react with 🇳 \n\nNote : Some files are in docx format, so file size maybe half the size of txt. and try to minimize translating if its already in library"))
                 await chk_msg.add_reaction('🇾')
                 await chk_msg.add_reaction('🇳')
 
@@ -470,7 +474,7 @@ class Crawler(commands.Cog):
                     res = await self.bot.wait_for(
                         "reaction_add",
                         check=check,
-                        timeout=10.0,
+                        timeout=15.0,
                     )
                 except asyncio.TimeoutError:
                     print(' Timeout error')
@@ -485,9 +489,10 @@ class Crawler(commands.Cog):
                 else:
                     await ctx.send("Reaction received", delete_after=10)
                     if str(res[0]) == '🇳':
-                        await chk_msg.delete()
-                        pass
+                        await msg.delete()
+                        msg = await ctx.reply("Reaction received.. please wait")
                     else:
+                        await ctx.send("Reaction received", delete_after=10)
                         try:
                             os.remove(f"{ctx.author.id}.txt")
                         except:
@@ -661,6 +666,12 @@ class Crawler(commands.Cog):
         finally:
             del self.bot.crawler[ctx.author.id]
 
+    @crawl.autocomplete("translate_to")
+    async def translate_complete(
+            self, inter: discord.Interaction, language: str
+    ) -> list[app_commands.Choice]:
+        lst = [i for i in self.bot.all_langs if language.lower() in i.lower()][:25]
+        return [app_commands.Choice(name=i, value=i) for i in lst]
 
 async def setup(bot: Raizel) -> None:
     await bot.add_cog(Crawler(bot))

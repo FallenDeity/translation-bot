@@ -2,6 +2,7 @@ import os
 import random
 import traceback
 
+import aiohttp
 import discord
 import heroku3
 from discord.ext import commands
@@ -151,6 +152,13 @@ class ErrorHandler(commands.Cog):
             await ctx.send(
                 embed=discord.Embed(
                     description=f"`{ctx.command.name}` command cannot be used in DMs",
+                    color=discord.Color.red(),
+                )
+            )
+        elif "InvalidURL" in str(error):
+            await ctx.send(
+                embed=discord.Embed(
+                    description=f"`{str(error).split(':')[-1]} is a invalid url. please try with valid link` ",
                     color=discord.Color.red(),
                 )
             )

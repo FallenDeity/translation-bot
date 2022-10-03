@@ -88,10 +88,14 @@ class Raizel(commands.Bot):
         try:
             return await super().start(os.getenv("TOKEN"), reconnect=True)
         except Exception as e:
+            try:
+                await super().close()
+            except:
+                pass
             print('error occurred on connecting to Discord client... will try after 60 secs')
             print(e)
             time.sleep(60)
-            await self.start()
+            return await self.start()
 
     @property
     def uptime(self) -> datetime.timedelta:
