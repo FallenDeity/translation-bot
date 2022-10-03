@@ -7,10 +7,12 @@ import aiofiles
 import chardet
 import discord
 import docx
+import ebooklib
+import parsel
 from PyDictionary import PyDictionary
 from deep_translator import single_detection
 from discord.ext import commands
-from epub2txt import epub2txt
+from ebooklib import epub
 from textblob import TextBlob
 
 from core.bot import Raizel
@@ -18,6 +20,11 @@ from core.views.linkview import LinkView
 from databases.data import Novel
 from languages import languages
 
+
+def chapter_to_str(chapter):
+    sel = parsel.Selector(str(chapter.get_content().decode()))
+    text = sel.css("* ::text").extract()
+    return "\n".join(text)
 
 class FileHandler:
     ENCODING: list[str] = ["utf-8", "cp936", "utf-16", "cp949"]
@@ -104,16 +111,20 @@ class FileHandler:
         string = "\n".join([para.text for para in doc.paragraphs])
         async with aiofiles.open(f"{ctx.author.id}.txt", "w", encoding="utf-8") as f:
             await f.write(string)
-        await msg.edit("Converted to .txt completed", delete_after=5)
+        await msg.delete()
         os.remove(f"{ctx.author.id}.docx")
 
     @staticmethod
     async def epub_to_txt(ctx: commands.Context):
         msg=await ctx.reply("> **Epub file detected please wait till we finish converting to .txt")
-        txt = epub2txt(f"{ctx.author.id}.epub")
+        book = epub.read_epub(f"{ctx.author.id}.epub")
+        items = list(book.get_items_of_type(ebooklib.ITEM_DOCUMENT))
+        text = ""
+        for i in items:
+            text += chapter_to_str(i) + "\n\n---------------------xxx---------------------\n\n"
         with open(f"{ctx.author.id}.txt", "w", encoding="utf-8") as f:
-            f.write(txt)
-        await msg.edit("Converted to .txt completed", delete_after=5)
+            f.write(text)
+        await msg.delete()
         os.remove(f"{ctx.author.id}.epub")
 
     async def read_file(
