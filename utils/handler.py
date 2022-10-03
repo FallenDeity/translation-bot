@@ -117,7 +117,7 @@ class FileHandler:
     @staticmethod
     async def epub_to_txt(ctx: commands.Context):
         msg=await ctx.reply("> **Epub file detected please wait till we finish converting to .txt")
-        book = epub.read_epub("new.epub")
+        book = epub.read_epub(f"{ctx.author.id}.epub")
         items = list(book.get_items_of_type(ebooklib.ITEM_DOCUMENT))
         text = ""
         for i in items:
