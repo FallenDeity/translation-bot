@@ -7,10 +7,12 @@ import aiofiles
 import chardet
 import discord
 import docx
+import ebooklib
 from PyDictionary import PyDictionary
+from bs4 import BeautifulSoup
 from deep_translator import single_detection
 from discord.ext import commands
-from epub2txt import epub2txt
+from ebooklib import epub
 from textblob import TextBlob
 
 from core.bot import Raizel
@@ -18,6 +20,11 @@ from core.views.linkview import LinkView
 from databases.data import Novel
 from languages import languages
 
+
+def chapter_to_str(chapter):
+    soup = BeautifulSoup(chapter.get_body_content(), "html.parser")
+    text = [para.get_text() for para in soup.find_all("p")]
+    return "\n".join(text)
 
 class FileHandler:
     ENCODING: list[str] = ["utf-8", "cp936", "utf-16", "cp949"]
@@ -110,9 +117,13 @@ class FileHandler:
     @staticmethod
     async def epub_to_txt(ctx: commands.Context):
         msg=await ctx.reply("> **Epub file detected please wait till we finish converting to .txt")
-        txt = epub2txt(f"{ctx.author.id}.epub")
+        book = epub.read_epub("new.epub")
+        items = list(book.get_items_of_type(ebooklib.ITEM_DOCUMENT))
+        text = ""
+        for i in items:
+            text += chapter_to_str(i) + "\n---------------------xxx---------------------\n"
         with open(f"{ctx.author.id}.txt", "w", encoding="utf-8") as f:
-            f.write(txt)
+            f.write(text)
         await msg.delete()
         os.remove(f"{ctx.author.id}.epub")
 
