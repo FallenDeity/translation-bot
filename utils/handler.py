@@ -23,7 +23,7 @@ from languages import languages
 
 def chapter_to_str(chapter):
     soup = BeautifulSoup(chapter.get_body_content(), "html.parser")
-    text = [para.get_text() for para in soup.find_all("p")]
+    text = [para.get_text() for para in soup.find_all()]
     return "\n".join(text)
 
 class FileHandler:
@@ -121,7 +121,7 @@ class FileHandler:
         items = list(book.get_items_of_type(ebooklib.ITEM_DOCUMENT))
         text = ""
         for i in items:
-            text += chapter_to_str(i) + "\n---------------------xxx---------------------\n"
+            text += chapter_to_str(i) + "\n\n---------------------xxx---------------------\n\n"
         with open(f"{ctx.author.id}.txt", "w", encoding="utf-8") as f:
             f.write(text)
         await msg.delete()
