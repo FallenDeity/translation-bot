@@ -8,8 +8,8 @@ import chardet
 import discord
 import docx
 import ebooklib
+import parsel
 from PyDictionary import PyDictionary
-from bs4 import BeautifulSoup
 from deep_translator import single_detection
 from discord.ext import commands
 from ebooklib import epub
@@ -22,8 +22,8 @@ from languages import languages
 
 
 def chapter_to_str(chapter):
-    soup = BeautifulSoup(chapter.get_body_content(), "html.parser")
-    text = [para.get_text() for para in soup.find_all()]
+    sel = parsel.Selector(str(chapter.get_content().decode()))
+    text = sel.css("* ::text").extract()
     return "\n".join(text)
 
 class FileHandler:
