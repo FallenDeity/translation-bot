@@ -59,6 +59,8 @@ def findURLCSS(link):
         return "#htmlContent ::text"
     elif "readwn" in link:
         return ".chapter-content"
+    elif "novelsemperor" in link:
+        return "div.epcontent.entry-content > p"
     else:
         return "* ::text"
 
@@ -258,6 +260,8 @@ class Crawler(commands.Cog):
             link = link[:-1]
         if "m.uuks" in link:
             link = link.replace("m.", "")
+        if "novelsemperor" in link:
+            reverse = "true"
         try:
             res = await self.bot.con.get(link)
         except Exception as e:
