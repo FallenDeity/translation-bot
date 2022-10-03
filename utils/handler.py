@@ -97,21 +97,23 @@ class FileHandler:
 
     @staticmethod
     async def docx_to_txt(ctx: commands.Context, file_type: str):
-        await ctx.reply(
+        msg = await ctx.reply(
             "> **✔Docx file detected please wait while we finish converting.**"
         )
         doc = docx.Document(f"{ctx.author.id}.{file_type}")
         string = "\n".join([para.text for para in doc.paragraphs])
         async with aiofiles.open(f"{ctx.author.id}.txt", "w", encoding="utf-8") as f:
             await f.write(string)
+        await msg.edit("Converted to .txt completed", delete_after=5)
         os.remove(f"{ctx.author.id}.docx")
 
     @staticmethod
-    async  def epub_to_txt(ctx: commands.Context):
-        await ctx.reply("> **Epub file detected please wait till we finish converting to .txt")
+    async def epub_to_txt(ctx: commands.Context):
+        msg=await ctx.reply("> **Epub file detected please wait till we finish converting to .txt")
         txt = epub2txt(f"{ctx.author.id}.epub")
         with open(f"{ctx.author.id}.txt", "w", encoding="utf-8") as f:
             f.write(txt)
+        await msg.edit("Converted to .txt completed", delete_after=5)
         os.remove(f"{ctx.author.id}.epub")
 
     async def read_file(
