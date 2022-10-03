@@ -87,7 +87,7 @@ class Translate(commands.Cog):
                 os.remove(path)
                 await rep_msg.delete()
                 return await ctx.send("> **❌Only .txt, .docx and .epub supported**", ephemeral=True)
-            name = name.replace(".txt", "").replace(".docx", "")
+            name = name.replace(".txt", "").replace(".docx", "").replace(".epub", "")
             name = name[:100]
             # os.rename(path, f"{ctx.author.id}.{file_type}")
             if "docx" in file_type:
