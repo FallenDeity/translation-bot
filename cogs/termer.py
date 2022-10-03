@@ -133,7 +133,7 @@ class Termer(commands.Cog):
             if msg is None:
                 msg = ctx.message
             resp = await self.bot.con.get(link)
-            name = msg.attachments[0].filename.replace(".txt", "").replace(".docx", "")
+            name = msg.attachments[0].filename.replace(".txt", "").replace(".docx", "").replace(".epub", "")
             file_type = resp.headers["content-type"].split("/")[-1]
         elif novel is None:
             resp = await self.bot.con.get(link)
@@ -145,13 +145,13 @@ class Termer(commands.Cog):
                 return await ctx.send(
                     "> **❌Currently this link is not supported.**", view=view
                 )
-            name = link.split("/")[-1].replace(".txt", "").replace(".docx", "")
+            name = link.split("/")[-1].replace(".txt", "").replace(".docx", "").replace(".epub", "")
             name = name.replace("%20", " ")
         if "plain" in file_type.lower() or "txt" in file_type.lower():
             file_type = "txt"
         elif "document" in file_type.lower() or "docx" in file_type.lower():
             file_type = "docx"
-        elif "epub" in file_type:
+        elif "epub" in file_type.lower():
             file_type = "epub"
         else:
             return await ctx.send("> **❌Only .epub,.docx and .txt supported**")

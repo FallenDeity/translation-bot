@@ -104,7 +104,7 @@ class FileHandler:
         string = "\n".join([para.text for para in doc.paragraphs])
         async with aiofiles.open(f"{ctx.author.id}.txt", "w", encoding="utf-8") as f:
             await f.write(string)
-        await msg.edit("Converted to .txt completed", delete_after=5)
+        await msg.delete()
         os.remove(f"{ctx.author.id}.docx")
 
     @staticmethod
@@ -113,7 +113,7 @@ class FileHandler:
         txt = epub2txt(f"{ctx.author.id}.epub")
         with open(f"{ctx.author.id}.txt", "w", encoding="utf-8") as f:
             f.write(txt)
-        await msg.edit("Converted to .txt completed", delete_after=5)
+        await msg.delete()
         os.remove(f"{ctx.author.id}.epub")
 
     async def read_file(
