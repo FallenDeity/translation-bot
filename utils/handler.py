@@ -10,7 +10,6 @@ import docx
 from PyDictionary import PyDictionary
 from deep_translator import single_detection
 from discord.ext import commands
-from epub2txt import epub2txt
 from textblob import TextBlob
 
 from core.bot import Raizel
@@ -105,14 +104,6 @@ class FileHandler:
         async with aiofiles.open(f"{ctx.author.id}.txt", "w", encoding="utf-8") as f:
             await f.write(string)
         os.remove(f"{ctx.author.id}.docx")
-
-    @staticmethod
-    async  def epub_to_txt(ctx: commands.Context):
-        await ctx.reply("> **Epub file detected please wait till we finish converting to .txt")
-        txt = epub2txt(f"{ctx.author.id}.epub")
-        with open(f"{ctx.author.id}", "w", encoding="utf-8") as f:
-            f.write(txt)
-        os.remove(f"{ctx.author.id}.epub")
 
     async def read_file(
             self, ctx: commands.Context
