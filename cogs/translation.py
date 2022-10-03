@@ -83,15 +83,17 @@ class Translate(commands.Cog):
             path = self.bot.mega.download_url(
                 link, dest_filename=f"{ctx.author.id}.{file_type}"
             )
-            if "txt" not in file_type and "docx" not in file_type:
+            if "txt" not in file_type and "docx" not in file_type and "epub" not in file_type:
                 os.remove(path)
                 await rep_msg.delete()
-                return await ctx.send("> **❌Only .docx and .txt supported**", ephemeral=True)
-            name = name.replace(".txt", "").replace(".docx", "")
+                return await ctx.send("> **❌Only .txt, .docx and .epub supported**", ephemeral=True)
+            name = name.replace(".txt", "").replace(".docx", "").replace(".epub", "")
             name = name[:100]
             # os.rename(path, f"{ctx.author.id}.{file_type}")
             if "docx" in file_type:
                 await FileHandler.docx_to_txt(ctx, file_type)
+            if "epub" in file_type:
+                await FileHandler.epub_to_txt(ctx)
             novel = await FileHandler.read_file(FileHandler, ctx=ctx)
         else:
             if messageid is not None:
@@ -116,7 +118,7 @@ class Translate(commands.Cog):
             resp = await self.bot.con.get(link)
             if msg is None:
                 msg = ctx.message
-            name = msg.attachments[0].filename.replace(".txt", "").replace(".docx", "")
+            name = msg.attachments[0].filename.replace(".txt", "").replace(".docx", "").replace(".epub", "")
             file_type = resp.headers["content-type"].split("/")[-1]
         elif novel is None:
             resp = await self.bot.con.get(link)
@@ -134,8 +136,10 @@ class Translate(commands.Cog):
             file_type = "txt"
         elif "document" in file_type.lower() or "docx" in file_type.lower():
             file_type = "docx"
+        elif "epub" in file_type:
+            file_type = "epub"
         else:
-            return await ctx.send("> **❌Only .docx and .txt supported**", ephemeral=True)
+            return await ctx.send("> **❌Only .txt, .docx and .epub supported**", ephemeral=True)
         if novelname is not None:
             name = novelname
         name_check = FileHandler.checkname(name, self.bot)
@@ -162,6 +166,8 @@ class Translate(commands.Cog):
                 await f.write(data)
             if "docx" in file_type:
                 await FileHandler.docx_to_txt(ctx, file_type)
+            if "epub" in file_type:
+                await FileHandler.epub_to_txt(ctx)
             novel = await FileHandler().read_file(ctx)
         novel_data = await self.bot.mongo.library.get_novel_by_name(name)
         if novel_data is not None:

@@ -14,6 +14,7 @@ import parsel
 import requests
 from bs4 import BeautifulSoup
 from deep_translator import GoogleTranslator
+from discord import app_commands
 from discord.ext import commands
 from readabilipy import simple_json_from_html_string
 
@@ -665,6 +666,12 @@ class Crawler(commands.Cog):
         finally:
             del self.bot.crawler[ctx.author.id]
 
+    @crawl.autocomplete("translate_to")
+    async def translate_complete(
+            self, inter: discord.Interaction, language: str
+    ) -> list[app_commands.Choice]:
+        lst = [i for i in self.bot.all_langs if language.lower() in i.lower()][:25]
+        return [app_commands.Choice(name=i, value=i) for i in lst]
 
 async def setup(bot: Raizel) -> None:
     await bot.add_cog(Crawler(bot))
