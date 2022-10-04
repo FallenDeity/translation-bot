@@ -3,6 +3,7 @@ import os
 import random
 import typing
 
+import PyPDF2
 import aiofiles
 import chardet
 import discord
@@ -126,6 +127,19 @@ class FileHandler:
             f.write(text)
         await msg.delete()
         os.remove(f"{ctx.author.id}.epub")
+
+    @staticmethod
+    async def pdf_to_txt(ctx: commands.Context):
+        msg = await ctx.reply("> **PDF file detected. converting to txt")
+        with open(f'{ctx.author.id}', 'rb') as pdfFileObj:
+            pdfReader = PyPDF2.PdfFileReader(pdfFileObj)
+            full_text = ""
+            for i in range(0, pdfReader.numPages):
+                pageObj = pdfReader.getPage(i)
+                full_text += pageObj.extractText()
+        await msg.delete()
+        with open(f"{ctx.author.id}.txt", "w", encoding="utf-8") as f:
+            f.write(full_text)
 
     async def read_file(
             self, ctx: commands.Context
