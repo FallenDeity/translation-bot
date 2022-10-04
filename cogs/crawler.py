@@ -157,6 +157,12 @@ class Crawler(commands.Cog):
         full = full + "\n---------------------xxx---------------------\n"
         return nums, full
 
+    def scrape(self, scraper, links: str):
+        response = scraper.get(links)
+        return response
+
+
+
     def direct(self, urls: t.List[str], novel: t.Dict[int, str], name: int, cloudscrape: bool) -> dict:
         if cloudscrape:
             scraper = cloudscraper.CloudScraper()
@@ -175,11 +181,11 @@ class Crawler(commands.Cog):
     async def getcontent(self, links: str, css: str, next_xpath, bot, tag, scraper):
         try:
             if scraper is not None:
-                response = scraper.get(links)
+                response = await self.bot.loop.run_in_executor(None, self.scrape, scraper, links)
                 soup = BeautifulSoup(response.text, "html.parser")
                 if response.status_code == 404:
                     return ['error', links]
-                await asyncio.sleep(1)
+                # await asyncio.sleep(1)
             else:
                 response = await bot.con.get(links)
                 soup = BeautifulSoup(await response.read(), "html.parser", from_encoding=response.get_encoding())
