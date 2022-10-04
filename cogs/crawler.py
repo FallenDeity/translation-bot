@@ -7,6 +7,7 @@ import typing
 import typing as t
 from urllib.parse import urljoin
 from urllib.parse import urlparse
+import cloudscraper
 
 import aiofiles
 import discord
@@ -107,10 +108,14 @@ class Crawler(commands.Cog):
         self.bot = bot
 
     @staticmethod
-    def easy(nums: int, links: str, css: str, chptitleCSS) -> t.Tuple[int, str]:
+    def easy(nums: int, links: str, css: str, chptitleCSS: str, cloudscrape: bool) -> t.Tuple[int, str]:
         response = None
         try:
-            response = requests.get(links, headers=headers, timeout=10)
+            if cloudscrape:
+                scraper = cloudscraper.CloudScraper()  # CloudScraper inherits from requests.Session
+                response = scraper.get(links, headers=headers)
+            else:
+                response = requests.get(links, headers=headers, timeout=10)
         except:
             return nums, f"\ncouldn't get connection to {links}\n"
         if response.status_code == 404:
@@ -153,10 +158,10 @@ class Crawler(commands.Cog):
         full = full + "\n---------------------xxx---------------------\n"
         return nums, full
 
-    def direct(self, urls: t.List[str], novel: t.Dict[int, str], name: int) -> dict:
+    def direct(self, urls: t.List[str], novel: t.Dict[int, str], name: int, cloudscrape: bool) -> dict:
         with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
             futures = [
-                executor.submit(self.easy, i, j, self.urlcss, self.chptitlecss)
+                executor.submit(self.easy, i, j, self.urlcss, self.chptitlecss, cloudscrape)
                 for i, j in enumerate(urls)
             ]
             for future in concurrent.futures.as_completed(futures):
@@ -232,7 +237,7 @@ class Crawler(commands.Cog):
     @commands.hybrid_command(
         help="Crawls other sites for novels. \nselector: give the css selector for the content page. It will try to auto select if not given\n Reverse: give any value if Table of Content is reversed in the given link(or if crawled novel needs to be reversed)")
     async def crawl(
-            self, ctx: commands.Context, link: str = None, reverse: str = None, selector: str = None,
+            self, ctx: commands.Context, link: str = None, reverse: str = None, selector: str = None, cloudscrape: bool = False,
             translate_to: str = None
     ) -> typing.Optional[discord.Message]:
         if ctx.author.id in self.bot.crawler:
@@ -270,7 +275,13 @@ class Crawler(commands.Cog):
             await msg.delete()
             return await ctx.send("We couldn't connect to the provided link. Please check the link")
         novel = {}
-        soup = BeautifulSoup(await res.read(), "html.parser", from_encoding=res.get_encoding())
+        if cloudscrape:
+            scraper = cloudscraper.CloudScraper()  # CloudScraper inherits from requests.Session
+            response = scraper.get(link)
+            soup = BeautifulSoup(response.text, "html.parser")
+            BeautifulSoup()
+        else:
+            soup = BeautifulSoup(await res.read(), "html.parser", from_encoding=res.get_encoding())
         data = await res.read()
         soup1 = BeautifulSoup(data, "lxml")
         self.titlecss = findchptitlecss(link)
@@ -504,7 +515,7 @@ class Crawler(commands.Cog):
             self.bot.crawler[ctx.author.id] = f"0/{len(urls)}"
             await msg.edit(content="> **✔Crawl started.**")
             book = await self.bot.loop.run_in_executor(
-                None, self.direct, urls, novel, ctx.author.id
+                None, self.direct, urls, novel, ctx.author.id, cloudscrape
             )
             parsed = {k: v for k, v in sorted(book.items(), key=lambda item: item[0])}
             whole = [i for i in list(parsed.values())]
