@@ -615,7 +615,7 @@ class Crawler(commands.Cog):
             if cloudscrape:
                 scraper = cloudscraper.CloudScraper()
                 response = scraper.get(firstchplink, headers=headers)
-                await asyncio.sleep(0.25)
+                # await asyncio.sleep(0.25)
             else:
                 scraper = None
                 response = requests.get(firstchplink, headers=headers, timeout=10)
