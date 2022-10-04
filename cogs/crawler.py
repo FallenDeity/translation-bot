@@ -453,7 +453,7 @@ class Crawler(commands.Cog):
             # print(urls)
             title_name = sel.css(maintitleCSS + " ::text").extract_first()
             # print(urls)
-        if urls == [] or num == len(allowed) or len(urls) < 30:
+        if urls == [] or len(urls) < 30:
             scraper = cloudscraper.CloudScraper()  # CloudScraper inherits from requests.Session
             response = scraper.get(link)
             soup = BeautifulSoup(response.text, "html.parser")
