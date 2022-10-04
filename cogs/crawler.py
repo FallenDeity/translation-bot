@@ -108,11 +108,10 @@ class Crawler(commands.Cog):
         self.bot = bot
 
     @staticmethod
-    def easy(nums: int, links: str, css: str, chptitleCSS: str, cloudscrape: bool) -> t.Tuple[int, str]:
+    def easy(nums: int, links: str, css: str, chptitleCSS: str, scraper) -> t.Tuple[int, str]:
         response = None
         try:
-            if cloudscrape:
-                scraper = cloudscraper.CloudScraper()  # CloudScraper inherits from requests.Session
+            if scraper is not None:
                 response = scraper.get(links, headers=headers)
             else:
                 response = requests.get(links, headers=headers, timeout=10)
@@ -159,9 +158,13 @@ class Crawler(commands.Cog):
         return nums, full
 
     def direct(self, urls: t.List[str], novel: t.Dict[int, str], name: int, cloudscrape: bool) -> dict:
+        if cloudscrape:
+            scraper = cloudscraper.CloudScraper()
+        else:
+            scraper = None
         with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
             futures = [
-                executor.submit(self.easy, i, j, self.urlcss, self.chptitlecss, cloudscrape)
+                executor.submit(self.easy, i, j, self.urlcss, self.chptitlecss, scraper)
                 for i, j in enumerate(urls)
             ]
             for future in concurrent.futures.as_completed(futures):
@@ -279,11 +282,12 @@ class Crawler(commands.Cog):
             scraper = cloudscraper.CloudScraper()  # CloudScraper inherits from requests.Session
             response = scraper.get(link)
             soup = BeautifulSoup(response.text, "html.parser")
-            BeautifulSoup()
+            soup1 = soup
         else:
             soup = BeautifulSoup(await res.read(), "html.parser", from_encoding=res.get_encoding())
-        data = await res.read()
-        soup1 = BeautifulSoup(data, "lxml")
+            data = await res.read()
+            soup1 = BeautifulSoup(data, "lxml")
+
         self.titlecss = findchptitlecss(link)
         maintitleCSS = self.titlecss[0]
         try:
@@ -436,6 +440,28 @@ class Crawler(commands.Cog):
             # print(urls)
             title_name = sel.css(maintitleCSS + " ::text").extract_first()
             # print(urls)
+        if urls == [] or num == len(allowed) or len(urls) < 30:
+            scraper = cloudscraper.CloudScraper()  # CloudScraper inherits from requests.Session
+            response = scraper.get(link)
+            soup = BeautifulSoup(response.text, "html.parser")
+            urls = [
+                f"{j}"
+                for j in [str(i.get("href")) for i in soup.find_all("a")]
+                if name in j and "txt" not in j
+            ]
+            host = urlparse(link).netloc
+            if urls == [] or len(urls) < 30:
+                urls = [
+                    f"{j}"
+                    for j in [str(i.get("href")) for i in soup.find_all("a")]
+                    if "txt" not in j
+                ]
+            utemp = []
+            for url in urls:
+                utemp.append(urljoin(link, url))
+            urls = [u for u in utemp if host in u]
+            cloudscrape = True
+            title_name = str(soup.select(maintitleCSS)[0].text)
         if len(urls) < 30:
             return await ctx.reply(
                 f"> **❌Currently this link is not supported.**"
