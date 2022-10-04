@@ -168,8 +168,6 @@ class Crawler(commands.Cog):
         response = scraper.get(links)
         return response
 
-
-
     def direct(self, urls: t.List[str], novel: t.Dict[int, str], name: int, cloudscrape: bool) -> dict:
         if cloudscrape:
             scraper = cloudscraper.CloudScraper()
@@ -189,7 +187,7 @@ class Crawler(commands.Cog):
         try:
             if scraper is not None:
                 response = await self.bot.loop.run_in_executor(None, self.scrape, scraper, links)
-                soup = BeautifulSoup(response.text, "html.parser",from_encoding=response.encoding)
+                soup = BeautifulSoup(response.text, "html.parser", from_encoding=response.encoding)
                 if response.status_code == 404:
                     return ['error', links]
                 # await asyncio.sleep(1)
@@ -260,7 +258,8 @@ class Crawler(commands.Cog):
     @commands.hybrid_command(
         help="Crawls other sites for novels. \nselector: give the css selector for the content page. It will try to auto select if not given\n Reverse: give any value if Table of Content is reversed in the given link(or if crawled novel needs to be reversed)")
     async def crawl(
-            self, ctx: commands.Context, link: str = None, reverse: str = None, selector: str = None, cloudscrape: bool = False,
+            self, ctx: commands.Context, link: str = None, reverse: str = None, selector: str = None,
+            cloudscrape: bool = False,
             translate_to: str = None
     ) -> typing.Optional[discord.Message]:
         if ctx.author.id in self.bot.crawler:
@@ -528,7 +527,7 @@ class Crawler(commands.Cog):
 
                 def check(reaction, user):
                     return reaction.message.id == chk_msg.id and (
-                                str(reaction.emoji) == '🇾' or str(reaction.emoji) == '🇳') and user == ctx.author
+                            str(reaction.emoji) == '🇾' or str(reaction.emoji) == '🇳') and user == ctx.author
 
                 try:
                     res = await self.bot.wait_for(
@@ -584,7 +583,8 @@ class Crawler(commands.Cog):
         if translate_to is not None and download_url is not None and not download_url.strip() == "":
             if translate_to not in self.bot.all_langs and original_Language not in ["english", "en"]:
                 translate_to = "english"
-            ctx.command = await self.bot.get_command("translate").callback(Translate(self.bot), ctx, download_url, None, None,
+            ctx.command = await self.bot.get_command("translate").callback(Translate(self.bot), ctx, download_url, None,
+                                                                           None,
                                                                            translate_to, title_name)
 
     @commands.hybrid_command(
@@ -636,11 +636,12 @@ class Crawler(commands.Cog):
                 response = requests.get(firstchplink, headers=headers, timeout=10)
         except Exception as e:
             print(e)
-            return await ctx.reply("> Couldn't connect to the provided link.... Please check the link or try with cloudscraper true")
+            return await ctx.reply(
+                "> Couldn't connect to the provided link.... Please check the link or try with cloudscraper true")
         if response.status_code == 404:
             return await ctx.reply("> Provided link gives 404 error... Please check the link")
         response.encoding = response.apparent_encoding
-        soup = BeautifulSoup(response.content, 'html5lib',from_encoding=response.encoding)
+        soup = BeautifulSoup(response.content, 'html5lib', from_encoding=response.encoding)
         htm = response.text
         sel = parsel.Selector(htm)
         sel_tag = False
@@ -744,6 +745,7 @@ class Crawler(commands.Cog):
     ) -> list[app_commands.Choice]:
         lst = [i for i in self.bot.all_langs if language.lower() in i.lower()][:25]
         return [app_commands.Choice(name=i, value=i) for i in lst]
+
 
 async def setup(bot: Raizel) -> None:
     await bot.add_cog(Crawler(bot))

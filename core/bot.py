@@ -9,7 +9,7 @@ import discord
 import nltk
 from discord.ext import commands
 from filestack import Client
-# from mega import Mega
+from mega import Mega
 
 from languages.languages import choices
 from languages.sites import sites
@@ -27,7 +27,7 @@ class Raizel(commands.Bot):
     def __init__(self) -> None:
         self.titles: list = None
         self.blocked = None
-        # self.mega
+        self.mega: Mega = None
         intents = discord.Intents.all()
         self.translator: t.Dict[int, str] = {}
         self.crawler: t.Dict[int, str] = {}
@@ -72,11 +72,11 @@ class Raizel(commands.Bot):
         print("Loaded titles")
         self.titles = random.sample(self.titles, len(self.titles))
         try:
-            # self.mega = Mega().login(os.getenv("USER"), os.getenv("MEGA"))
+            self.mega = Mega().login(os.getenv("USER"), os.getenv("MEGA"))
             print("Connected to Mega")
         except Exception as e:
             try:
-                # self.mega = Mega().login()
+                self.mega = Mega().login()
                 print("mega connection failed...connected anonymously....Please check password or account status")
             except:
                 print("mega login anonymously failed ..something wrong with mega")
