@@ -182,7 +182,7 @@ class Crawler(commands.Cog):
         try:
             if scraper is not None:
                 response = await self.bot.loop.run_in_executor(None, self.scrape, scraper, links)
-                soup = BeautifulSoup(response.text, "html.parser")
+                soup = BeautifulSoup(response.text, "html.parser",from_encoding=response.encoding)
                 if response.status_code == 404:
                     return ['error', links]
                 # await asyncio.sleep(1)
@@ -294,12 +294,12 @@ class Crawler(commands.Cog):
         if cloudscrape:
             scraper = cloudscraper.CloudScraper()  # CloudScraper inherits from requests.Session
             response = scraper.get(link)
-            soup = BeautifulSoup(response.text, "html.parser")
+            soup = BeautifulSoup(response.text, "html.parser", from_encoding=response.encoding)
             soup1 = soup
         else:
             soup = BeautifulSoup(await res.read(), "html.parser", from_encoding=res.get_encoding())
             data = await res.read()
-            soup1 = BeautifulSoup(data, "lxml")
+            soup1 = BeautifulSoup(data, "lxml", from_encoding=res.get_encoding())
 
         self.titlecss = findchptitlecss(link)
         maintitleCSS = self.titlecss[0]
@@ -456,7 +456,7 @@ class Crawler(commands.Cog):
         if urls == [] or len(urls) < 30:
             scraper = cloudscraper.CloudScraper()  # CloudScraper inherits from requests.Session
             response = scraper.get(link)
-            soup = BeautifulSoup(response.text, "html.parser")
+            soup = BeautifulSoup(response.text, "html.parser", from_encoding=response.encoding)
             urls = [
                 f"{j}"
                 for j in [str(i.get("href")) for i in soup.find_all("a")]
@@ -474,7 +474,10 @@ class Crawler(commands.Cog):
                 utemp.append(urljoin(link, url))
             urls = [u for u in utemp if host in u]
             cloudscrape = True
-            title_name = str(soup.select(maintitleCSS)[0].text)
+            try:
+                title_name = str(soup.select(maintitleCSS)[0].text)
+            except:
+                title_name = "None"
         if len(urls) < 30:
             return await ctx.reply(
                 f"> **❌Currently this link is not supported.**"
@@ -625,7 +628,7 @@ class Crawler(commands.Cog):
         if response.status_code == 404:
             return await ctx.reply("> Provided link gives 404 error... Please check the link")
         response.encoding = response.apparent_encoding
-        soup = BeautifulSoup(response.content, 'html5lib')
+        soup = BeautifulSoup(response.content, 'html5lib',from_encoding=response.encoding)
         htm = response.text
         sel = parsel.Selector(htm)
         sel_tag = False
