@@ -172,14 +172,20 @@ class Crawler(commands.Cog):
                 self.bot.crawler[name] = f"{len(novel)}/{len(urls)}"
             return novel
 
-    async def getcontent(self, links: str, css: str, next_xpath, bot, tag):
+    async def getcontent(self, links: str, css: str, next_xpath, bot, tag, scraper):
         try:
-            response = await bot.con.get(links)
-            soup = BeautifulSoup(await response.read(), "html.parser", from_encoding=response.get_encoding())
+            if scraper is not None:
+                response = scraper.get(links)
+                soup = BeautifulSoup(response.text, "html.parser")
+                if response.status_code == 404:
+                    return ['error', links]
+            else:
+                response = await bot.con.get(links)
+                soup = BeautifulSoup(await response.read(), "html.parser", from_encoding=response.get_encoding())
+                if response.status == 404:
+                    return ['error', links]
             # response = requests.get(links, headers=headers, timeout=10)
         except:
-            return ['error', links]
-        if response.status == 404:
             return ['error', links]
 
         # response.encoding = response.apparent_encoding
@@ -581,7 +587,7 @@ class Crawler(commands.Cog):
     async def crawlnext(
             self, ctx: commands.Context, firstchplink: str, secondchplink: str = None, lastchplink: str = None,
             nextselector: str = None, noofchapters: int = None,
-            cssselector: str = None
+            cssselector: str = None, cloudscraper: bool = False
     ) -> typing.Optional[discord.Message]:
         if ctx.author.id in self.bot.crawler:
             return await ctx.reply(
@@ -599,9 +605,14 @@ class Crawler(commands.Cog):
         if noofchapters is None:
             noofchapters = 2000
         try:
-            response = requests.get(firstchplink, headers=headers, timeout=10)
+            if cloudscraper:
+                scraper = cloudscraper.CloudScraper()
+                response = scraper.get(firstchplink, headers=headers)
+            else:
+                scraper = None
+                response = requests.get(firstchplink, headers=headers, timeout=10)
         except:
-            return await ctx.reply("> Couldn't connect to the provided link.... Please check the link")
+            return await ctx.reply("> Couldn't connect to the provided link.... Please check the link or try with cloudscraper true")
         if response.status_code == 404:
             return await ctx.reply("> Provided link gives 404 error... Please check the link")
         response.encoding = response.apparent_encoding
@@ -655,7 +666,7 @@ class Crawler(commands.Cog):
                         return await ctx.send(" There is some problem with the provided selector")
                     else:
                         return await ctx.send(" There is some problem with the detected selector")
-                output = await self.getcontent(current_link, css, path, self.bot, sel_tag)
+                output = await self.getcontent(current_link, css, path, self.bot, sel_tag, scraper)
                 chp_text = output[0]
                 # print(i)
                 if chp_text == 'error':
