@@ -100,6 +100,13 @@ def findchptitlecss(link):
         return ["title", "title ::text"]
 
 
+def find_next_selector(link):
+    if "readwn" in link or "wuxiax.co" in link or "novelmt.com" in link:
+        return "#chapter-article > header > div > aside > nav > div.action-select > a.chnav.next"
+    else:
+        return None
+
+
 class Crawler(commands.Cog):
     def __init__(self, bot: Raizel) -> None:
         self.titlecss = None
@@ -603,6 +610,10 @@ class Crawler(commands.Cog):
             return await ctx.reply(
                 "> **❌You cannot crawl two novels at the same time.**"
             )
+        if nextselector is None:
+            nextselector = find_next_selector(firstchplink)
+            if nextselector is not None:
+                secondchplink = None
         if secondchplink is None and nextselector is None:
             return await ctx.send("You must give second chapter link or next page css selector")
         msg = await ctx.send("Crawling will be started soon")
