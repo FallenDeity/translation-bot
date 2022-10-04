@@ -179,7 +179,7 @@ class Crawler(commands.Cog):
                 soup = BeautifulSoup(response.text, "html.parser")
                 if response.status_code == 404:
                     return ['error', links]
-                await asyncio.sleep(0.25)
+                await asyncio.sleep(1)
             else:
                 response = await bot.con.get(links)
                 soup = BeautifulSoup(await response.read(), "html.parser", from_encoding=response.get_encoding())
