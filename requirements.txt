@@ -19,3 +19,4 @@ mega.py @git+https://github.com/Ajurahul/mega.py@c3836facd07dba9b396982afd988ed2
 heroku3==5.1.4
 readabilipy==0.2.0
 EbookLib==0.17.1
+PyPDF2==2.11.0
