@@ -587,7 +587,7 @@ class Crawler(commands.Cog):
     async def crawlnext(
             self, ctx: commands.Context, firstchplink: str, secondchplink: str = None, lastchplink: str = None,
             nextselector: str = None, noofchapters: int = None,
-            cssselector: str = None, cloudscraper: bool = False
+            cssselector: str = None, cloudscrape: bool = False
     ) -> typing.Optional[discord.Message]:
         if ctx.author.id in self.bot.crawler:
             return await ctx.reply(
@@ -605,13 +605,14 @@ class Crawler(commands.Cog):
         if noofchapters is None:
             noofchapters = 2000
         try:
-            if cloudscraper:
+            if cloudscrape:
                 scraper = cloudscraper.CloudScraper()
                 response = scraper.get(firstchplink, headers=headers)
             else:
                 scraper = None
                 response = requests.get(firstchplink, headers=headers, timeout=10)
-        except:
+        except Exception as e:
+            print(e)
             return await ctx.reply("> Couldn't connect to the provided link.... Please check the link or try with cloudscraper true")
         if response.status_code == 404:
             return await ctx.reply("> Provided link gives 404 error... Please check the link")
