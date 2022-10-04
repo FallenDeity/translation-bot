@@ -140,6 +140,7 @@ class FileHandler:
         await msg.delete()
         with open(f"{ctx.author.id}.txt", "w", encoding="utf-8") as f:
             f.write(full_text)
+        os.remove(f"{ctx.author.id}".pdf)
 
     async def read_file(
             self, ctx: commands.Context
