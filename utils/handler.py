@@ -131,7 +131,7 @@ class FileHandler:
     @staticmethod
     async def pdf_to_txt(ctx: commands.Context):
         msg = await ctx.reply("> **PDF file detected. converting to txt")
-        with open(f'{ctx.author.id}', 'rb') as pdfFileObj:
+        with open(f'{ctx.author.id}.pdf', 'rb') as pdfFileObj:
             pdfReader = PyPDF2.PdfFileReader(pdfFileObj)
             full_text = ""
             for i in range(0, pdfReader.numPages):
