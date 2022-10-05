@@ -201,6 +201,8 @@ class ErrorHandler(commands.Cog):
             app = h.app(os.getenv("APPNAME"))
             await ctx.send("> Bot is restarting... please try after 30 sec....")
             app.restart()
+        elif "Detected a Cloudflare version 2 Captcha" in str(error):
+            await ctx.send(embed=discord.Embed(description="Error occured in bypassing cloudflare challenge. This site is not supported by bot for now.", colour=discord.Color.red()))
         else:
             print(error)
             await ctx.send(
