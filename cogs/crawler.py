@@ -61,7 +61,7 @@ def findURLCSS(link):
         return "* ::text"
     elif "shu05" in link:
         return "#htmlContent ::text"
-     elif "readwn" in link:
+    elif "readwn" in link:
         return ".chapter-content ::text"
     elif "novelsemperor" in link:
         return "div.epcontent.entry-content > p ::text"
