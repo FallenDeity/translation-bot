@@ -53,6 +53,8 @@ def findURLCSS(link):
         return ".read_chapterDetail p ::text"
     elif "powanjuan" in link or "ffxs" in link or "sjks" in link:
         return ".content p::text"
+    elif "txt520" in link:
+        return "div.content > p ::text"
     elif "69shu" in link:
         return ".txtnav ::text"
     elif "ptwxz" in link:
