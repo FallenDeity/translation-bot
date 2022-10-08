@@ -64,6 +64,9 @@ class Termer(commands.Cog):
         file_type = None
         name = None
         rep_msg = await ctx.reply("Please wait.. Translation will began soon")
+        if "discord.com/channels" in link:
+            messageid = link
+            link = None
         if ctx.message.attachments:
             link = ctx.message.attachments[0].url
         elif messageid is None and ("mega.nz" in link or "mega.co.nz" in link):
