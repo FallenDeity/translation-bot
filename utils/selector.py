@@ -33,7 +33,7 @@ class CssSelector:
             return "* ::text"
         elif "shu05" in link:
             return "#htmlContent ::text"
-        elif "readwn" in link:
+        elif "readwn" in link or "novelmt.com" in link or "wuxiax.com" in link:
             return ".chapter-content ::text"
         elif "novelsemperor" in link:
             return "div.epcontent.entry-content > p ::text"
@@ -43,6 +43,13 @@ class CssSelector:
             return "#cont-body ::text"
         elif "4ksw.com" in link:
             return "div.panel-body.content-body.content-ext ::text"
+        elif "novelfull.com" in link:
+            return "#chapter-content ::text"
+        elif "novelroom.net" in link:
+            return "div.reading-content ::text"
+        elif "readlightnovel" in link:
+            return "#growfoodsmart ::text"
+            # return "#ch-page-container > div > div.col-lg-8.content2 > div > div.chapter-content3 > div.desc ::text"
         else:
             return "* ::text"
 
@@ -81,5 +88,11 @@ class CssSelector:
     def find_next_selector(link):
         if "readwn" in link or "wuxiax.co" in link or "novelmt.com" in link:
             return "#chapter-article > header > div > aside > nav > div.action-select > a.chnav.next"
+        elif "novelfull.com" in link:
+            return "#next_chap"
+        elif "novelroom.net" in link:
+            return "#manga-reading-nav-foot > div > div.select-pagination > div > div.nav-next > a"
+        elif "readlightnovel" in link:
+            return "#ch-page-container > div > div.col-lg-8.content2 > div > div:nth-child(6) > ul > li:nth-child(3) > a"
         else:
             return None

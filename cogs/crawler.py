@@ -84,7 +84,7 @@ class Crawler(commands.Cog):
                     text.pop(0)
                 text.pop(0)
             full = full + "\n".join(text)
-        full = full + "\n---------------------xxx---------------------\n"
+        full = full + "\n---------------------xxx---------------------\n\n"
         return nums, full
 
     def scrape(self, scraper, links: str):
@@ -154,7 +154,7 @@ class Crawler(commands.Cog):
             except:
                 next_href = None
 
-        full_chp = full_chp + "\n---------------------xxx---------------------\n"
+        full_chp = full_chp + "\n---------------------xxx---------------------\n\n"
 
         return [full_chp, next_href]
 
