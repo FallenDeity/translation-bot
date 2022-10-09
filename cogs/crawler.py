@@ -190,6 +190,7 @@ class Crawler(commands.Cog):
             self.bot.crawler[ctx.author.id] = "break"
         elif ctx.author.id in self.bot.translator:
             self.bot.translator[ctx.author.id] = "break"
+        await ctx.send("Added stop command to all tasks..")
 
     @commands.hybrid_command(
         help="Crawls other sites for novels. \nselector: give the css selector for the content page. It will try to auto select if not given\n Reverse: give any value if Table of Content is reversed in the given link(or if crawled novel needs to be reversed)")
