@@ -257,7 +257,10 @@ class Termer(commands.Cog):
                 await f.write(story)
             await FileHandler().distribute(self.bot, ctx, name, language, original_Language, raw_name=rawname)
         except Exception as e:
-            raise Exception
+            if "Translation stopped" in str(e):
+                return await ctx.send("Translation stopped")
+            else:
+                raise Exception
         finally:
             del self.bot.translator[ctx.author.id]
             self.bot.titles.append(name)

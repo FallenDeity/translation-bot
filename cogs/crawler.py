@@ -103,6 +103,8 @@ class Crawler(commands.Cog):
             ]
             for future in concurrent.futures.as_completed(futures):
                 novel[future.result()[0]] = future.result()[1]
+                if self.bot.crawler[name] == "break":
+                    return None
                 self.bot.crawler[name] = f"{len(novel)}/{len(urls)}"
             return novel
 
@@ -177,6 +179,17 @@ class Crawler(commands.Cog):
                 "> **❌You have no novel deposited for crawling currently.**"
             )
         await ctx.send(f"> **🚄`{self.bot.crawler[ctx.author.id]}`**")
+
+    @commands.hybrid_command(help="stops the tasks initiated by user", aliases=["st"])
+    async def stop(self, ctx: commands.Context) -> typing.Optional[discord.Message]:
+        if ctx.author.id not in self.bot.crawler and ctx.author.id not in self.bot.translator:
+            return await ctx.send(
+                "> **❌You have no tasks currently running.**"
+            )
+        if ctx.author.id in self.bot.crawler:
+            self.bot.crawler[ctx.author.id] = "break"
+        elif ctx.author.id in self.bot.translator:
+            self.bot.translator[ctx.author.id] = "break"
 
     @commands.hybrid_command(
         help="Crawls other sites for novels. \nselector: give the css selector for the content page. It will try to auto select if not given\n Reverse: give any value if Table of Content is reversed in the given link(or if crawled novel needs to be reversed)")
@@ -484,13 +497,15 @@ class Crawler(commands.Cog):
                         return None
         try:
             self.bot.crawler[ctx.author.id] = f"0/{len(urls)}"
-            await msg.edit(content="> **✔Crawl started.**")
+            await msg.edit(content=f"> **:white_check_mark: Started Crawling the novel --  📔   {title_name.split('__')[0].strip()}.**")
             book = await self.bot.loop.run_in_executor(
                 None, self.direct, urls, novel, ctx.author.id, cloudscrape
             )
+            if book is None:
+                return await ctx.reply("Crawling stopped")
             parsed = {k: v for k, v in sorted(book.items(), key=lambda item: item[0])}
             whole = [i for i in list(parsed.values())]
-            whole.insert(0, "\nsource : " + str(link) + "\n\n")
+            whole.insert(0, "\nsource : " + str(link) + "\n\n" + str(title_name.split('__')[0]) + "\n\n")
             text = "\n".join(whole)
 
             async with aiofiles.open(f"{title}.txt", "w", encoding="utf-8") as f:
@@ -586,7 +601,7 @@ class Crawler(commands.Cog):
                     psrt = url
             if psrt == '':
                 return await ctx.send(
-                    "We couldn't find the selector for next chapter. Please check the links or provide the css selector")
+                    "We couldn't find the selector for next chapter. Please check the links or provide the css selector or check with turning on cloudscrape as true")
             href = [i for i in soup.find_all("a") if i.get("href") == psrt]
             # print(href)
             path = self.xpath_soup(href[0])
@@ -596,12 +611,17 @@ class Crawler(commands.Cog):
         current_link = firstchplink
         full_text = "Source : " + firstchplink + '\n\n'
         no_of_tries = 0
-        await msg.edit(content="> Crawling started")
+        await msg.edit(content=f">:white_check_mark:  Started crawling from 📔 {title}")
         crawled_urls = []
+        repeats = 0
         try:
             for i in range(1, noofchapters):
+                if self.bot.crawler[ctx.author.id] == "break":
+                    return await ctx.send("> **Stopped Crawling...")
                 self.bot.crawler[ctx.author.id] = f"{i}/{noofchapters}"
                 if current_link in crawled_urls:
+                    repeats += 1
+                if current_link in crawled_urls and repeats > 5:
                     await msg.delete()
                     if i >= 30:
                         break
@@ -637,6 +657,7 @@ class Crawler(commands.Cog):
                     print('break')
                     break
                 chp_count += 1
+                crawled_urls.append(current_link)
                 current_link = output[1]
             original_Language = FileHandler.find_language(full_text)
             if title is None or str(title).strip() == "" or title == "None":
