@@ -27,6 +27,8 @@ class Translator:
             ]
             for future in concurrent.futures.as_completed(futures):
                 self.order[future.result()[0]] = future.result()[1]
+                if self.bot.translator[self.user] == "break":
+                    raise Exception("Translation stopped")
                 self.bot.translator[self.user] = f"{len(self.order)}/{len(chapters)}"
 
     async def start(self, chapters: t.List[str]) -> str:

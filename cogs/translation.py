@@ -238,7 +238,10 @@ class Translate(commands.Cog):
                 await f.write(story)
             await FileHandler().distribute(self.bot, ctx, name, language, original_Language, rawname)
         except Exception as e:
-            raise e
+            if "Translation stopped" in str(e):
+                return await ctx.send("Translation stopped")
+            else:
+                raise e
         finally:
             del self.bot.translator[ctx.author.id]
             self.bot.titles.append(name)
