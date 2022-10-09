@@ -409,7 +409,7 @@ class Crawler(commands.Cog):
                 title_name = "None"
         if len(urls) < 30:
             return await ctx.reply(
-                f"> **❌Currently this link is not supported.**"
+                f"> **❌Provided link only got {str(len(urls))} links in the page.Check if you have provided correct Table of contents url. If there is no TOC page try using /crawlnext with first chapter and required urls"
             )
         if 'b.faloo' in link or 'wap.faloo' in link:
             urls = urls[:200]
@@ -585,7 +585,6 @@ class Crawler(commands.Cog):
                 if full_url == secondchplink:
                     psrt = url
             if psrt == '':
-                await msg.delete()
                 return await ctx.send(
                     "We couldn't find the selector for next chapter. Please check the links or provide the css selector")
             href = [i for i in soup.find_all("a") if i.get("href") == psrt]
@@ -614,16 +613,24 @@ class Crawler(commands.Cog):
                         return await ctx.send(" There is some problem with the provided selector")
                     else:
                         return await ctx.send(" There is some problem with the detected selector")
-                output = await self.getcontent(current_link, css, path, self.bot, sel_tag, scraper)
+
+                try:
+                    output = await self.getcontent(current_link, css, path, self.bot, sel_tag, scraper)
+                except Exception as e:
+                    if i <=10:
+                        print(e)
+                        return await ctx.send(f"Error occurred in crawling \n Error occurred at {current_link}")
+                    else:
+                        break
                 chp_text = output[0]
                 # print(i)
                 if chp_text == 'error':
                     no_of_tries += 1
                     chp_text = ''
                     if no_of_tries > 30:
-                        await msg.delete()
+                        # await msg.delete()
                         del self.bot.crawler[ctx.author.id]
-                        return await ctx.send('Error occured when crawling. Please Report to my developer')
+                        return await ctx.send('Error occurred when crawling. Please Report to my developer')
                 full_text += chp_text
                 # print(current_link)
                 if current_link == lastchplink or i >= noofchapters or output[1] is None:
