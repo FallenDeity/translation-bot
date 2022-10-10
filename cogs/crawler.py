@@ -616,6 +616,7 @@ class Crawler(commands.Cog):
         crawled_urls = []
         repeats = 0
         try:
+            self.bot.crawler[ctx.author.id] =f"0/{noofchapters}"
             for i in range(1, noofchapters):
                 if self.bot.crawler[ctx.author.id] == "break":
                     return await ctx.send("> **Stopped Crawling...")
