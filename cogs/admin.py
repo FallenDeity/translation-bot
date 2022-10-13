@@ -125,6 +125,15 @@ class Admin(commands.Cog):
                 color=discord.Color.random(),
             ),
         )
+        channel = self.bot.get_channel(
+                991911644831678484
+            ) or await self.bot.fetch_channel(991911644831678484)
+        try:
+                await channel.send(
+                    f"Bot has been restarted by user : {ctx.author.name}"
+                )
+        except:
+                pass
         h = heroku3.from_key(os.getenv("APIKEY"))
         app = h.app(os.getenv("APPNAME"))
         app.restart()
