@@ -176,7 +176,7 @@ class ErrorHandler(commands.Cog):
                     color=discord.Color.red(),
                 )
             )
-        elif "TooManyRequests" in str(error):
+        elif "TooManyRequests" in str(error) or "Request exception can happen due to an api connection error" in str(error):
             await ctx.send(
                 embed=discord.Embed(
                     description=f"Google translate limit reached. Trying to restart server",
