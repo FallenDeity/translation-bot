@@ -177,16 +177,27 @@ class ErrorHandler(commands.Cog):
                 )
             )
         elif "TooManyRequests" in str(error) or "Request exception can happen due to an api connection error" in str(error):
+            print(error)
             await ctx.send(
                 embed=discord.Embed(
                     description=f"Google translate limit reached. Trying to restart server",
                     color=discord.Color.red(),
                 ),
             )
-            h = heroku3.from_key(os.getenv("APIKEY"))
-            app = h.app(os.getenv("APPNAME"))
-            await ctx.send("> Bot is restarting... please try after 30 sec....")
-            app.restart()
+            # h = heroku3.from_key(os.getenv("APIKEY"))
+            # app = h.app(os.getenv("APPNAME"))
+            # await ctx.send("> Bot is restarting... please try after 30 sec....")
+            await ctx.send("Google api's are down for now . please try later ")
+            # app.restart()
+            channel = self.bot.get_channel(
+                991911644831678484
+            ) or await self.bot.fetch_channel(991911644831678484)
+            try:
+                await channel.send(
+                    f"Bot has been restarted due to google translate error\n{str(error)}"
+                )
+            except:
+                pass
         elif "Error R14" in str(error):
             try:
                 await ctx.send(
