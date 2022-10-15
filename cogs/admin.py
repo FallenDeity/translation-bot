@@ -42,9 +42,18 @@ class Admin(commands.Cog):
         ))
         await self.bot.mongo.blocker.ban(user)
         self.bot.blocked = await self.bot.mongo.blocker.get_all_banned_users()
-        return await ctx.send(
+        await ctx.send(
             f"User {m_user.mention} banned due to {reason}"
         )
+        channel = self.bot.get_channel(
+            991911644831678484
+        ) or await self.bot.fetch_channel(991911644831678484)
+        try:
+            return await channel.send(embed=discord.Embed(
+                description=f"User {m_user.name} has been banned by {ctx.author.name}", colour=discord.Color.dark_gold())
+            )
+        except:
+            pass
 
     @commands.has_role(1020638168237740042)
     @commands.hybrid_command(help="Gives all the banned users.. Admin only command")
@@ -83,9 +92,20 @@ class Admin(commands.Cog):
             pass
         await self.bot.mongo.blocker.unban(id)
         self.bot.blocked = await self.bot.mongo.blocker.get_all_banned_users()
-        return await ctx.send(
+        await ctx.send(
             f"Unbanned user : {user.mention}"
         )
+        channel = self.bot.get_channel(
+            991911644831678484
+        ) or await self.bot.fetch_channel(991911644831678484)
+        try:
+            return await channel.send(embed=discord.Embed(
+                description=f"User {user.name} has been unbanned by {ctx.author.name}",
+                colour=discord.Color.dark_gold())
+            )
+        except:
+            pass
+
 
     @commands.has_role(1020638168237740042)
     @commands.hybrid_command(help="send warning to user..Admin only command")
