@@ -485,7 +485,6 @@ class Crawler(commands.Cog):
                 else:
                     await ctx.send("Reaction received", delete_after=10)
                     if str(res[0]) == '🇳':
-                        await msg.delete()
                         msg = await ctx.reply("Reaction received.. please wait")
                     else:
                         await ctx.send("Reaction received", delete_after=10)
