@@ -51,12 +51,10 @@ class CssSelector:
             return "#growfoodsmart ::text"
         elif "m.qidian" in link:
             return "#chapterContent ::text"
-        elif "read.qidian" in link or "book.qidian" in link or "www.qidian" in link:
-            return "p ::text"
+            #         elif "read.qidian" in link or "book.qidian" in link or "www.qidian" in link:
+            #             return "p ::text"
         elif "m.xklxsw.com" in link:
             return "#nr1 ::text"
-        elif "www.xklxsw.com" in link:
-            return "#content ::text"
             # return "#ch-page-container > div > div.col-lg-8.content2 > div > div.chapter-content3 > div.desc ::text"
         else:
             return "* ::text"
