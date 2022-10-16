@@ -52,7 +52,7 @@ class CssSelector:
         elif "m.qidian" in link:
             return "#chapterContent ::text"
         elif "read.qidian" in link or "book.qidian" in link or "www.qidian":
-            return ".read-content ::text"
+            return "p ::text"
             # return "#ch-page-container > div > div.col-lg-8.content2 > div > div.chapter-content3 > div.desc ::text"
         else:
             return "* ::text"
@@ -86,8 +86,6 @@ class CssSelector:
             return [".bread>a:nth-of-type(3)", "title ::text"]
         if "ptwxz" in link:
             return [".title", "title ::text"]
-        if "read.qidian" in link or "book.qidian" in link or "www.qidian":
-            return ["title", "div.text-head > h3"]
         if "m.qidian" in link:
             return ["#header > h1", ""]
         else:
