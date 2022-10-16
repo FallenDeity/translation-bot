@@ -48,6 +48,7 @@ class Crawler(commands.Cog):
         except:
             return nums, f"\ncouldn't get connection to {links}\n"
         if response.status_code == 404:
+            print("Response received as error status code 404")
             return nums, ""
         response.encoding = response.apparent_encoding
         full = ""
@@ -223,10 +224,12 @@ class Crawler(commands.Cog):
             link = link.replace(".html", "/")
         if link[-1] == "/" and "69shu" not in link and "uukanshu.cc" not in link and not num == len(allowed):
             link = link[:-1]
-        if "m.uuks" in link:
-            link = link.replace("m.", "")
+        # if "m.uuks" in link:
+        #     link = link.replace("m.", "")
         if "novelsemperor" in link:
             reverse = "true"
+        if "www.xklxsw.com/" in link:
+            link = link.replace("www", "m")
         try:
             res = await self.bot.con.get(link)
         except Exception as e:
@@ -416,7 +419,9 @@ class Crawler(commands.Cog):
             for url in urls:
                 utemp.append(urljoin(link, url))
             urls = [u for u in utemp if host in u]
-            cloudscrape = True
+            if len(urls) > 30:
+                cloudscrape = True
+                await ctx.send("Cloudscraper is turned on as cloudflare is detected", delete_after=5)
             try:
                 title_name = str(soup.select(maintitleCSS)[0].text)
             except:
