@@ -75,7 +75,7 @@ class Translate(commands.Cog):
             await ctx.send("Mega link found.... downloading from mega", delete_after=10, ephemeral=True)
             info = self.bot.mega.get_public_url_info(link)
             size = int(info.get("size")) / 1000
-            if size >= 15 * 1000:
+            if size >= 17.5 * 1000:
                 await rep_msg.delete()
                 return await ctx.reply(
                     "> **❌ File size is too big... Please split the file and translate"
