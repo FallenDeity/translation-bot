@@ -35,11 +35,14 @@ class Admin(commands.Cog):
         ]
         user = User(*user_data)
         m_user = self.bot.get_user(id)
-        await m_user.send(embed=discord.Embed(
+        try:
+           await m_user.send(embed=discord.Embed(
             title="Blocked",
             description=f" You have been blocked by admins of @JARVIS bot due to {reason}\n",
             color=discord.Color.red(),
-        ))
+         ))
+        except:
+             pass
         await self.bot.mongo.blocker.ban(user)
         self.bot.blocked = await self.bot.mongo.blocker.get_all_banned_users()
         await ctx.send(
