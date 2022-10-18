@@ -206,8 +206,8 @@ class FileHandler:
                 channel = guild.get_channel(1005668482475643050)
                 user = str(ctx.author)
                 await channel.send(
-                    f"> {name.replace('_', ' ')} \nuploaded by {user} Translated from: {original_language} to: {language}",
-                    view=view,
+                    f"> {name.replace('_', ' ')} \nuploaded by {user} {ctx.author.mention} Translated from: {original_language} to: {language}",
+                    view=view, allowed_mentions=discord.AllowedMentions(users=False)
                 )
                 download_url = filelnk
             except Exception as e:
@@ -223,8 +223,8 @@ class FileHandler:
             channel = guild.get_channel(1005668482475643050)
             user = str(ctx.author)
             msg = await channel.send(
-                f'> {name.replace("_", " ")} \nUploaded by {user} Translated from: {original_language} to: {language}',
-                file=discord.File(f"{ctx.author.id}.txt", f"{name}.txt"),
+                f'> {name.replace("_", " ")} \nUploaded by {user} {ctx.author.mention}Translated from: {original_language} to: {language}',
+                file=discord.File(f"{ctx.author.id}.txt", f"{name}.txt"), allowed_mentions=discord.AllowedMentions(users=False)
             )
             os.remove(f"{ctx.author.id}.txt")
             try:
@@ -275,8 +275,8 @@ class FileHandler:
                 channel = guild.get_channel(1020980703229382706)
                 user = str(ctx.author)
                 await channel.send(
-                    f"> {title_name} \nCrawled by {user} Source language : {originallanguage}",
-                    view=view,
+                    f"> {title_name} \nCrawled by {user} {ctx.author.mention} Source language : {originallanguage}",
+                    view=view, allowed_mentions=discord.AllowedMentions(users=False)
                 )
                 download_url = filelnk
             except Exception as e:
@@ -290,8 +290,8 @@ class FileHandler:
             channel = guild.get_channel(1020980703229382706)
             user = str(ctx.author)
             msg = await channel.send(
-                f'> {title_name} \nCrawled by {user} Source language : {originallanguage} ',
-                file=discord.File(f"{title}.txt"),
+                f'> {title_name} \nCrawled by {user} {ctx.author.mention} Source language : {originallanguage} ',
+                file=discord.File(f"{title}.txt"), allowed_mentions=discord.AllowedMentions(users=False)
             )
             download_url = msg.attachments[0].url
             try:
