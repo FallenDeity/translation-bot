@@ -181,6 +181,7 @@ class Admin(commands.Cog):
                     f"Bot is up for {str(td[0]) + ' days ' if td[0] > 0 else ''}{str(td[1]) + ' hours ' if td[1] > 0 else ''}{str(td[2]) + ' minutes' if td[2] > 0 else ''}", ephemeral=True)
         return None
 
+    @commands.has_role(1020638168237740042)
     @commands.hybrid_command(help="Give the progress of all current tasks of the bot(only for bot-admins)... ")
     async def tasks(self, ctx: commands.Context):
         out = "**Crawler Tasks**\n"
