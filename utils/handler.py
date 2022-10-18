@@ -122,7 +122,10 @@ class FileHandler:
         items = list(book.get_items_of_type(ebooklib.ITEM_DOCUMENT))
         text = ""
         for i in items:
-            text += chapter_to_str(i) + "\n\n---------------------xxx---------------------\n\n"
+            try:
+                text += chapter_to_str(i) + "\n\n---------------------xxx---------------------\n\n"
+            except:
+                pass
         with open(f"{ctx.author.id}.txt", "w", encoding="utf-8") as f:
             f.write(text)
         await msg.delete()
