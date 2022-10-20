@@ -205,7 +205,7 @@ class FileHandler:
                     f"> **✔{ctx.author.mention} your novel {name} is ready.**",
                     view=view,
                 )
-                if original_language == "korean":
+                if original_language.lower() == "korean":
                     channel = self.bot.get_channel(
                         1032638028868501554
                     ) or await self.bot.fetch_channel(1032638028868501554)
@@ -228,7 +228,7 @@ class FileHandler:
         else:
             file = discord.File(f"{ctx.author.id}.txt", f"{name}.txt")
             await ctx.reply("**🎉Here is your translated novel**", file=file)
-            if original_language == "korean":
+            if original_language.lower() == "korean":
                 channel = self.bot.get_channel(
                     1032638028868501554
                 ) or await self.bot.fetch_channel(1032638028868501554)
