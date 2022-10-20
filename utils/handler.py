@@ -206,13 +206,13 @@ class FileHandler:
                     view=view,
                 )
                 if original_language.lower() == "korean":
-                    channel = self.bot.get_channel(
+                    channel = bot.get_channel(
                         1032638028868501554
-                    ) or await self.bot.fetch_channel(1032638028868501554)
+                    ) or await bot.fetch_channel(1032638028868501554)
                 else:
-                    channel = self.bot.get_channel(
+                    channel = bot.get_channel(
                         1005668482475643050
-                    ) or await self.bot.fetch_channel(1005668482475643050)
+                    ) or await bot.fetch_channel(1005668482475643050)
                 user = str(ctx.author)
                 await channel.send(
                     f"> {name.replace('_', ' ')} \nuploaded by {user} {ctx.author.mention} Translated from: {original_language} to: {language}",
@@ -229,13 +229,13 @@ class FileHandler:
             file = discord.File(f"{ctx.author.id}.txt", f"{name}.txt")
             await ctx.reply("**🎉Here is your translated novel**", file=file)
             if original_language.lower() == "korean":
-                channel = self.bot.get_channel(
+                channel = bot.get_channel(
                     1032638028868501554
-                ) or await self.bot.fetch_channel(1032638028868501554)
+                ) or await bot.fetch_channel(1032638028868501554)
             else:
-                channel = self.bot.get_channel(
+                channel = bot.get_channel(
                     1005668482475643050
-                ) or await self.bot.fetch_channel(1005668482475643050)
+                ) or await bot.fetch_channel(1005668482475643050)
             user = str(ctx.author)
             msg = await channel.send(
                 f'> {name.replace("_", " ")} \nUploaded by {user} {ctx.author.mention} Translated from: {original_language} to: {language}',
@@ -286,9 +286,9 @@ class FileHandler:
                     f"> **✔{ctx.author.mention} your novel {title_name} is ready.**",
                     view=view,
                 )
-                channel = self.bot.get_channel(
+                channel = bot.get_channel(
                     1020980703229382706
-                ) or await self.bot.fetch_channel(1020980703229382706)
+                ) or await bot.fetch_channel(1020980703229382706)
                 user = str(ctx.author)
                 await channel.send(
                     f"> {title_name} \nCrawled by {user} {ctx.author.mention} Source language : {originallanguage}",
@@ -302,9 +302,9 @@ class FileHandler:
         else:
             file = discord.File(f"{title}.txt", f"{title_name}.txt")
             await ctx.reply("**🎉Here is your crawled novel**", file=file)
-            channel = self.bot.get_channel(
+            channel = bot.get_channel(
                 1020980703229382706
-            ) or await self.bot.fetch_channel(1020980703229382706)
+            ) or await bot.fetch_channel(1020980703229382706)
             user = str(ctx.author)
             msg = await channel.send(
                 f'> {title_name} \nCrawled by {user} {ctx.author.mention} Source language : {originallanguage} ',
