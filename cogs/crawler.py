@@ -191,7 +191,7 @@ class Crawler(commands.Cog):
             self.bot.crawler[ctx.author.id] = "break"
         elif ctx.author.id in self.bot.translator:
             self.bot.translator[ctx.author.id] = "break"
-        await ctx.send("Added stop command to all tasks..")
+        await ctx.send("> Added stop command to all tasks..")
 
     @commands.hybrid_command(
         help="Crawls other sites for novels. \nselector: give the css selector for the content page. It will try to auto select if not given\n Reverse: give any value if Table of Content is reversed in the given link(or if crawled novel needs to be reversed)")
@@ -512,7 +512,7 @@ class Crawler(commands.Cog):
             whole = [i for i in list(parsed.values())]
             whole.insert(0, "\nsource : " + str(link) + "\n\n" + str(title_name.split('__')[0]) + "\n\n")
             text = "\n".join(whole)
-
+            title = title[:100]
             async with aiofiles.open(f"{title}.txt", "w", encoding="utf-8") as f:
                 await f.write(text)
             download_url = await FileHandler().crawlnsend(ctx, self.bot, title, title_name, original_Language)
@@ -616,7 +616,7 @@ class Crawler(commands.Cog):
         current_link = firstchplink
         full_text = "Source : " + firstchplink + '\n\n'
         no_of_tries = 0
-        await msg.edit(content=f">:white_check_mark:  Started crawling from 📔 {title}")
+        await msg.edit(content=f"> :white_check_mark:  Started crawling from 📔 {title}")
         crawled_urls = []
         repeats = 0
         try:
@@ -642,13 +642,14 @@ class Crawler(commands.Cog):
 
                 try:
                     output = await self.getcontent(current_link, css, path, self.bot, sel_tag, scraper)
+                    chp_text = output[0]
                 except Exception as e:
                     if i <=10:
                         print(e)
                         return await ctx.send(f"Error occurred in crawling \n Error occurred at {current_link}")
                     else:
                         break
-                chp_text = output[0]
+
                 # print(i)
                 if chp_text == 'error':
                     no_of_tries += 1
