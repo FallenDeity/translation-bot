@@ -528,7 +528,7 @@ class Crawler(commands.Cog):
                 translate_to = "english"
             ctx.command = await self.bot.get_command("translate").callback(Translate(self.bot), ctx, download_url, None,
                                                                            None,
-                                                                           translate_to, title_name)
+                                                                           translate_to, title_name[:100])
 
     @commands.hybrid_command(
         help="Clears any stagnant novels which were deposited for crawling."
