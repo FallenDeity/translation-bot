@@ -55,6 +55,8 @@ class CssSelector:
             #             return "p ::text"
         elif "m.xklxsw.com" in link:
             return "#nr1 ::text"
+        elif "www.youyoukanshu.com/" in link:
+            return "#content > article ::text"
             # return "#ch-page-container > div > div.col-lg-8.content2 > div > div.chapter-content3 > div.desc ::text"
         else:
             return "* ::text"

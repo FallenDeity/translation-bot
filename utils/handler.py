@@ -205,8 +205,14 @@ class FileHandler:
                     f"> **✔{ctx.author.mention} your novel {name} is ready.**",
                     view=view,
                 )
-                guild = bot.get_guild(940866934214373376)
-                channel = guild.get_channel(1005668482475643050)
+                if original_language == "korean":
+                    channel = self.bot.get_channel(
+                        1032638028868501554
+                    ) or await self.bot.fetch_channel(1032638028868501554)
+                else:
+                    channel = self.bot.get_channel(
+                        1005668482475643050
+                    ) or await self.bot.fetch_channel(1005668482475643050)
                 user = str(ctx.author)
                 await channel.send(
                     f"> {name.replace('_', ' ')} \nuploaded by {user} {ctx.author.mention} Translated from: {original_language} to: {language}",
@@ -222,11 +228,17 @@ class FileHandler:
         else:
             file = discord.File(f"{ctx.author.id}.txt", f"{name}.txt")
             await ctx.reply("**🎉Here is your translated novel**", file=file)
-            guild = bot.get_guild(940866934214373376)
-            channel = guild.get_channel(1005668482475643050)
+            if original_language == "korean":
+                channel = self.bot.get_channel(
+                    1032638028868501554
+                ) or await self.bot.fetch_channel(1032638028868501554)
+            else:
+                channel = self.bot.get_channel(
+                    1005668482475643050
+                ) or await self.bot.fetch_channel(1005668482475643050)
             user = str(ctx.author)
             msg = await channel.send(
-                f'> {name.replace("_", " ")} \nUploaded by {user} {ctx.author.mention}Translated from: {original_language} to: {language}',
+                f'> {name.replace("_", " ")} \nUploaded by {user} {ctx.author.mention} Translated from: {original_language} to: {language}',
                 file=discord.File(f"{ctx.author.id}.txt", f"{name}.txt"), allowed_mentions=discord.AllowedMentions(users=False)
             )
             os.remove(f"{ctx.author.id}.txt")
@@ -274,8 +286,9 @@ class FileHandler:
                     f"> **✔{ctx.author.mention} your novel {title_name} is ready.**",
                     view=view,
                 )
-                guild = bot.get_guild(940866934214373376)
-                channel = guild.get_channel(1020980703229382706)
+                channel = self.bot.get_channel(
+                    1020980703229382706
+                ) or await self.bot.fetch_channel(1020980703229382706)
                 user = str(ctx.author)
                 await channel.send(
                     f"> {title_name} \nCrawled by {user} {ctx.author.mention} Source language : {originallanguage}",
@@ -289,8 +302,9 @@ class FileHandler:
         else:
             file = discord.File(f"{title}.txt", f"{title_name}.txt")
             await ctx.reply("**🎉Here is your crawled novel**", file=file)
-            guild = bot.get_guild(940866934214373376)
-            channel = guild.get_channel(1020980703229382706)
+            channel = self.bot.get_channel(
+                1020980703229382706
+            ) or await self.bot.fetch_channel(1020980703229382706)
             user = str(ctx.author)
             msg = await channel.send(
                 f'> {title_name} \nCrawled by {user} {ctx.author.mention} Source language : {originallanguage} ',
