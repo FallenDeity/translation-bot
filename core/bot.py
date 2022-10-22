@@ -121,7 +121,7 @@ class Raizel(commands.Bot):
         langs = list(self.languages.keys()) + list(self.languages.values())
         return langs
 
-    @tasks.loop(hour=2)
+    @tasks.loop(hours=2)
     async def auto_restart(self):
         i = 0
         while True:
