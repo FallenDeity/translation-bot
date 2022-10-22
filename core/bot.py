@@ -75,7 +75,7 @@ class Raizel(commands.Bot):
         print("Loaded titles")
         self.titles = random.sample(self.titles, len(self.titles))
         try:
-            # self.mega = Mega().login(os.getenv("USER"), os.getenv("MEGA"))
+            self.mega = Mega().login(os.getenv("USER"), os.getenv("MEGA"))
             print("Connected to Mega")
         except Exception as e:
             try:
