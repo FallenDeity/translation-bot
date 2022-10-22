@@ -29,6 +29,7 @@ async def on_ready():
     print(f"Running as {bot.user}")
     await bot.tree.sync()
     census.start()
+    bot.auto_restart.start()
 
 
 async def main():

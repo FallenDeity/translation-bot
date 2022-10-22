@@ -1,3 +1,4 @@
+import asyncio
 import datetime
 import os
 import random
@@ -6,6 +7,7 @@ import typing as t
 
 import aiohttp
 import discord
+import heroku3
 import nltk
 from discord.ext import commands
 from filestack import Client
@@ -15,6 +17,7 @@ from languages.languages import choices
 from languages.sites import sites
 from languages.terms import get_dictionary
 from utils.connector import Mongo
+from discord.ext import tasks
 
 
 class Raizel(commands.Bot):
@@ -72,7 +75,7 @@ class Raizel(commands.Bot):
         print("Loaded titles")
         self.titles = random.sample(self.titles, len(self.titles))
         try:
-            self.mega = Mega().login(os.getenv("USER"), os.getenv("MEGA"))
+            # self.mega = Mega().login(os.getenv("USER"), os.getenv("MEGA"))
             print("Connected to Mega")
         except Exception as e:
             try:
@@ -109,7 +112,7 @@ class Raizel(commands.Bot):
     def display_langs(self) -> str:
         string = ["{0: ^17}".format(f"{k} --> {v}") for k, v in self.languages.items()]
         string = "\n".join(
-            ["".join(string[i : i + 3]) for i in range(0, len(string), 3)]
+            ["".join(string[i: i + 3]) for i in range(0, len(string), 3)]
         )
         return string
 
@@ -117,3 +120,34 @@ class Raizel(commands.Bot):
     def all_langs(self) -> list[str]:
         langs = list(self.languages.keys()) + list(self.languages.values())
         return langs
+
+    @tasks.loop(hour=2)
+    async def auto_restart(self):
+        i = 0
+        while True:
+            if (not self.crawler.items() and not self.translator.items()) or i == 6:
+                print("restart " + str(datetime.datetime.now()))
+                channel = self.get_channel(
+                    991911644831678484
+                ) or await self.bot.fetch_channel(991911644831678484)
+                try:
+                    await channel.send(embed=discord.Embed(description=f"Bot has been auto-restarted"
+                                                           , colour=discord.Colour.brand_green()))
+                except:
+                    pass
+                try:
+                    h = heroku3.from_key(os.getenv("APIKEY"))
+                    app = h.app(os.getenv("APPNAME"))
+                    app.restart()
+                except Exception as e:
+                    print("error occurred at restarting")
+                    print(e)
+                break
+            else:
+                i = i + 1
+                print("there are tasks waiting....")
+                channel = self.get_channel(
+                    991911644831678484
+                ) or await self.bot.fetch_channel(991911644831678484)
+                await channel.send(embed=discord.Embed(description="Task is already running.. waiting for it to finish for restart", colour=discord.Colour.random()))
+                await asyncio.sleep(60)

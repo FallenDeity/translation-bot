@@ -36,13 +36,13 @@ class Admin(commands.Cog):
         user = User(*user_data)
         m_user = self.bot.get_user(id)
         try:
-           await m_user.send(embed=discord.Embed(
-            title="Blocked",
-            description=f" You have been blocked by admins of @JARVIS bot due to {reason}\n",
-            color=discord.Color.red(),
-         ))
+            await m_user.send(embed=discord.Embed(
+                title="Blocked",
+                description=f" You have been blocked by admins of @JARVIS bot due to {reason}\n",
+                color=discord.Color.red(),
+            ))
         except:
-             pass
+            pass
         await self.bot.mongo.blocker.ban(user)
         self.bot.blocked = await self.bot.mongo.blocker.get_all_banned_users()
         await ctx.send(
@@ -53,7 +53,8 @@ class Admin(commands.Cog):
         ) or await self.bot.fetch_channel(991911644831678484)
         try:
             return await channel.send(embed=discord.Embed(
-                description=f"User {m_user.name} has been banned by {ctx.author.name}", colour=discord.Color.dark_gold())
+                description=f"User {m_user.name} has been banned by {ctx.author.name}",
+                colour=discord.Color.dark_gold())
             )
         except:
             pass
@@ -109,7 +110,6 @@ class Admin(commands.Cog):
         except:
             pass
 
-
     @commands.has_role(1020638168237740042)
     @commands.hybrid_command(help="send warning to user..Admin only command")
     async def warn(self, ctx: commands.Context, id: str,
@@ -149,14 +149,14 @@ class Admin(commands.Cog):
             ),
         )
         channel = self.bot.get_channel(
-                991911644831678484
-            ) or await self.bot.fetch_channel(991911644831678484)
+            991911644831678484
+        ) or await self.bot.fetch_channel(991911644831678484)
         try:
-                await channel.send(
-                    f"Bot has been restarted by user : {ctx.author.name}"
-                )
+            await channel.send(
+                f"Bot has been restarted by user : {ctx.author.name}"
+            )
         except:
-                pass
+            pass
         h = heroku3.from_key(os.getenv("APIKEY"))
         app = h.app(os.getenv("APPNAME"))
         app.restart()
@@ -166,7 +166,8 @@ class Admin(commands.Cog):
     async def logger(self, ctx: commands.Context, lines: int = 20):
         h = heroku3.from_key(os.getenv("APIKEY"))
         log = h.get_app_log(os.getenv("APPNAME"), lines=lines, timeout=10)
-        return await ctx.send(embed=discord.Embed(title=f"Logs of {os.getenv('APPNAME')}", description=str(log)[:3500]), ephemeral=True, delete_after=60)
+        return await ctx.send(embed=discord.Embed(title=f"Logs of {os.getenv('APPNAME')}", description=str(log)[:3500]),
+                              ephemeral=True, delete_after=60)
         # app = h.app(os.getenv("APPNAME"))
 
     @commands.hybrid_command(help="Give the latency and uptime of the bot(only for bot-admins)... ")
@@ -178,7 +179,8 @@ class Admin(commands.Cog):
                 td = datetime.datetime.utcnow() - self.bot.boot
                 td = days_hours_minutes(td)
                 await ctx.send(
-                    f"Bot is up for {str(td[0]) + ' days ' if td[0] > 0 else ''}{str(td[1]) + ' hours ' if td[1] > 0 else ''}{str(td[2]) + ' minutes' if td[2] > 0 else ''}", ephemeral=True)
+                    f"Bot is up for {str(td[0]) + ' days ' if td[0] > 0 else ''}{str(td[1]) + ' hours ' if td[1] > 0 else ''}{str(td[2]) + ' minutes' if td[2] > 0 else ''}",
+                    ephemeral=True)
         return None
 
     @commands.has_role(1020638168237740042)
@@ -200,7 +202,8 @@ class Admin(commands.Cog):
                 user = self.bot.get_user(keys)
                 user = user.name
                 out = f"{out}{user} : {values} \n"
-        return await ctx.send(embed=discord.Embed(description=out[:3800], colour=discord.Color.random()), ephemeral=True)
+        return await ctx.send(embed=discord.Embed(description=out[:3800], colour=discord.Color.random()),
+                              ephemeral=True)
 
 
 async def setup(bot):
