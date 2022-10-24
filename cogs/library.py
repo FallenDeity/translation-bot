@@ -183,17 +183,17 @@ class Library(commands.Cog):
                 valid.append(uploader)
 
         if not valid:
-            await ctx.send("No results found.")
+            await ctx.send("> **No results found.**")
             await msg.delete()
             return
         allnovels = self.common_elements_finder(*valid)
         if show_list:
             embeds = await self.make_list_embed_list(allnovels)
-            await msg.edit(content=f"> Found {len(allnovels)} novels")
+            await msg.edit(content=f"> Found **{len(allnovels)}** novels")
             await self.buttons(embeds, ctx)
         else:
             embeds = await self.make_list_embed(allnovels)
-            await msg.edit(content=f"> Found {len(embeds)} novels")
+            await msg.edit(content=f"> Found **{len(embeds)}** novels")
             await self.buttons(embeds, ctx)
     
     @library.command(name="random", help="Gives 10 random novel in library.")

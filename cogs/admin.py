@@ -173,7 +173,7 @@ class Admin(commands.Cog):
     @commands.hybrid_command(help="Give the latency and uptime of the bot(only for bot-admins)... ")
     async def ping(self, ctx: commands.Context):
         # await ctx.send(str(datetime.datetime.utcnow())+".-"+str(ctx.message.created_at))
-        await ctx.send(f"Latency is {self.bot.ws.latency*1000} ms")
+        await ctx.send(f"Latency is {int(self.bot.ws.latency*1000)} ms")
         for roles in ctx.author.roles:
             if roles.id == 1020638168237740042:
                 td = datetime.datetime.utcnow() - self.bot.boot

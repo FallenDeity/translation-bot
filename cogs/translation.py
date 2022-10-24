@@ -70,7 +70,7 @@ class Translate(commands.Cog):
         if link is not None and ("discord.com/channels" in link or link.isnumeric()):
             messageid = link
             link = None
-        if ctx.message.attachments:
+        if ctx.message.attachments and not str(link).startswith("https://cdn.discordapp.com"):
             link = ctx.message.attachments[0].url
         elif messageid is None and ("mega.nz" in link or "mega.co.nz" in link):
             await ctx.send("Mega link found.... downloading from mega", delete_after=10, ephemeral=True)
@@ -192,13 +192,13 @@ class Translate(commands.Cog):
             if lang_check:
                 ids = ids[:20]
                 chk_msg = await ctx.send(embed=discord.Embed(
-                    description=f"This novel is already in our library with ids {str(ids)}...  \nDo you want to search in library...react to this message with 🇾  ...\nIf you want to continue translation react with 🇳 \n\nNote : Some files are in docx format, so file size maybe half the size of txt. and try to minimize translating if its already in library"))
+                    description=f"This novel **{name}** is already in our library with ids **{str(ids)}**...  \nDo you want to search in library...react to this message with 🇾  ...\nIf you want to continue translation react with 🇳 \n\n**Note : Some files are in docx format, so file size maybe half the size of txt. and try to minimize translating if its already in library**"))
                 await chk_msg.add_reaction('🇾')
                 await chk_msg.add_reaction('🇳')
 
                 def check(reaction, user):
                     return reaction.message.id == chk_msg.id and (
-                                str(reaction.emoji) == '🇾' or str(reaction.emoji) == '🇳') and user == ctx.author
+                            str(reaction.emoji) == '🇾' or str(reaction.emoji) == '🇳') and user == ctx.author
 
                 try:
                     res = await self.bot.wait_for(
