@@ -616,7 +616,29 @@ class Crawler(commands.Cog):
         current_link = firstchplink
         full_text = "Source : " + firstchplink + '\n\n'
         no_of_tries = 0
-        await msg.edit(content=f"> :white_check_mark:  Started crawling from 📔 {title}")
+        original_Language = FileHandler.find_language("title_name " +title)
+        if title is None or str(title).strip() == "" or title == "None":
+            title = f"{ctx.author.id}_crl"
+            title_name = firstchplink
+        else:
+            title_name = title
+            if original_Language == 'english':
+                title = str(title[:100])
+            else:
+                try:
+                    title = GoogleTranslator(
+                        source="auto", target="english"
+                    ).translate(title).strip()
+                except:
+                    pass
+                title_name = title + "__" + title_name
+                try:
+                    title = str(title[:100])
+                except:
+                    pass
+            for tag in ['/', '\\', '<', '>', "'", '"', ':', ";", '?', '|', '*', ';', '\r', '\n', '\t', '\\\\']:
+                title = title.replace(tag, '')
+        await msg.edit(content=f"> :white_check_mark:  Started crawling from 📔 {title_name}")
         crawled_urls = []
         repeats = 0
         try:
@@ -666,28 +688,7 @@ class Crawler(commands.Cog):
                 chp_count += 1
                 crawled_urls.append(current_link)
                 current_link = output[1]
-            original_Language = FileHandler.find_language(full_text)
-            if title is None or str(title).strip() == "" or title == "None":
-                title = f"{ctx.author.id}_crl"
-                title_name = firstchplink
-            else:
-                title_name = title
-                if original_Language == 'english':
-                    title = str(title[:100])
-                else:
-                    try:
-                        title = GoogleTranslator(
-                            source="auto", target="english"
-                        ).translate(title).strip()
-                    except:
-                        pass
-                    title_name = title + "__" + title_name
-                    try:
-                        title = str(title[:100])
-                    except:
-                        pass
-                for tag in ['/', '\\', '<', '>', "'", '"', ':', ";", '?', '|', '*', ';', '\r', '\n', '\t', '\\\\']:
-                    title = title.replace(tag, '')
+
             with open(title + '.txt', 'w', encoding='utf-8') as f:
                 f.write(full_text)
             return await FileHandler().crawlnsend(ctx, self.bot, title, title_name, original_Language)

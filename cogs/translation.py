@@ -49,9 +49,10 @@ class Translate(commands.Cog):
         if ctx.author.id in self.bot.blocked:
             reason = await self.bot.mongo.blocker.get_banned_user_reason(ctx.author.id)
             reason = reason['reason']
-            return await ctx.reply(content=f"You have been blocked by admins for improper usage of bot. Please contact admin \nReason : {reason}")
+            return await ctx.reply(
+                content=f"You have been blocked by admins for improper usage of bot. Please contact admin \nReason : {reason}")
         if not file and not messageid:
-            return await ctx.reply(f"> **❌Send an attachment or a link.**",)
+            return await ctx.reply(f"> **❌Send an attachment or a link.**", )
         if language not in self.bot.all_langs and "http" not in language:
             return await ctx.reply(
                 f"**❌We have the following languages in our db.**\n```ini\n{self.bot.display_langs}```"
@@ -123,7 +124,8 @@ class Translate(commands.Cog):
             resp = await self.bot.con.get(link)
             if msg is None:
                 msg = ctx.message
-            name = msg.attachments[0].filename.replace(".txt", "").replace(".docx", "").replace(".epub", "").replace(".pdf", "")
+            name = msg.attachments[0].filename.replace(".txt", "").replace(".docx", "").replace(".epub", "").replace(
+                ".pdf", "")
             file_type = resp.headers["content-type"].split("/")[-1]
         elif novel is None:
             resp = await self.bot.con.get(link)
@@ -189,12 +191,15 @@ class Translate(commands.Cog):
                     lang_check = True
             if lang_check:
                 ids = ids[:20]
-                chk_msg = await ctx.send(embed=discord.Embed(description=f"This novel is already in our library with ids {str(ids)}...  \nDo you want to search in library...react to this message with 🇾  ...\nIf you want to continue translation react with 🇳 \n\nNote : Some files are in docx format, so file size maybe half the size of txt. and try to minimize translating if its already in library"))
+                chk_msg = await ctx.send(embed=discord.Embed(
+                    description=f"This novel is already in our library with ids {str(ids)}...  \nDo you want to search in library...react to this message with 🇾  ...\nIf you want to continue translation react with 🇳 \n\nNote : Some files are in docx format, so file size maybe half the size of txt. and try to minimize translating if its already in library"))
                 await chk_msg.add_reaction('🇾')
                 await chk_msg.add_reaction('🇳')
 
                 def check(reaction, user):
-                    return reaction.message.id == chk_msg.id and (str(reaction.emoji) == '🇾' or str(reaction.emoji) == '🇳') and user == ctx.author
+                    return reaction.message.id == chk_msg.id and (
+                                str(reaction.emoji) == '🇾' or str(reaction.emoji) == '🇳') and user == ctx.author
+
                 try:
                     res = await self.bot.wait_for(
                         "reaction_add",
@@ -208,7 +213,8 @@ class Translate(commands.Cog):
                     except:
                         pass
                     await ctx.send("No response detected. sending novels in library", delete_after=10)
-                    ctx.command = await self.bot.get_command("library search").callback(Library(self.bot), ctx, name, language)
+                    ctx.command = await self.bot.get_command("library search").callback(Library(self.bot), ctx, name,
+                                                                                        language)
                     return None
                 else:
                     if str(res[0]) == '🇳':
@@ -220,10 +226,11 @@ class Translate(commands.Cog):
                             os.remove(f"{ctx.author.id}.txt")
                         except:
                             pass
-                        ctx.command = await self.bot.get_command("library search").callback(Library(self.bot), ctx, name, language)
+                        ctx.command = await self.bot.get_command("library search").callback(Library(self.bot), ctx,
+                                                                                            name, language)
                         return None
 
-        await rep_msg.edit(content=f"> **✅Translation started. Translating to {language}.**")
+        await rep_msg.edit(content=f"> **✅ Started translating {name}. Translating to {language}.**")
         try:
             try:
                 original_Language = FileHandler.find_language(novel)
@@ -256,6 +263,26 @@ class Translate(commands.Cog):
         return [app_commands.Choice(name=i, value=i) for i in lst]
 
     @commands.hybrid_command(
+        help="translate multiple files together one at a time"
+    )
+    async def multi(self, ctx: commands.Context):
+        if ctx.author.id in self.bot.blocked:
+            reason = await self.bot.mongo.blocker.get_banned_user_reason(ctx.author.id)
+            reason = reason['reason']
+            return await ctx.reply(
+                content=f"You have been blocked by admins for improper usage of bot. Please contact admin \nReason : {reason}")
+        if not ctx.message.attachments:
+            return await ctx.reply(content="> Attach a file to translate")
+        for attached in ctx.message.attachments:
+            try:
+                ctx.command = await self.bot.get_command("translate").callback(Translate(self.bot), ctx, attached.url,
+                                                                               None,
+                                                                               None,
+                                                                               "english")
+            except:
+                await ctx.send(f"> Error occurred in translating {attached.filename}")
+
+    @commands.hybrid_command(
         help="Clears any stagnant novels which were deposited for translation."
     )
     async def tclear(self, ctx: commands.Context):
@@ -274,4 +301,3 @@ class Translate(commands.Cog):
 
 async def setup(bot):
     await bot.add_cog(Translate(bot))
-
