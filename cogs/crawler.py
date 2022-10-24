@@ -428,7 +428,7 @@ class Crawler(commands.Cog):
                 title_name = "None"
         if len(urls) < 30:
             return await ctx.reply(
-                f"> **❌Provided link only got {str(len(urls))} links in the page.Check if you have provided correct Table of contents url. If there is no TOC page try using /crawlnext with first chapter and required urls"
+                f"> **❌Provided link only got **{str(len(urls))}** links in the page.Check if you have provided correct Table of contents url. If there is no TOC page try using /crawlnext with first chapter and required urls"
             )
         if 'b.faloo' in link or 'wap.faloo' in link:
             urls = urls[:200]
@@ -463,7 +463,7 @@ class Crawler(commands.Cog):
             if True:
                 ids = ids[:20]
                 chk_msg = await ctx.send(embed=discord.Embed(
-                    description=f"This novel is already in our library with ids {ids.__str__()}...  \nDo you want to search in library...React to this message with 🇾  ...\nIf you want to continue crawling react with 🇳 \n\nNote : Some files are in docx format, so file size maybe half the size of txt. and try to minimize translating if its already in library"))
+                    description=f"This novel **{title}** is already in our library with ids **{ids.__str__()}**...  \nDo you want to search in library...React to this message with 🇾  ...\nIf you want to continue crawling react with 🇳 \n\n**Note : Some files are in docx format, so file size maybe half the size of txt. and try to minimize translating if its already in library**"))
                 await chk_msg.add_reaction('🇾')
                 await chk_msg.add_reaction('🇳')
 
@@ -696,7 +696,10 @@ class Crawler(commands.Cog):
             await ctx.send("> Error occurred .Please report to admin +\n" + str(e))
             raise e
         finally:
-            del self.bot.crawler[ctx.author.id]
+            try:
+                del self.bot.crawler[ctx.author.id]
+            except:
+                pass
 
     @crawl.autocomplete("translate_to")
     async def translate_complete(
