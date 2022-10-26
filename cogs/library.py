@@ -129,6 +129,7 @@ class Library(commands.Cog):
         raw_language: str = None,
         size: float = None,
         uploader: discord.User = None,
+        shuffle: bool = True,
     ) -> None:
         msg = await ctx.send("Searching...")
         tags = [i.strip() for i in tags.split() if i] if tags else None
@@ -187,6 +188,8 @@ class Library(commands.Cog):
             await msg.delete()
             return
         allnovels = self.common_elements_finder(*valid)
+        if shuffle:
+            random.shuffle(allnovels)
         if show_list:
             embeds = await self.make_list_embed_list(allnovels)
             await msg.edit(content=f"> Found **{len(allnovels)}** novels")
