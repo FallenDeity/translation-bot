@@ -59,6 +59,8 @@ class CssSelector:
             return "#content > article ::text"
         elif "fanqienovel.com" in link:
             return "div.muye-reader-content.noselect ::text"
+        elif "m.shubaow.net" in link:
+            return "#nr1 ::text"
             # return "#ch-page-container > div > div.col-lg-8.content2 > div > div.chapter-content3 > div.desc ::text"
         else:
             return "* ::text"
@@ -108,5 +110,7 @@ class CssSelector:
             return "#ch-page-container > div > div.col-lg-8.content2 > div > div:nth-child(6) > ul > li:nth-child(3) > a"
         elif "www.youyoukanshu.com" in link:
             return "#content > div.page.hidden-xs.hidden-sm > a:nth-child(3)"
+        elif "m.shubaow.net" in link:
+            return "#novelcontent > div.page_chapter > ul > li:nth-child(4) > a"
         else:
             return None

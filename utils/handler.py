@@ -191,6 +191,7 @@ class FileHandler:
             self, bot: Raizel, ctx: commands.Context, name: str, language: str, original_language: str, raw_name: str
     ) -> None:
         download_url = None
+        next_no = await bot.mongo.library.next_number
         if (size := os.path.getsize(f"{ctx.author.id}.txt")) > 8 * 10 ** 6:
             try:
                 await ctx.send(
@@ -215,7 +216,7 @@ class FileHandler:
                     ) or await bot.fetch_channel(1005668482475643050)
                 user = str(ctx.author)
                 await channel.send(
-                    f"> {name.replace('_', ' ')} \nuploaded by {user} {ctx.author.mention} Translated from: {original_language} to: {language}",
+                    f"> **#{next_no}** {name.replace('_', ' ')} \nuploaded by {user} {ctx.author.mention} Translated from: {original_language} to: {language}",
                     view=view, allowed_mentions=discord.AllowedMentions(users=False)
                 )
                 download_url = filelnk
@@ -238,7 +239,7 @@ class FileHandler:
                 ) or await bot.fetch_channel(1005668482475643050)
             user = str(ctx.author)
             msg = await channel.send(
-                f'> {name.replace("_", " ")} \nUploaded by {user} {ctx.author.mention} Translated from: {original_language} to: {language}',
+                f'> **#{next_no}** {name.replace("_", " ")} \nUploaded by {user} {ctx.author.mention} Translated from: {original_language} to: {language}',
                 file=discord.File(f"{ctx.author.id}.txt", f"{name}.txt"), allowed_mentions=discord.AllowedMentions(users=False)
             )
             os.remove(f"{ctx.author.id}.txt")
@@ -251,7 +252,7 @@ class FileHandler:
             name = name + "__" + raw_name
         if download_url and size > 0.3 * 10 ** 6:
             novel_data = [
-                await bot.mongo.library.next_number,
+                next_no,
                 name,
                 "",
                 0,
@@ -270,6 +271,7 @@ class FileHandler:
             self, ctx: commands.Context, bot: Raizel, title: str, title_name: str, originallanguage: str
     ) -> str:
         download_url = None
+        next_no = await bot.mongo.library.next_number
         if (size := os.path.getsize(f"{title}.txt")) > 8 * 10 ** 6:
             if size > 25 * 10 ** 6 and int(bot.crawler[ctx.author.id].split("/")[1]) < 2000:
                 os.remove(f"{title}.txt")
@@ -291,7 +293,7 @@ class FileHandler:
                 ) or await bot.fetch_channel(1020980703229382706)
                 user = str(ctx.author)
                 await channel.send(
-                    f"> {title_name} \nCrawled by {user} {ctx.author.mention} Source language : {originallanguage}",
+                    f"> **#{next_no}** {title_name} \nCrawled by {user} {ctx.author.mention} Source language : {originallanguage}",
                     view=view, allowed_mentions=discord.AllowedMentions(users=False)
                 )
                 download_url = filelnk
@@ -307,7 +309,7 @@ class FileHandler:
             ) or await bot.fetch_channel(1020980703229382706)
             user = str(ctx.author)
             msg = await channel.send(
-                f'> {title_name} \nCrawled by {user} {ctx.author.mention} Source language : {originallanguage} ',
+                f'> **#{next_no}** {title_name} \nCrawled by {user} {ctx.author.mention} Source language : {originallanguage} ',
                 file=discord.File(f"{title}.txt"), allowed_mentions=discord.AllowedMentions(users=False)
             )
             download_url = msg.attachments[0].url
@@ -318,7 +320,7 @@ class FileHandler:
                 pass
         if download_url and size > 0.3 * 10 ** 6:
             novel_data = [
-                await bot.mongo.library.next_number,
+                next_no,
                 title_name,
                 "",
                 0,
