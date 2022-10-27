@@ -13,6 +13,7 @@ from databases.data import Novel
 class Library(commands.Cog):
     def __init__(self, bot: Raizel) -> None:
         self.bot = bot
+        self.sorted_data: list = ["_id", "title", "rating", "size", "uploader", "date"]
 
     @staticmethod
     def common_elements_finder(*args):
@@ -73,13 +74,13 @@ class Library(commands.Cog):
         if not data.org_language.lower() == 'na':
             embed.add_field(name="Raw Language", value=data.org_language)
         embed.add_field(name="Language", value=data.language)
-        embed.add_field(name="Size", value=f"{round(data.size/(1024**2), 2)} MB")
+        embed.add_field(name="Size", value=f"{round(data.size / (1024 ** 2), 2)} MB")
         uploader = self.bot.get_user(data.uploader) or await self.bot.fetch_user(
             data.uploader
         )
         embed.set_thumbnail(url=self.bot.user.display_avatar)
         embed.set_footer(
-            text=f"ON {datetime.datetime.fromtimestamp(data.date).strftime('%m/%d/%Y, %H:%M:%S')} • {uploader} • {'⭐'*int(data.rating)}",
+            text=f"ON {datetime.datetime.fromtimestamp(data.date).strftime('%m/%d/%Y, %H:%M:%S')} • {uploader} • {'⭐' * int(data.rating)}",
             icon_url=uploader.display_avatar,
         )
         return embed
@@ -118,31 +119,34 @@ class Library(commands.Cog):
 
     @library.command(name="search", help="searches a novel in library.")
     async def search(
-        self,
-        ctx: commands.Context,
-        title: str = None,
-        language: str = None,
-        rating: int = None,
-        show_list: bool = False,
-        *,
-        tags: str = None,
-        raw_language: str = None,
-        size: float = None,
-        uploader: discord.User = None,
-        shuffle: bool = True,
+            self,
+            ctx: commands.Context,
+            title: str = None,
+            language: str = None,
+            rating: int = None,
+            show_list: bool = False,
+            *,
+            tags: str = None,
+            raw_language: str = None,
+            size: float = None,
+            uploader: discord.User = None,
+            shuffle: bool = True,
+            sort_by: str = None,
     ) -> None:
         msg = await ctx.send("Searching...")
         tags = [i.strip() for i in tags.split() if i] if tags else None
         if (
-            title is None
-            and language is None
-            and rating is None
-            and tags is None
-            and raw_language is None
-            and size is None
-            and uploader is None
+                title is None
+                and language is None
+                and rating is None
+                and tags is None
+                and raw_language is None
+                and size is None
+                and uploader is None
         ):
             novels = await self.bot.mongo.library.get_all_novels
+            if shuffle and sort_by is None:
+                random.shuffle(novels)
             if show_list:
                 embeds = await self.make_list_embed_list(novels)
                 await msg.edit(content=f"> Found {len(novels)} novels")
@@ -188,8 +192,27 @@ class Library(commands.Cog):
             await msg.delete()
             return
         allnovels = self.common_elements_finder(*valid)
-        if shuffle:
+        if shuffle and sort_by is None:
             random.shuffle(allnovels)
+        if sort_by is not None:
+            if sort_by not in self.sorted_data:
+                await ctx.send(f"> **Given sort by is not present in bot. available filters \n {self.sorted_data}**")
+            else:
+                if sort_by == "_id":
+                    allnovels.sort(key=lambda x: x._id)
+                elif sort_by == "title":
+                    allnovels.sort(key=lambda x: x.title)
+                elif sort_by == "rating":
+                    allnovels.sort(key=lambda x: x.rating)
+                    allnovels.reverse()
+                elif sort_by == "size":
+                    allnovels.sort(key=lambda x: x.size)
+                    allnovels.reverse()
+                elif sort_by == "uploader":
+                    allnovels.sort(key=lambda x: x.uploader)
+                elif sort_by == "date":
+                    allnovels.sort(key=lambda x: x.date)
+                    allnovels.reverse()
         if show_list:
             embeds = await self.make_list_embed_list(allnovels)
             await msg.edit(content=f"> Found **{len(allnovels)}** novels")
@@ -198,7 +221,7 @@ class Library(commands.Cog):
             embeds = await self.make_list_embed(allnovels)
             await msg.edit(content=f"> Found **{len(embeds)}** novels")
             await self.buttons(embeds, ctx)
-    
+
     @library.command(name="random", help="Gives 10 random novel in library.")
     async def random(
             self,
@@ -217,31 +240,38 @@ class Library(commands.Cog):
 
     @search.autocomplete("language")
     async def translate_complete(
-        self, inter: discord.Interaction, language: str
+            self, inter: discord.Interaction, language: str
     ) -> list[app_commands.Choice]:
         lst = [i for i in self.bot.all_langs if language.lower() in i.lower()][:25]
         return [app_commands.Choice(name=i, value=i) for i in lst]
 
+    @search.autocomplete("sort_by")
+    async def translate_complete(
+            self, inter: discord.Interaction, language: str
+    ) -> list[app_commands.Choice]:
+        lst = self.sorted_data
+        return [app_commands.Choice(name=i, value=i) for i in lst]
+
     @search.autocomplete("tags")
     async def translate_complete(
-        self, inter: discord.Interaction, tag: str
+            self, inter: discord.Interaction, tag: str
     ) -> list[app_commands.Choice]:
         lst = [
-            i
-            for i in await self.bot.mongo.library.get_all_tags
-            if tag.lower() in i.lower()
-        ][:25]
+                  i
+                  for i in await self.bot.mongo.library.get_all_tags
+                  if tag.lower() in i.lower()
+              ][:25]
         return [app_commands.Choice(name=i, value=i) for i in lst]
 
     @search.autocomplete("title")
     async def translate_complete(
-        self, inter: discord.Interaction, title: str
+            self, inter: discord.Interaction, title: str
     ) -> list[app_commands.Choice]:
         lst = [
-            str(i[:90]).strip()
-            for i in self.bot.titles
-            if title.lower() in i.lower()
-        ][:25]
+                  str(i[:90]).strip()
+                  for i in self.bot.titles
+                  if title.lower() in i.lower()
+              ][:25]
         # print(lst)
         return [app_commands.Choice(name=i, value=i) for i in lst]
 
@@ -256,7 +286,7 @@ class Library(commands.Cog):
 
     @library.command(name="review", help="reviews a novel.")
     async def review(
-        self, ctx: commands.Context, _id: int, rating: int, summary: str
+            self, ctx: commands.Context, _id: int, rating: int, summary: str
     ) -> None:
         if not 0 <= rating <= 5:
             await ctx.send("Rating must be between 0 and 5.")
