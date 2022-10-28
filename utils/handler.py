@@ -252,7 +252,7 @@ class FileHandler:
             name = name + "__" + raw_name
         if download_url and size > 0.3 * 10 ** 6:
             novel_data = [
-                next_no,
+                await bot.mongo.library.next_number,
                 name,
                 "",
                 0,
@@ -320,7 +320,7 @@ class FileHandler:
                 pass
         if download_url and size > 0.3 * 10 ** 6:
             novel_data = [
-                next_no,
+                await bot.mongo.library.next_number,
                 title_name,
                 "",
                 0,
