@@ -280,7 +280,7 @@ class Translate(commands.Cog):
             return await ctx.reply(content="> Attach a file to translate")
         count = 1
         for attached in message.attachments:
-            await ctx.send(f"**Translating {count} out of {len(message.attachments)}")
+            await ctx.send(f"**Translating {count} out of {len(message.attachments)}**")
             count = count + 1
             await asyncio.sleep(0.5)
             try:
