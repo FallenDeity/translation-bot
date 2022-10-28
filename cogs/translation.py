@@ -265,15 +265,24 @@ class Translate(commands.Cog):
     @commands.hybrid_command(
         help="translate multiple files together one at a time"
     )
-    async def multi(self, ctx: commands.Context):
+    async def multi(self, ctx: commands.Context, messageid: int = None):
+        if messageid:
+            channel = self.bot.get_channel(ctx.channel.id)
+            message = await channel.fetch_message(messageid)
+        else:
+            message = ctx.message
         if ctx.author.id in self.bot.blocked:
             reason = await self.bot.mongo.blocker.get_banned_user_reason(ctx.author.id)
             reason = reason['reason']
             return await ctx.reply(
                 content=f"You have been blocked by admins for improper usage of bot. Please contact admin \nReason : {reason}")
-        if not ctx.message.attachments:
+        if not message.attachments:
             return await ctx.reply(content="> Attach a file to translate")
-        for attached in ctx.message.attachments:
+        count = 1
+        for attached in message.attachments:
+            await ctx.send(f"**Translating {count} out of {len(message.attachments)}")
+            count = count + 1
+            await asyncio.sleep(0.5)
             try:
                 ctx.command = await self.bot.get_command("translate").callback(Translate(self.bot), ctx, attached.url,
                                                                                None,
