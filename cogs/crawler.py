@@ -198,6 +198,7 @@ class Crawler(commands.Cog):
     async def crawl(
             self, ctx: commands.Context, link: str = None, reverse: str = None, selector: str = None,
             cloudscrape: bool = False,
+            max_chapters: int = None,
             translate_to: str = None
     ) -> typing.Optional[discord.Message]:
         if ctx.author.id in self.bot.crawler:
@@ -222,6 +223,8 @@ class Crawler(commands.Cog):
         if "69shu" in link and "txt" in link:
             link = link.replace("/txt", "")
             link = link.replace(".htm", "/")
+        if "krmtl.com" in link and max_chapters is None:
+            return await ctx.reply("> **Provide max_chapters value in slash command for this site to be crawled**")
         if "ptwxz" in link and "bookinfo" in link:
             link = link.replace("bookinfo", "html")
             link = link.replace(".html", "/")
@@ -429,6 +432,12 @@ class Crawler(commands.Cog):
                 title_name = str(soup.select(maintitleCSS)[0].text)
             except:
                 title_name = "None"
+        if "krmtl.com" in link:
+            urls = []
+            for i in range(1, max_chapters+1):
+                temp_link = link + "/" + str(i)
+                urls.append(temp_link)
+
         if len(urls) < 30:
             return await ctx.reply(
                 f"> **❌Provided link only got **{str(len(urls))}** links in the page.Check if you have provided correct Table of contents url. If there is no TOC page try using /crawlnext with first chapter and required urls"
@@ -437,6 +446,8 @@ class Crawler(commands.Cog):
             urls = urls[:200]
         if reverse is not None:
             urls.reverse()
+        if max_chapters is not None:
+            urls = urls[:max_chapters]
         for tag in ['/', '\\', '!', '<', '>', "'", '"', ':', ";", '?', '|', '*', ';', '\r', '\n', '\t', '\\\\']:
             title_name = title_name.replace(tag, '')
         title_name = title_name.replace('_', ' ')
