@@ -117,7 +117,7 @@ class Library(commands.Cog):
         if ctx.invoked_subcommand is None:
             await ctx.send_help(ctx.command)
 
-    @library.command(name="search", help="searches a novel in library.")
+    @library.command(name="search", help="searches a novel in library. Shuffle is turned on by default. Use sort_by for sorting novels")
     async def search(
             self,
             ctx: commands.Context,
