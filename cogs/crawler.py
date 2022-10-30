@@ -572,6 +572,8 @@ class Crawler(commands.Cog):
             if nextselector is not None:
                 secondchplink = None
                 cloudscrape = True
+            if "fannovels.com" in firstchplink:
+                cloudscrape = False
         if secondchplink is None and nextselector is None:
             return await ctx.send("You must give second chapter link or next page css selector")
         msg = await ctx.send("Crawling will be started soon")
