@@ -205,12 +205,12 @@ class Crawler(commands.Cog):
             return await ctx.reply(
                 "> **❌You cannot crawl two novels at the same time.**"
             )
+        if link is None:
+            return await ctx.reply(f"> **❌Enter a link for crawling.**")
         allowed = self.bot.allowed
         next_sel = CssSelector.find_next_selector(link)
         if next_sel is not None:
             return await ctx.reply("> **Provided site is found in crawl_next available sites. This site doesn't have TOC page........ so proceed with /crawlnext or .tcrawlnext <first_chapter_link>**")
-        if link is None:
-            return await ctx.reply(f"> **❌Enter a link for crawling.**")
         msg = await ctx.reply('Started crawling please wait')
         num = 0
         for i in allowed:
