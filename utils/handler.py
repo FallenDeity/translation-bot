@@ -82,6 +82,8 @@ class FileHandler:
         name = name.replace("-", "_")
         name = name.replace(" ", "_")
         name = name.replace("%20", "_")
+        name = name.replace("Chapter", "")
+        name = name.replace("chapter", "")
         spl = name.split("_")
         dictionary = PyDictionary()
         segment = 0
