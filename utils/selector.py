@@ -74,6 +74,8 @@ class CssSelector:
                 or "jpxs" in link
         ):
             return [".infos>h1:first-child", ""]
+        if "txt520" in link:
+            return ["h1", ""]
         if "bixiange" in link:
             return [".desc>h1", ""]
         if "powanjuan" in link or "ffxs" in link:
