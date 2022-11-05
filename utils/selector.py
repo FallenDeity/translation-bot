@@ -107,20 +107,20 @@ class CssSelector:
 
     def find_next_selector(link):
         if "readwn" in link or "wuxiax.co" in link or "novelmt.com" in link or "fannovels.com" in link:
-            return "#chapter-article > header > div > aside > nav > div.action-select > a.chnav.next"
+            return ["#chapter-article > header > div > aside > nav > div.action-select > a.chnav.next", "#chapter-article > header > div > div > h1 > a"]
         elif "novelfull.com" in link:
-            return "#next_chap"
+            return ["#next_chap", "#chapter > div > div > a"]
         elif "novelroom.net" in link:
-            return "#manga-reading-nav-foot > div > div.select-pagination > div > div.nav-next > a"
+            return ["#manga-reading-nav-foot > div > div.select-pagination > div > div.nav-next > a", "#manga-reading-nav-head > div > div.entry-header_wrap > div > div.c-breadcrumb > ol > li:nth-child(2) > a"]
         elif "readlightnovel" in link:
-            return "#ch-page-container > div > div.col-lg-8.content2 > div > div:nth-child(6) > ul > li:nth-child(3) > a"
+            return ["#ch-page-container > div > div.col-lg-8.content2 > div > div:nth-child(6) > ul > li:nth-child(3) > a", "#ch-page-container > div > div.col-lg-8.content2 > div > div:nth-child(1) > div > div > h1"]
         elif "www.youyoukanshu.com" in link:
-            return "#content > div.page.hidden-xs.hidden-sm > a:nth-child(3)"
+            return ["#content > div.page.hidden-xs.hidden-sm > a:nth-child(3)", "#content > div.readtop > div.pull-left.hidden-lg > a > font > font"]
         elif "m.shubaow.net" in link:
-            return "#novelcontent > div.page_chapter > ul > li:nth-child(4) > a"
+            return ["#novelcontent > div.page_chapter > ul > li:nth-child(4) > a", "#novelbody > div.head > div.nav_name > h1 > font > font"]
         elif "m.xindingdianxsw.com" in link:
-            return "#chapter > div:nth-child(9) > a:nth-child(3)"
+            return ["#chapter > div:nth-child(9) > a:nth-child(3)", "#chapter > div.path > a:nth-child(2)"]
         elif "www.xindingdianxsw.com" in link:
-            return "#A3"
+            return ["#A3", "div.con_top > a:nth-child(3)"]
         else:
-            return None
+            return [None, "title"]
