@@ -61,6 +61,10 @@ class CssSelector:
             return "div.muye-reader-content.noselect ::text"
         elif "m.shubaow.net" in link:
             return "#nr1 ::text"
+        elif "m.xindingdianxsw.com" in link:
+            return "#chapter > div.axddxsw_e6365bd5 ::text"
+        elif "www.xindingdianxsw.com/" in link:
+            return "p ::text"
             # return "#ch-page-container > div > div.col-lg-8.content2 > div > div.chapter-content3 > div.desc ::text"
         else:
             return "* ::text"
@@ -114,5 +118,9 @@ class CssSelector:
             return "#content > div.page.hidden-xs.hidden-sm > a:nth-child(3)"
         elif "m.shubaow.net" in link:
             return "#novelcontent > div.page_chapter > ul > li:nth-child(4) > a"
+        elif "m.xindingdianxsw.com" in link:
+            return "#chapter > div:nth-child(9) > a:nth-child(3)"
+        elif "www.xindingdianxsw.com" in link:
+            return "#A3"
         else:
             return None
