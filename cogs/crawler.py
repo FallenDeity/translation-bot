@@ -209,7 +209,7 @@ class Crawler(commands.Cog):
             return await ctx.reply(f"> **❌Enter a link for crawling.**")
         allowed = self.bot.allowed
         next_sel = CssSelector.find_next_selector(link)
-        if next_sel is not None:
+        if next_sel[0] is not None:
             return await ctx.reply("> **Provided site is found in crawl_next available sites. This site doesn't have TOC page........ so proceed with /crawlnext or .tcrawlnext <first_chapter_link>**")
         msg = await ctx.reply('Started crawling please wait')
         num = 0
@@ -567,9 +567,12 @@ class Crawler(commands.Cog):
             return await ctx.reply(
                 "> **❌You cannot crawl two novels at the same time.**"
             )
+        title_css = "title"
         if nextselector is None:
-            nextselector = CssSelector.find_next_selector(firstchplink)
-            if nextselector is not None:
+            nextsel = CssSelector.find_next_selector(firstchplink)
+            if nextsel[0] is not None:
+                nextselector = nextsel[0]
+                title_css = nextsel[1]
                 secondchplink = None
                 cloudscrape = True
             if "fannovels.com" in firstchplink:
@@ -626,7 +629,11 @@ class Crawler(commands.Cog):
             href = [i for i in soup.find_all("a") if i.get("href") == psrt]
             # print(href)
             path = self.xpath_soup(href[0])
-        title = sel.css('title ::text').extract_first()
+
+        title = sel.css(f'{title_css} ::text').extract_first()
+        if title is None or str(title).strip() == "":
+            print(f"title empty {title}")
+            title = sel.css(f'title ::text').extract_first()
         chp_count = 1
         # print(title)
         current_link = firstchplink
@@ -654,6 +661,53 @@ class Crawler(commands.Cog):
                     pass
             for tag in ['/', '\\', '<', '>', "'", '"', ':', ";", '?', '|', '*', ';', '\r', '\n', '\t', '\\\\']:
                 title = title.replace(tag, '')
+        novel_data = await self.bot.mongo.library.get_novel_by_name(title_name.split('__')[0])
+        # print(title_name)
+        if novel_data is not None:
+            novel_data = list(novel_data)
+            ids = []
+            for n in novel_data:
+                ids.append(n._id)
+            if True:
+                ids = ids[:20]
+                chk_msg = await ctx.send(embed=discord.Embed(
+                    description=f"This novel **{title}** is already in our library with ids **{ids.__str__()}**...  \nDo you want to search in library...React to this message with 🇾  ...\nIf you want to continue crawling react with 🇳 \n\n**Note : Some files are in docx format, so file size maybe half the size of txt. and try to minimize translating if its already in library**"))
+                await chk_msg.add_reaction('🇾')
+                await chk_msg.add_reaction('🇳')
+
+                def check(reaction, user):
+                    return reaction.message.id == chk_msg.id and (
+                            str(reaction.emoji) == '🇾' or str(reaction.emoji) == '🇳') and user == ctx.author
+
+                try:
+                    res = await self.bot.wait_for(
+                        "reaction_add",
+                        check=check,
+                        timeout=15.0,
+                    )
+                except asyncio.TimeoutError:
+                    print(' Timeout error')
+                    try:
+                        os.remove(f"{ctx.author.id}.txt")
+                    except:
+                        pass
+                    await ctx.send("No response detected. sending novels in library", delete_after=10)
+                    ctx.command = await self.bot.get_command("library search").callback(Library(self.bot), ctx,
+                                                                                        title_name.split('__')[0])
+                    return None
+                else:
+                    await ctx.send("Reaction received", delete_after=10)
+                    if str(res[0]) == '🇳':
+                        msg = await ctx.reply("Reaction received.. please wait")
+                    else:
+                        await ctx.send("Reaction received", delete_after=10)
+                        try:
+                            os.remove(f"{ctx.author.id}.txt")
+                        except:
+                            pass
+                        ctx.command = await self.bot.get_command("library search").callback(Library(self.bot), ctx,
+                                                                                            title_name.split('__')[0])
+                        return None
         await msg.edit(content=f"> :white_check_mark:  Started crawling from 📔 {title_name}")
         crawled_urls = []
         repeats = 0
@@ -706,6 +760,7 @@ class Crawler(commands.Cog):
 
             with open(title + '.txt', 'w', encoding='utf-8') as f:
                 f.write(full_text)
+            await ctx.send(f"> crawled {i} chapters or pages")
             return await FileHandler().crawlnsend(ctx, self.bot, title, title_name, original_Language)
         except Exception as e:
             await ctx.send("> Error occurred .Please report to admin +\n" + str(e))
