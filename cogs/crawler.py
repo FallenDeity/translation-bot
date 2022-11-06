@@ -20,6 +20,7 @@ from discord.ext import commands
 from readabilipy import simple_json_from_html_string
 
 from cogs.library import Library
+from cogs.termer import Termer
 from cogs.translation import Translate
 from core.bot import Raizel
 from utils.handler import FileHandler
@@ -198,8 +199,9 @@ class Crawler(commands.Cog):
     async def crawl(
             self, ctx: commands.Context, link: str = None, reverse: str = None, selector: str = None,
             cloudscrape: bool = False,
+            translate_to: str = None,
+            add_terms: str = None,
             max_chapters: int = None,
-            translate_to: str = None
     ) -> typing.Optional[discord.Message]:
         if ctx.author.id in self.bot.crawler:
             return await ctx.reply(
@@ -210,7 +212,8 @@ class Crawler(commands.Cog):
         allowed = self.bot.allowed
         next_sel = CssSelector.find_next_selector(link)
         if next_sel[0] is not None:
-            return await ctx.reply("> **Provided site is found in crawl_next available sites. This site doesn't have TOC page........ so proceed with /crawlnext or .tcrawlnext <first_chapter_link>**")
+            return await ctx.reply(
+                "> **Provided site is found in crawl_next available sites. This site doesn't have TOC page........ so proceed with /crawlnext or .tcrawlnext <first_chapter_link>**")
         msg = await ctx.reply('Started crawling please wait')
         num = 0
         for i in allowed:
@@ -434,7 +437,7 @@ class Crawler(commands.Cog):
                 title_name = "None"
         if "krmtl.com" in link:
             urls = []
-            for i in range(1, max_chapters+1):
+            for i in range(1, max_chapters + 1):
                 temp_link = link + "/" + str(i)
                 urls.append(temp_link)
 
@@ -516,7 +519,8 @@ class Crawler(commands.Cog):
                         return None
         try:
             self.bot.crawler[ctx.author.id] = f"0/{len(urls)}"
-            await msg.edit(content=f"> **:white_check_mark: Started Crawling the novel --  📔   {title_name.split('__')[0].strip()}.**")
+            await msg.edit(
+                content=f"> **:white_check_mark: Started Crawling the novel --  📔   {title_name.split('__')[0].strip()}.**")
             book = await self.bot.loop.run_in_executor(
                 None, self.direct, urls, novel, ctx.author.id, cloudscrape
             )
@@ -537,12 +541,23 @@ class Crawler(commands.Cog):
             del self.bot.crawler[ctx.author.id]
             self.bot.titles.append(name)
             self.bot.titles = random.sample(self.bot.titles, len(self.bot.titles))
-        if translate_to is not None and download_url is not None and not download_url.strip() == "":
+        if (
+                translate_to is not None or add_terms is not None) and download_url is not None and not download_url.strip() == "":
+            if translate_to is None:
+                translate_to = "english"
             if translate_to not in self.bot.all_langs and original_Language not in ["english", "en"]:
                 translate_to = "english"
-            ctx.command = await self.bot.get_command("translate").callback(Translate(self.bot), ctx, download_url, None,
-                                                                           None,
-                                                                           translate_to, title_name[:100])
+            if add_terms is not None:
+                ctx.command = await self.bot.get_command("termer").callback(Termer(self.bot), ctx, add_terms,
+                                                                            download_url,
+                                                                            None,
+                                                                            None,
+                                                                            translate_to, title_name[:100])
+            else:
+                ctx.command = await self.bot.get_command("translate").callback(Translate(self.bot), ctx, download_url,
+                                                                               None,
+                                                                               None,
+                                                                               translate_to, title_name[:100])
 
     @commands.hybrid_command(
         help="Clears any stagnant novels which were deposited for crawling."
@@ -639,7 +654,7 @@ class Crawler(commands.Cog):
         current_link = firstchplink
         full_text = "Source : " + firstchplink + '\n\n'
         no_of_tries = 0
-        original_Language = FileHandler.find_language("title_name " +title)
+        original_Language = FileHandler.find_language("title_name " + title)
         if title is None or str(title).strip() == "" or title == "None":
             title = f"{ctx.author.id}_crl"
             title_name = firstchplink
@@ -712,7 +727,7 @@ class Crawler(commands.Cog):
         crawled_urls = []
         repeats = 0
         try:
-            self.bot.crawler[ctx.author.id] =f"0/{noofchapters}"
+            self.bot.crawler[ctx.author.id] = f"0/{noofchapters}"
             for i in range(1, noofchapters):
                 if self.bot.crawler[ctx.author.id] == "break":
                     return await ctx.send("> **Stopped Crawling...")
@@ -735,7 +750,7 @@ class Crawler(commands.Cog):
                     output = await self.getcontent(current_link, css, path, self.bot, sel_tag, scraper)
                     chp_text = output[0]
                 except Exception as e:
-                    if i <=10:
+                    if i <= 10:
                         print(e)
                         return await ctx.send(f"Error occurred in crawling \n Error occurred at {current_link}")
                     else:
@@ -776,6 +791,22 @@ class Crawler(commands.Cog):
             self, inter: discord.Interaction, language: str
     ) -> list[app_commands.Choice]:
         lst = [i for i in self.bot.all_langs if language.lower() in i.lower()][:25]
+        return [app_commands.Choice(name=i, value=i) for i in lst]
+
+    @crawl.autocomplete("add_terms")
+    async def translate_complete(
+            self, inter: discord.Interaction, term: str
+    ) -> list[app_commands.Choice]:
+        lst = [
+                  "naruto",
+                  "one-piece",
+                  "pokemon",
+                  "mixed",
+                  "prince-of-tennis",
+                  "marvel",
+                  "dc",
+                  "xianxia",
+              ] + list(map(str, range(1, 8)))
         return [app_commands.Choice(name=i, value=i) for i in lst]
 
 

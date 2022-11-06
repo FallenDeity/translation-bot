@@ -12,8 +12,15 @@ from discord.ext import commands
 from cogs.library import Library
 from core.bot import Raizel
 from core.views.linkview import LinkView
+from languages.terms import terms
 from utils.handler import FileHandler
 from utils.translate import Translator
+
+
+def term_raw(text, term_dict):
+    for i in term_dict:
+        text = text.replace(i, term_dict[i])
+    return text
 
 
 class Translate(commands.Cog):
@@ -237,6 +244,11 @@ class Translate(commands.Cog):
             except:
                 original_Language = 'NA'
             os.remove(f"{ctx.author.id}.txt")
+            poke_words = ["elves", "pokemon", "pokémon", "elf"]
+            if any(word in name.lower() for word in poke_words):
+                term_dict = terms("pokemon")
+                novel = term_raw(novel, term_dict)
+                await ctx.send("Added pokemon terms", delete_after=5)
             liz = [novel[i: i + 1800] for i in range(0, len(novel), 1800)]
             self.bot.translator[ctx.author.id] = f"0/{len(liz)}"
             translate = Translator(self.bot, ctx.author.id, language)
