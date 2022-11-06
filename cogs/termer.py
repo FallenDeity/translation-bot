@@ -67,7 +67,7 @@ class Termer(commands.Cog):
         if link is not None and ("discord.com/channels" in link or link.isnumeric()):
             messageid = link
             link = None
-        if ctx.message.attachments:
+        if ctx.message.attachments and not str(link).startswith("https://cdn.discordapp.com"):
             link = ctx.message.attachments[0].url
         elif messageid is None and ("mega.nz" in link or "mega.co.nz" in link):
             await ctx.send("Mega link found.... downloading from mega", delete_after=5)
@@ -134,7 +134,7 @@ class Termer(commands.Cog):
                 f"1 : Naruto \n\t2 : One-Piece \n\t3 : Pokemon\n\t4 : Mixed anime terms\n\t"
                 f"5 : Prince of Tennis\n\t6 : Anime + Marvel + DC\n\t7 : Cultivation terms\n\t"
             )
-        if "discord" in link:
+        if "discord" in link and "cdn.discord" not in link:
             if msg is None:
                 msg = ctx.message
             resp = await self.bot.con.get(link)
