@@ -1,3 +1,4 @@
+import asyncio
 import datetime
 import os
 import random
@@ -26,6 +27,7 @@ def chapter_to_str(chapter):
     sel = parsel.Selector(str(chapter.get_content().decode()))
     text = sel.css("* ::text").extract()
     return "\n".join(text)
+
 
 class FileHandler:
     ENCODING: list[str] = ["utf-8", "cp936", "utf-16", "cp949"]
@@ -119,7 +121,7 @@ class FileHandler:
 
     @staticmethod
     async def epub_to_txt(ctx: commands.Context):
-        msg=await ctx.reply("> **Epub file detected please wait till we finish converting to .txt")
+        msg = await ctx.reply("> **Epub file detected please wait till we finish converting to .txt")
         book = epub.read_epub(f"{ctx.author.id}.epub")
         items = list(book.get_items_of_type(ebooklib.ITEM_DOCUMENT))
         text = ""
@@ -242,7 +244,8 @@ class FileHandler:
             user = str(ctx.author)
             msg = await channel.send(
                 f'> **#{next_no}** {name.replace("_", " ")} \nUploaded by {user} {ctx.author.mention} Translated from: {original_language} to: {language}',
-                file=discord.File(f"{ctx.author.id}.txt", f"{name}.txt"), allowed_mentions=discord.AllowedMentions(users=False)
+                file=discord.File(f"{ctx.author.id}.txt", f"{name}.txt"),
+                allowed_mentions=discord.AllowedMentions(users=False)
             )
             os.remove(f"{ctx.author.id}.txt")
             try:
@@ -267,7 +270,20 @@ class FileHandler:
                 original_language,
             ]
             data = Novel(*novel_data)
-            await bot.mongo.library.add_novel(data)
+            try:
+                await bot.mongo.library.add_novel(data)
+            except:
+                loop = True
+                no_of_tries = 0
+                while loop and no_of_tries < 6:
+                    print(f"couldn't add to library... trying for {no_of_tries + 2} times")
+                    try:
+                        await asyncio.sleep(3)
+                        data[0] = await bot.mongo.library.next_number
+                        await bot.mongo.library.add_novel(data)
+                        loop = False
+                    except:
+                        no_of_tries += 1
 
     async def crawlnsend(
             self, ctx: commands.Context, bot: Raizel, title: str, title_name: str, originallanguage: str
@@ -335,5 +351,18 @@ class FileHandler:
                 originallanguage,
             ]
             data = Novel(*novel_data)
-            await bot.mongo.library.add_novel(data)
+            try:
+                await bot.mongo.library.add_novel(data)
+            except:
+                loop = True
+                no_of_tries = 0
+                while loop and no_of_tries < 6:
+                    print(f"couldn't add to library... trying for {no_of_tries+2} times")
+                    try:
+                        await asyncio.sleep(3)
+                        data[0] = await bot.mongo.library.next_number
+                        await bot.mongo.library.add_novel(data)
+                        loop = False
+                    except:
+                        no_of_tries += 1
         return download_url

@@ -1,4 +1,4 @@
-def terms(value):
+def terms(value: str):
     term_dict = {}
 
     if value == "1" or str(value).lower() == "naruto":
