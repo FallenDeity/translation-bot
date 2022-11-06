@@ -304,7 +304,7 @@ class FileHandler:
                 await ctx.reply("> **❌Sorry the file is too big to send.**")
             os.remove(f"{title}.txt")
         else:
-            file = discord.File(f"{title}.txt", f"{title_name}.txt")
+            file = discord.File(f"{title}.txt", f"{title_name[:100]}.txt")
             await ctx.reply("**🎉Here is your crawled novel**", file=file)
             channel = bot.get_channel(
                 1020980703229382706
