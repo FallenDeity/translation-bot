@@ -244,7 +244,7 @@ class Translate(commands.Cog):
             except:
                 original_Language = 'NA'
             os.remove(f"{ctx.author.id}.txt")
-            poke_words = ["elves", "pokemon", "pokémon", "elf"]
+            poke_words = ["elves ", "pokemon", "pokémon", " elf "]
             if any(word in name.lower() for word in poke_words):
                 term_dict = terms("pokemon")
                 novel = term_raw(novel, term_dict)
