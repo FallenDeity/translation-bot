@@ -114,6 +114,7 @@ class Crawler(commands.Cog):
         try:
             if scraper is not None:
                 response = await self.bot.loop.run_in_executor(None, self.scrape, scraper, links)
+                response.encoding = response.apparent_encoding
                 soup = BeautifulSoup(response.text, "html.parser", from_encoding=response.encoding)
                 if response.status_code == 404:
                     return ['error', links]
