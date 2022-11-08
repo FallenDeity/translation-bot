@@ -53,18 +53,18 @@ class CssSelector:
             return "#chapterContent ::text"
             #         elif "read.qidian" in link or "book.qidian" in link or "www.qidian" in link:
             #             return "p ::text"
-        elif "m.xklxsw.com" in link:
-            return "#nr1 ::text"
         elif "www.youyoukanshu.com" in link:
             return "#content > article ::text"
         elif "fanqienovel.com" in link:
             return "div.muye-reader-content.noselect ::text"
-        elif "m.shubaow.net" in link:
+        elif "m.shubaow.net" in link or "m.longteng788.com/" in link or "m.xklxsw.com" in link:
             return "#nr1 ::text"
         elif "m.xindingdianxsw.com" in link:
             return "#chapter > div.axddxsw_e6365bd5 ::text"
         elif "www.xindingdianxsw.com/" in link:
             return "p ::text"
+        elif "m.75zw.com/" in link:
+            return "#chapter > div.a75zwcom_u6369c35 ::text"
             # return "#ch-page-container > div > div.col-lg-8.content2 > div > div.chapter-content3 > div.desc ::text"
         else:
             return "* ::text"
@@ -122,5 +122,9 @@ class CssSelector:
             return ["#chapter > div:nth-child(9) > a:nth-child(3)", "#chapter > div.path > a:nth-child(2)"]
         elif "www.xindingdianxsw.com" in link:
             return ["#A3", "div.con_top > a:nth-child(3)"]
+        elif "m.longteng788.com/" in link:
+            return ["#pb_next", "#_52mb_h1"]
+        elif "m.75zw.com/" in link:
+            return ["#chapter > div.pager.z1 > a:nth-child(3)", "#chapter > div.path > a:nth-child(3) > font > font"]
         else:
             return [None, "title"]

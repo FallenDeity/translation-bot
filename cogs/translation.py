@@ -277,7 +277,7 @@ class Translate(commands.Cog):
     @commands.hybrid_command(
         help="translate multiple files together one at a time"
     )
-    async def multi(self, ctx: commands.Context, messageid: int = None):
+    async def multi(self, ctx: commands.Context, messageid: int = None, language: str = "english"):
         if messageid:
             channel = self.bot.get_channel(ctx.channel.id)
             message = await channel.fetch_message(messageid)
@@ -288,6 +288,11 @@ class Translate(commands.Cog):
             reason = reason['reason']
             return await ctx.reply(
                 content=f"You have been blocked by admins for improper usage of bot. Please contact admin \nReason : {reason}")
+        if language not in self.bot.all_langs:
+            return await ctx.reply(
+                f"**❌We have the following languages in our db.**\n```ini\n{self.bot.display_langs}```"
+            )
+        language = FileHandler.get_language(language)
         if not message.attachments:
             return await ctx.reply(content="> Attach a file to translate")
         count = 1
@@ -299,9 +304,19 @@ class Translate(commands.Cog):
                 ctx.command = await self.bot.get_command("translate").callback(Translate(self.bot), ctx, attached.url,
                                                                                None,
                                                                                None,
-                                                                               "english")
-            except:
-                await ctx.send(f"> Error occurred in translating {attached.filename}")
+                                                                               language)
+            except Exception as e:
+                if "TooManyRequests" in str(e):
+                    raise e
+                else:
+                    await ctx.send(f"> Error occurred in translating {attached.filename}")
+
+    @multi.autocomplete("language")
+    async def translate_complete(
+            self, inter: discord.Interaction, language: str
+    ) -> list[app_commands.Choice]:
+        lst = [i for i in self.bot.all_langs if language.lower() in i.lower()][:25]
+        return [app_commands.Choice(name=i, value=i) for i in lst]
 
     @commands.hybrid_command(
         help="Clears any stagnant novels which were deposited for translation."
