@@ -755,6 +755,7 @@ class Crawler(commands.Cog):
                         print(e)
                         return await ctx.send(f"Error occurred in crawling \n Error occurred at {current_link}")
                     else:
+                        print("error occured at " + current_link + str(e))
                         break
 
                 # print(i)
