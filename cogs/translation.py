@@ -277,7 +277,7 @@ class Translate(commands.Cog):
     @commands.hybrid_command(
         help="translate multiple files together one at a time"
     )
-    async def multi(self, ctx: commands.Context, messageid: int = None, language: str = "english"):
+    async def multi(self, ctx: commands.Context, language: str = "english", messageid: int = None,):
         if messageid:
             channel = self.bot.get_channel(ctx.channel.id)
             message = await channel.fetch_message(messageid)
