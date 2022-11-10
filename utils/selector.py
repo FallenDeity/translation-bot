@@ -59,13 +59,8 @@ class CssSelector:
             return "div.muye-reader-content.noselect ::text"
         elif "m.shubaow.net" in link or "m.longteng788.com/" in link or "m.xklxsw.com" in link:
             return "#nr1 ::text"
-        elif "m.xindingdianxsw.com" in link:
-            return "#chapter > div.axddxsw_e6365bd5 ::text"
         elif "www.xindingdianxsw.com/" in link:
             return "p ::text"
-        elif "m.75zw.com/" in link:
-            return "#chapter > div.a75zwcom_u6369c35 ::text"
-            # return "#ch-page-container > div > div.col-lg-8.content2 > div > div.chapter-content3 > div.desc ::text"
         else:
             return "* ::text"
 
