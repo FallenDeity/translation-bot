@@ -591,7 +591,7 @@ class Crawler(commands.Cog):
                 title_css = nextsel[1]
                 secondchplink = None
                 cloudscrape = True
-            if "fannovels.com" in firstchplink:
+            if "fannovels.com" in firstchplink or "xindingdianxsw.com" in firstchplink or "longteng788.com" in firstchplink or "75zw.com" in firstchplink or "longteng788.com" in firstchplink:
                 cloudscrape = False
         if secondchplink is None and nextselector is None:
             return await ctx.send("You must give second chapter link or next page css selector")
@@ -746,7 +746,9 @@ class Crawler(commands.Cog):
                         return await ctx.send(" There is some problem with the provided selector")
                     else:
                         return await ctx.send(" There is some problem with the detected selector")
-
+                if "readwn" in current_link or "wuxiax.co" in current_link or "novelmt.com" in current_link or "fannovels.com" in current_link:
+                    if i %30 == 0:
+                        await asyncio.sleep(3)
                 try:
                     output = await self.getcontent(current_link, css, path, self.bot, sel_tag, scraper)
                     chp_text = output[0]
