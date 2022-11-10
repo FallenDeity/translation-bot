@@ -86,7 +86,7 @@ class Translate(commands.Cog):
             if size >= 17.5 * 1000:
                 await rep_msg.delete()
                 return await ctx.reply(
-                    "> **❌ File size is too big... Please split the file and translate"
+                    "> **❌ File size is too big... Please split the file and translate**"
                 )
             name = info.get("name")
             name = bytes(name, encoding="raw_unicode_escape", errors="ignore").decode()

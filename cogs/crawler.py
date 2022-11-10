@@ -444,7 +444,7 @@ class Crawler(commands.Cog):
 
         if len(urls) < 30:
             return await ctx.reply(
-                f"> **❌Provided link only got **{str(len(urls))}** links in the page.Check if you have provided correct Table of contents url. If there is no TOC page try using /crawlnext with first chapter and required urls"
+                f"> ❌Provided link only got **{str(len(urls))}** links in the page.Check if you have provided correct Table of contents url. If there is no TOC page try using /crawlnext with first chapter and required urls"
             )
         if 'b.faloo' in link or 'wap.faloo' in link:
             urls = urls[:200]
@@ -731,7 +731,7 @@ class Crawler(commands.Cog):
             self.bot.crawler[ctx.author.id] = f"0/{noofchapters}"
             for i in range(1, noofchapters):
                 if self.bot.crawler[ctx.author.id] == "break":
-                    return await ctx.send("> **Stopped Crawling...")
+                    return await ctx.send("> **Stopped Crawling...**")
                 self.bot.crawler[ctx.author.id] = f"{i}/{noofchapters}"
                 if current_link in crawled_urls:
                     repeats += 1
@@ -747,8 +747,9 @@ class Crawler(commands.Cog):
                     else:
                         return await ctx.send(" There is some problem with the detected selector")
                 if "readwn" in current_link or "wuxiax.co" in current_link or "novelmt.com" in current_link or "fannovels.com" in current_link:
+                    await asyncio.sleep(1)
                     if i %30 == 0:
-                        await asyncio.sleep(3)
+                        await asyncio.sleep(4)
                 try:
                     output = await self.getcontent(current_link, css, path, self.bot, sel_tag, scraper)
                     chp_text = output[0]
@@ -779,7 +780,7 @@ class Crawler(commands.Cog):
 
             with open(title + '.txt', 'w', encoding='utf-8') as f:
                 f.write(full_text)
-            await ctx.send(f"> crawled {i} chapters or pages")
+            await ctx.send(f">** crawled {i} chapters or pages**")
             return await FileHandler().crawlnsend(ctx, self.bot, title, title_name, original_Language)
         except Exception as e:
             await ctx.send("> Error occurred .Please report to admin +\n" + str(e))
