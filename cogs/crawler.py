@@ -43,7 +43,7 @@ class Crawler(commands.Cog):
         response = None
         try:
             if scraper is not None:
-                response = scraper.get(links, headers=headers)
+                response = scraper.get(links, headers=headers, timeout=10)
             else:
                 response = requests.get(links, headers=headers, timeout=10)
         except:
@@ -90,7 +90,7 @@ class Crawler(commands.Cog):
         return nums, full
 
     def scrape(self, scraper, links: str):
-        response = scraper.get(links)
+        response = scraper.get(links, headers=headers, timeout=10)
         return response
 
     def direct(self, urls: t.List[str], novel: t.Dict[int, str], name: int, cloudscrape: bool) -> dict:
@@ -444,7 +444,7 @@ class Crawler(commands.Cog):
 
         if len(urls) < 30:
             return await ctx.reply(
-                f"> ❌Provided link only got **{str(len(urls))}** links in the page.Check if you have provided correct Table of contents url. If there is no TOC page try using /crawlnext with first chapter and required urls"
+                f"> **❌Provided link only got **{str(len(urls))}** links in the page.Check if you have provided correct Table of contents url. If there is no TOC page try using /crawlnext with first chapter and required urls"
             )
         if 'b.faloo' in link or 'wap.faloo' in link:
             urls = urls[:200]
@@ -591,7 +591,7 @@ class Crawler(commands.Cog):
                 title_css = nextsel[1]
                 secondchplink = None
                 cloudscrape = True
-            if "fannovels.com" in firstchplink or "xindingdianxsw.com" in firstchplink or "longteng788.com" in firstchplink or "75zw.com" in firstchplink or "longteng788.com" in firstchplink:
+            if "fannovels.com" in firstchplink or "xindingdianxsw.com" in firstchplink or "longteng788.com" in firstchplink or "75zw.com" in firstchplink or "longteng788.com" in firstchplink or "m.akshu8.com" in firstchplink or "www.wnmtl.org" in firstchplink :
                 cloudscrape = False
         if secondchplink is None and nextselector is None:
             return await ctx.send("You must give second chapter link or next page css selector")
@@ -607,8 +607,8 @@ class Crawler(commands.Cog):
         try:
             if cloudscrape:
                 scraper = cloudscraper.CloudScraper()
-                response = scraper.get(firstchplink, headers=headers)
-                # await asyncio.sleep(0.25)
+                response = scraper.get(firstchplink, headers=headers, timeout=10)
+                await asyncio.sleep(0.25)
             else:
                 scraper = None
                 response = requests.get(firstchplink, headers=headers, timeout=10)
@@ -731,7 +731,7 @@ class Crawler(commands.Cog):
             self.bot.crawler[ctx.author.id] = f"0/{noofchapters}"
             for i in range(1, noofchapters):
                 if self.bot.crawler[ctx.author.id] == "break":
-                    return await ctx.send("> **Stopped Crawling...**")
+                    return await ctx.send("> **Stopped Crawling...")
                 self.bot.crawler[ctx.author.id] = f"{i}/{noofchapters}"
                 if current_link in crawled_urls:
                     repeats += 1
@@ -746,10 +746,7 @@ class Crawler(commands.Cog):
                         return await ctx.send(" There is some problem with the provided selector")
                     else:
                         return await ctx.send(" There is some problem with the detected selector")
-                if "readwn" in current_link or "wuxiax.co" in current_link or "novelmt.com" in current_link or "fannovels.com" in current_link:
-                    await asyncio.sleep(1)
-                    if i %30 == 0:
-                        await asyncio.sleep(4)
+
                 try:
                     output = await self.getcontent(current_link, css, path, self.bot, sel_tag, scraper)
                     chp_text = output[0]
@@ -777,10 +774,12 @@ class Crawler(commands.Cog):
                 chp_count += 1
                 crawled_urls.append(current_link)
                 current_link = output[1]
+                if chp_count % 50 ==0:
+                    await msg.edit(content=f"> :white_check_mark:  Started crawling from 📔 {title_name}\n**Crawled {chp_count} pages**")
 
             with open(title + '.txt', 'w', encoding='utf-8') as f:
                 f.write(full_text)
-            await ctx.send(f">** crawled {i} chapters or pages**")
+            await ctx.send(f"> crawled {i} chapters or pages")
             return await FileHandler().crawlnsend(ctx, self.bot, title, title_name, original_Language)
         except Exception as e:
             await ctx.send("> Error occurred .Please report to admin +\n" + str(e))
