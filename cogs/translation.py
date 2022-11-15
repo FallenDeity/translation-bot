@@ -206,15 +206,19 @@ class Translate(commands.Cog):
             novel_data = list(novel_data)
             ids = []
             lang_check = False
+            eng_check = False
             for n in novel_data:
                 ids.append(n._id)
+                if "english" == n.language.lower():
+                    eng_check = True
                 if language == n.language:
                     lang_check = True
             if lang_check:
                 ids = ids[:20]
-                rep_msg= await rep_msg.edit("Novel is already in our library")
+                rep_msg = await rep_msg.edit("Novel is already in our library")
                 ctx.command = await self.bot.get_command("library search").callback(Library(self.bot), ctx, name,
-                                                                                    language, None, None, None, None, None, None, False, "size")
+                                                                                    language, None, None, None, None,
+                                                                                    None, None, False, "size")
                 chk_msg = await ctx.send(embed=discord.Embed(
                     description=f"This novel **{name}** is already in our library with ids **{str(ids)}**...use arrow marks  in above  to navigate...\nIf you want to continue translation react with 🇳 within 10 sec\n\n**Note : Some files are in docx format, so file size maybe half the size of txt. and try to minimize translating if its already in library**"))
                 await chk_msg.add_reaction('🇾')
@@ -251,6 +255,16 @@ class Translate(commands.Cog):
                             pass
                         await chk_msg.delete()
                         return None
+        if (novel_data is None or not eng_check)and not language.lower() == "english":
+            new_ch = self.bot.get_channel(
+                942513122177073222
+            ) or await self.bot.fetch_channel(942513122177073222)
+            msg_new = await new_ch.fetch_message(1040971784742248509)
+            context_new = await self.bot.get_context(msg_new)
+            asyncio.create_task(self.bot.get_command("translate").callback(Translate(self.bot), context_new, link,
+                                                                           file,
+                                                                           messageid,
+                                                                           "english", novelname, rawname, library_id))
         msg_content = f"> **✅ Started translating {name}. Translating to {language}.**"
         rep_msg = await rep_msg.edit(content=msg_content)
         try:
@@ -302,7 +316,7 @@ class Translate(commands.Cog):
     @commands.hybrid_command(
         help="translate multiple files together one at a time"
     )
-    async def multi(self, ctx: commands.Context, language: str = "english", messageid: int = None,):
+    async def multi(self, ctx: commands.Context, language: str = "english", messageid: int = None, ):
         if messageid:
             channel = self.bot.get_channel(ctx.channel.id)
             message = await channel.fetch_message(messageid)
