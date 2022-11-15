@@ -43,7 +43,7 @@ class Termer(commands.Cog):
             rawname: str = None,
             library_id: str = None,
     ):
-        if link.startswith("#"):
+        if link is not None and link.startswith("#"):
             try:
                 novel_id = int(link.replace("#", ""))
                 novel_data = await self.bot.mongo.library.get_novel_by_id(novel_id)
