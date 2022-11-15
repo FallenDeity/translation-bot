@@ -66,6 +66,8 @@ class Translate(commands.Cog):
                 link = novel_data.download
             except:
                 return await ctx.reply("send a valid id")
+        if ctx.author.id == 925597069748621353:
+            await asyncio.sleep(60)
         file = link or file
         if ctx.author.id in self.bot.blocked:
             reason = await self.bot.mongo.blocker.get_banned_user_reason(ctx.author.id)
@@ -306,7 +308,7 @@ class Translate(commands.Cog):
 
     async def cc_prog(self, msg: discord.Message, msg_content: str, author_id: int) -> typing.Optional[discord.Message]:
         while author_id in self.bot.translator:
-            await asyncio.sleep(6)
+            await asyncio.sleep(10)
             if author_id not in self.bot.translator:
                 return None
             content = msg_content + f"\nProgress > **🚄`{self.bot.translator[author_id]}`**"
