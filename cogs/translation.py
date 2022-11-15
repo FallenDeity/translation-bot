@@ -215,7 +215,7 @@ class Translate(commands.Cog):
                     lang_check = True
             if lang_check:
                 ids = ids[:20]
-                rep_msg = await rep_msg.edit("Novel is already in our library")
+                rep_msg = await rep_msg.edit(content="Novel is already in our library")
                 ctx.command = await self.bot.get_command("library search").callback(Library(self.bot), ctx, name,
                                                                                     language, None, None, None, None,
                                                                                     None, None, False, "size")
