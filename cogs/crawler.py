@@ -472,6 +472,7 @@ class Crawler(commands.Cog):
             if original_Language == 'english':
                 title = str(title_name[:100])
             else:
+                title = ""
                 try:
                     title = GoogleTranslator(
                         source="auto", target="english"
