@@ -257,14 +257,16 @@ class Termer(commands.Cog):
             novel = await FileHandler().read_file(ctx)
         rep_msg = await rep_msg.edit(content=f"> **✅Terming started. **")
         novel = self.term_raw(novel, term_dict)
-        await rep_msg.edit(
-            content=f"> **✅Terming completed ..Translation started. Translating to {language}.**"
+        msg_content = f"> **✅Terming completed ..Translation started. Translating to {language}.**"
+        rep_msg = await rep_msg.edit(
+            content=msg_content
         )
         try:
             os.remove(f"{ctx.author.id}.txt")
             original_Language = FileHandler.find_language(novel)
             liz = [novel[i: i + 1800] for i in range(0, len(novel), 1800)]
             self.bot.translator[ctx.author.id] = f"0/{len(liz)}"
+            asyncio.create_task(self.cc_prog(rep_msg, msg_content, ctx.author.id))
             translate = Translator(self.bot, ctx.author.id, language)
             story = await translate.start(liz)
             async with aiofiles.open(f"{ctx.author.id}.txt", "w", encoding="utf-8") as f:
@@ -286,6 +288,15 @@ class Termer(commands.Cog):
     ) -> list[app_commands.Choice]:
         lst = [i for i in self.bot.all_langs if language.lower() in i.lower()][:25]
         return [app_commands.Choice(name=i, value=i) for i in lst]
+
+    async def cc_prog(self, msg: discord.Message, msg_content: str, author_id: int) -> typing.Optional[discord.Message]:
+        while author_id in self.bot.translator:
+            await asyncio.sleep(6)
+            if author_id not in self.bot.translator:
+                return None
+            content = msg_content + f"\nProgress > **🚄`{self.bot.translator[author_id]}`**"
+            await msg.edit(content=content)
+        return
 
     @termer.autocomplete("term")
     async def translate_complete(
