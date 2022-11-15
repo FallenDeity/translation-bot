@@ -489,8 +489,10 @@ class Crawler(commands.Cog):
                 ids.append(n._id)
             if True:
                 ids = ids[:20]
+                ctx.command = await self.bot.get_command("library search").callback(Library(self.bot), ctx,
+                                                                                    title_name.split('__')[0], None, None, None, None, None, None, None, False, "size")
                 chk_msg = await ctx.send(embed=discord.Embed(
-                    description=f"This novel **{title}** is already in our library with ids **{ids.__str__()}**...  \nDo you want to search in library...React to this message with 🇾  ...\nIf you want to continue crawling react with 🇳 \n\n**Note : Some files are in docx format, so file size maybe half the size of txt. and try to minimize translating if its already in library**"))
+                    description=f"This novel **{title}** is already in our library with ids **{ids.__str__()}**...use arrow marks  in above  to navigate...  \n\nIf you want to continue crawling react with 🇳 \n\n**Note : Some files are in docx format, so file size maybe half the size of txt. and try to minimize translating if its already in library**"))
                 await chk_msg.add_reaction('🇾')
                 await chk_msg.add_reaction('🇳')
 
@@ -510,9 +512,8 @@ class Crawler(commands.Cog):
                         os.remove(f"{ctx.author.id}.txt")
                     except:
                         pass
-                    await ctx.send("No response detected. sending novels in library", delete_after=10)
-                    ctx.command = await self.bot.get_command("library search").callback(Library(self.bot), ctx,
-                                                                                        title_name.split('__')[0])
+                    await ctx.send("No response detected. ", delete_after=5)
+                    await chk_msg.delete()
                     return None
                 else:
                     await ctx.send("Reaction received", delete_after=10)
@@ -524,8 +525,7 @@ class Crawler(commands.Cog):
                             os.remove(f"{ctx.author.id}.txt")
                         except:
                             pass
-                        ctx.command = await self.bot.get_command("library search").callback(Library(self.bot), ctx,
-                                                                                            title_name.split('__')[0])
+                        await chk_msg.delete()
                         return None
         try:
             self.bot.crawler[ctx.author.id] = f"0/{len(urls)}"
@@ -697,8 +697,12 @@ class Crawler(commands.Cog):
                 ids.append(n._id)
             if True:
                 ids = ids[:20]
+                ctx.command = await self.bot.get_command("library search").callback(Library(self.bot), ctx,
+                                                                                    title_name.split('__')[0], None,
+                                                                                    None, None, None, None, None, None,
+                                                                                    False, "size")
                 chk_msg = await ctx.send(embed=discord.Embed(
-                    description=f"This novel **{title}** is already in our library with ids **{ids.__str__()}**...  \nDo you want to search in library...React to this message with 🇾  ...\nIf you want to continue crawling react with 🇳 \n\n**Note : Some files are in docx format, so file size maybe half the size of txt. and try to minimize translating if its already in library**"))
+                    description=f"This novel **{title}** is already in our library with ids **{ids.__str__()}**...use arrow marks in above to navigate...\nIf you want to continue crawling react with 🇳 \n\n**Note : Some files are in docx format, so file size maybe half the size of txt. and try to minimize translating if its already in library**"))
                 await chk_msg.add_reaction('🇾')
                 await chk_msg.add_reaction('🇳')
 
@@ -718,9 +722,8 @@ class Crawler(commands.Cog):
                         os.remove(f"{ctx.author.id}.txt")
                     except:
                         pass
-                    await ctx.send("No response detected. sending novels in library", delete_after=10)
-                    ctx.command = await self.bot.get_command("library search").callback(Library(self.bot), ctx,
-                                                                                        title_name.split('__')[0])
+                    await ctx.send("No response detected.", delete_after=5)
+                    await chk_msg.delete()
                     return None
                 else:
                     await ctx.send("Reaction received", delete_after=10)
@@ -732,8 +735,7 @@ class Crawler(commands.Cog):
                             os.remove(f"{ctx.author.id}.txt")
                         except:
                             pass
-                        ctx.command = await self.bot.get_command("library search").callback(Library(self.bot), ctx,
-                                                                                            title_name.split('__')[0])
+                        await chk_msg.delete()
                         return None
         await msg.edit(content=f"> :white_check_mark:  Started crawling from 📔 {title_name}")
         crawled_urls = []

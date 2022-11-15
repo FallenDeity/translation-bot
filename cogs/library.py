@@ -125,7 +125,6 @@ class Library(commands.Cog):
             language: str = None,
             rating: int = None,
             show_list: bool = False,
-            *,
             tags: str = None,
             raw_language: str = None,
             size: float = None,

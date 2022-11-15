@@ -212,8 +212,11 @@ class Translate(commands.Cog):
                     lang_check = True
             if lang_check:
                 ids = ids[:20]
+                rep_msg= await rep_msg.edit("Novel is already in our library")
+                ctx.command = await self.bot.get_command("library search").callback(Library(self.bot), ctx, name,
+                                                                                    language, None, None, None, None, None, None, False, "size")
                 chk_msg = await ctx.send(embed=discord.Embed(
-                    description=f"This novel **{name}** is already in our library with ids **{str(ids)}**...  \nDo you want to search in library...react to this message with 🇾  ...\nIf you want to continue translation react with 🇳 \n\n**Note : Some files are in docx format, so file size maybe half the size of txt. and try to minimize translating if its already in library**"))
+                    description=f"This novel **{name}** is already in our library with ids **{str(ids)}**...use arrow marks  in above  to navigate...\nIf you want to continue translation react with 🇳 within 10 sec\n\n**Note : Some files are in docx format, so file size maybe half the size of txt. and try to minimize translating if its already in library**"))
                 await chk_msg.add_reaction('🇾')
                 await chk_msg.add_reaction('🇳')
 
@@ -233,9 +236,8 @@ class Translate(commands.Cog):
                         os.remove(f"{ctx.author.id}.txt")
                     except:
                         pass
-                    await ctx.send("No response detected. sending novels in library", delete_after=10)
-                    ctx.command = await self.bot.get_command("library search").callback(Library(self.bot), ctx, name,
-                                                                                        language)
+                    await ctx.send("No response detected. ", delete_after=5)
+                    await chk_msg.delete()
                     return None
                 else:
                     if str(res[0]) == '🇳':
@@ -247,8 +249,7 @@ class Translate(commands.Cog):
                             os.remove(f"{ctx.author.id}.txt")
                         except:
                             pass
-                        ctx.command = await self.bot.get_command("library search").callback(Library(self.bot), ctx,
-                                                                                            name, language)
+                        await chk_msg.delete()
                         return None
         msg_content = f"> **✅ Started translating {name}. Translating to {language}.**"
         rep_msg = await rep_msg.edit(content=msg_content)
