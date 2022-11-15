@@ -40,8 +40,22 @@ class Termer(commands.Cog):
             messageid: str = None,
             language: str = "english",
             novelname: str = None,
-            rawname: str = None
+            rawname: str = None,
+            library_id: str = None,
     ):
+        if link.startswith("#"):
+            try:
+                novel_id = int(link.replace("#", ""))
+                novel_data = await self.bot.mongo.library.get_novel_by_id(novel_id)
+                link = novel_data.download
+            except:
+                return await ctx.reply("send a valid id")
+        if library_id is not None:
+            try:
+                novel_data = await self.bot.mongo.library.get_novel_by_id(library_id)
+                link = novel_data.download
+            except:
+                return await ctx.reply("send a valid id")
         file = link or file
         if not file and not messageid:
             return await ctx.reply(f"> **❌Send an attachment or a link.**")

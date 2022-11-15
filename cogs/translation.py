@@ -51,7 +51,21 @@ class Translate(commands.Cog):
             language: str = "english",
             novelname: str = None,
             rawname: str = None,
+            library_id: int = None,
     ):
+        if link.startswith("#"):
+            try:
+                novel_id = int(link.replace("#", ""))
+                novel_data = await self.bot.mongo.library.get_novel_by_id(novel_id)
+                link = novel_data.download
+            except:
+                return await ctx.reply("send a valid id")
+        if library_id is not None:
+            try:
+                novel_data = await self.bot.mongo.library.get_novel_by_id(library_id)
+                link = novel_data.download
+            except:
+                return await ctx.reply("send a valid id")
         file = link or file
         if ctx.author.id in self.bot.blocked:
             reason = await self.bot.mongo.blocker.get_banned_user_reason(ctx.author.id)
