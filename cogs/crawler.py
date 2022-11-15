@@ -118,7 +118,7 @@ class Crawler(commands.Cog):
                 soup = BeautifulSoup(response.text, "html.parser", from_encoding=response.encoding)
                 if response.status_code == 404:
                     return ['error', links]
-                # await asyncio.sleep(1)
+                # await asyncio.sleep(0.1)
             else:
                 response = await bot.con.get(links)
                 soup = BeautifulSoup(await response.read(), "html.parser", from_encoding=response.get_encoding())
@@ -182,6 +182,15 @@ class Crawler(commands.Cog):
                 "> **❌You have no novel deposited for crawling currently.**"
             )
         await ctx.send(f"> **🚄`{self.bot.crawler[ctx.author.id]}`**")
+
+    async def cc_prog(self, msg: discord.Message, msg_content: str, author_id: int) -> typing.Optional[discord.Message]:
+        while author_id in self.bot.crawler:
+            await asyncio.sleep(6)
+            if author_id not in self.bot.crawler:
+                return None
+            content = msg_content + f"\nProgress > **🚄`{self.bot.crawler[author_id]}`**"
+            await msg.edit(content=content)
+        return
 
     @commands.hybrid_command(help="stops the tasks initiated by user", aliases=["st"])
     async def stop(self, ctx: commands.Context) -> typing.Optional[discord.Message]:
@@ -520,10 +529,12 @@ class Crawler(commands.Cog):
                         return None
         try:
             self.bot.crawler[ctx.author.id] = f"0/{len(urls)}"
-            await msg.edit(
-                content=f"> **:white_check_mark: Started Crawling the novel --  📔   {title_name.split('__')[0].strip()}.**")
+            msg_content = f"> **:white_check_mark: Started Crawling the novel --  📔   {title_name.split('__')[0].strip()}.**"
+            msg = await msg.edit(
+                content=msg_content)
+            asyncio.create_task(self.cc_prog(msg, msg_content, ctx.author.id))
             book = await self.bot.loop.run_in_executor(
-                None, self.direct, urls, novel, ctx.author.id, cloudscrape
+                None, self.direct, urls, novel, ctx.author.id, cloudscrape,
             )
             if book is None:
                 return await ctx.reply("Crawling stopped")

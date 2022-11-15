@@ -51,7 +51,21 @@ class Translate(commands.Cog):
             language: str = "english",
             novelname: str = None,
             rawname: str = None,
+            library_id: int = None,
     ):
+        if link.startswith("#"):
+            try:
+                novel_id = int(link.replace("#", ""))
+                novel_data = await self.bot.mongo.library.get_novel_by_id(novel_id)
+                link = novel_data.download
+            except:
+                return await ctx.reply("send a valid id")
+        if library_id is not None:
+            try:
+                novel_data = await self.bot.mongo.library.get_novel_by_id(library_id)
+                link = novel_data.download
+            except:
+                return await ctx.reply("send a valid id")
         file = link or file
         if ctx.author.id in self.bot.blocked:
             reason = await self.bot.mongo.blocker.get_banned_user_reason(ctx.author.id)
@@ -236,8 +250,8 @@ class Translate(commands.Cog):
                         ctx.command = await self.bot.get_command("library search").callback(Library(self.bot), ctx,
                                                                                             name, language)
                         return None
-
-        await rep_msg.edit(content=f"> **✅ Started translating {name}. Translating to {language}.**")
+        msg_content = f"> **✅ Started translating {name}. Translating to {language}.**"
+        rep_msg = await rep_msg.edit(content=msg_content)
         try:
             try:
                 original_Language = FileHandler.find_language(novel)
@@ -251,6 +265,7 @@ class Translate(commands.Cog):
                 await ctx.send("Added pokemon terms", delete_after=5)
             liz = [novel[i: i + 1800] for i in range(0, len(novel), 1800)]
             self.bot.translator[ctx.author.id] = f"0/{len(liz)}"
+            asyncio.create_task(self.cc_prog(rep_msg, msg_content, ctx.author.id))
             translate = Translator(self.bot, ctx.author.id, language)
             story = await translate.start(liz)
             async with aiofiles.open(f"{ctx.author.id}.txt", "w", encoding="utf-8") as f:
@@ -273,6 +288,15 @@ class Translate(commands.Cog):
     ) -> list[app_commands.Choice]:
         lst = [i for i in self.bot.all_langs if language.lower() in i.lower()][:25]
         return [app_commands.Choice(name=i, value=i) for i in lst]
+
+    async def cc_prog(self, msg: discord.Message, msg_content: str, author_id: int) -> typing.Optional[discord.Message]:
+        while author_id in self.bot.translator:
+            await asyncio.sleep(6)
+            if author_id not in self.bot.translator:
+                return None
+            content = msg_content + f"\nProgress > **🚄`{self.bot.translator[author_id]}`**"
+            await msg.edit(content=content)
+        return
 
     @commands.hybrid_command(
         help="translate multiple files together one at a time"
