@@ -3,6 +3,7 @@ import concurrent.futures
 import itertools
 import os
 import random
+import time
 import typing
 import typing as t
 from urllib.parse import urljoin
@@ -87,6 +88,8 @@ class Crawler(commands.Cog):
                 text.pop(0)
             full = full + "\n".join(text)
         full = full + "\n---------------------xxx---------------------\n\n"
+        if "uukanshu" in links:
+            time.sleep(5)
         return nums, full
 
     def scrape(self, scraper, links: str):

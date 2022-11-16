@@ -138,7 +138,10 @@ class Translate(commands.Cog):
                     channel = self.bot.get_channel(ctx.channel.id)
                     resolvedMessage = await channel.fetch_message(messageid)
                 msg = resolvedMessage
-                link = resolvedMessage.attachments[0].url
+                try:
+                    link = resolvedMessage.attachments[0].url
+                except:
+                    return await ctx.reply("> **There is no attachment in the provided message**")
             elif isinstance(file, discord.Attachment):
                 link = file.url
             else:
