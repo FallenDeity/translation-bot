@@ -510,7 +510,7 @@ class Crawler(commands.Cog):
                     await ctx.send("**Please check from above library**", delete_after=20)
                     await asyncio.sleep(12)
                 for l in ["bixiange", "trxs", "txt520", "powanjuan", "tongrenquan", "jpxs"]:
-                    if link in l and name_lib_check is True:
+                    if link in l:
                         await ctx.send("Novel is already in our library. if its not ping Admin")
                         return None
                     else:
