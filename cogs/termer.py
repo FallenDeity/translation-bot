@@ -152,7 +152,8 @@ class Termer(commands.Cog):
             if msg is None:
                 msg = ctx.message
             resp = await self.bot.con.get(link)
-            name = msg.attachments[0].filename.replace(".txt", "").replace(".docx", "").replace(".epub", "").replace(".pdf", "")
+            name = msg.attachments[0].filename.replace(".txt", "").replace(".docx", "").replace(".epub", "").replace(
+                ".pdf", "")
             file_type = resp.headers["content-type"].split("/")[-1]
         elif novel is None:
             resp = await self.bot.con.get(link)
@@ -201,26 +202,48 @@ class Termer(commands.Cog):
             novel_data = list(novel_data)
             ids = []
             lang_check = False
+            eng_check = False
+            size_check = False
             for n in novel_data:
                 ids.append(n._id)
+                if "english" == n.language.lower():
+                    eng_check = True
                 if language == n.language:
                     lang_check = True
+                if name in n.title:
+                    name_lib_check = True
+                try:
+                    size_found = round(os.path.getsize(f"{ctx.author.id}.txt") / (1024 ** 2), 2) - 0.01
+                    lib_size = round(n.size / (1024 ** 2), 2)
+                    if size_found <= lib_size:
+                        size_check = True
+                except:
+                    pass
             if lang_check:
                 ids = ids[:20]
+                ctx.command = await self.bot.get_command("library search").callback(Library(self.bot), ctx, name,
+                                                                                    language, None, None, None, None,
+                                                                                    None, None, False, "size")
+                if len(ids) < 5 or name_lib_check:
+                    await ctx.send("**Please check from above library**", delete_after=20)
+                    await asyncio.sleep(12)
+                if name_lib_check and size_check:
+                    await ctx.send("**Please check from above library**")
+                    return None
                 chk_msg = await ctx.send(embed=discord.Embed(
-                    description=f"This novel is already in our library... \nDo you want to search in library with ids {str(ids)}...react to this message with 🇾  ...\n If you want to continue translation react with 🇳"))
+                    description=f"**This novel is already in our library... **\n If you want to continue translation react with 🇳"))
                 await chk_msg.add_reaction('🇾')
                 await chk_msg.add_reaction('🇳')
 
                 def check(reaction, user):
                     return reaction.message.id == chk_msg.id and (
-                                str(reaction.emoji) == '🇾' or str(reaction.emoji) == '🇳') and user == ctx.author
+                            str(reaction.emoji) == '🇾' or str(reaction.emoji) == '🇳') and user == ctx.author
 
                 try:
                     res = await self.bot.wait_for(
                         "reaction_add",
                         check=check,
-                        timeout=15.0,
+                        timeout=8.0,
                     )
                 except asyncio.TimeoutError:
                     print('error')
@@ -228,22 +251,35 @@ class Termer(commands.Cog):
                         os.remove(f"{ctx.author.id}.txt")
                     except:
                         pass
-                    await ctx.send("No response detected. sending novels in library", delete_after=10)
-                    ctx.command = await self.bot.get_command("library search").callback(Library(self.bot), ctx, name,
-                                                                                        language)
+                    await ctx.send("No response detected. ", delete_after=10)
+                    await chk_msg.delete()
                     return None
                 else:
                     await ctx.send("Reaction received", delete_after=10)
+
                     if str(res[0]) == '🇳':
-                        pass
+                        await chk_msg.delete()
                     else:
                         try:
                             os.remove(f"{ctx.author.id}.txt")
                         except:
                             pass
-                        ctx.command = await self.bot.get_command("library search").callback(Library(self.bot), ctx,
-                                                                                            name, language)
+                        await chk_msg.delete()
                         return None
+        if (novel_data is None or not eng_check) and not language.lower() == "english":
+            new_ch = self.bot.get_channel(
+                942513122177073222
+            ) or await self.bot.fetch_channel(942513122177073222)
+            msg_new = await new_ch.fetch_message(1040971784742248509)
+            context_new = await self.bot.get_context(msg_new)
+            try:
+                asyncio.create_task(
+                    self.bot.get_command("translate").callback(Termer(self.bot), context_new, term, link,
+                                                               file,
+                                                               messageid,
+                                                               "english", novelname, rawname, library_id))
+            except:
+                pass
         if novel is None:
             data = await resp.read()
             async with aiofiles.open(f"{ctx.author.id}.{file_type}", "wb") as f:

@@ -209,18 +209,34 @@ class Translate(commands.Cog):
             ids = []
             lang_check = False
             eng_check = False
+            size_check = False
             for n in novel_data:
                 ids.append(n._id)
                 if "english" == n.language.lower():
                     eng_check = True
                 if language == n.language:
                     lang_check = True
+                if name in n.title:
+                    name_lib_check = True
+                try:
+                    size_found = round(os.path.getsize(f"{ctx.author.id}.txt") / (1024 ** 2), 2) - 0.01
+                    lib_size = round(n.size / (1024 ** 2), 2)
+                    if size_found <= lib_size:
+                        size_check = True
+                except:
+                    pass
             if lang_check:
                 ids = ids[:20]
                 rep_msg = await rep_msg.edit(content="Novel is already in our library")
                 ctx.command = await self.bot.get_command("library search").callback(Library(self.bot), ctx, name,
                                                                                     language, None, None, None, None,
                                                                                     None, None, False, "size")
+                if len(ids) < 5 or name_lib_check:
+                    await ctx.send("**Please check from above library**", delete_after=20)
+                    await asyncio.sleep(12)
+                if name_lib_check and size_check:
+                    await ctx.send("**Please check from above library**")
+                    return None
                 chk_msg = await ctx.send(embed=discord.Embed(
                     description=f"This novel **{name}** is already in our library with ids **{str(ids)}**...use arrow marks  in above  to navigate...\nIf you want to continue translation react with 🇳 within 10 sec\n\n**Note : Some files are in docx format, so file size maybe half the size of txt. and try to minimize translating if its already in library**"))
                 await chk_msg.add_reaction('🇾')
@@ -234,7 +250,7 @@ class Translate(commands.Cog):
                     res = await self.bot.wait_for(
                         "reaction_add",
                         check=check,
-                        timeout=15.0,
+                        timeout=8.0,
                     )
                 except asyncio.TimeoutError:
                     print('error')
@@ -257,16 +273,20 @@ class Translate(commands.Cog):
                             pass
                         await chk_msg.delete()
                         return None
-        if (novel_data is None or not eng_check)and not language.lower() == "english":
+        if (novel_data is None or not eng_check) and not language.lower() == "english":
             new_ch = self.bot.get_channel(
                 942513122177073222
             ) or await self.bot.fetch_channel(942513122177073222)
             msg_new = await new_ch.fetch_message(1040971784742248509)
             context_new = await self.bot.get_context(msg_new)
-            asyncio.create_task(self.bot.get_command("translate").callback(Translate(self.bot), context_new, link,
-                                                                           file,
-                                                                           messageid,
-                                                                           "english", novelname, rawname, library_id))
+            try:
+                asyncio.create_task(self.bot.get_command("translate").callback(Translate(self.bot), context_new, link,
+                                                                               file,
+                                                                               messageid,
+                                                                               "english", novelname, rawname,
+                                                                               library_id))
+            except:
+                pass
         msg_content = f"> **✅ Started translating {name}. Translating to {language}.**"
         rep_msg = await rep_msg.edit(content=msg_content)
         try:
