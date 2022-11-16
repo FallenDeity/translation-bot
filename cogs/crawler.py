@@ -484,26 +484,14 @@ class Crawler(commands.Cog):
         novel_data = await self.bot.mongo.library.get_novel_by_name(title_name.split('__')[0])
         # print(title_name)
         if novel_data is not None:
-            name_lib_check = False
             novel_data = list(novel_data)
             ids = []
             for n in novel_data:
                 ids.append(n._id)
-                if title_name.strip('__')[0] in n.title:
-                    name_lib_check = True
             if True:
                 ids = ids[:20]
                 ctx.command = await self.bot.get_command("library search").callback(Library(self.bot), ctx,
                                                                                     title_name.split('__')[0], None, None, None, None, None, None, None, False, "size")
-                if len(ids) < 5 or name_lib_check:
-                    await ctx.send("**Please check from above library**", delete_after=20)
-                    await asyncio.sleep(12)
-                for l in ["bixiange", "trxs", "txt520", "powanjuan", "tongrenquan", "jpxs"]:
-                    if link in l and name_lib_check is True:
-                        await ctx.send("Novel is already in our library. if its not ping Admin")
-                        return None
-                    else:
-                        await asyncio.sleep(1)
                 chk_msg = await ctx.send(embed=discord.Embed(
                     description=f"This novel **{title}** is already in our library with ids **{ids.__str__()}**...use arrow marks  in above  to navigate...  \n\nIf you want to continue crawling react with 🇳 \n\n**Note : Some files are in docx format, so file size maybe half the size of txt. and try to minimize translating if its already in library**"))
                 await chk_msg.add_reaction('🇾')
@@ -517,7 +505,7 @@ class Crawler(commands.Cog):
                     res = await self.bot.wait_for(
                         "reaction_add",
                         check=check,
-                        timeout=8.0,
+                        timeout=15.0,
                     )
                 except asyncio.TimeoutError:
                     print(' Timeout error')
@@ -705,21 +693,15 @@ class Crawler(commands.Cog):
         # print(title_name)
         if novel_data is not None:
             novel_data = list(novel_data)
-            name_lib_check = False
             ids = []
             for n in novel_data:
                 ids.append(n._id)
-                if title_name.strip('__')[0] in n.title:
-                    name_lib_check = True
             if True:
                 ids = ids[:20]
                 ctx.command = await self.bot.get_command("library search").callback(Library(self.bot), ctx,
                                                                                     title_name.split('__')[0], None,
                                                                                     None, None, None, None, None, None,
-                                                                                   False, "size")
-                if len(ids) < 5 or name_lib_check:
-                    await ctx.send("**Please check from above library**", delete_after=20)
-                    await asyncio.sleep(12)
+                                                                                    False, "size")
                 chk_msg = await ctx.send(embed=discord.Embed(
                     description=f"This novel **{title}** is already in our library with ids **{ids.__str__()}**...use arrow marks in above to navigate...\nIf you want to continue crawling react with 🇳 \n\n**Note : Some files are in docx format, so file size maybe half the size of txt. and try to minimize translating if its already in library**"))
                 await chk_msg.add_reaction('🇾')
@@ -733,7 +715,7 @@ class Crawler(commands.Cog):
                     res = await self.bot.wait_for(
                         "reaction_add",
                         check=check,
-                        timeout=8.0,
+                        timeout=15.0,
                     )
                 except asyncio.TimeoutError:
                     print(' Timeout error')
