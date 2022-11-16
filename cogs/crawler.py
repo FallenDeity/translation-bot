@@ -44,14 +44,22 @@ class Crawler(commands.Cog):
         response = None
         try:
             if scraper is not None:
-                response = scraper.get(links, headers=headers, timeout=10)
+                response = scraper.get(links, headers=headers, timeout=20)
             else:
-                response = requests.get(links, headers=headers, timeout=10)
-        except:
-            return nums, f"\ncouldn't get connection to {links}\n"
+                response = requests.get(links, headers=headers, timeout=20)
+        except Exception as e:
+            time.sleep(10)
+            try:
+                if scraper is not None:
+                    response = scraper.get(links, headers=headers, timeout=20)
+                else:
+                    response = requests.get(links, headers=headers, timeout=20)
+            except:
+                print(e)
+                return nums, f"\ncouldn't get connection to {links}\n"
         if response.status_code == 404:
             print("Response received as error status code 404")
-            return nums, ""
+            return nums, "\n----x---\n"
         response.encoding = response.apparent_encoding
         full = ""
         if '* ::text' == css or css is None or css.strip() == '':
