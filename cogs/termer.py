@@ -204,6 +204,7 @@ class Termer(commands.Cog):
             lang_check = False
             eng_check = False
             size_check = False
+            name_lib_check = False
             for n in novel_data:
                 ids.append(n._id)
                 if "english" == n.language.lower():
