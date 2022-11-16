@@ -67,7 +67,7 @@ class Translate(commands.Cog):
             except:
                 return await ctx.reply("send a valid id")
         if ctx.author.id == 925597069748621353:
-            await asyncio.sleep(60)
+            await asyncio.sleep(120)
         file = link or file
         if ctx.author.id in self.bot.blocked:
             reason = await self.bot.mongo.blocker.get_banned_user_reason(ctx.author.id)
@@ -138,7 +138,10 @@ class Translate(commands.Cog):
                     channel = self.bot.get_channel(ctx.channel.id)
                     resolvedMessage = await channel.fetch_message(messageid)
                 msg = resolvedMessage
-                link = resolvedMessage.attachments[0].url
+                try:
+                    link = resolvedMessage.attachments[0].url
+                except:
+                    return await ctx.reply("> **There is no attachment in the provided message**")
             elif isinstance(file, discord.Attachment):
                 link = file.url
             else:
