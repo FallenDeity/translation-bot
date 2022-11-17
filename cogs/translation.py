@@ -370,6 +370,7 @@ class Translate(commands.Cog):
                                                                                None,
                                                                                None,
                                                                                language)
+                await asyncio.sleep(4.7)
             except Exception as e:
                 if "TooManyRequests" in str(e):
                     raise e
