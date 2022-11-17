@@ -475,7 +475,7 @@ class Crawler(commands.Cog):
         for tag in ['/', '\\', '!', '<', '>', "'", '"', ':', ";", '?', '|', '*', ';', '\r', '\n', '\t', '\\\\']:
             title_name = title_name.replace(tag, '')
         title_name = title_name.replace('_', ' ')
-        original_Language = FileHandler.find_language("title_name " + title_name)
+        original_Language = FileHandler.find_language(text="title_name " + title_name, link=link)
         if title_name == "" or title_name == "None" or title_name is None:
             title = f"{ctx.author.id}_crl"
             title_name = link
@@ -500,7 +500,9 @@ class Crawler(commands.Cog):
             ids = []
             for n in novel_data:
                 ids.append(n._id)
-                if title_name.strip('__')[0] in n.title:
+                org_str = ''.join(e for e in title.split('__')[0] if e.isalnum())
+                lib_str = ''.join(e for e in n.title if e.isalnum())
+                if title.strip('__')[0] in n.title or org_str in lib_str:
                     name_lib_check = True
             if True:
                 ids = ids[:20]
@@ -510,7 +512,7 @@ class Crawler(commands.Cog):
                     await ctx.send("**Please check from above library**", delete_after=20)
                     await asyncio.sleep(12)
                 for l in ["bixiange", "trxs", "txt520", "powanjuan", "tongrenquan", "jpxs"]:
-                    if l in link:
+                    if l in link and name_lib_check:
                         await ctx.send("Novel is already in our library. if its not ping Admin")
                         return None
                     else:
@@ -730,7 +732,7 @@ class Crawler(commands.Cog):
                                                                                    False, "size")
                 if len(ids) < 5 or name_lib_check:
                     await ctx.send("**Please check from above library**", delete_after=20)
-                    await asyncio.sleep(12)
+                    await asyncio.sleep(15)
                 chk_msg = await ctx.send(embed=discord.Embed(
                     description=f"This novel **{title}** is already in our library with ids **{ids.__str__()}**...use arrow marks in above to navigate...\nIf you want to continue crawling react with 🇳 \n\n**Note : Some files are in docx format, so file size maybe half the size of txt. and try to minimize translating if its already in library**"))
                 await chk_msg.add_reaction('🇾')

@@ -223,9 +223,9 @@ class Translate(commands.Cog):
                 if name in n.title:
                     name_lib_check = True
                 try:
-                    size_found = round(os.path.getsize(f"{ctx.author.id}.txt") / (1024 ** 2), 2) - 0.01
+                    size_found = round(os.path.getsize(f"{ctx.author.id}.txt") / (1024 ** 2), 2) - 0.10
                     lib_size = round(n.size / (1024 ** 2), 2)
-                    if size_found <= lib_size:
+                    if size_found <= lib_size <= 2*size_found:
                         size_check = True
                 except:
                     pass
