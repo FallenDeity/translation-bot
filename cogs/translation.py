@@ -216,7 +216,7 @@ class Translate(commands.Cog):
             name_lib_check = False
             for n in novel_data:
                 ids.append(n._id)
-                if "english" == n.language.lower():
+                if "english" == n.language:
                     eng_check = True
                 if language == n.language:
                     lang_check = True
