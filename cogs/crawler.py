@@ -101,7 +101,7 @@ class Crawler(commands.Cog):
         return nums, full
 
     def scrape(self, scraper, links: str):
-        response = scraper.get(links, headers=headers, timeout=10)
+        response = scraper.get(links, headers=headers, timeout=20)
         return response
 
     def direct(self, urls: t.List[str], novel: t.Dict[int, str], name: int, cloudscrape: bool) -> dict:
@@ -403,7 +403,7 @@ class Crawler(commands.Cog):
                 link = link[:-1]
 
             try:
-                response = requests.get(link, headers=headers, timeout=10)
+                response = requests.get(link, headers=headers, timeout=20)
             except:
                 print('error')
             response.encoding = response.apparent_encoding
@@ -640,15 +640,15 @@ class Crawler(commands.Cog):
         else:
             css = CssSelector.findURLCSS(firstchplink)
         if noofchapters is None:
-            noofchapters = 2000
+            noofchapters = 3000
         try:
             if cloudscrape:
                 scraper = cloudscraper.CloudScraper()
-                response = scraper.get(firstchplink, headers=headers, timeout=10)
+                response = scraper.get(firstchplink, headers=headers, timeout=20)
                 await asyncio.sleep(0.25)
             else:
                 scraper = None
-                response = requests.get(firstchplink, headers=headers, timeout=10)
+                response = requests.get(firstchplink, headers=headers, timeout=20)
         except Exception as e:
             print(e)
             return await ctx.reply(
