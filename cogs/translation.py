@@ -216,19 +216,21 @@ class Translate(commands.Cog):
             name_lib_check = False
             for n in novel_data:
                 ids.append(n._id)
-                if "english" == n.language:
+                if "english" == str(n.language).lower():
                     eng_check = True
-                if language == n.language:
+                if language == str(n.language).lower():
                     lang_check = True
-                if name in n.title:
-                    name_lib_check = True
-                try:
-                    size_found = round(os.path.getsize(f"{ctx.author.id}.txt") / (1024 ** 2), 2) - 0.10
-                    lib_size = round(n.size / (1024 ** 2), 2)
-                    if size_found <= lib_size <= 2*size_found:
-                        size_check = True
-                except:
-                    pass
+                    org_str = ''.join(e for e in name.split('__')[0] if e.isalnum())
+                    lib_str = ''.join(e for e in n.title if e.isalnum())
+                    if org_str in lib_str:
+                        name_lib_check = True
+                        try:
+                            size_found = round(os.path.getsize(f"{ctx.author.id}.txt") / (1024 ** 2), 2) - 0.10
+                            lib_size = round(n.size / (1024 ** 2), 2)
+                            if size_found <= lib_size <= 2*size_found:
+                                size_check = True
+                        except:
+                            pass
             if lang_check:
                 ids = ids[:20]
                 rep_msg = await rep_msg.edit(content="Novel is already in our library")
@@ -237,7 +239,7 @@ class Translate(commands.Cog):
                                                                                     None, None, False, "size")
                 if len(ids) < 5 or name_lib_check:
                     await ctx.send("**Please check from above library**", delete_after=20)
-                    await asyncio.sleep(12)
+                    await asyncio.sleep(15)
                 if name_lib_check and size_check:
                     await ctx.send("**Please check from above library**")
                     return None
