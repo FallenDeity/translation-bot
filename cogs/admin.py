@@ -172,7 +172,7 @@ class Admin(commands.Cog):
         # app = h.app(os.getenv("APPNAME"))
 
     @commands.hybrid_command(help="Give the latency and uptime of the bot... ")
-    async def ping(self, ctx: commands.Context):
+    async def status(self, ctx: commands.Context):
         # await ctx.send(str(datetime.datetime.utcnow())+".-"+str(ctx.message.created_at))
         await ctx.send(f"Latency is {int(self.bot.ws.latency*1000)} ms")
         for roles in ctx.author.roles:
@@ -183,7 +183,7 @@ class Admin(commands.Cog):
                     f"Bot is up for {str(td[0]) + ' days ' if td[0] > 0 else ''}{str(td[1]) + ' hours ' if td[1] > 0 else ''}{str(td[2]) + ' minutes' if td[2] > 0 else ''}",
                     ephemeral=True)
                 try:
-                    await ctx.send(embed=discord.Embed(title=f"**Bot has {str(len(asyncio.all_tasks()))} running at the moment **", description=f"\n{str(asyncio.all_tasks())[:2000]}", colour=discord.Colour.dark_blue()))
+                    await ctx.send(embed=discord.Embed(title=f"**Bot has {str(len(asyncio.all_tasks()))} tasks running at the moment**", description=f"\n{str(asyncio.all_tasks())[:2000]}", colour=discord.Colour.dark_blue()))
                 except Exception as e:
                     print(e)
         return None

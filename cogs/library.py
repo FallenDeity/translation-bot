@@ -173,9 +173,17 @@ class Library(commands.Cog):
             if rating:
                 valid.append(rating)
         if raw_language:
-            raw_language = await self.bot.mongo.library.get_novel_by_rawlanguage(raw_language)
+            raw_language_list = await self.bot.mongo.library.get_novel_by_rawlanguage(raw_language)
+            try:
+                if "chinese (simplified)" == raw_language:
+                    temp = await self.bot.mongo.library.get_novel_by_rawlanguage(raw_language)
+                    for t in temp:
+                        raw_language_list.append(t)
+            except:
+                pass
             if raw_language:
-                valid.append(raw_language)
+                valid.append(raw_language_list)
+
         if size:
             # print(size)
             size = await self.bot.mongo.library.get_novel_by_size(size)
@@ -238,6 +246,13 @@ class Library(commands.Cog):
         return
 
     @search.autocomplete("language")
+    async def translate_complete(
+            self, inter: discord.Interaction, language: str
+    ) -> list[app_commands.Choice]:
+        lst = [i for i in self.bot.all_langs if language.lower() in i.lower()][:25]
+        return [app_commands.Choice(name=i, value=i) for i in lst]
+
+    @search.autocomplete("raw_language")
     async def translate_complete(
             self, inter: discord.Interaction, language: str
     ) -> list[app_commands.Choice]:
