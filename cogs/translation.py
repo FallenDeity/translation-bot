@@ -221,11 +221,12 @@ class Translate(commands.Cog):
                 if language == str(n.language).lower():
                     lang_check = True
                     org_str = ''.join(e for e in name.split('__')[0] if e.isalnum())
-                    lib_str = ''.join(e for e in n.title if e.isalnum())
-                    if org_str in lib_str:
+                    lib_str = ''.join(e for e in str(n.title).split('__')[0] if e.isalnum())
+                    if org_str.lower() in lib_str.lower() or org_str.lower() == lib_str.lower():
                         name_lib_check = True
                         try:
                             size_found = round(os.path.getsize(f"{ctx.author.id}.txt") / (1024 ** 2), 2) - 0.10
+                            size_found = size_found - 0.1*size_found
                             lib_size = round(n.size / (1024 ** 2), 2)
                             if size_found <= lib_size <= 2*size_found:
                                 size_check = True
