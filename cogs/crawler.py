@@ -510,7 +510,7 @@ class Crawler(commands.Cog):
                                                                                     title_name.split('__')[0], None, None, None, None, None, None, None, False, "size")
                 if len(ids) < 5 or name_lib_check:
                     await ctx.send("**Please check from above library**", delete_after=20)
-                    await asyncio.sleep(12)
+                    await asyncio.sleep(15)
                 for l in ["bixiange", "trxs", "txt520", "powanjuan", "tongrenquan", "jpxs"]:
                     if l in link and name_lib_check:
                         await ctx.send("Novel is already in our library. if its not ping Admin")
@@ -792,9 +792,9 @@ class Crawler(commands.Cog):
                     else:
                         return await ctx.send(" There is some problem with the detected selector")
                 if "readwn" in current_link or "wuxiax.co" in current_link or "novelmt.com" in current_link or "fannovels.com" in current_link:
-                    await asyncio.sleep(1.1)
+                    await asyncio.sleep(2)
                     if i %25 == 0:
-                        await asyncio.sleep(4)
+                        await asyncio.sleep(4.5)
                 try:
                     output = await self.getcontent(current_link, css, path, self.bot, sel_tag, scraper)
                     chp_text = output[0]
@@ -822,12 +822,12 @@ class Crawler(commands.Cog):
                 chp_count += 1
                 crawled_urls.append(current_link)
                 current_link = output[1]
-                if chp_count % 50 ==0:
+                if random.randint(0, 35) == 10:
                     await msg.edit(content=f"> :white_check_mark:  Started crawling from 📔 {title_name}\n**Crawled {chp_count} pages**")
 
             with open(title + '.txt', 'w', encoding='utf-8') as f:
                 f.write(full_text)
-            await ctx.send(f"> **crawled {i} chapters or pages**")
+            await ctx.send(f"> **crawled {i} chapters**")
             return await FileHandler().crawlnsend(ctx, self.bot, title, title_name, original_Language)
         except Exception as e:
             await ctx.send("> Error occurred .Please report to admin +\n" + str(e))
