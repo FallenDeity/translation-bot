@@ -16,7 +16,7 @@ class CssSelector:
                 or "qbtr" in link
                 or "tongrenquan" in link
         ):
-            return ".read_chapterDetail p ::text"
+            return ".read_chapterDetail ::text"
         elif "biqugeabc" in link:
             return ".text_row_txt >p ::text"
         elif "uuks" in link:
