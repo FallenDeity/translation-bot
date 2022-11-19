@@ -67,7 +67,10 @@ class Translate(commands.Cog):
             except:
                 return await ctx.reply("send a valid id")
         if ctx.author.id == 925597069748621353:
-            await asyncio.sleep(10)
+            while len(asyncio.all_tasks())>=8 or ctx.author.id in self.bot.translator:
+                if ctx.author.id not in self.bot.translator:
+                    self.bot.translator[ctx.author.id] = f"waiting"
+                await asyncio.sleep(20)
         file = link or file
         if ctx.author.id in self.bot.blocked:
             reason = await self.bot.mongo.blocker.get_banned_user_reason(ctx.author.id)
