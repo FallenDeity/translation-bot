@@ -130,8 +130,16 @@ class Raizel(commands.Bot):
     async def auto_restart(self):
         i = 0
         if self.auto_restart.current_loop != 0:
+            await self.change_presence(
+                activity=discord.Activity(
+                    type=discord.ActivityType.watching,
+                    name="for Restart. Please don't start any other tasks till I turn idle",
+                ),
+                status=discord.Status.do_not_disturb,
+            )
+            await asyncio.sleep(60)
             while True:
-                if (not self.crawler.items() and not self.translator.items()) or i == 6:
+                if (not self.crawler.items() and not self.translator.items()) or i == 20:
                     print("restart " + str(datetime.datetime.now()))
                     channel = self.get_channel(
                         991911644831678484
@@ -158,4 +166,4 @@ class Raizel(commands.Bot):
                     await channel.send(embed=discord.Embed(
                         description="Task is already running.. waiting for it to finish for restart",
                         colour=discord.Colour.random()))
-                    await asyncio.sleep(60)
+                    await asyncio.sleep(40)
