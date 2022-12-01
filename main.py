@@ -27,13 +27,12 @@ async def before_census():
 @bot.event
 async def on_ready():
     print(f"Running as {bot.user}")
-    await bot.tree.sync()
-    census.start()
+    
 
 
 async def main():
     async with bot:
-        await bot.start()
+        print("done"
 
 
 if __name__ == "__main__":
