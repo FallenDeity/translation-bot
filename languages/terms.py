@@ -7671,7 +7671,7 @@ def terms(value: str):
     return term_dict
 
 
-def get_dictionary() -> list[str]:
+def get_dictionary():
     temp = [terms(str(i)).values() for i in range(1, 8)]
     dictionary = []
     for i in temp:
