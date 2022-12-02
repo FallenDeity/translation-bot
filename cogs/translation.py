@@ -93,6 +93,9 @@ class Translate(commands.Cog):
         file_type = None
         name = None
         rep_msg = await ctx.reply("Please wait.. Translation will began soon")
+        while len(asyncio.all_tasks()) >= 8:
+            await rep_msg.edit("> **Currently bot is busy.Please wait some time**")
+            await asyncio.sleep(10)
         if link is not None and ("discord.com/channels" in link or link.isnumeric()):
             messageid = link
             link = None

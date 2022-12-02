@@ -553,6 +553,9 @@ class Crawler(commands.Cog):
                             pass
                         await chk_msg.delete()
                         return None
+        while len(asyncio.all_tasks()) >= 8:
+            await msg.edit("> **Currently bot is busy.Please wait some time**")
+            await asyncio.sleep(10)
         try:
             self.bot.crawler[ctx.author.id] = f"0/{len(urls)}"
             msg_content = f"> **:white_check_mark: Started Crawling the novel --  📔   {title_name.split('__')[0].strip()}.**"
