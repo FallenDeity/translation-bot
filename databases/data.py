@@ -1,5 +1,6 @@
 import datetime
 from dataclasses import dataclass
+from typing import List
 
 
 @dataclass
@@ -9,7 +10,7 @@ class Novel:
     description: str
     rating: float
     language: str
-    tags: list[str]
+    tags: List[str]
     download: str
     size: float
     uploader: int
