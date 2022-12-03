@@ -554,7 +554,7 @@ class Crawler(commands.Cog):
                         await chk_msg.delete()
                         return None
         while len(asyncio.all_tasks()) >= 8:
-            await msg.edit("> **Currently bot is busy.Please wait some time**")
+            await msg.edit(content="> **Currently bot is busy.Please wait some time**")
             await asyncio.sleep(10)
         try:
             self.bot.crawler[ctx.author.id] = f"0/{len(urls)}"
