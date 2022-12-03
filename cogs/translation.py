@@ -93,8 +93,14 @@ class Translate(commands.Cog):
         file_type = None
         name = None
         rep_msg = await ctx.reply("Please wait.. Translation will began soon")
-        while len(asyncio.all_tasks()) >= 8:
-            await rep_msg.edit(content="> **Currently bot is busy.Please wait some time**")
+        no_tries = 0
+        while len(asyncio.all_tasks()) >= 7 or len(self.bot.translator) >= 3:
+            no_tries = no_tries + 1
+            await rep_msg.edit(
+                content=f"> **Currently bot is busy.Please wait some time. Please wait till bot become free. will retry automatically in 20sec  ** {str(no_tries)} try")
+            if no_tries >= 5:
+                self.bot.translator = {}
+                await asyncio.sleep(10)
             await asyncio.sleep(10)
         if link is not None and ("discord.com/channels" in link or link.isnumeric()):
             messageid = link
@@ -296,7 +302,7 @@ class Translate(commands.Cog):
             try:
                 asyncio.create_task(self.bot.get_command("translate").callback(Translate(self.bot), context_new, link,
                                                                                file,
-                                                                               messageid,
+                                                                               None,
                                                                                "english", novelname, rawname,
                                                                                library_id))
             except:
@@ -343,11 +349,19 @@ class Translate(commands.Cog):
         return [app_commands.Choice(name=i, value=i) for i in lst]
 
     async def cc_prog(self, msg: discord.Message, msg_content: str, author_id: int) -> typing.Optional[discord.Message]:
+        value = 0
         while author_id in self.bot.translator:
-            await asyncio.sleep(10)
+            await asyncio.sleep(8)
             if author_id not in self.bot.translator:
                 return None
-            content = msg_content + f"\nProgress > **🚄`{self.bot.translator[author_id]}`**"
+            try:
+                if eval(self.bot.translator[author_id]) < value:
+                    return None
+                else:
+                    value = eval(self.bot.translator[author_id])
+            except Exception as e:
+                print(e)
+            content = msg_content + f"\nProgress > **🚄`{self.bot.translator[author_id]}`** + {value}"
             await msg.edit(content=content)
         return
 
@@ -382,7 +396,7 @@ class Translate(commands.Cog):
                                                                                None,
                                                                                None,
                                                                                language)
-                await asyncio.sleep(4.7)
+                await asyncio.sleep(5)
             except Exception as e:
                 if "TooManyRequests" in str(e):
                     raise e

@@ -195,10 +195,18 @@ class Crawler(commands.Cog):
         await ctx.send(f"> **🚄`{self.bot.crawler[ctx.author.id]}`**")
 
     async def cc_prog(self, msg: discord.Message, msg_content: str, author_id: int) -> typing.Optional[discord.Message]:
+        value = 0
         while author_id in self.bot.crawler:
             await asyncio.sleep(6)
             if author_id not in self.bot.crawler:
                 return None
+            try:
+                if eval(self.bot.crawler[author_id]) < value:
+                    return None
+                else:
+                    value = eval(self.bot.crawler[author_id])
+            except Exception as e:
+                print(e)
             content = msg_content + f"\nProgress > **🚄`{self.bot.crawler[author_id]}`**"
             await msg.edit(content=content)
         return
@@ -553,6 +561,10 @@ class Crawler(commands.Cog):
                             pass
                         await chk_msg.delete()
                         return None
+        if ctx.author.id in self.bot.crawler:
+            return await ctx.reply(
+                "> **❌You cannot crawl two novels at the same time.**"
+            )
         while len(asyncio.all_tasks()) >= 8:
             await msg.edit(content="> **Currently bot is busy.Please wait some time**")
             await asyncio.sleep(10)
