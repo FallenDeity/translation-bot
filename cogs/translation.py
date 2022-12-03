@@ -139,6 +139,7 @@ class Translate(commands.Cog):
                     msg_id = int(spl_link[6])
                     server = self.bot.get_guild(server_id)
                     channel = server.get_channel(channel_id)
+
                     resolvedMessage = await channel.fetch_message(msg_id)
                 else:
                     channel = self.bot.get_channel(ctx.channel.id)
