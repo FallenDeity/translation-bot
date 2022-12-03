@@ -401,7 +401,8 @@ class Translate(commands.Cog):
                 if "TooManyRequests" in str(e):
                     raise e
                 else:
-                    await ctx.send(f"> Error occurred in translating {attached.filename}")
+                    print(e)
+                    await ctx.send(f"> Error occurred in translating {attached.filename}\ndue to : {str(e)}")
 
     @multi.autocomplete("language")
     async def translate_complete(
