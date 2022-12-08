@@ -205,9 +205,11 @@ class Crawler(commands.Cog):
                     return None
                 else:
                     value = eval(self.bot.crawler[author_id])
+                    out = str(round(value * 100, 2))
             except Exception as e:
                 print(e)
-            content = msg_content + f"\nProgress > **🚄`{self.bot.crawler[author_id]}`**"
+                out = ""
+            content = msg_content + f"\nProgress > **🚄`{self.bot.crawler[author_id]}`    {out}%**"
             await msg.edit(content=content)
         return
 
@@ -837,8 +839,9 @@ class Crawler(commands.Cog):
                 chp_count += 1
                 crawled_urls.append(current_link)
                 current_link = output[1]
-                if random.randint(0, 35) == 10:
+                if random.randint(1, 30) == 10:
                     await msg.edit(content=f"> :white_check_mark:  Started crawling from 📔 {title_name}\n**Crawled {chp_count} pages**")
+                    asyncio.sleep(1)
 
             with open(title + '.txt', 'w', encoding='utf-8') as f:
                 f.write(full_text)

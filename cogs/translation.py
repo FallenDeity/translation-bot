@@ -359,9 +359,11 @@ class Translate(commands.Cog):
                     return None
                 else:
                     value = eval(self.bot.translator[author_id])
+                    out = str(round(value * 100, 2))
             except Exception as e:
                 print(e)
-            content = msg_content + f"\nProgress > **🚄`{self.bot.translator[author_id]}`**"
+                out = ""
+            content = msg_content + f"\nProgress > **🚄`{self.bot.translator[author_id]}`    {out}%**"
             await msg.edit(content=content)
         return
 
