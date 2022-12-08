@@ -61,7 +61,7 @@ class CssSelector:
             return "#nr1 ::text"
         elif "www.xindingdianxsw.com/" in link:
             return "p ::text"
-        elif "m.akshu8.com" in link or "soruncg.com" in link or "www.630shu.net" in link or "www.yifan.net" in link:
+        elif "m.akshu8.com" in link or "soruncg.com" in link or "www.630shu.net" in link or "www.yifan.net" in link or "www.soxscc.net" in link:
             return "#content ::text"
         elif "www.wnmtl.org" in link:
             return "#reader > div > div.chapter-container ::text"
@@ -69,6 +69,8 @@ class CssSelector:
             return "#chaptercontent ::text"
         elif "www.qcxxs.com" in link:
             return "body > div.container > div.row.row-detail > div > div ::text"
+        elif "m.soxscc.net" in link:
+            return "#chapter > div.content ::text"
         else:
             return "* ::text"
 
@@ -81,30 +83,30 @@ class CssSelector:
                 or "jpxs" in link
         ):
             return [".infos>h1:first-child", ""]
-        if "txt520" in link:
+        elif "txt520" in link or "powanjuan" in link or "ffxs" in link:
             return ["title", ""]
-        if "bixiange" in link:
+        elif "bixiange" in link:
             return [".desc>h1", ""]
-        if "powanjuan" in link or "ffxs" in link:
-            return ["title", ""]
-        if "sjks" in link:
+        elif "sjks" in link:
             return [".box-artic>h1", ""]
-        if "sj.uukanshu" in link or "t.uukanshu" in link:
+        elif "sj.uukanshu" in link or "t.uukanshu" in link:
             return [".bookname", "#divContent >h3 ::text"]
-        if "uukanshu.cc" in link:
+        elif "uukanshu.cc" in link:
             return [".booktitle", "h1 ::text"]
-        if "biqugeabc" in link:
+        elif "biqugeabc" in link or "ptwxz" in link:
             return ["title", "title ::text"]
-        if "uuks" in link:
+        elif "uuks" in link:
             return [".jieshao_content>h1", "h1#timu ::text"]
-        if "uukanshu" in link:
+        elif "uukanshu" in link:
             return ["title", "h1#timu ::text"]
-        if "69shu" in link:
+        elif "69shu" in link:
             return [".bread>a:nth-of-type(3)", "title ::text"]
-        if "ptwxz" in link:
-            return [".title", "title ::text"]
-        if "m.qidian" in link:
+        elif "m.qidian" in link:
             return ["#header > h1", ""]
+        elif "m.soxscc.net" in link:
+            return ["title", "#chapter > h1 ::text"]
+        elif "www.soxscc.net" in link:
+            return ["#info > h1", "body > div.content_read > div > div.bookname > h1 ::text"]
         else:
             return ["title", "title ::text"]
 
