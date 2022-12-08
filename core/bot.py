@@ -126,7 +126,7 @@ class Raizel(commands.Bot):
         langs = list(self.languages.keys()) + list(self.languages.values())
         return langs
 
-    @tasks.loop(hours=3)
+    @tasks.loop(hours=4)
     async def auto_restart(self):
         i = 0
         if self.auto_restart.current_loop != 0:
@@ -150,9 +150,7 @@ class Raizel(commands.Bot):
                     except:
                         pass
                     try:
-                        h = heroku3.from_key(os.getenv("APIKEY"))
-                        app = h.app(os.getenv("APPNAME"))
-                        app.restart()
+                        await self.start()
                     except Exception as e:
                         print("error occurred at restarting")
                         print(e)
