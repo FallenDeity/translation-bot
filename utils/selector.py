@@ -141,6 +141,8 @@ class CssSelector:
             return ["#book > div.content > div:nth-child(5) > ul > li:nth-child(3) > a", "title"]
         elif "m.630shu.net" in link:
             return ["#pb_next", "title"]
+        elif "m.soxscc.net" in link:
+            return ["#chapter > div.pager > a:nth-child(3)", "#bookname"]
         elif "www.qcxxs.com" in link:
             return ["body > div.container > div.row.row-detail > div > div > div.read_btn > a:nth-child(4)", "body > div.container > div.row.row-detail > div > h2 > a:nth-child(3)"]
         else:
