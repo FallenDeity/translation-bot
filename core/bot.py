@@ -102,8 +102,8 @@ class Raizel(commands.Bot):
                 pass
             print('error occurred on connecting to Discord client... will try after 60 secs')
             print(e)
-            time.sleep(60)
-            return await self.start()
+            # time.sleep(60)
+            # return await self.start()
 
     @property
     def uptime(self) -> datetime.timedelta:
