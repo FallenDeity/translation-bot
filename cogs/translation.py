@@ -353,9 +353,13 @@ class Translate(commands.Cog):
         while author_id in self.bot.translator:
             await asyncio.sleep(8)
             if author_id not in self.bot.translator:
+                content = msg_content + f"\nProgress > **🚄`Completed`    {100}%**"
+                await msg.edit(content=content)
                 return None
             try:
                 if eval(self.bot.translator[author_id]) < value:
+                    content = msg_content + f"\nProgress > **🚄`Completed`    {100}%**"
+                    await msg.edit(content=content)
                     return None
                 else:
                     value = eval(self.bot.translator[author_id])

@@ -199,9 +199,13 @@ class Crawler(commands.Cog):
         while author_id in self.bot.crawler:
             await asyncio.sleep(6)
             if author_id not in self.bot.crawler:
+                content = msg_content + f"\nProgress > **🚄`Completed`    {100}%**"
+                await msg.edit(content=content)
                 return None
             try:
                 if eval(self.bot.crawler[author_id]) < value:
+                    content = msg_content + f"\nProgress > **🚄`Completed`    {100}%**"
+                    await msg.edit(content=content)
                     return None
                 else:
                     value = eval(self.bot.crawler[author_id])
