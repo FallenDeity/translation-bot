@@ -81,7 +81,7 @@ class Termer(commands.Cog):
         no_tries = 0
         while len(asyncio.all_tasks()) >= 7 or len(self.bot.translator) >= 3:
             no_tries = no_tries + 1
-            await rep_msg.edit(content=f"> **Currently bot is busy.Please wait some time. Please wait till bot become free. will retry automatically in 20sec  ** {str(no_tries)} try")
+            rep_msg = await rep_msg.edit(content=f"> **Currently bot is busy.Please wait some time. Please wait till bot become free. will retry automatically in 20sec  ** {str(no_tries)} try")
             if no_tries >= 5:
                 self.bot.translator = {}
                 await asyncio.sleep(10)
@@ -302,7 +302,7 @@ class Termer(commands.Cog):
             novel = await FileHandler().read_file(ctx)
         rep_msg = await rep_msg.edit(content=f"> **✅Terming started. **")
         novel = self.term_raw(novel, term_dict)
-        msg_content = f"> **✅Terming completed ..Translation started. Translating to {language}.**"
+        msg_content = f"> **✅Terming completed.. Started Translating 📔{novelname} Translating to {language}.**"
         rep_msg = await rep_msg.edit(
             content=msg_content
         )
@@ -340,12 +340,12 @@ class Termer(commands.Cog):
             await asyncio.sleep(6)
             if author_id not in self.bot.translator:
                 content = msg_content + f"\nProgress > **🚄`Completed`    {100}%**"
-                await msg.edit(content=content)
+                msg = await msg.edit(content=content)
                 return None
             try:
                 if eval(self.bot.translator[author_id]) < value:
                     content = msg_content + f"\nProgress > **🚄`Completed`    {100}%**"
-                    await msg.edit(content=content)
+                    msg = await msg.edit(content=content)
                     return None
                 else:
                     value = eval(self.bot.translator[author_id])
@@ -354,7 +354,7 @@ class Termer(commands.Cog):
                 print(e)
                 out = ""
             content = msg_content + f"\nProgress > **🚄`{self.bot.translator[author_id]}`    {out}%**"
-            await msg.edit(content=content)
+            msg = await msg.edit(content=content)
         return
 
     @termer.autocomplete("term")

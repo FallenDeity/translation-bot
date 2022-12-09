@@ -96,7 +96,7 @@ class Translate(commands.Cog):
         no_tries = 0
         while len(asyncio.all_tasks()) >= 7 or len(self.bot.translator) >= 3:
             no_tries = no_tries + 1
-            await rep_msg.edit(
+            rep_msg = await rep_msg.edit(
                 content=f"> **Currently bot is busy.Please wait some time. Please wait till bot become free. will retry automatically in 20sec  ** {str(no_tries)} try")
             if no_tries >= 5:
                 self.bot.translator = {}
@@ -309,7 +309,7 @@ class Translate(commands.Cog):
                 pass
         if ctx.author.id in self.bot.translator and not ctx.author.id == 925597069748621353:
             return await ctx.send("> **❌You cannot translate two novels at a time.**", ephemeral=True)
-        msg_content = f"> **✅ Started translating {name}. Translating to {language}.**"
+        msg_content = f"> **✅ Started translating 📔 {name}. Translating to {language}.**"
         rep_msg = await rep_msg.edit(content=msg_content)
         try:
             try:
@@ -354,12 +354,12 @@ class Translate(commands.Cog):
             await asyncio.sleep(8)
             if author_id not in self.bot.translator:
                 content = msg_content + f"\nProgress > **🚄`Completed`    {100}%**"
-                await msg.edit(content=content)
+                msg = await msg.edit(content=content)
                 return None
             try:
                 if eval(self.bot.translator[author_id]) < value:
                     content = msg_content + f"\nProgress > **🚄`Completed`    {100}%**"
-                    await msg.edit(content=content)
+                    msg = await msg.edit(content=content)
                     return None
                 else:
                     value = eval(self.bot.translator[author_id])
@@ -368,7 +368,7 @@ class Translate(commands.Cog):
                 print(e)
                 out = ""
             content = msg_content + f"\nProgress > **🚄`{self.bot.translator[author_id]}`    {out}%**"
-            await msg.edit(content=content)
+            msg = await msg.edit(content=content)
         return
 
     @commands.hybrid_command(

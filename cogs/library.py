@@ -148,11 +148,11 @@ class Library(commands.Cog):
                 random.shuffle(novels)
             if show_list:
                 embeds = await self.make_list_embed_list(novels)
-                await msg.edit(content=f"> Found {len(novels)} novels")
+                msg = await msg.edit(content=f"> Found {len(novels)} novels")
                 await self.buttons(embeds, ctx)
             else:
                 embeds = await self.make_list_embed(novels)
-                await msg.edit(content=f"> Found {len(embeds)} novels")
+                msg = await msg.edit(content=f"> Found {len(embeds)} novels")
                 await self.buttons(embeds, ctx)
             return
         valid = []
@@ -222,11 +222,11 @@ class Library(commands.Cog):
                     allnovels.reverse()
         if show_list:
             embeds = await self.make_list_embed_list(allnovels)
-            await msg.edit(content=f"> Found **{len(allnovels)}** novels")
+            msg = await msg.edit(content=f"> Found **{len(allnovels)}** novels")
             await self.buttons(embeds, ctx)
         else:
             embeds = await self.make_list_embed(allnovels)
-            await msg.edit(content=f"> Found **{len(embeds)}** novels")
+            msg = await msg.edit(content=f"> Found **{len(embeds)}** novels")
             await self.buttons(embeds, ctx)
 
     @library.command(name="random", help="Gives 10 random novel in library.")

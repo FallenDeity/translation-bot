@@ -200,12 +200,12 @@ class Crawler(commands.Cog):
             await asyncio.sleep(6)
             if author_id not in self.bot.crawler:
                 content = msg_content + f"\nProgress > **🚄`Completed`    {100}%**"
-                await msg.edit(content=content)
+                msg = await msg.edit(content=content)
                 return None
             try:
                 if eval(self.bot.crawler[author_id]) < value:
                     content = msg_content + f"\nProgress > **🚄`Completed`    {100}%**"
-                    await msg.edit(content=content)
+                    msg = await msg.edit(content=content)
                     return None
                 else:
                     value = eval(self.bot.crawler[author_id])
@@ -214,7 +214,7 @@ class Crawler(commands.Cog):
                 print(e)
                 out = ""
             content = msg_content + f"\nProgress > **🚄`{self.bot.crawler[author_id]}`    {out}%**"
-            await msg.edit(content=content)
+            msg = await msg.edit(content=content)
         return
 
     @commands.hybrid_command(help="stops the tasks initiated by user", aliases=["st"])
@@ -572,7 +572,7 @@ class Crawler(commands.Cog):
                 "> **❌You cannot crawl two novels at the same time.**"
             )
         while len(asyncio.all_tasks()) >= 8:
-            await msg.edit(content="> **Currently bot is busy.Please wait some time**")
+            msg = await msg.edit(content="> **Currently bot is busy.Please wait some time**")
             await asyncio.sleep(10)
         try:
             self.bot.crawler[ctx.author.id] = f"0/{len(urls)}"
@@ -790,7 +790,7 @@ class Crawler(commands.Cog):
                             pass
                         await chk_msg.delete()
                         return None
-        await msg.edit(content=f"> :white_check_mark:  Started crawling from 📔 {title_name}")
+        msg = await msg.edit(content=f"> :white_check_mark:  Started crawling from 📔 {title_name}")
         crawled_urls = []
         repeats = 0
         try:
@@ -843,8 +843,8 @@ class Crawler(commands.Cog):
                 chp_count += 1
                 crawled_urls.append(current_link)
                 current_link = output[1]
-                if random.randint(1, 30) == 10:
-                    await msg.edit(content=f"> :white_check_mark:  Started crawling from 📔 {title_name}\n**Crawled {chp_count} pages**")
+                if random.randint(1, 35) == 10:
+                    msg = await msg.edit(content=f"> :white_check_mark:  Started crawling from 📔 {title_name}\n**Crawled {chp_count} pages**")
                     asyncio.sleep(1)
 
             with open(title + '.txt', 'w', encoding='utf-8') as f:
