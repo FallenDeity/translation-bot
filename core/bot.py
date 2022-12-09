@@ -2,12 +2,10 @@ import asyncio
 import datetime
 import os
 import random
-import time
 import typing as t
 
 import aiohttp
 import discord
-import heroku3
 import nltk
 from discord.ext import commands
 from filestack import Client
@@ -126,7 +124,7 @@ class Raizel(commands.Bot):
         langs = list(self.languages.keys()) + list(self.languages.values())
         return langs
 
-    @tasks.loop(hours=1)
+    @tasks.loop(minutes=2)
     async def auto_restart(self):
         i = 0
         if self.auto_restart.current_loop != 0:
@@ -150,8 +148,16 @@ class Raizel(commands.Bot):
                     except:
                         pass
                     try:
-                        await self.start()
+                        raise Exception
+                        # new_ch = self.get_channel(
+                        #     991911644831678484
+                        # ) or await self.bot.fetch_channel(991911644831678484)
+                        # msg_new = await new_ch.fetch_message(1050579735840817202)
+                        # context_new = await self.bot.get_context(msg_new)
+                        # command = await self.get_command("restart").callback(Admin(self), context_new)
                     except Exception as e:
+                        await self.close()
+                        raise Exception("closed session")
                         print("error occurred at restarting")
                         print(e)
                     break
