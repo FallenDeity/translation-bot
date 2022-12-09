@@ -35,6 +35,7 @@ class Raizel(commands.Bot):
         self.languages = choices
         self.dictionary: str = get_dictionary()
         self.boot = datetime.datetime.utcnow()
+        self.app_status: str = "up"
         super().__init__(
             command_prefix=commands.when_mentioned_or(".t"),
             intents=intents,
@@ -135,6 +136,7 @@ class Raizel(commands.Bot):
                 ),
                 status=discord.Status.do_not_disturb,
             )
+            self.app_status = "restart"
             await asyncio.sleep(60)
             while True:
                 if (not self.crawler.items() and not self.translator.items()) or i == 20:

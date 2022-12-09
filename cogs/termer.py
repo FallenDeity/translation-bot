@@ -59,6 +59,9 @@ class Termer(commands.Cog):
         file = link or file
         if not file and not messageid:
             return await ctx.reply(f"> **❌Send an attachment or a link.**")
+        if self.bot.app_status == "restart":
+            return await ctx.reply(
+                f"> Bot is scheduled to restart within 60 sec or after all current tasks are completed.. Please try after bot is restarted")
         if ctx.author.id in self.bot.blocked:
             reason = await self.bot.mongo.blocker.get_banned_user_reason(ctx.author.id)
             reason = reason['reason']
