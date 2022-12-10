@@ -75,7 +75,7 @@ class FileHandler:
             lang = languages.choices
             original_Language = {i for i in lang if lang[i] == lang_code}
         if original_Language == set() or original_Language == [set()]:
-            original_Language = FileHandler.find_language(text[600:])
+            original_Language = FileHandler.find_language(text[600:700])
         else:
             try:
                 original_Language = original_Language.pop()
