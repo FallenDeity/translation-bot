@@ -61,10 +61,10 @@ class FileHandler:
                 text = text.replace("title_name ", "")
                 lang_code = single_detection(str(text[:120]), api_key=random.choice(api_keys))
             else:
-                lang_code = single_detection(text[200:400].__str__(), api_key=random.choice(api_keys))
+                lang_code = single_detection(text[200:250].__str__(), api_key=random.choice(api_keys))
         except:
             try:
-                lang_code = single_detection(text[500:620].__str__(), api_key=random.choice(api_keys))
+                lang_code = single_detection(text[1:100].__str__(), api_key=random.choice(api_keys))
             except:
                 lang_code = 'NA'
         if lang_code == 'zh':
