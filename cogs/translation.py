@@ -69,10 +69,12 @@ class Translate(commands.Cog):
         if self.bot.app_status == "restart":
             return await ctx.reply(f"> Bot is scheduled to restart within 60 sec or after all current tasks are completed.. Please try after bot is restarted")
         if ctx.author.id == 925597069748621353:
-            while len(asyncio.all_tasks())>=8 or ctx.author.id in self.bot.translator:
+            while len(asyncio.all_tasks())>=10 or (ctx.author.id in self.bot.translator and not self.bot.translator[ctx.author.id] == "waiting"):
                 if ctx.author.id not in self.bot.translator:
                     self.bot.translator[ctx.author.id] = f"waiting"
                 await asyncio.sleep(20)
+                if self.bot.translator[ctx.author.id] == "waiting" and len(self.bot.translator) <=1:
+                    break
         file = link or file
         if ctx.author.id in self.bot.blocked:
             reason = await self.bot.mongo.blocker.get_banned_user_reason(ctx.author.id)
