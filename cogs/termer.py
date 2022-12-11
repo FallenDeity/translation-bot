@@ -82,11 +82,14 @@ class Termer(commands.Cog):
         name = None
         rep_msg = await ctx.reply("Please wait.. Translation will began soon")
         no_tries = 0
-        while len(asyncio.all_tasks()) >= 7 or len(self.bot.translator) >= 3:
+        while len(asyncio.all_tasks()) >= 9 or len(self.bot.translator) >= 3:
             no_tries = no_tries + 1
-            rep_msg = await rep_msg.edit(content=f"> **Currently bot is busy.Please wait some time. Please wait till bot become free. will retry automatically in 20sec  ** {str(no_tries)} try")
+            rep_msg = await rep_msg.edit(
+                content=f"> **Currently bot is busy.Please wait some time. Please wait till bot become free. will retry automatically in 20sec  ** {str(no_tries)} try")
             if no_tries >= 5:
                 self.bot.translator = {}
+                if len(self.bot.translator) < 2:
+                    break
                 await asyncio.sleep(10)
             await asyncio.sleep(10)
         if link is not None and ("discord.com/channels" in link or link.isnumeric()):

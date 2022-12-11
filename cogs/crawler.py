@@ -574,9 +574,17 @@ class Crawler(commands.Cog):
             return await ctx.reply(
                 "> **❌You cannot crawl two novels at the same time.**"
             )
-        while len(asyncio.all_tasks()) >= 8:
+        no_tries = 0
+        while len(asyncio.all_tasks()) >= 10:
+            no_tries = no_tries + 1
             msg = await msg.edit(content="> **Currently bot is busy.Please wait some time**")
             await asyncio.sleep(10)
+            if no_tries >= 5:
+                self.bot.translator = {}
+                self.bot.crawler = {}
+                if len(self.bot.crawler) < 3:
+                    break
+                await asyncio.sleep(10)
         try:
             self.bot.crawler[ctx.author.id] = f"0/{len(urls)}"
             msg_content = f"> **:white_check_mark: Started Crawling the novel --  📔   {title_name.split('__')[0].strip()}.**"

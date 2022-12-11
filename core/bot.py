@@ -137,7 +137,9 @@ class Raizel(commands.Bot):
                 status=discord.Status.do_not_disturb,
             )
             self.app_status = "restart"
-            await asyncio.sleep(60)
+            self.bot.translator = {}
+            self.bot.crawler = {}
+            await asyncio.sleep(50)
             while True:
                 if (not self.crawler.items() and not self.translator.items()) or i == 20:
                     print("restart " + str(datetime.datetime.now()))
@@ -172,4 +174,6 @@ class Raizel(commands.Bot):
                     await channel.send(embed=discord.Embed(
                         description="Task is already running.. waiting for it to finish for restart",
                         colour=discord.Colour.random()))
+                    self.bot.translator = {}
+                    self.bot.crawler = {}
                     await asyncio.sleep(40)

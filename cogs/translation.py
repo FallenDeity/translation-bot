@@ -96,12 +96,14 @@ class Translate(commands.Cog):
         name = None
         rep_msg = await ctx.reply("Please wait.. Translation will began soon")
         no_tries = 0
-        while len(asyncio.all_tasks()) >= 7 or len(self.bot.translator) >= 3:
+        while len(asyncio.all_tasks()) >= 9 or len(self.bot.translator) >= 3:
             no_tries = no_tries + 1
             rep_msg = await rep_msg.edit(
                 content=f"> **Currently bot is busy.Please wait some time. Please wait till bot become free. will retry automatically in 20sec  ** {str(no_tries)} try")
             if no_tries >= 5:
                 self.bot.translator = {}
+                if len(self.bot.translator) < 2:
+                    break
                 await asyncio.sleep(10)
             await asyncio.sleep(10)
         if link is not None and ("discord.com/channels" in link or link.isnumeric()):
@@ -396,11 +398,17 @@ class Translate(commands.Cog):
             return await ctx.reply(content="> Attach a file to translate")
         count = 1
         for attached in message.attachments:
-            await ctx.send(f"**Translating {count} out of {len(message.attachments)}**")
+            try:
+                ctx_new = self.bot.get_context(message)
+            except:
+                channel = self.bot.get_channel(ctx_new.channel.id)
+                message = await channel.fetch_message(messageid)
+                ctx_new = self.bot.get_context(message)
+            await ctx_new.send(f"**Translating {count} out of {len(message.attachments)}**")
             count = count + 1
             await asyncio.sleep(0.5)
             try:
-                ctx.command = await self.bot.get_command("translate").callback(Translate(self.bot), ctx, attached.url,
+                ctx.command = await self.bot.get_command("translate").callback(Translate(self.bot), ctx_new, attached.url,
                                                                                None,
                                                                                None,
                                                                                language)
@@ -410,7 +418,8 @@ class Translate(commands.Cog):
                     raise e
                 else:
                     print(e)
-                    await ctx.send(f"> Error occurred in translating {attached.filename}\ndue to : {str(e)}")
+                    ctx_new = self.bot.get_context(message)
+                    await ctx_new.send(f"> Error occurred in translating {attached.filename}\ndue to : {str(e)}")
 
     @multi.autocomplete("language")
     async def translate_complete(
