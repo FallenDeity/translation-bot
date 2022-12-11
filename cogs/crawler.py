@@ -858,7 +858,10 @@ class Crawler(commands.Cog):
                 crawled_urls.append(current_link)
                 current_link = output[1]
                 if random.randint(1, 35) == 10:
-                    msg = await msg.edit(content=f"> :white_check_mark:  Started crawling from 📔 {title_name}\n**Crawled {chp_count} pages**")
+                    try:
+                        msg = await msg.edit(content=f"> :white_check_mark:  Started crawling from 📔 {title_name}\n**Crawled {chp_count} pages**")
+                    except:
+                        pass
                     asyncio.sleep(1)
 
             with open(title + '.txt', 'w', encoding='utf-8') as f:
