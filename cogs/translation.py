@@ -98,8 +98,11 @@ class Translate(commands.Cog):
         no_tries = 0
         while len(asyncio.all_tasks()) >= 9 or len(self.bot.translator) >= 3:
             no_tries = no_tries + 1
-            rep_msg = await rep_msg.edit(
-                content=f"> **Currently bot is busy.Please wait some time. Please wait till bot become free. will retry automatically in 20sec  ** {str(no_tries)} try")
+            try:
+                rep_msg = await rep_msg.edit(
+                    content=f"> **Currently bot is busy.Please wait some time. Please wait till bot become free. will retry automatically in 20sec  ** {str(no_tries)} try")
+            except:
+                pass
             if no_tries >= 5:
                 self.bot.translator = {}
                 if len(self.bot.translator) < 2:

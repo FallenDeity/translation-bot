@@ -214,7 +214,10 @@ class Crawler(commands.Cog):
                 print(e)
                 out = ""
             content = msg_content + f"\nProgress > **🚄`{self.bot.crawler[author_id]}`    {out}%**"
-            msg = await msg.edit(content=content)
+            try:
+                msg = await msg.edit(content=content)
+            except:
+                pass
         return
 
     @commands.hybrid_command(help="stops the tasks initiated by user", aliases=["st"])
@@ -524,7 +527,9 @@ class Crawler(commands.Cog):
             if True:
                 ids = ids[:20]
                 ctx.command = await self.bot.get_command("library search").callback(Library(self.bot), ctx,
-                                                                                    title_name.split('__')[0], None, None, None, None, None, None, None, False, "size")
+                                                                                    title_name.split('__')[0], None,
+                                                                                    None, None, None, None, None, None,
+                                                                                    False, "size")
                 if len(ids) < 5 or name_lib_check:
                     await ctx.send("**Please check from above library**", delete_after=20)
                     await asyncio.sleep(15)
@@ -577,7 +582,10 @@ class Crawler(commands.Cog):
         no_tries = 0
         while len(asyncio.all_tasks()) >= 10:
             no_tries = no_tries + 1
-            msg = await msg.edit(content="> **Currently bot is busy.Please wait some time**")
+            try:
+                msg = await msg.edit(content="> **Currently bot is busy.Please wait some time**")
+            except:
+                pass
             await asyncio.sleep(10)
             if no_tries >= 5:
                 self.bot.translator = {}
@@ -663,7 +671,7 @@ class Crawler(commands.Cog):
                 title_css = nextsel[1]
                 secondchplink = None
                 cloudscrape = True
-            if "fannovels.com" in firstchplink or "xindingdianxsw.com" in firstchplink or "longteng788.com" in firstchplink or "75zw.com" in firstchplink or "longteng788.com" in firstchplink or "m.akshu8.com" in firstchplink or "www.wnmtl.org" in firstchplink :
+            if "fannovels.com" in firstchplink or "xindingdianxsw.com" in firstchplink or "longteng788.com" in firstchplink or "75zw.com" in firstchplink or "longteng788.com" in firstchplink or "m.akshu8.com" in firstchplink or "www.wnmtl.org" in firstchplink:
                 cloudscrape = False
         if secondchplink is None and nextselector is None:
             return await ctx.send("You must give second chapter link or next page css selector")
@@ -764,7 +772,7 @@ class Crawler(commands.Cog):
                 ctx.command = await self.bot.get_command("library search").callback(Library(self.bot), ctx,
                                                                                     title_name.split('__')[0], None,
                                                                                     None, None, None, None, None, None,
-                                                                                   False, "size")
+                                                                                    False, "size")
                 if len(ids) < 5 or name_lib_check:
                     await ctx.send("**Please check from above library**", delete_after=20)
                     await asyncio.sleep(15)
@@ -828,7 +836,7 @@ class Crawler(commands.Cog):
                         return await ctx.send(" There is some problem with the detected selector")
                 if "readwn" in current_link or "wuxiax.co" in current_link or "novelmt.com" in current_link or "fannovels.com" in current_link:
                     await asyncio.sleep(1.3)
-                    if i %25 == 0:
+                    if i % 25 == 0:
                         await asyncio.sleep(4.1)
                 try:
                     output = await self.getcontent(current_link, css, path, self.bot, sel_tag, scraper)
@@ -857,12 +865,13 @@ class Crawler(commands.Cog):
                 chp_count += 1
                 crawled_urls.append(current_link)
                 current_link = output[1]
-                if random.randint(1, 35) == 10:
+                if random.randint(0, 65) == 10 or chp_count % 100 == 0:
                     try:
-                        msg = await msg.edit(content=f"> :white_check_mark:  Started crawling from 📔 {title_name}\n**Crawled {chp_count} pages**")
+                        msg = await msg.edit(
+                            content=f"> :white_check_mark:  Started crawling from 📔 {title_name}\n**Crawled {chp_count} pages**")
                     except:
                         pass
-                    asyncio.sleep(1)
+                    await asyncio.sleep(0.5)
 
             with open(title + '.txt', 'w', encoding='utf-8') as f:
                 f.write(full_text)
