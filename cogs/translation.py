@@ -402,11 +402,12 @@ class Translate(commands.Cog):
         count = 1
         for attached in message.attachments:
             try:
-                ctx_new = self.bot.get_context(message)
+                ctx_new = await self.bot.get_context(message)
             except:
                 channel = self.bot.get_channel(ctx_new.channel.id)
                 message = await channel.fetch_message(messageid)
-                ctx_new = self.bot.get_context(message)
+                ctx_new = await self.bot.get_context(message)
+            await asyncio.sleep(1)
             await ctx_new.send(f"**Translating {count} out of {len(message.attachments)}**")
             count = count + 1
             await asyncio.sleep(0.5)
