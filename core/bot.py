@@ -136,7 +136,7 @@ class Raizel(commands.Bot):
                 ),
                 status=discord.Status.do_not_disturb,
             )
-            self.app_status = "restart"
+            # self.app_status = "restart"
             self.bot.translator = {}
             self.bot.crawler = {}
             await asyncio.sleep(50)
@@ -152,6 +152,7 @@ class Raizel(commands.Bot):
                     except:
                         pass
                     try:
+                        await self.close()
                         raise Exception
                         # new_ch = self.get_channel(
                         #     991911644831678484
