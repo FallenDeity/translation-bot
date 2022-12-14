@@ -136,11 +136,12 @@ class Raizel(commands.Bot):
                 ),
                 status=discord.Status.do_not_disturb,
             )
-            # self.app_status = "restart"
-            self.bot.translator = {}
-            self.bot.crawler = {}
+            self.app_status = "restart"
+            self.translator = {}
+            self.crawler = {}
             await asyncio.sleep(50)
             while True:
+                print("Started restart")
                 if (not self.crawler.items() and not self.translator.items()) or i == 20:
                     print("restart " + str(datetime.datetime.now()))
                     channel = self.get_channel(
