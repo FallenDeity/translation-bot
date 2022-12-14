@@ -16,3 +16,4 @@ class Novel:
     uploader: int
     date: datetime.datetime.timestamp
     org_language: str = 'NA'
+    category: str = 'others'
