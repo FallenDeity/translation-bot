@@ -527,7 +527,7 @@ class Crawler(commands.Cog):
             if True:
                 ids = ids[:20]
                 ctx.command = await self.bot.get_command("library search").callback(Library(self.bot), ctx,
-                                                                                    title_name.split('__')[0], None,
+                                                                                    title_name.split('__')[0], None, None,
                                                                                     None, None, None, None, None, None,
                                                                                     False, "size", 20)
                 if len(ids) < 5 or name_lib_check:
@@ -770,7 +770,7 @@ class Crawler(commands.Cog):
             if True:
                 ids = ids[:20]
                 ctx.command = await self.bot.get_command("library search").callback(Library(self.bot), ctx,
-                                                                                    title_name.split('__')[0], None,
+                                                                                    title_name.split('__')[0], None, None,
                                                                                     None, None, None, None, None, None,
                                                                                     False, "size", 20)
                 if len(ids) < 5 or name_lib_check:
