@@ -54,7 +54,7 @@ class FileHandler:
         if link is not None:
             for l in ["bixiange", "trxs", "txt520", "powanjuan", "tongrenquan", "jpxs", "ptwxz", "qidian", "xindingdian", "longteng", "akshu8", "qbtr"]:
                 if l in link:
-                    return ['chinese (simplified)']
+                    return 'chinese (simplified)'
         api_keys = ['8ca7a29f3b7c8ac85487451129f35c89', '1c2d644450cb8923818607150e7766d4',
                     '5cd7b28759bb7aafe9b1d395824e7a67', 'af207e865e0277f375348293a30bcc5e']
         try:
