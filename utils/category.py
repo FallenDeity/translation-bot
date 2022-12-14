@@ -31,7 +31,7 @@ class Categorizer:
                     'big mom', '柱灭之刃', 'big-mom', 'kaido', 'charlotte', 'nami', 'robin', 'grand voyage',
                     'great voyage', 'akainu', 'yellow ape', 'navy', 'celestial dragon', 'great route']
         dc = ['superman', 'bat-man', 'super-man', 'clark', 'speedster', 'aquaman']
-        marvel = ['marvel', 'meimen', 'DC', '美漫', '漫威', 'infinite gem', 'loki', 'thor', 'shield agent', 'coulson', 'agent shield']
+        marvel = ['marvel', 'meimen', '美漫', '漫威', 'infinite gem', 'loki', 'thor', 'shield agent', 'coulson', 'agent shield']
         pokemon = ['pokemon', '神奇宝贝', '精灵', 'elves', 'elf', 'trainer', 'digimon', 'pokémon']
         chatroom = ['聊天群组', '聊天室', 'chat group', 'chat rooms', 'chatgroup',
                     'red envelope', 'exchange group', 'exchangegroup']
@@ -47,11 +47,11 @@ class Categorizer:
         conan = ['conan', 'winery', 'belmod', 'belmod', 'black organization', 'blackorganization']
         highdxd = ['high school', 'dxd', '惡魔高校', 'demon high']
         simulation = ['simulation', '模拟']
-        hunter = ['hunter', '猎人']
-        globalrei = ['全球综漫轮', 'global reinc', 'global', 'spiritual energy']
+        hunter = ['hunter', '猎人', 'hunterXhunter', 'hxh']
+        globalrei = ['全球综漫轮', 'global reincarnation', 'global', 'spiritual energy']
         dragonball = ['龙珠', 'dragon ball', 'trunks', 'goku', 'vegeta', 'vegito', '破坏神', 'god of destruction']
         comprehensive = ['dimensional', '综漫', 'comprehensive', 'anime']
-        livebroadcast = ['live broadcast', '直播', 'broadcast', 'anchor']
+        livebroadcast = ['live broadcast', '直播', 'broadcast', 'anchor', 'stream']
         cartoonist = ['animation', 'manga', 'cartoonist', 'writer', '级漫画家', '画家', 'anime']
         doomsday = ['doomsday', '毁灭', 'apocalypse']
         urban = ['urban', 'city', '都市', '都市', 'shenhao', 'school flower', 'doctor']
