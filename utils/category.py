@@ -19,7 +19,7 @@ class Categorizer:
                "store", "horror", "Siheyuan", "Zombie", "Ultraman", "survival", "Hong Kong",
                "football", "tennis", "anti-japanese", "yugi-oh", "bleach", "detective", "LOL", "demon slayer",
                "shokugeki", "rebirth", "system", "Teacher", "Invincible flow",
-               "Jackie chan", "China dynasty", "Tech", "Journey to west", "One-punch man", "Special forces", "others"]
+               "Jackie chan", "China dynasty", "Tech", "Journey to west", "One-punch man", "Special forces", "uncategorized", "others"]
 
         return CAT
 
