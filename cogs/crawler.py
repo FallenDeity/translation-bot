@@ -529,7 +529,7 @@ class Crawler(commands.Cog):
                 ctx.command = await self.bot.get_command("library search").callback(Library(self.bot), ctx,
                                                                                     title_name.split('__')[0], None,
                                                                                     None, None, None, None, None, None,
-                                                                                    False, "size")
+                                                                                    False, "size", 20)
                 if len(ids) < 5 or name_lib_check:
                     await ctx.send("**Please check from above library**", delete_after=20)
                     await asyncio.sleep(15)
@@ -772,7 +772,7 @@ class Crawler(commands.Cog):
                 ctx.command = await self.bot.get_command("library search").callback(Library(self.bot), ctx,
                                                                                     title_name.split('__')[0], None,
                                                                                     None, None, None, None, None, None,
-                                                                                    False, "size")
+                                                                                    False, "size", 20)
                 if len(ids) < 5 or name_lib_check:
                     await ctx.send("**Please check from above library**", delete_after=20)
                     await asyncio.sleep(15)

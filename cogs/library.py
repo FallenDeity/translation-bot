@@ -131,6 +131,7 @@ class Library(commands.Cog):
             uploader: discord.User = None,
             shuffle: bool = True,
             sort_by: str = None,
+            no_of_novels: int = 300,
     ) -> None:
         msg = await ctx.send("Searching...")
         tags = [i.strip() for i in tags.split() if i] if tags else None
@@ -144,15 +145,26 @@ class Library(commands.Cog):
                 and uploader is None
         ):
             novels = await self.bot.mongo.library.get_all_novels
+            if show_list is True and no_of_novels == 300:
+                no_of_novels = 1000
+            if len(novels) >= no_of_novels:
+                full_size = len(novels)
+                novels = novels[:no_of_novels]
             if shuffle and sort_by is None:
                 random.shuffle(novels)
             if show_list:
                 embeds = await self.make_list_embed_list(novels)
-                msg = await msg.edit(content=f"> Found {len(novels)} novels")
+                if full_size != 0:
+                    msg = await msg.edit(content=f"> Showing first **{str(no_of_novels)} out of {str(full_size)}**")
+                else:
+                    msg = await msg.edit(content=f"> Found {len(novels)} novels")
                 await self.buttons(embeds, ctx)
             else:
                 embeds = await self.make_list_embed(novels)
-                msg = await msg.edit(content=f"> Found {len(embeds)} novels")
+                if full_size != 0:
+                    msg = await msg.edit(content=f"> Showing first **{str(no_of_novels)} out of {str(full_size)}**")
+                else:
+                    msg = await msg.edit(content=f"> Found {len(embeds)} novels")
                 await self.buttons(embeds, ctx)
             return
         valid = []
@@ -220,13 +232,26 @@ class Library(commands.Cog):
                 elif sort_by == "date":
                     allnovels.sort(key=lambda x: x.date)
                     allnovels.reverse()
+        print("got all novels")
+        full_size = 0
+        if show_list is True and no_of_novels == 300:
+            no_of_novels = 1000
+        if len(allnovels) >= no_of_novels:
+            full_size = len(allnovels)
+            allnovels = allnovels[:no_of_novels]
         if show_list:
             embeds = await self.make_list_embed_list(allnovels)
-            msg = await msg.edit(content=f"> Found **{len(allnovels)}** novels")
+            if full_size !=0:
+                msg = await msg.edit(content=f"> Showing first **{str(no_of_novels)} out of {str(full_size)}**")
+            else:
+                msg = await msg.edit(content=f"> Found **{len(allnovels)}** novels")
             await self.buttons(embeds, ctx)
         else:
             embeds = await self.make_list_embed(allnovels)
-            msg = await msg.edit(content=f"> Found **{len(embeds)}** novels")
+            if full_size != 0:
+                msg = await msg.edit(content=f"> Showing first **{str(no_of_novels)} out of {str(full_size)}**")
+            else:
+                msg = await msg.edit(content=f"> Found **{len(embeds)}** novels")
             await self.buttons(embeds, ctx)
 
     @library.command(name="random", help="Gives 10 random novel in library.")
