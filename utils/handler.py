@@ -21,6 +21,7 @@ from core.bot import Raizel
 from core.views.linkview import LinkView
 from databases.data import Novel
 from languages import languages
+from utils.category import Categorizer
 
 
 def chapter_to_str(chapter):
@@ -200,6 +201,12 @@ class FileHandler:
     ) -> None:
         download_url = None
         next_no = await bot.mongo.library.next_number
+        category = "uncategorized"
+        try:
+            category = await Categorizer().find_category(name)
+        except Exception as e:
+            print("exception in  getting category")
+            print(e)
         if (size := os.path.getsize(f"{ctx.author.id}.txt")) > 8 * 10 ** 6:
             try:
                 await ctx.send(
@@ -272,6 +279,7 @@ class FileHandler:
                 ctx.author.id,
                 datetime.datetime.utcnow().timestamp(),
                 original_language,
+                category
             ]
             data = Novel(*novel_data)
             try:
@@ -294,6 +302,12 @@ class FileHandler:
     ) -> str:
         download_url = None
         next_no = await bot.mongo.library.next_number
+        category = "uncategorized"
+        try:
+            category = await Categorizer().find_category(title_name)
+        except Exception as e:
+            print("exception in  getting category")
+            print(e)
         if (size := os.path.getsize(f"{title}.txt")) > 8 * 10 ** 6:
             if size > 32 * 10 ** 6 and int(bot.crawler[ctx.author.id].split("/")[1]) < 2000:
                 os.remove(f"{title}.txt")
@@ -353,6 +367,7 @@ class FileHandler:
                 ctx.author.id,
                 datetime.datetime.utcnow().timestamp(),
                 originallanguage,
+                category
             ]
             data = Novel(*novel_data)
             try:
