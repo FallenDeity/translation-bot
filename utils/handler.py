@@ -234,7 +234,7 @@ class FileHandler:
                     ) or await bot.fetch_channel(1005668482475643050)
                 user = str(ctx.author)
                 await channel.send(
-                    f"> **#{next_no}** {name.replace('_', ' ')} \nuploaded by {user} {ctx.author.mention} Translated from: {original_language} to: {language}",
+                    f"> **#{next_no}** {name.replace('_', ' ')} \nuploaded by {user} {ctx.author.mention} Translated from: {original_language} to: {language}\n Added in Category : {category}",
                     view=view, allowed_mentions=discord.AllowedMentions(users=False)
                 )
                 download_url = filelnk
@@ -257,7 +257,7 @@ class FileHandler:
                 ) or await bot.fetch_channel(1005668482475643050)
             user = str(ctx.author)
             msg = await channel.send(
-                f'> **#{next_no}** {name.replace("_", " ")} \nUploaded by {user} {ctx.author.mention} Translated from: {original_language} to: {language}',
+                f'> **#{next_no}** {name.replace("_", " ")} \nUploaded by {user} {ctx.author.mention} Translated from: {original_language} to: {language}\n Added in Category : {category}',
                 file=discord.File(f"{ctx.author.id}.txt", f"{name}.txt"),
                 allowed_mentions=discord.AllowedMentions(users=False)
             )
@@ -332,7 +332,7 @@ class FileHandler:
                 ) or await bot.fetch_channel(1020980703229382706)
                 user = str(ctx.author)
                 await channel.send(
-                    f"> **#{next_no}** {title_name} \nCrawled by {user} {ctx.author.mention} Source language : {originallanguage}",
+                    f"> **#{next_no}** {title_name} \nCrawled by {user} {ctx.author.mention} Source language : {originallanguage}\n Added in Category : {category}",
                     view=view, allowed_mentions=discord.AllowedMentions(users=False)
                 )
                 download_url = filelnk
@@ -348,7 +348,7 @@ class FileHandler:
             ) or await bot.fetch_channel(1020980703229382706)
             user = str(ctx.author)
             msg = await channel.send(
-                f'> **#{next_no}** {title_name} \nCrawled by {user} {ctx.author.mention} Source language : {originallanguage} ',
+                f'> **#{next_no}** {title_name} \nCrawled by {user} {ctx.author.mention} Source language : {originallanguage} \n Added in Category : {category}',
                 file=discord.File(f"{title}.txt"), allowed_mentions=discord.AllowedMentions(users=False)
             )
             download_url = msg.attachments[0].url
