@@ -8,6 +8,7 @@ from reactionmenu import ViewButton, ViewMenu
 
 from core.bot import Raizel
 from databases.data import Novel
+from utils.category import Categorizer
 
 
 class Library(commands.Cog):
@@ -70,6 +71,7 @@ class Library(commands.Cog):
             else "No description.",
             color=discord.Color.blue(),
         )
+        embed.add_field(name="Category", value=data.category)
         embed.add_field(name="Tags", value=f'```yaml\n{", ".join(data.tags)}```')
         if not str(data.org_language).lower() == 'na':
             embed.add_field(name="Raw Language", value=data.org_language)
@@ -125,12 +127,14 @@ class Library(commands.Cog):
             language: str = None,
             rating: int = None,
             show_list: bool = False,
+            category: str = None,
             tags: str = None,
             raw_language: str = None,
             size: float = None,
             uploader: discord.User = None,
             shuffle: bool = True,
             sort_by: str = None,
+            no_of_novels: int = 300,
     ) -> None:
         msg = await ctx.send("Searching...")
         tags = [i.strip() for i in tags.split() if i] if tags else None
@@ -138,21 +142,33 @@ class Library(commands.Cog):
                 title is None
                 and language is None
                 and rating is None
+                and category is None
                 and tags is None
                 and raw_language is None
                 and size is None
                 and uploader is None
         ):
             novels = await self.bot.mongo.library.get_all_novels
+            if show_list is True and no_of_novels == 300:
+                no_of_novels = 1000
+            if len(novels) >= no_of_novels:
+                full_size = len(novels)
+                novels = novels[:no_of_novels]
             if shuffle and sort_by is None:
                 random.shuffle(novels)
             if show_list:
                 embeds = await self.make_list_embed_list(novels)
-                await msg.edit(content=f"> Found {len(novels)} novels")
+                if full_size != 0:
+                    msg = await msg.edit(content=f"> Showing first **{str(no_of_novels)} out of {str(full_size)}**")
+                else:
+                    msg = await msg.edit(content=f"> Found {len(novels)} novels")
                 await self.buttons(embeds, ctx)
             else:
                 embeds = await self.make_list_embed(novels)
-                await msg.edit(content=f"> Found {len(embeds)} novels")
+                if full_size != 0:
+                    msg = await msg.edit(content=f"> Showing first **{str(no_of_novels)} out of {str(full_size)}**")
+                else:
+                    msg = await msg.edit(content=f"> Found {len(embeds)} novels")
                 await self.buttons(embeds, ctx)
             return
         valid = []
@@ -160,6 +176,10 @@ class Library(commands.Cog):
             title = await self.bot.mongo.library.get_novel_by_name(title)
             if title:
                 valid.append(title)
+        if category:
+            category = await self.bot.mongo.library.get_novel_by_category(category)
+            if category:
+                valid.append(category)
         if tags:
             tags = await self.bot.mongo.library.get_novel_by_tags(tags)
             if tags:
@@ -220,13 +240,26 @@ class Library(commands.Cog):
                 elif sort_by == "date":
                     allnovels.sort(key=lambda x: x.date)
                     allnovels.reverse()
+        print("got all novels")
+        full_size = 0
+        if show_list is True and no_of_novels == 300:
+            no_of_novels = 1000
+        if len(allnovels) >= no_of_novels:
+            full_size = len(allnovels)
+            allnovels = allnovels[:no_of_novels]
         if show_list:
             embeds = await self.make_list_embed_list(allnovels)
-            await msg.edit(content=f"> Found **{len(allnovels)}** novels")
+            if full_size !=0:
+                msg = await msg.edit(content=f"> Showing first **{str(no_of_novels)} out of {str(full_size)}**")
+            else:
+                msg = await msg.edit(content=f"> Found **{len(allnovels)}** novels")
             await self.buttons(embeds, ctx)
         else:
             embeds = await self.make_list_embed(allnovels)
-            await msg.edit(content=f"> Found **{len(embeds)}** novels")
+            if full_size != 0:
+                msg = await msg.edit(content=f"> Showing first **{str(no_of_novels)} out of {str(full_size)}**")
+            else:
+                msg = await msg.edit(content=f"> Found **{len(embeds)}** novels")
             await self.buttons(embeds, ctx)
 
     @library.command(name="random", help="Gives 10 random novel in library.")
@@ -257,6 +290,13 @@ class Library(commands.Cog):
             self, inter: discord.Interaction, language: str
     ) -> list[app_commands.Choice]:
         lst = [i for i in self.bot.all_langs if language.lower() in i.lower()][:25]
+        return [app_commands.Choice(name=i, value=i) for i in lst]
+
+    @search.autocomplete("category")
+    async def translate_complete(
+            self, inter: discord.Interaction, category: str
+    ) -> list[app_commands.Choice]:
+        lst = [i for i in Categorizer.get_categories() if category.lower() in i.lower()][:25]
         return [app_commands.Choice(name=i, value=i) for i in lst]
 
     @search.autocomplete("sort_by")
@@ -315,6 +355,21 @@ class Library(commands.Cog):
         await self.bot.mongo.library.update_rating(novel._id, rating)
         await ctx.send("Novel reviewed.")
 
+    @commands.has_role(1020638168237740042)
+    @library.command(name="category")
+    async def category(self, ctx: commands.Context):
+        await ctx.send("started categorizing")
+        for i in range(1, await self.bot.mongo.library.next_number):
+            # print(i)
+            try:
+                title: str = await self.bot.mongo.library.get_title_by_id(i)
+                category = await Categorizer().find_category(title)
+                await self.bot.mongo.library.update_category(i, category)
+                print(f"{str(i)} : category {category} updated for {title}")
+            except Exception as e:
+                print(f"error in {str(i)}")
+                print(e)
+        await ctx.send("finished categorizing")
 
 async def setup(bot: Raizel) -> None:
     await bot.add_cog(Library(bot))

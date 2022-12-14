@@ -59,6 +59,9 @@ class Termer(commands.Cog):
         file = link or file
         if not file and not messageid:
             return await ctx.reply(f"> **❌Send an attachment or a link.**")
+        if self.bot.app_status == "restart":
+            return await ctx.reply(
+                f"> Bot is scheduled to restart within 60 sec or after all current tasks are completed.. Please try after bot is restarted")
         if ctx.author.id in self.bot.blocked:
             reason = await self.bot.mongo.blocker.get_banned_user_reason(ctx.author.id)
             reason = reason['reason']
@@ -78,6 +81,17 @@ class Termer(commands.Cog):
         file_type = None
         name = None
         rep_msg = await ctx.reply("Please wait.. Translation will began soon")
+        no_tries = 0
+        while len(asyncio.all_tasks()) >= 9 or len(self.bot.translator) >= 3:
+            no_tries = no_tries + 1
+            rep_msg = await rep_msg.edit(
+                content=f"> **Currently bot is busy.Please wait some time. Please wait till bot become free. will retry automatically in 20sec  ** {str(no_tries)} try")
+            if no_tries >= 5:
+                self.bot.translator = {}
+                if len(self.bot.translator) < 2:
+                    break
+                await asyncio.sleep(10)
+            await asyncio.sleep(10)
         if link is not None and ("discord.com/channels" in link or link.isnumeric()):
             messageid = link
             link = None
@@ -207,7 +221,7 @@ class Termer(commands.Cog):
             name_lib_check = False
             for n in novel_data:
                 ids.append(n._id)
-                if "english" == n.language.lower():
+                if "english" == n.language:
                     eng_check = True
                 if language == n.language:
                     lang_check = True
@@ -223,8 +237,8 @@ class Termer(commands.Cog):
             if lang_check:
                 ids = ids[:20]
                 ctx.command = await self.bot.get_command("library search").callback(Library(self.bot), ctx, name,
-                                                                                    language, None, None, None, None,
-                                                                                    None, None, False, "size")
+                                                                                    language, None, None, None, None, None,
+                                                                                    None, None, False, "size", 20)
                 if len(ids) < 5 or name_lib_check:
                     await ctx.send("**Please check from above library**", delete_after=20)
                     await asyncio.sleep(12)
@@ -277,7 +291,7 @@ class Termer(commands.Cog):
                 asyncio.create_task(
                     self.bot.get_command("translate").callback(Termer(self.bot), context_new, term, link,
                                                                file,
-                                                               messageid,
+                                                               None,
                                                                "english", novelname, rawname, library_id))
             except:
                 pass
@@ -294,7 +308,7 @@ class Termer(commands.Cog):
             novel = await FileHandler().read_file(ctx)
         rep_msg = await rep_msg.edit(content=f"> **✅Terming started. **")
         novel = self.term_raw(novel, term_dict)
-        msg_content = f"> **✅Terming completed ..Translation started. Translating to {language}.**"
+        msg_content = f"> **✅Terming completed.. Started Translating 📔{novelname} Translating to {language}.**"
         rep_msg = await rep_msg.edit(
             content=msg_content
         )
@@ -327,12 +341,26 @@ class Termer(commands.Cog):
         return [app_commands.Choice(name=i, value=i) for i in lst]
 
     async def cc_prog(self, msg: discord.Message, msg_content: str, author_id: int) -> typing.Optional[discord.Message]:
+        value = 0
         while author_id in self.bot.translator:
             await asyncio.sleep(6)
             if author_id not in self.bot.translator:
+                content = msg_content + f"\nProgress > **🚄`Completed`    {100}%**"
+                msg = await msg.edit(content=content)
                 return None
-            content = msg_content + f"\nProgress > **🚄`{self.bot.translator[author_id]}`**"
-            await msg.edit(content=content)
+            try:
+                if eval(self.bot.translator[author_id]) < value:
+                    content = msg_content + f"\nProgress > **🚄`Completed`    {100}%**"
+                    msg = await msg.edit(content=content)
+                    return None
+                else:
+                    value = eval(self.bot.translator[author_id])
+                    out = str(round(value * 100, 2))
+            except Exception as e:
+                print(e)
+                out = ""
+            content = msg_content + f"\nProgress > **🚄`{self.bot.translator[author_id]}`    {out}%**"
+            msg = await msg.edit(content=content)
         return
 
     @termer.autocomplete("term")

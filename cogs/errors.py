@@ -1,10 +1,8 @@
-import os
 import random
 import traceback
 
-import aiohttp
 import discord
-import heroku3
+
 from discord.ext import commands
 
 from core.bot import Raizel
@@ -191,11 +189,7 @@ class ErrorHandler(commands.Cog):
                     color=discord.Color.red(),
                 ),
             )
-            h = heroku3.from_key(os.getenv("APIKEY"))
-            app = h.app(os.getenv("APPNAME"))
             await ctx.send("> Bot is restarting... please try after 30 sec....")
-            await ctx.send("Google api's are down for now . please try later ")
-            app.restart()
             channel = self.bot.get_channel(
                 991911644831678484
             ) or await self.bot.fetch_channel(991911644831678484)
@@ -205,6 +199,8 @@ class ErrorHandler(commands.Cog):
                 )
             except:
                 pass
+            return await self.bot.start()
+
         elif "Request exception can happen due to an api connection error" in str(error):
             await ctx.send(
                 embed=discord.Embed(
@@ -212,20 +208,6 @@ class ErrorHandler(commands.Cog):
                     color=discord.Color.red(),
                 ),
             )
-        elif "Error R14" in str(error):
-            try:
-                await ctx.send(
-                    embed=discord.Embed(
-                        description=f"Ram is overloaded .. trying to restart.",
-                        color=discord.Color.red(),
-                    ),
-                )
-            except:
-                pass
-            h = heroku3.from_key(os.getenv("APIKEY"))
-            app = h.app(os.getenv("APPNAME"))
-            await ctx.send("> Bot is restarting... please try after 30 sec....")
-            app.restart()
         elif "CloudflareChallengeError" in str(error):
             await ctx.send(embed=discord.Embed(description="Error occured in bypassing cloudflare challenge. This site is not supported by bot for now.", colour=discord.Color.red()))
         else:

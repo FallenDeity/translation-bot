@@ -2,12 +2,10 @@ import asyncio
 import datetime
 import os
 import random
-import time
 import typing as t
 
 import aiohttp
 import discord
-import heroku3
 import nltk
 from discord.ext import commands
 from filestack import Client
@@ -37,6 +35,7 @@ class Raizel(commands.Bot):
         self.languages = choices
         self.dictionary: str = get_dictionary()
         self.boot = datetime.datetime.utcnow()
+        self.app_status: str = "up"
         super().__init__(
             command_prefix=commands.when_mentioned_or(".t"),
             intents=intents,
@@ -102,8 +101,8 @@ class Raizel(commands.Bot):
                 pass
             print('error occurred on connecting to Discord client... will try after 60 secs')
             print(e)
-            time.sleep(60)
-            return await self.start()
+            # time.sleep(60)
+            # return await self.start()
 
     @property
     def uptime(self) -> datetime.timedelta:
@@ -126,7 +125,7 @@ class Raizel(commands.Bot):
         langs = list(self.languages.keys()) + list(self.languages.values())
         return langs
 
-    @tasks.loop(hours=3)
+    @tasks.loop(hours=5)
     async def auto_restart(self):
         i = 0
         if self.auto_restart.current_loop != 0:
@@ -137,8 +136,12 @@ class Raizel(commands.Bot):
                 ),
                 status=discord.Status.do_not_disturb,
             )
-            await asyncio.sleep(60)
+            self.app_status = "restart"
+            self.translator = {}
+            self.crawler = {}
+            await asyncio.sleep(50)
             while True:
+                print("Started restart")
                 if (not self.crawler.items() and not self.translator.items()) or i == 20:
                     print("restart " + str(datetime.datetime.now()))
                     channel = self.get_channel(
@@ -150,10 +153,17 @@ class Raizel(commands.Bot):
                     except:
                         pass
                     try:
-                        h = heroku3.from_key(os.getenv("APIKEY"))
-                        app = h.app(os.getenv("APPNAME"))
-                        app.restart()
+                        await self.close()
+                        raise Exception
+                        # new_ch = self.get_channel(
+                        #     991911644831678484
+                        # ) or await self.bot.fetch_channel(991911644831678484)
+                        # msg_new = await new_ch.fetch_message(1050579735840817202)
+                        # context_new = await self.bot.get_context(msg_new)
+                        # command = await self.get_command("restart").callback(Admin(self), context_new)
                     except Exception as e:
+                        await self.close()
+                        raise Exception("closed session")
                         print("error occurred at restarting")
                         print(e)
                     break
@@ -166,4 +176,6 @@ class Raizel(commands.Bot):
                     await channel.send(embed=discord.Embed(
                         description="Task is already running.. waiting for it to finish for restart",
                         colour=discord.Colour.random()))
+                    self.bot.translator = {}
+                    self.bot.crawler = {}
                     await asyncio.sleep(40)

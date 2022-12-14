@@ -21,6 +21,7 @@ from core.bot import Raizel
 from core.views.linkview import LinkView
 from databases.data import Novel
 from languages import languages
+from utils.category import Categorizer
 
 
 def chapter_to_str(chapter):
@@ -53,7 +54,7 @@ class FileHandler:
         if link is not None:
             for l in ["bixiange", "trxs", "txt520", "powanjuan", "tongrenquan", "jpxs", "ptwxz", "qidian", "xindingdian", "longteng", "akshu8", "qbtr"]:
                 if l in link:
-                    return ['chinese (simplified)']
+                    return 'chinese (simplified)'
         api_keys = ['8ca7a29f3b7c8ac85487451129f35c89', '1c2d644450cb8923818607150e7766d4',
                     '5cd7b28759bb7aafe9b1d395824e7a67', 'af207e865e0277f375348293a30bcc5e']
         try:
@@ -61,10 +62,10 @@ class FileHandler:
                 text = text.replace("title_name ", "")
                 lang_code = single_detection(str(text[:120]), api_key=random.choice(api_keys))
             else:
-                lang_code = single_detection(text[200:400].__str__(), api_key=random.choice(api_keys))
+                lang_code = single_detection(text[200:250].__str__(), api_key=random.choice(api_keys))
         except:
             try:
-                lang_code = single_detection(text[500:620].__str__(), api_key=random.choice(api_keys))
+                lang_code = single_detection(text[1:100].__str__(), api_key=random.choice(api_keys))
             except:
                 lang_code = 'NA'
         if lang_code == 'zh':
@@ -75,10 +76,13 @@ class FileHandler:
             lang = languages.choices
             original_Language = {i for i in lang if lang[i] == lang_code}
         if original_Language == set() or original_Language == [set()]:
-            original_Language = FileHandler.find_language(text[600:])
-        else:
+            original_Language = FileHandler.find_language(text[600:700])
+
+        try:
+            original_Language = original_Language.pop()
+        except:
             try:
-                original_Language = original_Language.pop()
+                original_Language = original_Language.replace("['", "").replace("']",  "")
             except:
                 pass
         return original_Language
@@ -200,6 +204,12 @@ class FileHandler:
     ) -> None:
         download_url = None
         next_no = await bot.mongo.library.next_number
+        category = "uncategorized"
+        try:
+            category = await Categorizer().find_category(name)
+        except Exception as e:
+            print("exception in  getting category")
+            print(e)
         if (size := os.path.getsize(f"{ctx.author.id}.txt")) > 8 * 10 ** 6:
             try:
                 await ctx.send(
@@ -272,6 +282,7 @@ class FileHandler:
                 ctx.author.id,
                 datetime.datetime.utcnow().timestamp(),
                 original_language,
+                category
             ]
             data = Novel(*novel_data)
             try:
@@ -294,6 +305,12 @@ class FileHandler:
     ) -> str:
         download_url = None
         next_no = await bot.mongo.library.next_number
+        category = "uncategorized"
+        try:
+            category = await Categorizer().find_category(title_name)
+        except Exception as e:
+            print("exception in  getting category")
+            print(e)
         if (size := os.path.getsize(f"{title}.txt")) > 8 * 10 ** 6:
             if size > 32 * 10 ** 6 and int(bot.crawler[ctx.author.id].split("/")[1]) < 2000:
                 os.remove(f"{title}.txt")
@@ -353,6 +370,7 @@ class FileHandler:
                 ctx.author.id,
                 datetime.datetime.utcnow().timestamp(),
                 originallanguage,
+                category
             ]
             data = Novel(*novel_data)
             try:

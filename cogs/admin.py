@@ -158,9 +158,11 @@ class Admin(commands.Cog):
             )
         except:
             pass
-        h = heroku3.from_key(os.getenv("APIKEY"))
-        app = h.app(os.getenv("APPNAME"))
-        app.restart()
+        return await self.bot.start()
+        # raise Exception("TooManyRequests")
+        # h = heroku3.from_key(os.getenv("APIKEY"))
+        # app = h.app(os.getenv("APPNAME"))
+        # app.restart()
 
     @commands.has_role(1020638168237740042)
     @commands.hybrid_command(help="Gives the logger for debug")

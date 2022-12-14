@@ -66,11 +66,15 @@ class Translate(commands.Cog):
                 link = novel_data.download
             except:
                 return await ctx.reply("send a valid id")
+        if self.bot.app_status == "restart":
+            return await ctx.reply(f"> Bot is scheduled to restart within 60 sec or after all current tasks are completed.. Please try after bot is restarted")
         if ctx.author.id == 925597069748621353:
-            while len(asyncio.all_tasks())>=8 or ctx.author.id in self.bot.translator:
+            while len(asyncio.all_tasks())>=10 or (ctx.author.id in self.bot.translator and not self.bot.translator[ctx.author.id] == "waiting"):
                 if ctx.author.id not in self.bot.translator:
                     self.bot.translator[ctx.author.id] = f"waiting"
                 await asyncio.sleep(20)
+                if self.bot.translator[ctx.author.id] == "waiting" and len(self.bot.translator) <=1:
+                    break
         file = link or file
         if ctx.author.id in self.bot.blocked:
             reason = await self.bot.mongo.blocker.get_banned_user_reason(ctx.author.id)
@@ -93,6 +97,20 @@ class Translate(commands.Cog):
         file_type = None
         name = None
         rep_msg = await ctx.reply("Please wait.. Translation will began soon")
+        no_tries = 0
+        while len(asyncio.all_tasks()) >= 9 or len(self.bot.translator) >= 3:
+            no_tries = no_tries + 1
+            try:
+                rep_msg = await rep_msg.edit(
+                    content=f"> **Currently bot is busy.Please wait some time. Please wait till bot become free. will retry automatically in 20sec  ** {str(no_tries)} try")
+            except:
+                pass
+            if no_tries >= 5:
+                self.bot.translator = {}
+                if len(self.bot.translator) < 2:
+                    break
+                await asyncio.sleep(10)
+            await asyncio.sleep(10)
         if link is not None and ("discord.com/channels" in link or link.isnumeric()):
             messageid = link
             link = None
@@ -136,6 +154,7 @@ class Translate(commands.Cog):
                     msg_id = int(spl_link[6])
                     server = self.bot.get_guild(server_id)
                     channel = server.get_channel(channel_id)
+
                     resolvedMessage = await channel.fetch_message(msg_id)
                 else:
                     channel = self.bot.get_channel(ctx.channel.id)
@@ -239,8 +258,8 @@ class Translate(commands.Cog):
                 ids = ids[:20]
                 rep_msg = await rep_msg.edit(content="Novel is already in our library")
                 ctx.command = await self.bot.get_command("library search").callback(Library(self.bot), ctx, name,
-                                                                                    language, None, None, None, None,
-                                                                                    None, None, False, "size")
+                                                                                    language, None, None, None, None, None,
+                                                                                    None, None, False, "size", 20)
                 if len(ids) < 5 or name_lib_check:
                     await ctx.send("**Please check from above library**", delete_after=20)
                     await asyncio.sleep(15)
@@ -292,14 +311,14 @@ class Translate(commands.Cog):
             try:
                 asyncio.create_task(self.bot.get_command("translate").callback(Translate(self.bot), context_new, link,
                                                                                file,
-                                                                               messageid,
+                                                                               None,
                                                                                "english", novelname, rawname,
                                                                                library_id))
             except:
                 pass
         if ctx.author.id in self.bot.translator and not ctx.author.id == 925597069748621353:
             return await ctx.send("> **❌You cannot translate two novels at a time.**", ephemeral=True)
-        msg_content = f"> **✅ Started translating {name}. Translating to {language}.**"
+        msg_content = f"> **✅ Started translating 📔 {name}. Translating to {language}.**"
         rep_msg = await rep_msg.edit(content=msg_content)
         try:
             try:
@@ -339,12 +358,26 @@ class Translate(commands.Cog):
         return [app_commands.Choice(name=i, value=i) for i in lst]
 
     async def cc_prog(self, msg: discord.Message, msg_content: str, author_id: int) -> typing.Optional[discord.Message]:
+        value = 0
         while author_id in self.bot.translator:
-            await asyncio.sleep(10)
+            await asyncio.sleep(8)
             if author_id not in self.bot.translator:
+                content = msg_content + f"\nProgress > **🚄`Completed`    {100}%**"
+                msg = await msg.edit(content=content)
                 return None
-            content = msg_content + f"\nProgress > **🚄`{self.bot.translator[author_id]}`**"
-            await msg.edit(content=content)
+            try:
+                if eval(self.bot.translator[author_id]) < value:
+                    content = msg_content + f"\nProgress > **🚄`Completed`    {100}%**"
+                    msg = await msg.edit(content=content)
+                    return None
+                else:
+                    value = eval(self.bot.translator[author_id])
+                    out = str(round(value * 100, 2))
+            except Exception as e:
+                print(e)
+                out = ""
+            content = msg_content + f"\nProgress > **🚄`{self.bot.translator[author_id]}`    {out}%**"
+            msg = await msg.edit(content=content)
         return
 
     @commands.hybrid_command(
@@ -370,20 +403,29 @@ class Translate(commands.Cog):
             return await ctx.reply(content="> Attach a file to translate")
         count = 1
         for attached in message.attachments:
-            await ctx.send(f"**Translating {count} out of {len(message.attachments)}**")
+            try:
+                ctx_new = await self.bot.get_context(message)
+            except:
+                channel = self.bot.get_channel(ctx_new.channel.id)
+                message = await channel.fetch_message(messageid)
+                ctx_new = await self.bot.get_context(message)
+            await asyncio.sleep(1)
+            await ctx_new.send(f"**Translating {count} out of {len(message.attachments)}**")
             count = count + 1
             await asyncio.sleep(0.5)
             try:
-                ctx.command = await self.bot.get_command("translate").callback(Translate(self.bot), ctx, attached.url,
+                ctx.command = await self.bot.get_command("translate").callback(Translate(self.bot), ctx_new, attached.url,
                                                                                None,
                                                                                None,
                                                                                language)
-                await asyncio.sleep(4.7)
+                await asyncio.sleep(5)
             except Exception as e:
                 if "TooManyRequests" in str(e):
                     raise e
                 else:
-                    await ctx.send(f"> Error occurred in translating {attached.filename}")
+                    print(e)
+                    ctx_new = self.bot.get_context(message)
+                    await ctx_new.send(f"> Error occurred in translating {attached.filename}\ndue to : {str(e)}")
 
     @multi.autocomplete("language")
     async def translate_complete(

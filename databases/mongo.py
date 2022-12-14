@@ -37,12 +37,20 @@ class Library(Database):
         novel = await self.library.find_one({"_id": _id})
         return Novel(**novel) if novel else None
 
+    async def get_title_by_id(self, _id: int) -> Novel:
+        novel = await self.library.find_one({"_id": _id})
+        return novel['title']
+
     async def update_novel(self, novel: Novel) -> None:
         await self.library.update_one({"_id": novel._id}, {"$set": novel.__dict__})
 
     async def get_novel_by_name(self, name: str) -> list[Novel]:
         name = get_regex_from_name(name)
         novels = await self.library.find({"title": re.compile(name, re.IGNORECASE)}).to_list(None)
+        return [Novel(**novel) for novel in novels] if novels else None
+
+    async def get_novel_by_category(self, category: str) -> list[Novel]:
+        novels = await self.library.find({"category": re.compile(category, re.IGNORECASE)}).to_list(None)
         return [Novel(**novel) for novel in novels] if novels else None
 
     async def get_novel_by_tags(self, tags: list[str]) -> list[Novel]:
@@ -72,6 +80,9 @@ class Library(Database):
 
     async def update_rating(self, _id: int, rating: int) -> None:
         await self.library.update_one({"_id": _id}, {"$set": {"rating": rating}})
+
+    async def update_category(self, _id: int, category: str) -> None:
+        await self.library.update_one({"_id": _id}, {"$set": {"category": category}})
 
     async def update_description(self, _id: int, description: str) -> None:
         await self.library.update_one(
