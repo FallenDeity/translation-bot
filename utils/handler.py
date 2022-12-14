@@ -77,9 +77,12 @@ class FileHandler:
             original_Language = {i for i in lang if lang[i] == lang_code}
         if original_Language == set() or original_Language == [set()]:
             original_Language = FileHandler.find_language(text[600:700])
-        else:
+
+        try:
+            original_Language = original_Language.pop()
+        except:
             try:
-                original_Language = original_Language.pop()
+                original_Language = original_Language.replace("['", "").replace("']",  "")
             except:
                 pass
         return original_Language

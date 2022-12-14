@@ -81,7 +81,7 @@ class Categorizer:
         rebirth = ['rebirth', 'reincarnation', 're-incarnation', '重生']
         system = ['system', '系统']
         teacher = ['teacher', '老师']
-        invincible = ['invinc', '最强', 'strong']
+        invincible = ['invinc', '最强', 'strong', "god level", "god-level"]
         jackie = ['jackie', '成龙']
         dynasty = ['tang', 'dynasty', 'song dy']
         tech = ['tech', 'robot', 'scholar', 'satellite', 'study', 'invent', 'build', 'scientific', 'research']
