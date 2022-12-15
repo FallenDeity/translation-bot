@@ -9,6 +9,7 @@ from deep_translator import GoogleTranslator
 from discord import app_commands
 from discord.ext import commands
 
+from cogs.admin import Admin
 from cogs.library import Library
 from core.bot import Raizel
 from core.views.linkview import LinkView
@@ -345,10 +346,26 @@ class Translate(commands.Cog):
             else:
                 raise e
         finally:
-            del self.bot.translator[ctx.author.id]
-            self.bot.titles.append(name)
-            # print(self.bot.titles[-1])
-            self.bot.titles = random.sample(self.bot.titles, len(self.bot.titles))
+            try:
+                del self.bot.translator[ctx.author.id]
+                self.bot.titles.append(name)
+                # print(self.bot.titles[-1])
+                self.bot.titles = random.sample(self.bot.titles, len(self.bot.titles))
+            except:
+                pass
+            try:
+                if self.bot.translation_count >=20 or self.bot.crawler_count >=20:
+                    await ctx.reply("> **Bot will be Restarted when the bot is free due to max limit is reached.. Please be patient")
+                    chan = self.bot.get_channel(
+                        991911644831678484
+                    ) or await self.bot.fetch_channel(991911644831678484)
+                    msg_new2 = await chan.fetch_message(1052750970557308988)
+                    context_new2 = await self.bot.get_context(msg_new2)
+                    asyncio.create_task(
+                        self.bot.get_command("restart").callback(Admin(self.bot), context_new2))
+
+            except:
+                pass
 
     @translate.autocomplete("language")
     async def translate_complete(

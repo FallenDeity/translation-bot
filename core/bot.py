@@ -36,6 +36,8 @@ class Raizel(commands.Bot):
         self.dictionary: str = get_dictionary()
         self.boot = datetime.datetime.utcnow()
         self.app_status: str = "up"
+        self.translation_count = 0
+        self.crawler_count = 0
         super().__init__(
             command_prefix=commands.when_mentioned_or(".t"),
             intents=intents,

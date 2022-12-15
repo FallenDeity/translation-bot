@@ -20,6 +20,7 @@ from discord import app_commands
 from discord.ext import commands
 from readabilipy import simple_json_from_html_string
 
+from cogs.admin import Admin
 from cogs.library import Library
 from cogs.termer import Termer
 from cogs.translation import Translate
@@ -116,8 +117,11 @@ class Crawler(commands.Cog):
             ]
             for future in concurrent.futures.as_completed(futures):
                 novel[future.result()[0]] = future.result()[1]
-                if self.bot.crawler[name] == "break":
-                    return None
+                try:
+                    if self.bot.crawler[name] == "break":
+                        return None
+                except:
+                    pass
                 self.bot.crawler[name] = f"{len(novel)}/{len(urls)}"
             return novel
 
@@ -527,7 +531,8 @@ class Crawler(commands.Cog):
             if True:
                 ids = ids[:20]
                 ctx.command = await self.bot.get_command("library search").callback(Library(self.bot), ctx,
-                                                                                    title_name.split('__')[0], None, None,
+                                                                                    title_name.split('__')[0], None,
+                                                                                    None,
                                                                                     None, None, None, None, None, None,
                                                                                     False, "size", 20)
                 if len(ids) < 5 or name_lib_check:
@@ -616,9 +621,26 @@ class Crawler(commands.Cog):
             await ctx.send("> Error occurred .Please report to admin +\n" + str(e))
             raise e
         finally:
-            del self.bot.crawler[ctx.author.id]
-            self.bot.titles.append(name)
-            self.bot.titles = random.sample(self.bot.titles, len(self.bot.titles))
+            try:
+                del self.bot.crawler[ctx.author.id]
+                self.bot.titles.append(name)
+                self.bot.titles = random.sample(self.bot.titles, len(self.bot.titles))
+            except:
+                pass
+            if translate_to is None and add_terms is None:
+                try:
+                    if self.bot.translation_count >= 20 or self.bot.crawler_count >= 20:
+                        await ctx.reply(
+                            "> **Bot will be Restarted when the bot is free due to max limit is reached.. Please be patient")
+                        chan = self.bot.get_channel(
+                            991911644831678484
+                        ) or await self.bot.fetch_channel(991911644831678484)
+                        msg_new2 = await chan.fetch_message(1052750970557308988)
+                        context_new2 = await self.bot.get_context(msg_new2)
+                        asyncio.create_task(
+                            self.bot.get_command("restart").callback(Admin(self.bot), context_new2))
+                except:
+                    pass
         if (
                 translate_to is not None or add_terms is not None) and download_url is not None and not download_url.strip() == "":
             if translate_to is None:
@@ -770,7 +792,8 @@ class Crawler(commands.Cog):
             if True:
                 ids = ids[:20]
                 ctx.command = await self.bot.get_command("library search").callback(Library(self.bot), ctx,
-                                                                                    title_name.split('__')[0], None, None,
+                                                                                    title_name.split('__')[0], None,
+                                                                                    None,
                                                                                     None, None, None, None, None, None,
                                                                                     False, "size", 20)
                 if len(ids) < 5 or name_lib_check:
@@ -818,8 +841,11 @@ class Crawler(commands.Cog):
         try:
             self.bot.crawler[ctx.author.id] = f"0/{noofchapters}"
             for i in range(1, noofchapters):
-                if self.bot.crawler[ctx.author.id] == "break":
-                    return await ctx.send("> **Stopped Crawling...**")
+                try:
+                    if self.bot.crawler[ctx.author.id] == "break":
+                        return await ctx.send("> **Stopped Crawling...**")
+                except:
+                    break
                 self.bot.crawler[ctx.author.id] = f"{i}/{noofchapters}"
                 if current_link in crawled_urls:
                     repeats += 1

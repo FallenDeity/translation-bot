@@ -205,6 +205,7 @@ class FileHandler:
         download_url = None
         next_no = await bot.mongo.library.next_number
         category = "uncategorized"
+        bot.translation_count = bot.translation_count + 1
         try:
             category = await Categorizer().find_category(name)
         except Exception as e:
@@ -306,6 +307,7 @@ class FileHandler:
         download_url = None
         next_no = await bot.mongo.library.next_number
         category = "uncategorized"
+        bot.crawler_count = bot.crawler_count + 1
         try:
             category = await Categorizer().find_category(title_name)
         except Exception as e:

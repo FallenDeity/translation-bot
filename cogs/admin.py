@@ -143,6 +143,26 @@ class Admin(commands.Cog):
     @commands.has_role(1020638168237740042)
     @commands.hybrid_command(help="Restart the bot incase of bot crash. Ping any BOT-admins to restart bot")
     async def restart(self, ctx: commands.Context):
+        self.bot.app_status = "restart"
+        while True:
+            print("Started restart")
+            if not self.bot.crawler.items() and not self.bot.translator.items():
+                print("restart " + str(datetime.datetime.now()))
+                channel = self.bot.get_channel(
+                    991911644831678484
+                ) or await self.bot.fetch_channel(991911644831678484)
+                try:
+                    await channel.send(embed=discord.Embed(description=f"Bot has started restarting"))
+                except:
+                    pass
+                break
+            else:
+                print("waiting")
+                self.bot.app_status = "restart"
+                self.bot.translator = {}
+                self.bot.crawler = {}
+                await asyncio.sleep(20)
+
         await ctx.send(
             embed=discord.Embed(
                 description=f"Bot is restarting...",
