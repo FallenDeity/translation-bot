@@ -205,6 +205,7 @@ class Admin(commands.Cog):
                     f"Bot is up for {str(td[0]) + ' days ' if td[0] > 0 else ''}{str(td[1]) + ' hours ' if td[1] > 0 else ''}{str(td[2]) + ' minutes' if td[2] > 0 else ''}",
                     ephemeral=True)
                 try:
+                    await ctx.send(f"** Bot has done {str(self.bot.translation_count)} translation and crawled {str(self.bot.crawler_count)} novels**")
                     await ctx.send(embed=discord.Embed(title=f"**Bot has {str(len(asyncio.all_tasks()))} tasks running at the moment**", description=f"\n{str(asyncio.all_tasks())[:2000]}", colour=discord.Colour.dark_blue()))
                 except Exception as e:
                     print(e)

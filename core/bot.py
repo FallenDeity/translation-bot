@@ -82,7 +82,7 @@ class Raizel(commands.Bot):
             try:
                 self.mega = Mega().login()
                 channel = await self.fetch_channel(991911644831678484)
-                await channel.send("> <@&1020638168237740042> **Couldn't connect with Mega. some problem occured with mega acount")
+                await channel.send("> <@&1020638168237740042> **Couldn't connect with Mega. some problem occured with mega acount**")
                 print("mega connection failed...connected anonymously....Please check password or account status")
             except:
                 channel = await self.fetch_channel(991911644831678484)
