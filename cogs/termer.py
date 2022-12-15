@@ -183,14 +183,14 @@ class Termer(commands.Cog):
             name = name.replace("%20", " ")
         if "plain" in file_type.lower() or "txt" in file_type.lower():
             file_type = "txt"
-        elif "document" in file_type.lower() or "docx" in file_type.lower():
-            file_type = "docx"
+        # elif "document" in file_type.lower() or "docx" in file_type.lower():
+        #     file_type = "docx"
         elif "epub" in file_type.lower():
             file_type = "epub"
         elif "pdf" in file_type.lower():
             file_type = "pdf"
         else:
-            return await ctx.send("> **❌Only .txt, .docx, .pdf and .epub supported**")
+            return await ctx.send("> **❌Only .txt, .pdf and .epub supported**Use txt for best results")
         if novelname is not None:
             name = novelname
         name_check = FileHandler.checkname(name, self.bot)
@@ -299,8 +299,8 @@ class Termer(commands.Cog):
             data = await resp.read()
             async with aiofiles.open(f"{ctx.author.id}.{file_type}", "wb") as f:
                 await f.write(data)
-            if "docx" in file_type:
-                await FileHandler.docx_to_txt(ctx, file_type)
+            # if "docx" in file_type:
+            #     await FileHandler.docx_to_txt(ctx, file_type)
             if "epub" in file_type:
                 await FileHandler.epub_to_txt(ctx)
             if "pdf" in file_type:

@@ -132,15 +132,15 @@ class Translate(commands.Cog):
             path = self.bot.mega.download_url(
                 link, dest_filename=f"{ctx.author.id}.{file_type}"
             )
-            if "txt" not in file_type and "docx" not in file_type and "epub" not in file_type and "pdf" not in file_type:
+            if "txt" not in file_type and "epub" not in file_type and "pdf" not in file_type:
                 os.remove(path)
                 await rep_msg.delete()
-                return await ctx.send("> **❌Only .txt, .docx, .pdf and .epub supported**", ephemeral=True)
+                return await ctx.send("> **❌Only .txt, .pdf and .epub supported** use txt for best results", ephemeral=True)
             name = name.replace(".txt", "").replace(".docx", "").replace(".epub", "").replace(".pdf", "")
             name = name[:100]
             # os.rename(path, f"{ctx.author.id}.{file_type}")
-            if "docx" in file_type:
-                await FileHandler.docx_to_txt(ctx, file_type)
+            # if "docx" in file_type:
+            #     await FileHandler.docx_to_txt(ctx, file_type)
             if "epub" in file_type:
                 await FileHandler.epub_to_txt(ctx)
             if "pdf" in file_type:
@@ -190,14 +190,14 @@ class Translate(commands.Cog):
             name = name.replace("%20", " ")
         if "plain" in file_type.lower() or "txt" in file_type.lower():
             file_type = "txt"
-        elif "document" in file_type.lower() or "docx" in file_type.lower():
-            file_type = "docx"
+        # elif "document" in file_type.lower() or "docx" in file_type.lower():
+        #     file_type = "docx"
         elif "epub" in file_type.lower():
             file_type = "epub"
         elif "pdf" in file_type.lower():
             file_type = "pdf"
         else:
-            return await ctx.send("> **❌Only .txt, .docx , .pdf and .epub supported**", ephemeral=True)
+            return await ctx.send("> **❌Only .txt , .pdf and .epub supported** Use txt for best results", ephemeral=True)
         if novelname is not None:
             name = novelname
         name_check = FileHandler.checkname(name, self.bot)
