@@ -82,7 +82,7 @@ class Raizel(commands.Bot):
         except Exception as e:
             try:
                 self.mega = Mega().login()
-                await channel.send("> <@&1020638168237740042> **Couldn't connect with Mega. some problem occured with mega acount**")
+                await channel.send("> <@&1020638168237740042> **Couldn't connect with Mega. some problem occured with mega acount**", allowed_mentions=discord.AllowedMentions(roles=False))
                 print("mega connection failed...connected anonymously....Please check password or account status")
             except:
                 await channel.send(
