@@ -174,7 +174,7 @@ class Admin(commands.Cog):
         ) or await self.bot.fetch_channel(991911644831678484)
         try:
             await channel.send(
-                f"Bot has been restarted by user : {ctx.author.name}"
+                f"Bot has been restarted by user : {ctx.author.name} \nBot has translated {str(self.bot.translation_count)} novels and crawled {str(self.bot.crawler_count)} novels"
             )
         except:
             pass
