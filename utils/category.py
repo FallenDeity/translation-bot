@@ -7,7 +7,7 @@ class Categorizer:
            "store", "horror", "Siheyuan", "Zombie", "Ultraman", "survival", "Hong Kong",
            "football", "tennis", "anti-japanese", "yugi-oh", "bleach", "detective", "LOL", "demon slayer",
            "shokugeki", "rebirth", "system", "Teacher", "Invincible flow",
-           "Jackie chan", "China dynasty", "Tech", "Journey to west", "One-punch man", "Special forces", "uncategorized", "others"]
+           "Jackie chan", "China dynasty", "Tech", "Journey to west", "One-punch man", "Special forces", "uncategorized", "R-18", "others"]
 
     @staticmethod
     def get_categories():
@@ -19,7 +19,7 @@ class Categorizer:
                "store", "horror", "Siheyuan", "Zombie", "Ultraman", "survival", "Hong Kong",
                "football", "tennis", "anti-japanese", "yugi-oh", "bleach", "detective", "LOL", "demon slayer",
                "shokugeki", "rebirth", "system", "Teacher", "Invincible flow",
-               "Jackie chan", "China dynasty", "Tech", "Journey to west", "One-punch man", "Special forces", "uncategorized", "others"]
+               "Jackie chan", "China dynasty", "Tech", "Journey to west", "One-punch man", "Special forces", "uncategorized", "R-18","others"]
 
         return CAT
 
@@ -35,7 +35,7 @@ class Categorizer:
         pokemon = ['pokemon', '神奇宝贝', '精灵', 'elves', 'elf', 'trainer', 'digimon', 'pokémon']
         chatroom = ['聊天群组', '聊天室', 'chat group', 'chat rooms', 'chatgroup',
                     'red envelope', 'exchange group', 'exchangegroup']
-        villain = ['villain']
+        villain = ['villain', 'hunt protagonist']
         spiritrecovery = ['reiki', '灵气复苏', '诡异复苏', 'aura', 'spirit rec', 'recovery', '灵级复苏']
         fantasy = ['fantasy', '玄幻', 'xuanhuan', 'wuxia', 'wu xia', 'tame', 'evolve', 'evolution', 'empress',
                    'cultivation']
@@ -89,6 +89,7 @@ class Categorizer:
                         'wuzhu']
         onepunch = ['saitama', 'one punch', 'onepunch', 'genos']
         specialforces = ['special force', 'agent']
+        r18 = ["sex", "horny", "incest", "busty", "r18", "fuck", "hynosis", "rape", ]
 
         if any(term in file_name.lower() for term in naruto):
             return "Naruto"
@@ -206,5 +207,7 @@ class Categorizer:
             return "One-punch man"
         elif any(term in file_name.lower() for term in specialforces):
             return "Special forces"
+        elif any(term in file_name.lower() for term in r18):
+            return "R-18"
         else:
             return "uncategorized"
