@@ -1,4 +1,5 @@
 import asyncio
+import gc
 import os
 import random
 import typing
@@ -330,11 +331,21 @@ class Termer(commands.Cog):
                 raise Exception
         finally:
             try:
+                del story
+                del novel
+                del liz
+            except:
+                pass
+            try:
                 del self.bot.translator[ctx.author.id]
                 self.bot.titles.append(name)
                 self.bot.titles = random.sample(self.bot.titles, len(self.bot.titles))
             except:
                 pass
+            try:
+                gc.collect()
+            except:
+                print("error in garbage collection")
 
     @termer.autocomplete("language")
     async def translate_complete(

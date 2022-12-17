@@ -249,6 +249,10 @@ class Library(commands.Cog):
             allnovels = allnovels[:no_of_novels]
         if show_list:
             embeds = await self.make_list_embed_list(allnovels)
+            try:
+                del allnovels
+            except:
+                pass
             if full_size !=0:
                 msg = await msg.edit(content=f"> Showing first **{str(no_of_novels)} out of {str(full_size)}**")
             else:
@@ -256,6 +260,10 @@ class Library(commands.Cog):
             await self.buttons(embeds, ctx)
         else:
             embeds = await self.make_list_embed(allnovels)
+            try:
+                del allnovels
+            except:
+                pass
             if full_size != 0:
                 msg = await msg.edit(content=f"> Showing first **{str(no_of_novels)} out of {str(full_size)}**")
             else:

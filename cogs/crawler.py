@@ -1,5 +1,6 @@
 import asyncio
 import concurrent.futures
+import gc
 import itertools
 import os
 import random
@@ -622,6 +623,17 @@ class Crawler(commands.Cog):
             raise e
         finally:
             try:
+                del text
+                del whole
+                del parsed
+            except Exception as e:
+                print("error")
+                print(e)
+            try:
+                gc.collect()
+            except:
+                print("error in garbage collection")
+            try:
                 del self.bot.crawler[ctx.author.id]
                 self.bot.titles.append(name)
                 self.bot.titles = random.sample(self.bot.titles, len(self.bot.titles))
@@ -908,9 +920,17 @@ class Crawler(commands.Cog):
             raise e
         finally:
             try:
+                del full_text
+            except:
+                pass
+            try:
                 del self.bot.crawler[ctx.author.id]
             except:
                 pass
+            try:
+                gc.collect()
+            except:
+                print("error in garbage collection")
 
     @crawl.autocomplete("translate_to")
     async def translate_complete(

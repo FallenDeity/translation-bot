@@ -1,4 +1,5 @@
 import asyncio
+import gc
 import os
 import random
 import typing
@@ -347,6 +348,12 @@ class Translate(commands.Cog):
                 raise e
         finally:
             try:
+                del story
+                del novel
+                del liz
+            except:
+                pass
+            try:
                 del self.bot.translator[ctx.author.id]
                 self.bot.titles.append(name)
                 # print(self.bot.titles[-1])
@@ -366,6 +373,10 @@ class Translate(commands.Cog):
 
             except:
                 pass
+            try:
+                gc.collect()
+            except:
+                print("error in garbage collection")
 
     @translate.autocomplete("language")
     async def translate_complete(
