@@ -209,6 +209,8 @@ class FileHandler:
         next_no = await bot.mongo.library.next_number
         category = "uncategorized"
         bot.translation_count = bot.translation_count + 1
+        if (os.path.getsize(f"{ctx.author.id}.txt")) > 4 * 10 ** 6:
+            bot.translation_count = bot.translation_count + 1
         try:
             category = await Categorizer().find_category(name)
         except Exception as e:
@@ -216,7 +218,7 @@ class FileHandler:
             print(e)
         if (size := os.path.getsize(f"{ctx.author.id}.txt")) > 8 * 10 ** 6:
             bot.translation_count = bot.translation_count + 1
-            if (size := os.path.getsize(f"{ctx.author.id}.txt")) > 15 * 10 ** 6:
+            if (size := os.path.getsize(f"{ctx.author.id}.txt")) > 13 * 10 ** 6:
                 bot.translation_count = bot.translation_count + 2
             try:
                 await ctx.send(

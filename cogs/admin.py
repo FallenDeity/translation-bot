@@ -161,7 +161,7 @@ class Admin(commands.Cog):
                 self.bot.app_status = "restart"
                 self.bot.translator = {}
                 self.bot.crawler = {}
-                await asyncio.sleep(20)
+                await asyncio.sleep(40)
 
         await ctx.send(
             embed=discord.Embed(

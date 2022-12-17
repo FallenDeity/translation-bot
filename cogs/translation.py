@@ -281,7 +281,7 @@ class Translate(commands.Cog):
                     res = await self.bot.wait_for(
                         "reaction_add",
                         check=check,
-                        timeout=8.0,
+                        timeout=16.0,
                     )
                 except asyncio.TimeoutError:
                     print('error')
@@ -364,7 +364,7 @@ class Translate(commands.Cog):
             except:
                 pass
             try:
-                if self.bot.translation_count >=20 or self.bot.crawler_count >=20:
+                if self.bot.translation_count >=16 or self.bot.crawler_count >=20:
                     await ctx.reply("> **Bot will be Restarted when the bot is free due to max limit is reached.. Please be patient")
                     chan = self.bot.get_channel(
                         991911644831678484

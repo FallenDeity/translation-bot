@@ -259,7 +259,7 @@ class Termer(commands.Cog):
                     res = await self.bot.wait_for(
                         "reaction_add",
                         check=check,
-                        timeout=8.0,
+                        timeout=16.0,
                     )
                 except asyncio.TimeoutError:
                     print('error')
