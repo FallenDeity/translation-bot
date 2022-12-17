@@ -320,6 +320,9 @@ class Translate(commands.Cog):
                 pass
         if ctx.author.id in self.bot.translator and not ctx.author.id == 925597069748621353:
             return await ctx.send("> **❌You cannot translate two novels at a time.**", ephemeral=True)
+        if (size := os.path.getsize(f"{ctx.author.id}.txt")) > 21 * 10 ** 6:
+            os.remove(f"{ctx.author.id}.txt")
+            return await ctx.reply("The provided file is bigger than 20mb. Please split the file and translate")
         msg_content = f"> **✅ Started translating 📔 {name}. Translating to {language}.**"
         rep_msg = await rep_msg.edit(content=msg_content)
         try:

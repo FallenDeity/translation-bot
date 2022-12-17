@@ -90,7 +90,7 @@ class Raizel(commands.Bot):
                 print("mega login anonymously failed ..something wrong with mega", allowed_mentions=discord.AllowedMentions(roles=False))
             print(e)
         # await self.tree.sync()
-        await channel.send(embed=discord.Embed(description=f"<@&1020638168237740042> Bot is up"), allowed_mentions=discord.AllowedMentions(roles=False))
+        await channel.send(embed=discord.Embed(description=f"Bot is up now"))
         return await super().setup_hook()
 
     async def start(self) -> None:
