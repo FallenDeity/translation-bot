@@ -1,5 +1,6 @@
 import asyncio
 import datetime
+import gc
 import os
 import random
 import typing as t
@@ -152,6 +153,8 @@ class Raizel(commands.Bot):
                     try:
                         await channel.send(embed=discord.Embed(description=f"Bot has been auto-restarted. \nBot has translated {str(self.translation_count)} novels and crawled {str(self.crawler_count)} novels"
                                                                , colour=discord.Colour.brand_green()))
+                        del self.titles
+                        gc.collect()
                     except:
                         pass
                     try:

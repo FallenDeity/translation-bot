@@ -391,7 +391,7 @@ class Translate(commands.Cog):
     async def cc_prog(self, msg: discord.Message, msg_content: str, author_id: int) -> typing.Optional[discord.Message]:
         value = 0
         while author_id in self.bot.translator:
-            await asyncio.sleep(8)
+            await asyncio.sleep(10)
             if author_id not in self.bot.translator:
                 content = msg_content + f"\nProgress > **🚄`Completed`    {100}%**"
                 msg = await msg.edit(content=content)

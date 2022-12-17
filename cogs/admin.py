@@ -1,5 +1,6 @@
 import asyncio
 import datetime
+import gc
 import os
 
 import discord
@@ -176,8 +177,11 @@ class Admin(commands.Cog):
             await channel.send(
                 f"Bot has been restarted by user : {ctx.author.name} \nBot has translated {str(self.bot.translation_count)} novels and crawled {str(self.bot.crawler_count)} novels"
             )
+            del self.bot.titles
+            gc.collect()
         except:
             pass
+
         return await self.bot.start()
         # raise Exception("TooManyRequests")
         # h = heroku3.from_key(os.getenv("APIKEY"))
