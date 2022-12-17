@@ -35,7 +35,7 @@ class CssSelector:
             return "#htmlContent ::text"
         elif "readwn" in link or "novelmt.com" in link or "wuxiax.com" in link or "fannovels.com" in link:
             return ".chapter-content ::text"
-        elif "novelsemperor" in link:
+        elif "novelsemperor" in link or "novelsknight.com" in link:
             return "div.epcontent.entry-content > p ::text"
         elif "www.vbiquge.co" in link:
             return "#rtext ::text"

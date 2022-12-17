@@ -1,5 +1,6 @@
 import asyncio
 import concurrent.futures
+import gc
 import itertools
 import os
 import random
@@ -20,6 +21,7 @@ from discord import app_commands
 from discord.ext import commands
 from readabilipy import simple_json_from_html_string
 
+from cogs.admin import Admin
 from cogs.library import Library
 from cogs.termer import Termer
 from cogs.translation import Translate
@@ -109,15 +111,18 @@ class Crawler(commands.Cog):
             scraper = cloudscraper.CloudScraper()
         else:
             scraper = None
-        with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
+        with concurrent.futures.ThreadPoolExecutor(max_workers=8) as executor:
             futures = [
                 executor.submit(self.easy, i, j, self.urlcss, self.chptitlecss, scraper)
                 for i, j in enumerate(urls)
             ]
             for future in concurrent.futures.as_completed(futures):
                 novel[future.result()[0]] = future.result()[1]
-                if self.bot.crawler[name] == "break":
-                    return None
+                try:
+                    if self.bot.crawler[name] == "break":
+                        return None
+                except:
+                    pass
                 self.bot.crawler[name] = f"{len(novel)}/{len(urls)}"
             return novel
 
@@ -197,7 +202,7 @@ class Crawler(commands.Cog):
     async def cc_prog(self, msg: discord.Message, msg_content: str, author_id: int) -> typing.Optional[discord.Message]:
         value = 0
         while author_id in self.bot.crawler:
-            await asyncio.sleep(6)
+            await asyncio.sleep(10)
             if author_id not in self.bot.crawler:
                 content = msg_content + f"\nProgress > **🚄`Completed`    {100}%**"
                 msg = await msg.edit(content=content)
@@ -276,7 +281,7 @@ class Crawler(commands.Cog):
             link = link[:-1]
         # if "m.uuks" in link:
         #     link = link.replace("m.", "")
-        if "novelsemperor" in link:
+        if "novelsemperor" in link or "novelsknight.com" in link:
             reverse = "true"
         if "www.xklxsw.com/" in link:
             link = link.replace("www", "m")
@@ -527,7 +532,8 @@ class Crawler(commands.Cog):
             if True:
                 ids = ids[:20]
                 ctx.command = await self.bot.get_command("library search").callback(Library(self.bot), ctx,
-                                                                                    title_name.split('__')[0], None, None,
+                                                                                    title_name.split('__')[0], None,
+                                                                                    None,
                                                                                     None, None, None, None, None, None,
                                                                                     False, "size", 20)
                 if len(ids) < 5 or name_lib_check:
@@ -552,7 +558,7 @@ class Crawler(commands.Cog):
                     res = await self.bot.wait_for(
                         "reaction_add",
                         check=check,
-                        timeout=8.0,
+                        timeout=16.0,
                     )
                 except asyncio.TimeoutError:
                     print(' Timeout error')
@@ -616,9 +622,37 @@ class Crawler(commands.Cog):
             await ctx.send("> Error occurred .Please report to admin +\n" + str(e))
             raise e
         finally:
-            del self.bot.crawler[ctx.author.id]
-            self.bot.titles.append(name)
-            self.bot.titles = random.sample(self.bot.titles, len(self.bot.titles))
+            try:
+                del text
+                del whole
+                del parsed
+            except Exception as e:
+                print("error")
+                print(e)
+            try:
+                gc.collect()
+            except:
+                print("error in garbage collection")
+            try:
+                del self.bot.crawler[ctx.author.id]
+                self.bot.titles.append(name)
+                self.bot.titles = random.sample(self.bot.titles, len(self.bot.titles))
+            except:
+                pass
+            if translate_to is None and add_terms is None:
+                try:
+                    if self.bot.translation_count >= 20 or self.bot.crawler_count >= 20:
+                        await ctx.reply(
+                            "> **Bot will be Restarted when the bot is free due to max limit is reached.. Please be patient")
+                        chan = self.bot.get_channel(
+                            991911644831678484
+                        ) or await self.bot.fetch_channel(991911644831678484)
+                        msg_new2 = await chan.fetch_message(1052750970557308988)
+                        context_new2 = await self.bot.get_context(msg_new2)
+                        asyncio.create_task(
+                            self.bot.get_command("restart").callback(Admin(self.bot), context_new2))
+                except:
+                    pass
         if (
                 translate_to is not None or add_terms is not None) and download_url is not None and not download_url.strip() == "":
             if translate_to is None:
@@ -770,7 +804,8 @@ class Crawler(commands.Cog):
             if True:
                 ids = ids[:20]
                 ctx.command = await self.bot.get_command("library search").callback(Library(self.bot), ctx,
-                                                                                    title_name.split('__')[0], None, None,
+                                                                                    title_name.split('__')[0], None,
+                                                                                    None,
                                                                                     None, None, None, None, None, None,
                                                                                     False, "size", 20)
                 if len(ids) < 5 or name_lib_check:
@@ -789,7 +824,7 @@ class Crawler(commands.Cog):
                     res = await self.bot.wait_for(
                         "reaction_add",
                         check=check,
-                        timeout=8.0,
+                        timeout=16.0,
                     )
                 except asyncio.TimeoutError:
                     print(' Timeout error')
@@ -818,8 +853,11 @@ class Crawler(commands.Cog):
         try:
             self.bot.crawler[ctx.author.id] = f"0/{noofchapters}"
             for i in range(1, noofchapters):
-                if self.bot.crawler[ctx.author.id] == "break":
-                    return await ctx.send("> **Stopped Crawling...**")
+                try:
+                    if self.bot.crawler[ctx.author.id] == "break":
+                        return await ctx.send("> **Stopped Crawling...**")
+                except:
+                    break
                 self.bot.crawler[ctx.author.id] = f"{i}/{noofchapters}"
                 if current_link in crawled_urls:
                     repeats += 1
@@ -882,9 +920,17 @@ class Crawler(commands.Cog):
             raise e
         finally:
             try:
+                del full_text
+            except:
+                pass
+            try:
                 del self.bot.crawler[ctx.author.id]
             except:
                 pass
+            try:
+                gc.collect()
+            except:
+                print("error in garbage collection")
 
     @crawl.autocomplete("translate_to")
     async def translate_complete(

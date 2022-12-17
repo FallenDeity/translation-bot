@@ -1,5 +1,6 @@
 import asyncio
 import datetime
+import gc
 import os
 import random
 import typing as t
@@ -36,6 +37,8 @@ class Raizel(commands.Bot):
         self.dictionary: str = get_dictionary()
         self.boot = datetime.datetime.utcnow()
         self.app_status: str = "up"
+        self.translation_count = 0
+        self.crawler_count = 0
         super().__init__(
             command_prefix=commands.when_mentioned_or(".t"),
             intents=intents,
@@ -73,22 +76,22 @@ class Raizel(commands.Bot):
         self.titles = list(await self.mongo.library.get_all_titles)
         print("Loaded titles")
         self.titles = random.sample(self.titles, len(self.titles))
+        channel = await self.fetch_channel(991911644831678484)
         try:
             self.mega = Mega().login(os.getenv("USER"), os.getenv("MEGA"))
             print("Connected to Mega")
         except Exception as e:
             try:
                 self.mega = Mega().login()
-                channel = await self.fetch_channel(991911644831678484)
-                await channel.send("> <@&1020638168237740042> **Couldn't connect with Mega. some problem occured with mega acount")
+                await channel.send("> <@&1020638168237740042> **Couldn't connect with Mega. some problem occured with mega acount**", allowed_mentions=discord.AllowedMentions(roles=False))
                 print("mega connection failed...connected anonymously....Please check password or account status")
             except:
-                channel = await self.fetch_channel(991911644831678484)
                 await channel.send(
                     "> <@&1020638168237740042> **Couldn't connect with Mega servers. some problem with connection")
-                print("mega login anonymously failed ..something wrong with mega")
+                print("mega login anonymously failed ..something wrong with mega", allowed_mentions=discord.AllowedMentions(roles=False))
             print(e)
         # await self.tree.sync()
+        await channel.send(embed=discord.Embed(description=f"Bot is up now"))
         return await super().setup_hook()
 
     async def start(self) -> None:
@@ -125,7 +128,7 @@ class Raizel(commands.Bot):
         langs = list(self.languages.keys()) + list(self.languages.values())
         return langs
 
-    @tasks.loop(hours=5)
+    @tasks.loop(hours=4)
     async def auto_restart(self):
         i = 0
         if self.auto_restart.current_loop != 0:
@@ -148,8 +151,10 @@ class Raizel(commands.Bot):
                         991911644831678484
                     ) or await self.bot.fetch_channel(991911644831678484)
                     try:
-                        await channel.send(embed=discord.Embed(description=f"Bot has been auto-restarted"
+                        await channel.send(embed=discord.Embed(description=f"Bot has been auto-restarted. \nBot has translated {str(self.translation_count)} novels and crawled {str(self.crawler_count)} novels"
                                                                , colour=discord.Colour.brand_green()))
+                        del self.titles
+                        gc.collect()
                     except:
                         pass
                     try:

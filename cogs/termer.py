@@ -1,4 +1,5 @@
 import asyncio
+import gc
 import os
 import random
 import typing
@@ -183,14 +184,14 @@ class Termer(commands.Cog):
             name = name.replace("%20", " ")
         if "plain" in file_type.lower() or "txt" in file_type.lower():
             file_type = "txt"
-        elif "document" in file_type.lower() or "docx" in file_type.lower():
-            file_type = "docx"
+        # elif "document" in file_type.lower() or "docx" in file_type.lower():
+        #     file_type = "docx"
         elif "epub" in file_type.lower():
             file_type = "epub"
         elif "pdf" in file_type.lower():
             file_type = "pdf"
         else:
-            return await ctx.send("> **❌Only .txt, .docx, .pdf and .epub supported**")
+            return await ctx.send("> **❌Only .txt, .pdf and .epub supported**Use txt for best results")
         if novelname is not None:
             name = novelname
         name_check = FileHandler.checkname(name, self.bot)
@@ -258,7 +259,7 @@ class Termer(commands.Cog):
                     res = await self.bot.wait_for(
                         "reaction_add",
                         check=check,
-                        timeout=8.0,
+                        timeout=16.0,
                     )
                 except asyncio.TimeoutError:
                     print('error')
@@ -299,13 +300,16 @@ class Termer(commands.Cog):
             data = await resp.read()
             async with aiofiles.open(f"{ctx.author.id}.{file_type}", "wb") as f:
                 await f.write(data)
-            if "docx" in file_type:
-                await FileHandler.docx_to_txt(ctx, file_type)
+            # if "docx" in file_type:
+            #     await FileHandler.docx_to_txt(ctx, file_type)
             if "epub" in file_type:
                 await FileHandler.epub_to_txt(ctx)
             if "pdf" in file_type:
                 await FileHandler.pdf_to_txt(ctx)
             novel = await FileHandler().read_file(ctx)
+        if (size := os.path.getsize(f"{ctx.author.id}.txt")) > 21 * 10 ** 6:
+            os.remove(f"{ctx.author.id}.txt")
+            return await ctx.reply("The provided file is bigger than 20mb. Please split the file and translate")
         rep_msg = await rep_msg.edit(content=f"> **✅Terming started. **")
         novel = self.term_raw(novel, term_dict)
         msg_content = f"> **✅Terming completed.. Started Translating 📔{novelname} Translating to {language}.**"
@@ -329,9 +333,22 @@ class Termer(commands.Cog):
             else:
                 raise Exception
         finally:
-            del self.bot.translator[ctx.author.id]
-            self.bot.titles.append(name)
-            self.bot.titles = random.sample(self.bot.titles, len(self.bot.titles))
+            try:
+                del story
+                del novel
+                del liz
+            except:
+                pass
+            try:
+                del self.bot.translator[ctx.author.id]
+                self.bot.titles.append(name)
+                self.bot.titles = random.sample(self.bot.titles, len(self.bot.titles))
+            except:
+                pass
+            try:
+                gc.collect()
+            except:
+                print("error in garbage collection")
 
     @termer.autocomplete("language")
     async def translate_complete(
@@ -343,7 +360,7 @@ class Termer(commands.Cog):
     async def cc_prog(self, msg: discord.Message, msg_content: str, author_id: int) -> typing.Optional[discord.Message]:
         value = 0
         while author_id in self.bot.translator:
-            await asyncio.sleep(6)
+            await asyncio.sleep(10)
             if author_id not in self.bot.translator:
                 content = msg_content + f"\nProgress > **🚄`Completed`    {100}%**"
                 msg = await msg.edit(content=content)

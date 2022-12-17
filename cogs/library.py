@@ -162,6 +162,10 @@ class Library(commands.Cog):
                     msg = await msg.edit(content=f"> Showing first **{str(no_of_novels)} out of {str(full_size)}**")
                 else:
                     msg = await msg.edit(content=f"> Found {len(novels)} novels")
+                try:
+                    del novels
+                except:
+                    pass
                 await self.buttons(embeds, ctx)
             else:
                 embeds = await self.make_list_embed(novels)
@@ -169,6 +173,10 @@ class Library(commands.Cog):
                     msg = await msg.edit(content=f"> Showing first **{str(no_of_novels)} out of {str(full_size)}**")
                 else:
                     msg = await msg.edit(content=f"> Found {len(embeds)} novels")
+                try:
+                    del novels
+                except:
+                    pass
                 await self.buttons(embeds, ctx)
             return
         valid = []
@@ -253,6 +261,10 @@ class Library(commands.Cog):
                 msg = await msg.edit(content=f"> Showing first **{str(no_of_novels)} out of {str(full_size)}**")
             else:
                 msg = await msg.edit(content=f"> Found **{len(allnovels)}** novels")
+            try:
+                del allnovels
+            except:
+                pass
             await self.buttons(embeds, ctx)
         else:
             embeds = await self.make_list_embed(allnovels)
@@ -260,6 +272,10 @@ class Library(commands.Cog):
                 msg = await msg.edit(content=f"> Showing first **{str(no_of_novels)} out of {str(full_size)}**")
             else:
                 msg = await msg.edit(content=f"> Found **{len(embeds)}** novels")
+            try:
+                del allnovels
+            except:
+                pass
             await self.buttons(embeds, ctx)
 
     @library.command(name="random", help="Gives 10 random novel in library.")

@@ -7,7 +7,7 @@ class Categorizer:
            "store", "horror", "Siheyuan", "Zombie", "Ultraman", "survival", "Hong Kong",
            "football", "tennis", "anti-japanese", "yugi-oh", "bleach", "detective", "LOL", "demon slayer",
            "shokugeki", "rebirth", "system", "Teacher", "Invincible flow",
-           "Jackie chan", "China dynasty", "Tech", "Journey to west", "One-punch man", "Special forces", "uncategorized", "others"]
+           "Jackie chan", "China dynasty", "Tech", "Journey to west", "One-punch man", "Special forces", "uncategorized", "R-18", "others"]
 
     @staticmethod
     def get_categories():
@@ -19,7 +19,7 @@ class Categorizer:
                "store", "horror", "Siheyuan", "Zombie", "Ultraman", "survival", "Hong Kong",
                "football", "tennis", "anti-japanese", "yugi-oh", "bleach", "detective", "LOL", "demon slayer",
                "shokugeki", "rebirth", "system", "Teacher", "Invincible flow",
-               "Jackie chan", "China dynasty", "Tech", "Journey to west", "One-punch man", "Special forces", "uncategorized", "others"]
+               "Jackie chan", "China dynasty", "Tech", "Journey to west", "One-punch man", "Special forces", "uncategorized", "R-18","others"]
 
         return CAT
 
@@ -31,11 +31,11 @@ class Categorizer:
                     'big mom', '柱灭之刃', 'big-mom', 'kaido', 'charlotte', 'nami', 'robin', 'grand voyage',
                     'great voyage', 'akainu', 'yellow ape', 'navy', 'celestial dragon', 'great route']
         dc = ['superman', 'bat-man', 'super-man', 'clark', 'speedster', 'aquaman']
-        marvel = ['marvel', 'meimen', '美漫', '漫威', 'infinite gem', 'loki', 'thor', 'shield agent', 'coulson', 'agent shield']
+        marvel = ['marvel', 'meimen', 'infinite gem', 'loki', 'thor', 'shield agent', 'coulson', 'agent shield']
         pokemon = ['pokemon', '神奇宝贝', '精灵', 'elves', 'elf', 'trainer', 'digimon', 'pokémon']
         chatroom = ['聊天群组', '聊天室', 'chat group', 'chat rooms', 'chatgroup',
                     'red envelope', 'exchange group', 'exchangegroup']
-        villain = ['villain', '反派']
+        villain = ['villain', 'hunt protagonist']
         spiritrecovery = ['reiki', '灵气复苏', '诡异复苏', 'aura', 'spirit rec', 'recovery', '灵级复苏']
         fantasy = ['fantasy', '玄幻', 'xuanhuan', 'wuxia', 'wu xia', 'tame', 'evolve', 'evolution', 'empress',
                    'cultivation']
@@ -51,10 +51,10 @@ class Categorizer:
         globalrei = ['全球综漫轮', 'global reincarnation', 'global', 'spiritual energy']
         dragonball = ['龙珠', 'dragon ball', 'trunks', 'goku', 'vegeta', 'vegito', '破坏神', 'god of destruction']
         comprehensive = ['dimensional', '综漫', 'comprehensive', 'anime']
-        livebroadcast = ['live broadcast', '直播', 'broadcast', 'anchor', 'stream']
+        livebroadcast = ['live broadcast', 'broadcast', 'anchor', 'stream']
         cartoonist = ['animation', 'manga', 'cartoonist', 'writer', '级漫画家', '画家', 'anime']
-        doomsday = ['doomsday', '毁灭', 'apocalypse']
-        urban = ['urban', 'city', '都市', '都市', 'shenhao', 'school flower', 'doctor']
+        doomsday = ['doomsday', 'apocalypse']
+        urban = ['urban', 'city', 'shenhao', 'school flower', 'doctor']
         doraemon = ['doraemon', 'nobita', 'shizuka']
         threeking = ['three kingdom', '3 king', 'threekingdom', 'threekingdoms']
         daqin = ['daqin', 'datang']
@@ -82,13 +82,14 @@ class Categorizer:
         system = ['system', '系统']
         teacher = ['teacher', '老师']
         invincible = ['invinc', '最强', 'strong', "god level", "god-level"]
-        jackie = ['jackie', '成龙']
+        jackie = ['jackie']
         dynasty = ['tang', 'dynasty', 'song dy']
         tech = ['tech', 'robot', 'scholar', 'satellite', 'study', 'invent', 'build', 'scientific', 'research']
         journey2west = ['journey to west', 'monkey king', 'journey to the west', 'west journey', 'westward journey',
                         'wuzhu']
         onepunch = ['saitama', 'one punch', 'onepunch', 'genos']
         specialforces = ['special force', 'agent']
+        r18 = ["sex", "horny", "incest", "busty", "r18", "fuck", "hynosis", "rape", ]
 
         if any(term in file_name.lower() for term in naruto):
             return "Naruto"
@@ -206,5 +207,7 @@ class Categorizer:
             return "One-punch man"
         elif any(term in file_name.lower() for term in specialforces):
             return "Special forces"
+        elif any(term in file_name.lower() for term in r18):
+            return "R-18"
         else:
             return "uncategorized"

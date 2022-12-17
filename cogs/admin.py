@@ -1,5 +1,6 @@
 import asyncio
 import datetime
+import gc
 import os
 
 import discord
@@ -143,6 +144,26 @@ class Admin(commands.Cog):
     @commands.has_role(1020638168237740042)
     @commands.hybrid_command(help="Restart the bot incase of bot crash. Ping any BOT-admins to restart bot")
     async def restart(self, ctx: commands.Context):
+        self.bot.app_status = "restart"
+        while True:
+            print("Started restart")
+            if not self.bot.crawler.items() and not self.bot.translator.items():
+                print("restart " + str(datetime.datetime.now()))
+                channel = self.bot.get_channel(
+                    991911644831678484
+                ) or await self.bot.fetch_channel(991911644831678484)
+                try:
+                    await channel.send(embed=discord.Embed(description=f"Bot has started restarting"))
+                except:
+                    pass
+                break
+            else:
+                print("waiting")
+                self.bot.app_status = "restart"
+                self.bot.translator = {}
+                self.bot.crawler = {}
+                await asyncio.sleep(40)
+
         await ctx.send(
             embed=discord.Embed(
                 description=f"Bot is restarting...",
@@ -154,10 +175,13 @@ class Admin(commands.Cog):
         ) or await self.bot.fetch_channel(991911644831678484)
         try:
             await channel.send(
-                f"Bot has been restarted by user : {ctx.author.name}"
+                f"Bot has been restarted by user : {ctx.author.name} \nBot has translated {str(self.bot.translation_count)} novels and crawled {str(self.bot.crawler_count)} novels"
             )
+            del self.bot.titles
+            gc.collect()
         except:
             pass
+
         return await self.bot.start()
         # raise Exception("TooManyRequests")
         # h = heroku3.from_key(os.getenv("APIKEY"))
@@ -185,6 +209,7 @@ class Admin(commands.Cog):
                     f"Bot is up for {str(td[0]) + ' days ' if td[0] > 0 else ''}{str(td[1]) + ' hours ' if td[1] > 0 else ''}{str(td[2]) + ' minutes' if td[2] > 0 else ''}",
                     ephemeral=True)
                 try:
+                    await ctx.send(f"** Bot has done {str(self.bot.translation_count)} translation and crawled {str(self.bot.crawler_count)} novels**")
                     await ctx.send(embed=discord.Embed(title=f"**Bot has {str(len(asyncio.all_tasks()))} tasks running at the moment**", description=f"\n{str(asyncio.all_tasks())[:2000]}", colour=discord.Colour.dark_blue()))
                 except Exception as e:
                     print(e)

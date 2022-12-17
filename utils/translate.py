@@ -20,15 +20,18 @@ class Translator:
         return num, translated
 
     def translates(self, chapters: t.List[str]) -> None:
-        with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
+        with concurrent.futures.ThreadPoolExecutor(max_workers=7) as executor:
             futures = [
                 executor.submit(self.translate, [url], num)
                 for num, url in enumerate(chapters)
             ]
             for future in concurrent.futures.as_completed(futures):
                 self.order[future.result()[0]] = future.result()[1]
-                if self.bot.translator[self.user] == "break":
-                    raise Exception("Translation stopped")
+                try:
+                    if self.bot.translator[self.user] == "break":
+                        raise Exception("Translation stopped")
+                except:
+                    break
                 self.bot.translator[self.user] = f"{len(self.order)}/{len(chapters)}"
 
     async def start(self, chapters: t.List[str]) -> str:

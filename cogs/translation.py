@@ -1,4 +1,5 @@
 import asyncio
+import gc
 import os
 import random
 import typing
@@ -9,6 +10,7 @@ from deep_translator import GoogleTranslator
 from discord import app_commands
 from discord.ext import commands
 
+from cogs.admin import Admin
 from cogs.library import Library
 from core.bot import Raizel
 from core.views.linkview import LinkView
@@ -131,15 +133,15 @@ class Translate(commands.Cog):
             path = self.bot.mega.download_url(
                 link, dest_filename=f"{ctx.author.id}.{file_type}"
             )
-            if "txt" not in file_type and "docx" not in file_type and "epub" not in file_type and "pdf" not in file_type:
+            if "txt" not in file_type and "epub" not in file_type and "pdf" not in file_type:
                 os.remove(path)
                 await rep_msg.delete()
-                return await ctx.send("> **❌Only .txt, .docx, .pdf and .epub supported**", ephemeral=True)
+                return await ctx.send("> **❌Only .txt, .pdf and .epub supported** use txt for best results", ephemeral=True)
             name = name.replace(".txt", "").replace(".docx", "").replace(".epub", "").replace(".pdf", "")
             name = name[:100]
             # os.rename(path, f"{ctx.author.id}.{file_type}")
-            if "docx" in file_type:
-                await FileHandler.docx_to_txt(ctx, file_type)
+            # if "docx" in file_type:
+            #     await FileHandler.docx_to_txt(ctx, file_type)
             if "epub" in file_type:
                 await FileHandler.epub_to_txt(ctx)
             if "pdf" in file_type:
@@ -189,14 +191,14 @@ class Translate(commands.Cog):
             name = name.replace("%20", " ")
         if "plain" in file_type.lower() or "txt" in file_type.lower():
             file_type = "txt"
-        elif "document" in file_type.lower() or "docx" in file_type.lower():
-            file_type = "docx"
+        # elif "document" in file_type.lower() or "docx" in file_type.lower():
+        #     file_type = "docx"
         elif "epub" in file_type.lower():
             file_type = "epub"
         elif "pdf" in file_type.lower():
             file_type = "pdf"
         else:
-            return await ctx.send("> **❌Only .txt, .docx , .pdf and .epub supported**", ephemeral=True)
+            return await ctx.send("> **❌Only .txt , .pdf and .epub supported** Use txt for best results", ephemeral=True)
         if novelname is not None:
             name = novelname
         name_check = FileHandler.checkname(name, self.bot)
@@ -279,7 +281,7 @@ class Translate(commands.Cog):
                     res = await self.bot.wait_for(
                         "reaction_add",
                         check=check,
-                        timeout=8.0,
+                        timeout=16.0,
                     )
                 except asyncio.TimeoutError:
                     print('error')
@@ -318,6 +320,9 @@ class Translate(commands.Cog):
                 pass
         if ctx.author.id in self.bot.translator and not ctx.author.id == 925597069748621353:
             return await ctx.send("> **❌You cannot translate two novels at a time.**", ephemeral=True)
+        if (size := os.path.getsize(f"{ctx.author.id}.txt")) > 21 * 10 ** 6:
+            os.remove(f"{ctx.author.id}.txt")
+            return await ctx.reply("The provided file is bigger than 20mb. Please split the file and translate")
         msg_content = f"> **✅ Started translating 📔 {name}. Translating to {language}.**"
         rep_msg = await rep_msg.edit(content=msg_content)
         try:
@@ -345,10 +350,36 @@ class Translate(commands.Cog):
             else:
                 raise e
         finally:
-            del self.bot.translator[ctx.author.id]
-            self.bot.titles.append(name)
-            # print(self.bot.titles[-1])
-            self.bot.titles = random.sample(self.bot.titles, len(self.bot.titles))
+            try:
+                del story
+                del novel
+                del liz
+            except:
+                pass
+            try:
+                del self.bot.translator[ctx.author.id]
+                self.bot.titles.append(name)
+                # print(self.bot.titles[-1])
+                self.bot.titles = random.sample(self.bot.titles, len(self.bot.titles))
+            except:
+                pass
+            try:
+                if self.bot.translation_count >=16 or self.bot.crawler_count >=20:
+                    await ctx.reply("> **Bot will be Restarted when the bot is free due to max limit is reached.. Please be patient")
+                    chan = self.bot.get_channel(
+                        991911644831678484
+                    ) or await self.bot.fetch_channel(991911644831678484)
+                    msg_new2 = await chan.fetch_message(1052750970557308988)
+                    context_new2 = await self.bot.get_context(msg_new2)
+                    asyncio.create_task(
+                        self.bot.get_command("restart").callback(Admin(self.bot), context_new2))
+
+            except:
+                pass
+            try:
+                gc.collect()
+            except:
+                print("error in garbage collection")
 
     @translate.autocomplete("language")
     async def translate_complete(
@@ -360,7 +391,7 @@ class Translate(commands.Cog):
     async def cc_prog(self, msg: discord.Message, msg_content: str, author_id: int) -> typing.Optional[discord.Message]:
         value = 0
         while author_id in self.bot.translator:
-            await asyncio.sleep(8)
+            await asyncio.sleep(10)
             if author_id not in self.bot.translator:
                 content = msg_content + f"\nProgress > **🚄`Completed`    {100}%**"
                 msg = await msg.edit(content=content)
