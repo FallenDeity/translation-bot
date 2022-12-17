@@ -215,6 +215,9 @@ class FileHandler:
             print("exception in  getting category")
             print(e)
         if (size := os.path.getsize(f"{ctx.author.id}.txt")) > 8 * 10 ** 6:
+            bot.translation_count = bot.translation_count + 1
+            if (size := os.path.getsize(f"{ctx.author.id}.txt")) > 15 * 10 ** 6:
+                bot.translation_count = bot.translation_count + 2
             try:
                 await ctx.send(
                     "Translation Completed... Your novel is too big.We are uploading to Mega.. Please wait",
@@ -317,8 +320,10 @@ class FileHandler:
             print("exception in  getting category")
             print(e)
         if (size := os.path.getsize(f"{title}.txt")) > 8 * 10 ** 6:
+            bot.crawler_count = bot.crawler_count + 1
             if size > 32 * 10 ** 6 and int(bot.crawler[ctx.author.id].split("/")[1]) < 2000:
                 os.remove(f"{title}.txt")
+                bot.crawler_count = bot.crawler_count + 1
                 return await ctx.send('Crawled file is too big. there is some problem in crawler')
             try:
                 file = bot.mega.upload(f"{title}.txt")
