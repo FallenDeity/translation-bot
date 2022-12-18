@@ -306,9 +306,10 @@ class Translate(commands.Cog):
                         return None
         if (novel_data is None or not eng_check) and not language.lower() == "english":
             new_ch = self.bot.get_channel(
-                942513122177073222
-            ) or await self.bot.fetch_channel(942513122177073222)
-            msg_new = await new_ch.fetch_message(1040971784742248509)
+                1054014022019715092
+            ) or await self.bot.fetch_channel(1054014022019715092)
+            msg_new_id = new_ch.last_message_id
+            msg_new = await new_ch.fetch_message(msg_new_id)
             context_new = await self.bot.get_context(msg_new)
             try:
                 asyncio.create_task(self.bot.get_command("translate").callback(Translate(self.bot), context_new, link,

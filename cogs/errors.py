@@ -181,6 +181,13 @@ class ErrorHandler(commands.Cog):
                     color=discord.Color.red(),
                 )
             )
+        elif "Unknown Message" in str(error):
+            await ctx.send(
+                embed=discord.Embed(
+                    description=f"There is no message found for the provided id\n{str(error)}",
+                    color=discord.Color.red(),
+                )
+            )
         elif "TooManyRequests" in str(error):
             print(error)
             await ctx.send(
