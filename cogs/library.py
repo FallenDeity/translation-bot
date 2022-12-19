@@ -64,7 +64,7 @@ class Library(commands.Cog):
 
     async def make_base_embed(self, data: Novel) -> discord.Embed:
         embed = discord.Embed(
-            title=f"**#{data._id} \t•\t {data.title.strip()}**",
+            title=f"**#{data._id} \t•\t {data.title[:250].strip()}**",
             url=data.download,
             description=f"*{data.description}*"
             if data.description
