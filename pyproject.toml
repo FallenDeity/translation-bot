@@ -1,0 +1,63 @@
+[tool.poetry]
+name = "translationbot"
+version = "0.1.0"
+description = ""
+authors = ["FallenDeity <61227305+FallenDeity@users.noreply.github.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+disnake = "^2.7.0"
+motor = "^3.1.1"
+python-dotenv = "^0.21.0"
+aiohttp = "^3.8.3"
+textblob = "^0.17.1"
+deep-translator = "^1.9.1"
+"mega.py" = "^1.0.8"
+aiofiles = "^22.1.0"
+PyDictionary = "^2.0.1"
+cloudscraper = "^1.2.66"
+trafilatura = "^1.4.0"
+
+
+[tool.poetry.group.dev.dependencies]
+black = "^22.12.0"
+isort = "^5.11.3"
+pyright = "^1.1.284"
+ruff = "^0.0.185"
+pre-commit = "^2.20.0"
+mypy = "^0.991"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.ruff]
+line-length = 120
+target-version = "py310"
+
+[tool.black]
+line-length = 120
+target-version = ["py310"]
+
+[tool.isort]
+line_length = 120
+profile = "black"
+multi_line_output = 3
+include_trailing_comma = true
+force_grid_wrap = 0
+use_parentheses = true
+ensure_newline_before_comments = true
+src_paths = ["src"]
+
+[tool.pyright]
+pythonVersion = "3.10"
+strict = true
+include = ["src"]
+reportPrivateUsage = false
+reportImportCycles = false
+
+[tool.mypy]
+python_version = "3.10"
+strict = true
+ignore_missing_imports = true
