@@ -7,7 +7,6 @@ from functools import partial
 import textblob
 from deep_translator import GoogleTranslator, single_detection
 from PyDictionary import PyDictionary
-from disnake.ext import commands
 
 from src.assets import Languages
 

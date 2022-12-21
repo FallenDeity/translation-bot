@@ -78,8 +78,10 @@ class TranslationBot(commands.InteractionBot):
 
     @property
     def invite_url(self) -> str:
-        return f"https://discord.com/oauth2/authorize?client_id={self.user.id}" \
-               f"&scope=applications.commands%20bot&permissions=8"
+        return (
+            f"https://discord.com/oauth2/authorize?client_id={self.user.id}"
+            f"&scope=applications.commands%20bot&permissions=8"
+        )
 
     @property
     def uptime(self) -> float:

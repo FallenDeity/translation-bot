@@ -47,7 +47,9 @@ class ValidSites(enum.Enum):
 
     @staticmethod
     def rearrange(urls: list[str]) -> list[str]:
-        return list(dict.fromkeys(sorted(urls, key=lambda x: int(re.search(r"\d+", x.split("/")[-1]).group(0)))))  # type: ignore
+        return list(
+            dict.fromkeys(sorted(urls, key=lambda x: int(re.search(r"\d+", x.split("/")[-1]).group(0))))  # type: ignore
+        )
 
     @classmethod
     def all_sites(cls) -> list[str]:

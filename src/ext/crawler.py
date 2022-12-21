@@ -102,13 +102,12 @@ class Crawl(Cog):
 
     @crawl_.autocomplete("translate_to")
     async def crawl_language_autocomplete(
-            self, _inter: disnake.ApplicationCommandInteraction, language: str
+        self, _inter: disnake.ApplicationCommandInteraction, language: str
     ) -> dict[str, str]:
         """Autocomplete for the language parameter."""
         data: list[tuple[str, str]] = [
-                                          (str(lang.name), str(lang.value)) for lang in Languages if
-                                          lang.name.lower().startswith(language.lower())
-                                      ][0:25]
+            (str(lang.name), str(lang.value)) for lang in Languages if lang.name.lower().startswith(language.lower())
+        ][0:25]
         return {key: value for key, value in data}
 
     @crawl_.autocomplete("term")

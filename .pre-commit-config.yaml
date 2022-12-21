@@ -34,10 +34,10 @@ repos:
         entry: poetry run black .
         language: python
 
-      - id: mypy
-        name: mypy
+      - id: pyright
+        name: pyright
         pass_filenames: false
-        entry: poetry run mypy ./
+        entry: poetry run pyright ./
         language: python
 
       - id: ruff
