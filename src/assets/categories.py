@@ -461,6 +461,7 @@ class Categories(enum.Enum):
         for category in cls:
             if category.value.name == string:
                 return random.choice(category.value.thumbnails)
+        return ""
 
     @classmethod
     def from_string(cls, string: str) -> str:

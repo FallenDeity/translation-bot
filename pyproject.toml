@@ -60,6 +60,7 @@ include = ["src"]
 reportPrivateUsage = false
 reportImportCycles = false
 reportMissingImports = false
+reportMissingModuleSource = false
 
 [tool.mypy]
 python_version = "3.10"
