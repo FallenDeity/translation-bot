@@ -18,6 +18,9 @@ aiofiles = "^22.1.0"
 PyDictionary = "^2.0.1"
 cloudscraper = "^1.2.66"
 trafilatura = "^1.4.0"
+translators = "^5.5.5"
+psutil = "^5.9.4"
+lxml = "^4.9.2"
 
 
 [tool.poetry.group.dev.dependencies]

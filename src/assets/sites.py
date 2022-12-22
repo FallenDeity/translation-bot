@@ -44,6 +44,11 @@ class ValidSites(enum.Enum):
     SHU630 = "630shu"
     AKSHU8 = "akshu8"
     QCXXS = "qcxxs"
+    KRMTL = "krmtl"
+    SOXSCC = "soxscc"
+    MXINDINGDIANXSW = "m.xindingdianxsw"
+    WWWXINDINGDIANXSW = "www.xindingdianxsw"
+    METRUYENCV = "metruyencv"
 
     @staticmethod
     def rearrange(urls: list[str]) -> list[str]:
@@ -148,15 +153,26 @@ class ValidSites(enum.Enum):
                 ):
                     urls.append(a.get("href"))
             urls = cls.rearrange(urls)
-        elif str(cls.QCXXS.value) in url:
+        elif str(cls.QCXXS.value) in url or str(cls.WWWXINDINGDIANXSW.value) in url:
             for a in soup.find_all("a"):
                 if (
                     f"/{midfix}/" in str(a.get("href"))
                     and ".html" in str(a.get("href"))
                     and "index" not in str(a.get("href"))
                 ):
-                    urls.append(f"https://www.{cls.QCXXS.value}.com{a['href']}")
+                    name = f"www.{cls.QCXXS.value}" if str(cls.QCXXS.value) in url else cls.WWWXINDINGDIANXSW.value
+                    urls.append(f"https://{name}.com{a['href']}")
             urls = cls.rearrange(urls)
+        elif str(cls.KRMTL.value) in url:
+            spans = soup.find_all("span")
+            chapters = [span for span in spans if "Chapter" in span.text]
+            chapters = [int(s.group(0)) for chapter in chapters if (s := re.search(r"\d+", chapter.text))]
+            max_chapter = max(chapters)
+            urls = [f"{prefix}/{midfix}/{suffix}/{n}" for n in range(1, max_chapter + 1)]
+        elif str(cls.METRUYENCV.value) in url:
+            urls = [url.get("href") for url in soup.find_all("a") if "/chuong-" in str(url.get("href"))]
+            max_chapter = max([int(url.split("-")[-1]) for url in urls])
+            urls = [f"{prefix}/{midfix}/{suffix}/chuong-{n}" for n in range(1, max_chapter + 1)]
         else:
             for a in soup.find_all("a"):
                 if f"/{suffix}" in str(a.get("href")):

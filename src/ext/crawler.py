@@ -1,6 +1,7 @@
 import typing as t
 
 import disnake
+import psutil
 import trafilatura
 from disnake.ext import commands
 
@@ -22,8 +23,9 @@ class Crawl(Cog):
             raise commands.CheckFailure(f"{inter.user} is blocked from using this bot")
 
     @commands.slash_command(name="crawl", description="Crawl a website")
-    async def crawl(self, ctx: disnake.ApplicationCommandInteraction) -> None:
-        ...
+    async def crawl(self, inter: disnake.ApplicationCommandInteraction) -> None:
+        if psutil.virtual_memory().percent > 90:
+            return await inter.send("Memory usage is too high, please try again later")
 
     @crawl.sub_command(name="crawl", description="Crawl a website")
     @commands.max_concurrency(1, commands.BucketType.user)
@@ -63,6 +65,8 @@ class Crawl(Cog):
         if not await crawler.is_valid():
             raise commands.BadArgument("This website is not supported")
         await crawler.get_soup()
+        description = await translator.translate(crawler.get_description(), target=Languages.English.value)
+        thumbnail = await self.bot.loop.run_in_executor(None, crawler.get_thumbnail)
         title = crawler.get_title(Sites.title_css_from_link(crawler.link))
         title = await crawler.get_title_from_link(url) if not title else title
         title = await translator.translate(title) if title else f"{inter.user.id}_{url}"
@@ -82,6 +86,9 @@ class Crawl(Cog):
             content=f"> **Crawling...**\n> **Title:** {title}\n> **Language:** {language}"
         )
         text = await self.bot.loop.run_in_executor(None, crawler.bucket_scrape, urls, self.crawler_tasks, inter.user.id)
+        await inter.edit_original_response(
+            content=f"> **Crawling complete**\n> **Title:** {title}\n> **Language:** {language}"
+        )
         if translate:
             if language != Languages.from_string(translate_to):
                 await inter.edit_original_response(content="> **Translating...**")
@@ -92,12 +99,19 @@ class Crawl(Cog):
                 await inter.edit_original_response(content=f"> **Translated to:** {translate_to}")
                 cog.translator_tasks.pop(inter.user.id)
             await inter.edit_original_response(content="> **Not translating since the language is the same**")
+        else:
+            translate_to = await translator.detect(text[:5000])
         if term:
             await inter.edit_original_response(content="> **Filtering...**")
             text = self.bot.termer.replace_terms(text, term)
             await inter.edit_original_response(content=f"> **Filtered by:** {term}")
         await inter.edit_original_response(content="> **Uploading...**")
-        await crawler.distribute_translations(inter, translator, text, translate_to, language, title, term, True)
+        novel = await crawler.distribute_translations(
+            inter, translator, text, translate_to, language, title, term, True
+        )
+        await self.bot.mongo.library.update_novel(
+            novel.id, description=description, thumbnail=thumbnail, crawled_source=url
+        )
         self.crawler_tasks.pop(inter.user.id)
 
     @crawl_.autocomplete("translate_to")
@@ -120,7 +134,3 @@ class Crawl(Cog):
         if inter.user.id not in self.crawler_tasks:
             raise commands.BadArgument("You have no active crawls")
         await inter.send(f"> **Progress:** {self.crawler_tasks[inter.user.id]}")
-
-    @commands.message_command(name="multi-crawl", description="Crawl multiple websites")
-    async def multi_crawl(self, inter: disnake.ApplicationCommandInteraction, message: disnake.Message) -> None:
-        ...

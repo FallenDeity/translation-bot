@@ -4,6 +4,7 @@ import typing as t
 
 import aiofiles
 import disnake
+import psutil
 from disnake.ext import commands
 
 from src.assets import Languages
@@ -25,9 +26,33 @@ class Translate(Cog):
     DOWNLOAD_DIRECTORY: pathlib.Path = pathlib.Path("bin")
 
     @commands.Cog.listener()
-    async def on_novel_add(self, novel: "Novel") -> None:
+    async def on_novel_add(self, novel: "Novel", url: str, file: disnake.File | None) -> None:
         user = self.bot.get_user(novel.uploader) or await self.bot.fetch_user(novel.uploader)
         self.bot.logger.info(f"{user} uploaded {novel.title} ({novel.id})")
+        channel = self.bot.get_channel(1005668482475643050) or await self.bot.fetch_channel(1005668482475643050)
+        channel = t.cast(disnake.TextChannel, channel)
+        embed = disnake.Embed(
+            title=novel.title,
+            url=url,
+            description=novel.description,
+            color=disnake.Color.random(),
+            timestamp=novel.date,
+        )
+        embed.set_footer(text=f"Uploaded by {user}", icon_url=user.display_avatar)
+        embed.set_thumbnail(url=novel.thumbnail)
+        embed.add_field(name="Uploader", value=user.mention, inline=True)
+        embed.add_field(name="ID", value=novel.id, inline=True)
+        embed.add_field(name="Language", value=novel.language, inline=True)
+        embed.add_field(name="Tags", value=", ".join(novel.tags), inline=False)
+        embed.add_field(name="Category", value=f"`{novel.category}`", inline=True)
+        if novel.crawled_source:
+            embed.add_field(name="Crawled Source", value=novel.crawled_source, inline=True)
+        view = disnake.ui.View(timeout=None)
+        view.add_item(disnake.ui.Button(label="Download", url=url, style=disnake.ButtonStyle.link, emoji="📥"))
+        if file:
+            await channel.send(embed=embed, file=file, view=view)
+            return
+        await channel.send(embed=embed, view=view)
 
     async def load_novel_from_link(self, link: str) -> str:
         response = await self.bot.http_session.get(link)
@@ -95,7 +120,8 @@ class Translate(Cog):
 
     @commands.slash_command(name="translate", description="Translate a novel from one language to another")
     async def translate(self, inter: disnake.ApplicationCommandInteraction) -> None:
-        ...
+        if psutil.virtual_memory().percent > 90:
+            return await inter.send("Memory usage is too high, please try again later")
 
     @translate.sub_command(name="translate", description="Translate a novel")
     @commands.max_concurrency(1, commands.BucketType.user)
@@ -160,9 +186,10 @@ class Translate(Cog):
             raise commands.BadArgument(f"Invalid name {name}")
         if original_language == Languages.from_string(language):
             if term:
-                return await translator.distribute_translations(
+                await translator.distribute_translations(
                     inter, translator, text, language, original_language, name, termed=True
                 )
+                return
             raise commands.BadArgument("Cannot translate to the same language")
         if not await translator.check_library(inter, language, name):
             return
@@ -217,6 +244,8 @@ class Translate(Cog):
         message: disnake.Message
             The message to translate.
         """
+        if psutil.virtual_memory().percent > 90:
+            return await inter.send("Memory usage is too high, please try again later")
         await inter.send("> **Please wait while I translate your novels...**")
         links = re.findall(r"https?://\S+", message.content)
         if not links and not message.attachments:

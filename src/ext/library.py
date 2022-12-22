@@ -122,7 +122,7 @@ class Library(Cog):
     @library_search.autocomplete("category")
     async def library_search_category(self, _inter: disnake.ApplicationCommandInteraction, category: str) -> list[str]:
         """Autocomplete the category parameter."""
-        return [str(cat.value) for cat in Categories if cat.value.startswith(category)][0:25]
+        return [str(cat.value.name) for cat in Categories if cat.value.name.lower().startswith(category.lower())][0:25]
 
     @library.sub_command(name="info", description="Get the info of a novel.")
     async def library_info(self, inter: disnake.ApplicationCommandInteraction, novel_id: int) -> None:

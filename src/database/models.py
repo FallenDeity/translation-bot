@@ -54,6 +54,7 @@ class Novel:
     id: int
     title: str
     description: str
+    thumbnail: str
     rating: float
     language: str
     original_language: str
@@ -62,6 +63,7 @@ class Novel:
     size: float
     uploader: int
     category: str
+    crawled_source: str
     date: datetime.datetime = dataclasses.field(default_factory=datetime.datetime.utcnow)
 
     @classmethod
@@ -70,6 +72,7 @@ class Novel:
             id=data.get("id", 0),
             title=data.get("title", ""),
             description=data.get("description", ""),
+            thumbnail=data.get("thumbnail", ""),
             rating=data.get("rating", 0),
             language=data.get("language", ""),
             tags=data.get("tags", []),
@@ -78,6 +81,7 @@ class Novel:
             uploader=data.get("uploader", 0),
             category=data.get("category", ""),
             date=data.get("date", datetime.datetime.utcnow()),
+            crawled_source=data.get("crawled_source", ""),
             original_language=data.get("original_language", data.get("language", "")),
         )
 
@@ -86,6 +90,7 @@ class Novel:
             "id": self.id,
             "title": self.title,
             "description": self.description,
+            "thumbnail": self.thumbnail,
             "rating": self.rating,
             "language": self.language,
             "tags": self.tags,
@@ -94,5 +99,6 @@ class Novel:
             "uploader": self.uploader,
             "date": self.date,
             "category": self.category,
+            "crawled_source": self.crawled_source,
             "original_language": self.original_language,
         }

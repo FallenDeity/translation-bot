@@ -4,7 +4,9 @@ import typing as t
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from functools import partial
 
+import deep_translator.exceptions
 import textblob
+import translators.server as server
 from deep_translator import GoogleTranslator, single_detection
 from PyDictionary import PyDictionary
 
@@ -46,16 +48,20 @@ class Translator(BaseSession):
                 return True
         return False
 
+    def translate_(self, text: str, **kwargs: t.Any) -> str:
+        self._translator._target = kwargs.get("target", self._translator.target) if kwargs else self._translator.target
+        return self._translator.translate(text, **kwargs)
+
     async def translate(self, text: str, **kwargs: t.Any) -> str:
-        self._translator.target = kwargs.get("target", self._translator.target) if kwargs else self._translator.target
-        return await self.bot.loop.run_in_executor(None, partial(self._translator.translate, text, **kwargs))
+        self._translator._target = kwargs.get("target", self._translator.target) if kwargs else self._translator.target
+        return await self.bot.loop.run_in_executor(None, partial(self._translator.translate, text=text, **kwargs))
 
     async def translate_file(self, file: t.Union[str, "pathlib.Path"], **kwargs: t.Any) -> str:
-        self._translator.target = kwargs.get("target", self._translator.target) if kwargs else self._translator.target
+        self._translator._target = kwargs.get("target", self._translator.target) if kwargs else self._translator.target
         return await self.bot.loop.run_in_executor(None, partial(self._translator.translate_file, file, **kwargs))
 
     async def translate_batch(self, batch: list[str], **kwargs: t.Any) -> list[str]:
-        self._translator.target = kwargs.get("target", self._translator.target) if kwargs else self._translator.target
+        self._translator._target = kwargs.get("target", self._translator.target) if kwargs else self._translator.target
         return await self.bot.loop.run_in_executor(None, partial(self._translator.translate_batch, batch, **kwargs))
 
     async def detect(self, text: str) -> str:
@@ -63,13 +69,15 @@ class Translator(BaseSession):
         return Languages.from_string(lang)
 
     def _task(self, text: str, i: int, data: dict[int, str], target: str) -> None:
-        self._translator.target = target
-        data[i] = self._translator.translate_batch([text])[0]
+        try:
+            data[i] = self.translate_(text, target=target)
+        except deep_translator.exceptions.RequestError:
+            data[i] = server.google(text, to_language=target)
 
     def bucket_translate(self, text: str, progress: dict[int, str], user_id: int, target: str) -> str:
         chunks = [text[i : i + 2000] for i in range(0, len(text), 2000)]
         data: dict[int, str] = {}
-        with ThreadPoolExecutor(max_workers=8) as executor:
+        with ThreadPoolExecutor(max_workers=10) as executor:
             tasks = [executor.submit(self._task, chunk, i, data, target) for i, chunk in enumerate(chunks)]
             for _ in as_completed(tasks):
                 progress[user_id] = f"Translating {round((len(data) / len(chunks)) * 100)}%"

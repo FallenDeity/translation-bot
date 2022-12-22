@@ -48,6 +48,7 @@ class Library:
         await self._pool.delete_one({"id": novel_id})
 
     async def update_novel(self, novel_id: int, **kwargs: t.Any) -> None:
+        kwargs = {key: value for key, value in kwargs.items() if value}
         await self._pool.update_one({"id": novel_id}, {"$set": kwargs})
 
     async def get_all_novels(self) -> list[Novel]:
@@ -62,6 +63,9 @@ class Library:
         self.current_count = await self.get_novels_count() if not self.current_count else self.current_count
         self.current_count += 1
         return self.current_count
+
+    async def update(self, novel: Novel) -> None:
+        await self._pool.update_one({"id": novel.id}, {"$set": novel.to_dict()})
 
     async def update_novel_id(self, novel_id: int, new_id: int) -> None:
         await self._pool.update_one({"id": novel_id}, {"$set": {"id": new_id}})

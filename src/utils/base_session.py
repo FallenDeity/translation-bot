@@ -32,7 +32,7 @@ class BaseSession:
         name: str,
         termed: bool = False,
         crawled: bool = False,
-    ) -> None:
+    ) -> Novel:
         buffer = BytesIO()
         buffer.write(text.encode("utf-8"))
         buffer.seek(0)
@@ -51,6 +51,7 @@ class BaseSession:
             path = self.DOWNLOAD_DIRECTORY / f"{name}.txt"
             async with aiofiles.open(path, "w", encoding="utf-8") as f:
                 await f.write(text)
+            await inter.edit_original_response(content="> **Writing to file...**")
             file = await self.bot.loop.run_in_executor(None, partial(self.bot.mega.upload, path.as_posix()))
             url = await self.bot.loop.run_in_executor(None, self.bot.mega.get_upload_link, file)
             view = disnake.ui.View(timeout=None)
@@ -75,9 +76,13 @@ class BaseSession:
             rating=0,
             size=round(sys.getsizeof(buffer) / 1024 / 1024, 2),
             uploader=inter.user.id,
+            thumbnail=Categories.thumbnail_from_category(category),
+            crawled_source="",
         )
         await self.bot.mongo.library.add_novel(novel)
-        self.bot.dispatch("novel_add", novel)
+        await inter.edit_original_response(f"> **Completed {message}**")
+        self.bot.dispatch("novel_add", novel, url, file if isinstance(file, disnake.File) else None)
+        return novel
 
     async def check_library(self, inter: disnake.ApplicationCommandInteraction, language: str, name: str) -> bool:
         if id_ := await self.bot.mongo.library.find_common(language=Languages.from_string(language), title=name):

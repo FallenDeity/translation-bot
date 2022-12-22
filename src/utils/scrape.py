@@ -1,3 +1,5 @@
+import re
+import sys
 import typing as t
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
@@ -14,6 +16,7 @@ if t.TYPE_CHECKING:
 
 
 __all__: tuple[str, ...] = ("Scraper",)
+sys.setrecursionlimit(10000)
 
 
 HEADERS = {
@@ -43,9 +46,64 @@ class Scraper(BaseSession):
                 pass
         return ""
 
+    def tokenize(self) -> tuple[str, ...]:
+        url = self.link.rstrip(".html").rstrip(".htm/")
+        suffix = url.split("/")[-1]
+        midfix = url.replace(f"/{suffix}", "").split("/")[-1]
+        prefix = url.replace(f"/{midfix}/{suffix}", "")
+        return url, suffix, midfix, prefix
+
+    def get_thumbnail(self) -> str:
+        response = self.scraper.get(self.link)
+        soup = BeautifulSoup(response.content, "lxml")
+        url, suffix, midfix, prefix = self.tokenize()
+        compound = (
+            ValidSites.READWN,
+            ValidSites.FANNOVELS,
+            ValidSites.NOVELMT,
+            ValidSites.WUXIAX,
+        )
+        imgs = []
+        tag = "src" if not any(str(i.value) in self.link for i in compound) else "data-src"
+        for img in soup.find_all(tag):
+            if any(x in img.get(tag, "") for x in ("cover", "thumb", ".jpg", "upload")):
+                if ".png" not in img.get(tag, ""):
+                    imgs.append(img.get(tag, ""))
+        if imgs:
+            img = imgs[0]
+            for i in imgs:
+                if suffix in i or "/file" in i or midfix in i:
+                    if str(ValidSites.NOVELSKNIGHT.value) in self.link:
+                        img = i if "resize=" in i.get("src", "") else img
+                        break
+                    img = i
+                    break
+            if "http" not in img:
+                domain = x.group() if (x := re.search(r"(?<=//)[^/]+", url)) else ""
+                status = "https" if "https" in url else "http"
+                img = f"{status}://{domain}{img}"
+                if self.scraper.get(img).status_code != 200:
+                    img = img.lstrip(f"{status}://{domain}")
+                    return f"{prefix}{img}"
+            return img
+        meta = soup.find_all("meta")
+        for i in meta:
+            if i.get("property") == "og:image":
+                return i.get("content", "")
+        return ""
+
+    def get_description(self) -> str:
+        aliases = ("description", "Description", "DESCRIPTION", "desc", "Desc", "DESC")
+        description = ""
+        for meta in self.soup.find_all("meta"):
+            if meta.get("name") in aliases:
+                description += meta.get("content")
+        return description
+
     async def get_title_from_link(self, link: str) -> str:
         response = await self.bot.loop.run_in_executor(None, self.scraper.get, link)
-        soup = BeautifulSoup(response.content, "html.parser")
+        data = response.text if any(str(i.value) in self.link for i in (ValidSites.BIQUGEABC,)) else response.content
+        soup = BeautifulSoup(data, "lxml")
         return self._get_title(soup)
 
     async def is_valid(self) -> bool:
@@ -60,7 +118,8 @@ class Scraper(BaseSession):
 
     async def get_soup(self) -> BeautifulSoup:
         response = await self.bot.loop.run_in_executor(None, self.scraper.get, self.link)
-        self.soup = BeautifulSoup(response.content, "html.parser")
+        data = response.text if any(str(i.value) in self.link for i in (ValidSites.BIQUGEABC,)) else response.content
+        self.soup = BeautifulSoup(data, "lxml")
         await self.get_link()
         await self.get_pages()
         return self.soup
@@ -73,14 +132,11 @@ class Scraper(BaseSession):
                 ):
                     self.link = f"https://www.txt520.com{link.get('href')}"
                     response = await self.bot.loop.run_in_executor(None, self.scraper.get, self.link)
-                    self.soup = BeautifulSoup(response.content, "html.parser")
+                    self.soup = BeautifulSoup(response.content, "lxml")
                     break
 
     async def get_pages(self) -> list[BeautifulSoup]:
-        url = self.link.rstrip(".html").rstrip(".htm/")
-        suffix = url.split("/")[-1]
-        midfix = url.replace(f"/{suffix}", "").split("/")[-1]
-        prefix = url.replace(f"/{midfix}/{suffix}", "")
+        url, suffix, midfix, prefix = self.tokenize()
         done: list[str] = []
         if f"sj.{ValidSites.UUKANSHU.value}" in self.link:
             for link in self.soup.find_all("a"):
@@ -91,7 +147,7 @@ class Scraper(BaseSession):
                 ):
                     url = f"{prefix}/{midfix}/{link['href']}"
                     response = await self.bot.loop.run_in_executor(None, self.scraper.get, url)
-                    self.pages.append(BeautifulSoup(response.content, "html.parser"))
+                    self.pages.append(BeautifulSoup(response.content, "lxml"))
                     done.append(str(link.get("href")))
         elif str(ValidSites.NOVELFULL.value) in self.link:
             nums: list[int] = []
@@ -102,7 +158,57 @@ class Scraper(BaseSession):
             links = [f"{prefix}/{midfix}/{suffix}.html?page={i}" for i in range(1, max_page + 1)]
             for link in links:
                 response = await self.bot.loop.run_in_executor(None, self.scraper.get, link)
-                self.pages.append(BeautifulSoup(response.content, "html.parser"))
+                self.pages.append(BeautifulSoup(response.content, "lxml"))
+        elif str(ValidSites.MXINDINGDIANXSW.value) in self.link:
+            links = list(
+                dict.fromkeys(
+                    [
+                        f"{prefix}{a.get('href')}"
+                        for a in self.soup.find_all("a")
+                        if f"/{suffix}/" in str(a.get("href")) and "index" not in str(a.get("href"))
+                    ]
+                )
+            )
+            links = await self.bot.loop.run_in_executor(
+                None,
+                self._bucket_paginator,
+                prefix,
+                links[-1],
+                (
+                    "下一页",
+                    "下一章",
+                ),
+            )
+            soup = BeautifulSoup("", "lxml")
+            for link in links:
+                soup.append(BeautifulSoup(f'<a href="{link}"></a>', "lxml"))
+            self.soup = soup
+        elif str(ValidSites.SOXSCC.value) in url:
+            links = list(
+                dict.fromkeys(
+                    [
+                        f"{prefix}{a.get('href')}"
+                        for a in self.soup.find_all("a")
+                        if f"/{suffix}/" in str(a.get("href"))
+                        and "index" not in str(a.get("href"))
+                        and ".html" in str(a.get("href"))
+                    ]
+                )
+            )
+            links = await self.bot.loop.run_in_executor(
+                None,
+                self._bucket_paginator,
+                prefix,
+                links[-1],
+                (
+                    "下一页",
+                    "下一章",
+                ),
+            )
+            soup = BeautifulSoup("", "lxml")
+            for link in links:
+                soup.append(BeautifulSoup(f'<a href="{link}"></a>', "lxml"))
+            self.soup = soup
         return self.pages
 
     def get_title(self, css: tuple[str, ...]) -> str:
@@ -114,12 +220,27 @@ class Scraper(BaseSession):
                 pass
         return ""
 
+    def _get_next_link(self, n: int, prefix: str, link: str, data: dict[int, str], selectors: tuple[str, ...]) -> None:
+        resp = self.scraper.get(link)
+        soup = BeautifulSoup(resp.content, "lxml")
+        for a in soup.find_all("a"):
+            if any(selector in a.get_text() for selector in selectors):
+                data[n] = f"{a.get('href')}"
+                self.bot.logger.info(f"Found next link: {data[n]} [{len(data)}]")
+                return self._get_next_link(n + 1, prefix, f"{prefix}{data[n]}", data, selectors)
+        return None
+
+    def _bucket_paginator(self, prefix: str, link: str, selelctors: tuple[str, ...]) -> list[str]:
+        data: dict[int, str] = {1: link}
+        self._get_next_link(len(data) + 1, prefix, link, data, selelctors)
+        return list(data.values())
+
     def _scrape(self, link: str, n: int, data: dict[int, str]) -> None:
         response = self.scraper.get(link)
-        soup = BeautifulSoup(response.content, "html.parser")
+        soup = BeautifulSoup(response.content, "lxml")
         text = trafilatura.extract(response.content)
         title = self._get_title(soup)
-        data[n] = f"{title}\n\n{text}"
+        data[n] = f"\n{title}\n\n{text}\n"
 
     def bucket_scrape(self, links: list[str], progress: dict[int, str], user_id: int) -> str:
         data: dict[int, str] = {}
@@ -129,4 +250,4 @@ class Scraper(BaseSession):
                 progress[user_id] = f"Crawling {round((len(data) / len(links)) * 100)}%"
                 self.bot.logger.info(f"Crawling {round((len(data) / len(links)) * 100)}% for {user_id}")
         ordered = [text for _, text in sorted(data.items(), key=lambda item: item[0])]
-        return "\n\n".join(ordered)
+        return "\n\n\n".join(ordered)
