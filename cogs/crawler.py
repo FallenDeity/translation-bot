@@ -111,7 +111,7 @@ class Crawler(commands.Cog):
             scraper = cloudscraper.CloudScraper()
         else:
             scraper = None
-        with concurrent.futures.ThreadPoolExecutor(max_workers=8) as executor:
+        with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
             futures = [
                 executor.submit(self.easy, i, j, self.urlcss, self.chptitlecss, scraper)
                 for i, j in enumerate(urls)
