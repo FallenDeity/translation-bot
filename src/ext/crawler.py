@@ -169,6 +169,15 @@ class Crawl(Cog):
 
     @crawl.sub_command(name="progress", description="Check the progress of a crawl")
     async def progress(self, inter: disnake.ApplicationCommandInteraction, user: disnake.Member | None = None) -> None:
+        """Check the progress of a crawl
+
+        Parameters
+        ----------
+        inter : disnake.ApplicationCommandInteraction
+            The interaction
+        user : disnake.Member, optional
+            The user to check the progress of, by default None
+        """
         member = user or inter.user
         if member.id not in self.crawler_tasks:
             raise commands.BadArgument("You have no active crawls")

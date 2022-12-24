@@ -115,3 +115,25 @@ class Utility(Cog):
         """Restart the bot"""
         await inter.response.send_message("Restarting...")
         os.execl(sys.executable, sys.executable, *sys.argv)
+
+    @commands.slash_command(name="suggest", description="Suggest a feature")
+    async def suggest(self, inter: disnake.ApplicationCommandInteraction, *, suggestion: str) -> None:
+        """Suggest a feature
+
+        Parameters
+        ----------
+        inter : disnake.ApplicationCommandInteraction
+            The interaction
+        suggestion: str
+            The suggestion.
+        """
+        channel = self.bot.get_channel(1055445441958916167) or await self.bot.fetch_channel(1055445441958916167)
+        assert isinstance(channel, disnake.TextChannel)
+        embed = disnake.Embed(
+            title="Suggestion",
+            description=f"```fix\n{suggestion}\n```",
+            color=disnake.Color.random(),
+        )
+        embed.set_footer(text=f"From {inter.author}", icon_url=inter.author.display_avatar)
+        await channel.send(embed=embed)
+        await inter.response.send_message("Suggestion sent!", ephemeral=True)
