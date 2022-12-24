@@ -37,6 +37,7 @@ class TranslationBot(commands.InteractionBot):
         self._uptime = datetime.datetime.utcnow()
         self.http_session = aiohttp.ClientSession()
         self.mongo = Database(self.logger)
+        self._login_mega()
         self.logger.flair("Logged in to Mega!")
 
     def _login_mega(self) -> None:
