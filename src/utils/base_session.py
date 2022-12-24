@@ -22,53 +22,95 @@ class BaseSession:
     def __init__(self, *, bot: "TranslationBot") -> None:
         self.bot = bot
 
+    @staticmethod
+    def _build_embed(
+        inter: disnake.ApplicationCommandInteraction,
+        translated: bool,
+        title: str,
+        description: str,
+        thumbnail: str,
+        term: str,
+        language: str,
+        url: str,
+        mega: bool,
+    ) -> disnake.Embed:
+        embed = disnake.Embed(
+            title=f"</{inter.application_command.qualified_name}> Command Report",
+            color=disnake.Colour.random(),
+            description=f"```md\n# {title}\n{description}```",
+        )
+        if translated:
+            embed.add_field(name="Translated to", value=f"```css\n[{language}]```", inline=True)
+        if term:
+            embed.add_field(name="Termed", value=f"```css\n[{term}]```", inline=True)
+        if url:
+            embed.add_field(name="Crawled from", value=f"[This link]({url})", inline=True)
+        embed.set_footer(text=f"Requested by {inter.user}", icon_url=inter.user.display_avatar.url)
+        if mega:
+            embed.add_field(
+                name="Mega.nz",
+                value=f"*The file is too large to be sent as a message, so it was"
+                f" uploaded to mega.nz and can be downloaded from [here]({url})*",
+                inline=False,
+            )
+        embed.set_thumbnail(url=thumbnail)
+        return embed
+
     async def distribute_translations(
         self,
+        *,
         inter: disnake.ApplicationCommandInteraction,
         translator: "Translator",
         text: str,
         language: str,
         original_language: str,
-        name: str,
-        termed: bool = False,
-        crawled: bool = False,
+        title: str,
+        term: str = "",
+        crawled_site: str = "",
+        thumbnail: str = "",
+        description: str = "",
     ) -> Novel:
+        description = text[:300] + "..." if not description else description
         buffer = BytesIO()
         buffer.write(text.encode("utf-8"))
         buffer.seek(0)
-        file = disnake.File(buffer, filename=f"{name}.txt")
-        message = f"translated from {original_language} to {language}" if not termed else f"termed {name}"
-        message += " and crawled" if crawled else ""
+        file = disnake.File(buffer, filename=f"{title}.txt")
+        view = None
         try:
-            msg = await inter.followup.send(
-                content=f"> **{inter.user.mention} {message}**",
-                file=file,
-            )
-            url = msg.attachments[0].url if msg else ""
+            url = ""
         except disnake.HTTPException:
             if not self.DOWNLOAD_DIRECTORY.exists():
                 self.DOWNLOAD_DIRECTORY.mkdir()
-            path = self.DOWNLOAD_DIRECTORY / f"{name}.txt"
+            path = self.DOWNLOAD_DIRECTORY / f"{title}.txt"
             async with aiofiles.open(path, "w", encoding="utf-8") as f:
                 await f.write(text)
-            await inter.edit_original_response(content="> **Writing to file...**")
             file = await self.bot.loop.run_in_executor(None, partial(self.bot.mega.upload, path.as_posix()))
             url = await self.bot.loop.run_in_executor(None, self.bot.mega.get_upload_link, file)
             view = disnake.ui.View(timeout=None)
             view.add_item(disnake.ui.Button(label="Novel", url=url, emoji="📖"))
-            await inter.send(
-                content=f"> **{inter.user.mention} {message}**"
-                f"\nYour translation is too uploaded to mega.nz and can be downloaded from [here]({url})",
-                view=view,
-            )
             path.unlink()
-        category = Categories.from_string(name)
-        tags = translator.get_tags(name) + Categories.get_tags_from_string(name)
+            view = disnake.ui.View(timeout=None)
+            view.add_item(disnake.ui.Button(label="Novel", url=url, emoji="📖"))
+        category = Categories.from_string(title)
+        tags = translator.get_tags(title) + Categories.get_tags_from_string(title)
+        thumbnail = Categories.thumbnail_from_category(category) if not thumbnail else thumbnail
+        args = (
+            inter,
+            language == original_language,
+            title,
+            description,
+            thumbnail,
+            term,
+            language,
+            url,
+            bool(view),
+        )
+        msg = await inter.edit_original_response(embed=self._build_embed(*args), view=view)
         novel = Novel(
             id=await self.bot.mongo.library.get_novel_id(),
-            description="",
-            download=url,
-            title=name,
+            description=description,
+            download=msg.attachments[0].url if msg.attachments else url,
+            title=title,
             language=Languages.from_string(language),
             original_language=original_language,
             tags=tags,
@@ -77,10 +119,9 @@ class BaseSession:
             size=round(sys.getsizeof(buffer) / 1024 / 1024, 2),
             uploader=inter.user.id,
             thumbnail=Categories.thumbnail_from_category(category),
-            crawled_source="",
+            crawled_source=crawled_site,
         )
         await self.bot.mongo.library.add_novel(novel)
-        await inter.edit_original_response(f"> **Completed {message}**")
         self.bot.dispatch("novel_add", novel, url, file if isinstance(file, disnake.File) else None)
         return novel
 
@@ -92,9 +133,12 @@ class BaseSession:
                 f" is present in the library, would you like to continue?",
             )
             if not result:
-                await inter.edit_original_response(content="> **Cancelled**", view=None)
+                await inter.edit_original_response(
+                    embed=disnake.Embed(title="Process cancelled", color=disnake.Colour.red())
+                )
                 return False
             else:
-                await inter.edit_original_response(content="> **Continuing...**", view=None)
-        await inter.edit_original_response(content="> **Translating...**", view=None)
+                await inter.edit_original_response(
+                    embed=disnake.Embed(title="Process resumed...", color=disnake.Colour.green())
+                )
         return True

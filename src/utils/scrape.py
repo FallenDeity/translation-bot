@@ -65,10 +65,11 @@ class Scraper(BaseSession):
         )
         imgs = []
         tag = "src" if not any(str(i.value) in self.link for i in compound) else "data-src"
-        for img in soup.find_all(tag):
-            if any(x in img.get(tag, "") for x in ("cover", "thumb", ".jpg", "upload")):
-                if ".png" not in img.get(tag, ""):
-                    imgs.append(img.get(tag, ""))
+        for img in soup.find_all("img"):
+            if any(x in img.get(tag, "") for x in ("cover", "thumb", ".jpg", "upload")) and ".png" not in img.get(
+                tag, ""
+            ):
+                imgs.append(img.get(tag, ""))
         if imgs:
             img = imgs[0]
             for i in imgs:

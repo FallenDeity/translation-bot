@@ -17,24 +17,29 @@ class Library(Cog):
             title=f"#{novel.id} {novel.title}",
             description=novel.description,
             color=disnake.Color.random(),
+            url=novel.download,
         )
-        embed.add_field(name="Rating", value=f"{novel.rating}/5")
-        embed.add_field(name="Language", value=novel.language)
-        embed.add_field(name="Original Language", value=novel.original_language)
-        embed.add_field(name="Category", value=novel.category)
-        embed.add_field(name="Tags", value=f"```ini\n{', '.join(novel.tags)}```")
-        embed.add_field(name="Size", value=f"{novel.size} MB")
+        embed.add_field(name="Rating", value=f"{novel.rating}/5", inline=True)
+        embed.add_field(name="Language", value=novel.language, inline=True)
+        embed.add_field(name="Original Language", value=novel.original_language, inline=True)
+        embed.add_field(name="Category", value=novel.category, inline=True)
+        embed.add_field(name="Tags", value=f"```fix\n{', '.join(novel.tags)}```", inline=True)
+        embed.add_field(name="Size", value=f"{novel.size} MB", inline=True)
         embed.add_field(
-            name="Uploader", value=f"Uploaded by `{user}` {disnake.utils.format_dt(novel.date, style='R')} ago"
+            name="Uploader",
+            value=f"Uploaded by `{user}` {disnake.utils.format_dt(novel.date, style='R')} ago",
+            inline=True,
         )
-        embed.add_field(name="Download", value=f"[Click Here]({novel.download})")
-        embed.set_thumbnail(url=user.display_avatar)
+        embed.add_field(name="Download", value=f"[Click Here]({novel.download})", inline=True)
+        if novel.crawled_source:
+            embed.add_field(name="Crawled Source", value=f"[Click Here]({novel.crawled_source})", inline=True)
+        embed.set_thumbnail(url=novel.thumbnail)
         return embed
 
     @commands.slash_command(name="library", description="Get the bot's library.")
     async def library(self, inter: disnake.ApplicationCommandInteraction) -> None:
         """Get the bot's library."""
-        ...
+        await inter.response.defer()
 
     @library.sub_command(name="search", description="Search the bot's library.")
     async def library_search(
@@ -72,7 +77,6 @@ class Library(Cog):
         size: float
             The size of the novel.
         """
-        await inter.response.defer()
         if not any([title, rating, language, original_language, tag, category, uploader, size]):
             total_novels = await self.bot.mongo.library.get_novels_count()
             await LazyPaginator.paginate(inter=inter, bot=self.bot, pages=list(range(1, total_novels + 1)))
@@ -135,17 +139,18 @@ class Library(Cog):
         novel_id: int
             The ID of the novel.
         """
+        novel_id = await self.bot.mongo.library.get_novels_count() if novel_id == -1 else novel_id
         novel = await self.bot.mongo.library.get_novel(novel_id)
         if novel is None:
-            await inter.response.send_message("Novel not found.", ephemeral=True)
+            await inter.edit_original_response("Novel not found.")
             return
-        await inter.response.send_message(embed=await self._build_embed(novel))
+        await inter.edit_original_response(embed=await self._build_embed(novel))
 
     @library.sub_command(name="random", description="Get a random novel.")
     async def library_random(self, inter: disnake.ApplicationCommandInteraction) -> None:
         """Get a random novel."""
         novel = await self.bot.mongo.library.get_random_novel()
-        await inter.response.send_message(embed=await self._build_embed(novel))
+        await inter.edit_original_response(embed=await self._build_embed(novel))
 
     @commands.slash_command(name="review", description="Review a novel.")
     async def review(
@@ -166,7 +171,7 @@ class Library(Cog):
         """
         novel = await self.bot.mongo.library.get_novel(novel_id)
         if novel is None:
-            await inter.response.send_message("Novel not found.", ephemeral=True)
+            await inter.edit_original_response("Novel not found.")
             return
         await self.bot.mongo.library.update_novel(novel_id, rating=rating, review=review)
-        await inter.response.send_message("Review added.", ephemeral=True)
+        await inter.edit_original_response("Review added.")

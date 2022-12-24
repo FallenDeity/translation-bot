@@ -1,17 +1,18 @@
-import disnake
-import psutil
 import os
 import sys
+
+import disnake
+import psutil
 from disnake.ext import commands, tasks
 
 from src.core.views import InviteView
+from src.core.views.paginators import Paginator
 from src.utils import Eval
 
 from . import Cog
 
 
 class Utility(Cog):
-
     @tasks.loop(seconds=120)
     async def _update_status(self) -> None:
         total_novels = await self.bot.mongo.library.get_novels_count()
@@ -60,6 +61,34 @@ class Utility(Cog):
         embed.set_footer(text="Thanks for using TranslationBot!", icon_url=self.bot.user.avatar)
         embed.set_thumbnail(url=inter.client.user.display_avatar)
         await inter.response.send_message(embed=embed, view=InviteView(self.bot))
+
+    @commands.slash_command(name="leaderboard", description="Get the bot's leaderboard.")
+    async def leaderboard(self, inter: disnake.ApplicationCommandInteraction) -> None:
+        """Get the bot's leaderboard."""
+        user_rank = await self.bot.mongo.library.get_user_novel_count(inter.author.id)
+        top_200 = await self.bot.mongo.library.get_user_novel_count(_top_200=True)
+        embeds = []
+        top_200 = [(user_id, count) for user_id, count in top_200.items()]
+        chunks = [top_200[i : i + 10] for i in range(0, len(top_200), 10)]
+        n = 1
+        for chunk in chunks:
+            embed = disnake.Embed(
+                title="Leaderboard",
+                description=f"**Leaderboard of the bot!**\
+                    \n\n**Your Rank:** {user_rank[inter.author.id]}",
+                color=disnake.Color.random(),
+            )
+            embed.set_footer(text="Thanks for using TranslationBot!", icon_url=self.bot.user.display_avatar)
+            embed.set_thumbnail(url=inter.client.user.display_avatar)
+            for user_id, count in chunk:
+                embed.add_field(
+                    name=f"{n}. <@{user_id}>",
+                    value=f"{count} novels",
+                    inline=False,
+                )
+                n += 1
+            embeds.append(embed)
+        await Paginator.paginate(inter, self.bot, embeds)
 
     @commands.message_command(name="Execute Code", description="Execute a python code")
     @commands.is_owner()

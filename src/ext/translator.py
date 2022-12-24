@@ -55,6 +55,9 @@ class Translate(Cog):
         await channel.send(embed=embed, view=view)
 
     async def load_novel_from_link(self, link: str) -> str:
+        head = await self.bot.http_session.head(link)
+        if int(head.headers["Content-Length"]) / 1024 / 1024 > 20:
+            raise commands.BadArgument("File is too large")
         response = await self.bot.http_session.get(link)
         return await response.text(encoding="utf-8")
 
@@ -74,7 +77,12 @@ class Translate(Cog):
             None, translator.bucket_translate, text, self.translator_tasks, inter.user.id, Languages.English.value
         )
         await translator.distribute_translations(
-            inter, translator, translated, str(Languages.English.value), original_language, name
+            inter=inter,
+            translator=translator,
+            text=translated,
+            original_language=original_language,
+            title=name,
+            language=str(Languages.English.value),
         )
         await inter.edit_original_response(content="> **Translation complete**", view=None)
 
@@ -115,13 +123,13 @@ class Translate(Cog):
 
     async def cog_before_slash_command_invoke(self, inter: disnake.ApplicationCommandInteraction) -> None:
         if await self.bot.mongo.warns.blocked(inter.user.id):
-            await inter.response.send_message("You have been blocked from using this bot")
             raise commands.CheckFailure(f"{inter.user} is blocked from using this bot")
 
     @commands.slash_command(name="translate", description="Translate a novel from one language to another")
-    async def translate(self, inter: disnake.ApplicationCommandInteraction) -> None:
+    async def translate(self, _inter: disnake.ApplicationCommandInteraction) -> None:
         if psutil.virtual_memory().percent > 90:
-            return await inter.send("Memory usage is too high, please try again later")
+            raise commands.CheckFailure("Bot is under heavy load")
+        await _inter.response.defer()
 
     @translate.sub_command(name="translate", description="Translate a novel")
     @commands.max_concurrency(1, commands.BucketType.user)
@@ -154,7 +162,9 @@ class Translate(Cog):
         term: str
             The terms to replace.
         """
-        await inter.send("> **Please wait while I translate your novel...**")
+        await inter.send(
+            embed=disnake.Embed(title="Translating...", description="Please wait...", colour=disnake.Colour.random())
+        )
         if not any([link, file, library_id]):
             raise commands.BadArgument("You must provide a link, file, or library id")
         if link and not link.startswith("https://"):
@@ -166,28 +176,58 @@ class Translate(Cog):
         if term and term not in self.bot.termer.get_categories():
             raise commands.BadArgument("Invalid term")
         if link:
+            await inter.edit_original_response(
+                embed=disnake.Embed(
+                    title="Downloading...", description="Please wait...", colour=disnake.Colour.random()
+                )
+            )
             text, o_name = await self.download_from_link(link)
         elif file:
             text, o_name = (await file.read()).decode("utf-8"), file.filename
         elif library_id:
+            await inter.edit_original_response(
+                embed=disnake.Embed(
+                    title="Downloading...", description="Please wait...", colour=disnake.Colour.random()
+                )
+            )
             novel = await self.bot.mongo.library.get_novel(library_id)
             text, o_name = await self.download_from_link(novel.download if novel else "")
         else:
             raise commands.BadArgument("Invalid input")
+        if not text or not o_name:
+            raise commands.BadArgument("Invalid input")
         translator = Translator(bot=self.bot)
         name = await translator.format_name(name=name or o_name)
-        await inter.edit_original_response(content=f"> **Translating {name}...**")
+        await inter.edit_original_response(
+            embed=disnake.Embed(
+                title="Translating...", description="Translation started...", colour=disnake.Colour.random()
+            )
+        )
         original_language = await translator.detect(text[:10000])
         if term:
-            await inter.edit_original_response(content=f"> **Replacing terms {term} ...**")
+            await inter.edit_original_response(
+                embed=disnake.Embed(
+                    title="Terming...", description="Replacing terms...", colour=disnake.Colour.random()
+                )
+            )
             text = self.bot.termer.replace_terms(text, term)
-            await inter.edit_original_response(content="> **Terming complete**")
+            await inter.edit_original_response(
+                embed=disnake.Embed(
+                    title="Terming...", description="Terming complete...", colour=disnake.Colour.random()
+                )
+            )
         if not await translator.check_name(name):
             raise commands.BadArgument(f"Invalid name {name}")
         if original_language == Languages.from_string(language):
             if term:
                 await translator.distribute_translations(
-                    inter, translator, text, language, original_language, name, termed=True
+                    inter=inter,
+                    translator=translator,
+                    text=text,
+                    title=name,
+                    original_language=original_language,
+                    language=language,
+                    term=term,
                 )
                 return
             raise commands.BadArgument("Cannot translate to the same language")
@@ -197,8 +237,19 @@ class Translate(Cog):
             None, translator.bucket_translate, text, self.translator_tasks, inter.user.id, language
         )
         language = Languages.from_string(language)
-        await translator.distribute_translations(inter, translator, translated, language, original_language, name)
-        await inter.edit_original_response(content="> **Translation complete**", view=None)
+        await inter.edit_original_response(
+            embed=disnake.Embed(
+                title="Translating...", description="Translation complete...", colour=disnake.Colour.random()
+            )
+        )
+        await translator.distribute_translations(
+            inter=inter,
+            translator=translator,
+            text=translated,
+            title=name,
+            original_language=original_language,
+            language=language,
+        )
         self.translator_tasks.pop(inter.user.id)
 
     @translate_.autocomplete("language")
@@ -228,9 +279,15 @@ class Translate(Cog):
             The user to get the progress of.
         """
         member = user or inter.user
-        if not (progress := self.translator_tasks.get(member.id)):
-            return await inter.response.send_message("No translation in progress")
-        await inter.response.send_message(f"> **{progress}**")
+        if member.id not in self.translator_tasks:
+            raise commands.BadArgument("You have no active translations")
+        await inter.send(
+            embed=disnake.Embed(
+                title="Crawl progress",
+                description=f"```elixir\n{self.translator_tasks[member.id]}%```",
+                colour=disnake.Colour.random(),
+            )
+        )
 
     @commands.message_command(name="multi-translate", description="Translate multiple novels")
     @commands.max_concurrency(1, commands.BucketType.user)
@@ -245,8 +302,12 @@ class Translate(Cog):
             The message to translate.
         """
         if psutil.virtual_memory().percent > 90:
-            return await inter.send("Memory usage is too high, please try again later")
-        await inter.send("> **Please wait while I translate your novels...**")
+            raise commands.BadArgument("The bot is currently under heavy load, please try again later")
+        await inter.send(
+            embed=disnake.Embed(
+                title="Translating...", description="Translation started...", colour=disnake.Colour.random()
+            )
+        )
         links = re.findall(r"https?://\S+", message.content)
         if not links and not message.attachments:
             raise commands.BadArgument("No links or attachments")
@@ -264,7 +325,17 @@ class Translate(Cog):
                 text, o_name = (await attachment.read()).decode("utf-8"), attachment.filename
                 await self._minimal_translate(inter, translator, o_name, text)
             except Exception as e:
-                await inter.send(f"> **Error: {e}**")
+                await inter.send(
+                    embed=disnake.Embed(
+                        title="Failed",
+                        description="Translation failed for current novel...",
+                        colour=disnake.Colour.red(),
+                    )
+                )
                 self.bot.logger.exception(e.with_traceback(e.__traceback__))
                 continue
-        await inter.edit_original_response("> **Done**")
+        await inter.edit_original_response(
+            embed=disnake.Embed(
+                title="Translating...", description="Translation complete...", colour=disnake.Colour.random()
+            )
+        )

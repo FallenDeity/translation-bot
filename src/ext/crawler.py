@@ -19,13 +19,38 @@ class Crawl(Cog):
 
     async def cog_before_slash_command_invoke(self, inter: disnake.ApplicationCommandInteraction) -> None:
         if await self.bot.mongo.warns.blocked(inter.user.id):
-            await inter.response.send_message("You have been blocked from using this bot")
             raise commands.CheckFailure(f"{inter.user} is blocked from using this bot")
 
     @commands.slash_command(name="crawl", description="Crawl a website")
-    async def crawl(self, inter: disnake.ApplicationCommandInteraction) -> None:
+    async def crawl(self, _inter: disnake.ApplicationCommandInteraction) -> None:
         if psutil.virtual_memory().percent > 90:
-            return await inter.send("Memory usage is too high, please try again later")
+            raise commands.CheckFailure("The bot is currently under heavy load")
+        await _inter.response.defer()
+
+    @staticmethod
+    def _build_embed(
+        status: str,
+        title: str,
+        link: str,
+        description: str,
+        thumbnail: str,
+        translate: bool,
+        translate_to: str,
+        term: str,
+    ) -> disnake.Embed:
+        embed = disnake.Embed(
+            title=title,
+            description=f"```diff\n- {status}...\n{'+ ' + description if description else ''}```",
+            url=link,
+            color=disnake.Colour.random(),
+        )
+        if thumbnail:
+            embed.set_thumbnail(url=thumbnail)
+        if translate:
+            embed.add_field(name="Translation Language", value=translate_to, inline=True)
+        if term:
+            embed.add_field(name="Terming Category", value=term, inline=True)
+        return embed
 
     @crawl.sub_command(name="crawl", description="Crawl a website")
     @commands.max_concurrency(1, commands.BucketType.user)
@@ -35,7 +60,7 @@ class Crawl(Cog):
         url: str,
         translate: bool = False,
         translate_to: str = "en",
-        term: bool = False,
+        term: str = "",
     ) -> None:
         """Crawl a website
 
@@ -49,8 +74,8 @@ class Crawl(Cog):
             Whether to translate the text, by default False
         translate_to : str, optional
             The language to translate to, by default "en"
-        term : bool, optional
-            Whether to term the text, by default False
+        term : str, optional
+            Whether to term the text, by default ""
         """
         if not ValidSites.is_valid(url):
             raise commands.BadArgument("This website is not supported")
@@ -58,7 +83,6 @@ class Crawl(Cog):
             raise commands.BadArgument("Invalid language")
         if term and term not in self.bot.termer.get_categories():
             raise commands.BadArgument("Invalid term")
-        await inter.send("> **Crawling...**")
         link = ValidSites.format_link(url)
         crawler = Scraper(bot=self.bot, link=link)
         translator = Translator(bot=self.bot, target=translate_to)
@@ -71,56 +95,70 @@ class Crawl(Cog):
         title = await crawler.get_title_from_link(url) if not title else title
         title = await translator.translate(title) if title else f"{inter.user.id}_{url}"
         title = await translator.format_name(title)
-        await inter.edit_original_response(content=f"> **Crawling...**\n> **Title:** {title}")
+        args = (
+            title,
+            link,
+            description,
+            thumbnail,
+            translate,
+            translate_to,
+            term,
+        )
+        await inter.edit_original_response(embed=self._build_embed("Crawling currently", *args))
         urls = ValidSites.get_urls(crawler.soup, crawler.link) + sum(
             [ValidSites.get_urls(i, crawler.link) for i in crawler.pages], []
         )
         if not urls:
             raise commands.BadArgument("No chapters found")
+        if len(urls) > 2000:
+            raise commands.BadArgument("More than 2000 chapters found")
         text = await self.bot.loop.run_in_executor(None, crawler.scraper.get, urls[0])
         text = trafilatura.extract(text.content)
         language = await translator.detect(text)
         if not await crawler.check_library(inter, language, title):
             return
-        await inter.edit_original_response(
-            content=f"> **Crawling...**\n> **Title:** {title}\n> **Language:** {language}"
-        )
         text = await self.bot.loop.run_in_executor(None, crawler.bucket_scrape, urls, self.crawler_tasks, inter.user.id)
-        await inter.edit_original_response(
-            content=f"> **Crawling complete**\n> **Title:** {title}\n> **Language:** {language}"
-        )
+        await inter.edit_original_response(embed=self._build_embed("Crawling complete", *args))
         if translate:
             if language != Languages.from_string(translate_to):
-                await inter.edit_original_response(content="> **Translating...**")
+                await inter.edit_original_response(embed=self._build_embed("Translating", *args))
                 cog: "Translate" = t.cast("Translate", self.bot.get_cog("Translate"))
                 text = await self.bot.loop.run_in_executor(
                     None, translator.bucket_translate, text, cog.translator_tasks, inter.user.id, translate_to
                 )
-                await inter.edit_original_response(content=f"> **Translated to:** {translate_to}")
+                await inter.edit_original_response(embed=self._build_embed("Translation complete", *args))
                 cog.translator_tasks.pop(inter.user.id)
-            await inter.edit_original_response(content="> **Not translating since the language is the same**")
+            await inter.edit_original_response(embed=self._build_embed("No translation required", *args))
         else:
             translate_to = await translator.detect(text[:5000])
         if term:
-            await inter.edit_original_response(content="> **Filtering...**")
+            await inter.edit_original_response(embed=self._build_embed("Terming", *args))
             text = self.bot.termer.replace_terms(text, term)
-            await inter.edit_original_response(content=f"> **Filtered by:** {term}")
-        await inter.edit_original_response(content="> **Uploading...**")
-        novel = await crawler.distribute_translations(
-            inter, translator, text, translate_to, language, title, term, True
-        )
-        await self.bot.mongo.library.update_novel(
-            novel.id, description=description, thumbnail=thumbnail, crawled_source=url
+            await inter.edit_original_response(embed=self._build_embed("Terming complete", *args))
+        await inter.edit_original_response(embed=self._build_embed("Uploading", *args))
+        await crawler.distribute_translations(
+            inter=inter,
+            text=text,
+            title=title,
+            language=translate_to,
+            original_language=language,
+            term=term,
+            crawled_site=url,
+            translator=translator,
+            thumbnail=thumbnail,
+            description=description,
         )
         self.crawler_tasks.pop(inter.user.id)
 
     @crawl_.autocomplete("translate_to")
-    async def crawl_language_autocomplete(
-        self, _inter: disnake.ApplicationCommandInteraction, language: str
+    async def crawl_translate_to_autocomplete(
+        self, _inter: disnake.ApplicationCommandInteraction, translate_to: str
     ) -> dict[str, str]:
         """Autocomplete for the language parameter."""
         data: list[tuple[str, str]] = [
-            (str(lang.name), str(lang.value)) for lang in Languages if lang.name.lower().startswith(language.lower())
+            (str(lang.name), str(lang.value))
+            for lang in Languages
+            if lang.name.lower().startswith(translate_to.lower())
         ][0:25]
         return {key: value for key, value in data}
 
@@ -130,7 +168,14 @@ class Crawl(Cog):
         return [term for term in self.bot.termer.get_categories() if term.lower().startswith(term_.lower())][0:25]
 
     @crawl.sub_command(name="progress", description="Check the progress of a crawl")
-    async def progress(self, inter: disnake.ApplicationCommandInteraction) -> None:
-        if inter.user.id not in self.crawler_tasks:
+    async def progress(self, inter: disnake.ApplicationCommandInteraction, user: disnake.Member | None = None) -> None:
+        member = user or inter.user
+        if member.id not in self.crawler_tasks:
             raise commands.BadArgument("You have no active crawls")
-        await inter.send(f"> **Progress:** {self.crawler_tasks[inter.user.id]}")
+        await inter.send(
+            embed=disnake.Embed(
+                title="Crawl progress",
+                description=f"```elixir\n{self.crawler_tasks[member.id]}%```",
+                colour=disnake.Colour.random(),
+            )
+        )

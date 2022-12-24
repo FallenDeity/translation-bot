@@ -15,9 +15,19 @@ class ErrorHandler(Cog):
         exc = "".join(traceback.format_exception(type(error), error, error.__traceback__))
         embeds = []
         for i in range(0, len(exc), 1024):
-            embed = disnake.Embed(title="Error", description=f"```py\n{exc[i:i+1024]}```")
+            embed = disnake.Embed(title="Error", description=f"```py\n{exc[i:i+1024]}\n---```")
             embeds.append(embed)
         return embeds
+
+    @staticmethod
+    def _build_embed(error: Exception | str) -> disnake.Embed:
+        exc = (
+            "".join(traceback.format_exception(type(error), error, error.__traceback__))
+            if isinstance(error, Exception)
+            else error
+        )
+        embed = disnake.Embed(title="Error", description=f"```diff\n- {exc}```", color=disnake.Color.red())
+        return embed
 
     @commands.Cog.listener()
     async def on_slash_command_error(
@@ -25,24 +35,47 @@ class ErrorHandler(Cog):
     ) -> None:
         if isinstance(error, commands.MissingPermissions):
             return await inter.send(
-                "> **You don't have the required permissions to run this command.**", ephemeral=True
+                embed=self._build_embed(
+                    f"You are missing the following permissions: {', '.join(error.missing_permissions)}"
+                ),
+                ephemeral=True,
             )
         elif isinstance(error, commands.BotMissingPermissions):
-            return await inter.send("> **I don't have the required permissions to run this command.**", ephemeral=True)
+            return await inter.send(
+                embed=self._build_embed(
+                    f"I am missing the following permissions: {', '.join(error.missing_permissions)}"
+                ),
+                ephemeral=True,
+            )
         elif isinstance(error, commands.CommandOnCooldown):
             return await inter.send(
-                f"> **This command is on cooldown. Try again in {error.retry_after:.2f}s.**", ephemeral=True
+                embed=self._build_embed(f"This command is on cooldown. Try again in {error.retry_after:.2f} seconds."),
+                ephemeral=True,
             )
         elif isinstance(error, commands.MaxConcurrencyReached):
-            return await inter.send("> **This command is already running.**", ephemeral=True)
+            return await inter.send(
+                embed=self._build_embed("This command is already running. Try again later."),
+                ephemeral=True,
+            )
         elif isinstance(error, commands.CheckFailure):
-            return await inter.send(f"> **{error}**", ephemeral=True)
+            return await inter.send(
+                embed=self._build_embed(
+                    f"{error.args[0] if error.args else 'You do not have permission to use this command.'}"
+                ),
+                ephemeral=True,
+            )
         elif isinstance(error, commands.BadArgument):
-            return await inter.send(f"> **{error}**", ephemeral=True)
+            return await inter.send(
+                embed=self._build_embed(f"Invalid argument: {error}"),
+                ephemeral=True,
+            )
         elif isinstance(error, disnake.NotFound):
             return
         else:
-            await inter.send("> **An error occurred while executing this command.**", ephemeral=True)
+            await inter.send(
+                embed=self._build_embed("An unknown error has occurred. Please try again later."),
+                ephemeral=True,
+            )
         whole_error = "".join(traceback.format_exception(type(error), error, error.__traceback__))
         self.bot.logger.error(f"Error in {inter.application_command.name} command: {whole_error}")
         if self.channel is None:

@@ -41,6 +41,19 @@ class Library:
         novels: list[dict[str, t.Any]] = await self._pool.find({"id": {"$in": novel_ids}}, {"_id": 0}).to_list(None)
         return [Novel.from_dict(novel) for novel in novels]
 
+    async def get_user_novel_count(self, user_id: int | None = None, _top_200: bool = False) -> dict[int, int]:
+        if user_id is None:
+            top_200_uploaders = await self._pool.aggregate(
+                [
+                    {"$group": {"_id": "$uploader", "count": {"$sum": 1}}},
+                    {"$sort": {"count": -1}},
+                    {"$limit": 200},
+                ]
+            ).to_list(None)
+            return {top_200_uploader["_id"]: top_200_uploader["count"] for top_200_uploader in top_200_uploaders}
+        user_novel_count: int = await self._pool.count_documents({"uploader": user_id})
+        return {user_id: user_novel_count}
+
     async def add_novel(self, novel: Novel) -> None:
         await self._pool.insert_one(novel.to_dict())
 

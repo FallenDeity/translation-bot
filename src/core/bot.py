@@ -10,8 +10,8 @@ import typing as t
 import aiohttp
 import disnake
 import dotenv
+import mega
 from disnake.ext import commands
-from mega import Mega
 
 from ..assets import Termer
 from ..database import Database
@@ -37,8 +37,15 @@ class TranslationBot(commands.InteractionBot):
         self._uptime = datetime.datetime.utcnow()
         self.http_session = aiohttp.ClientSession()
         self.mongo = Database(self.logger)
-        self.mega = Mega().login(email=os.getenv("MEGA_EMAIL"), password=os.getenv("MEGA_PASSWORD"))
         self.logger.flair("Logged in to Mega!")
+
+    def _login_mega(self) -> None:
+        try:
+            self.mega = mega.Mega()
+            self.mega.login(os.environ["MEGA_EMAIL"], os.environ["MEGA_PASSWORD"])
+        except mega.mega.RequestError:
+            self.logger.critical("Failed to login to Mega!")
+            self.mega = mega.Mega().login()
 
     def run(self, *args: t.Any, **kwargs: t.Any) -> None:
         self.logger.info("Loading extensions...")
