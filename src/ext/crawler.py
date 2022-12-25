@@ -25,6 +25,8 @@ class Crawl(Cog):
     async def crawl(self, _inter: disnake.ApplicationCommandInteraction) -> None:
         if psutil.virtual_memory().percent > 90:
             raise commands.CheckFailure("The bot is currently under heavy load")
+        if _inter.user.id in self.crawler_tasks:
+            raise commands.CheckFailure("You already have a crawl task running")
         await _inter.response.defer()
 
     @staticmethod

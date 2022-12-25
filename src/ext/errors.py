@@ -15,7 +15,7 @@ class ErrorHandler(Cog):
         exc = "".join(traceback.format_exception(type(error), error, error.__traceback__))
         embeds = []
         for i in range(0, len(exc), 1024):
-            embed = disnake.Embed(title="Error", description=f"```py\n{exc[i:i+1024]}\n---```")
+            embed = disnake.Embed(title="Error", description=f"```py\n{exc[i:i+1024]}\n```")
             embeds.append(embed)
         return embeds
 

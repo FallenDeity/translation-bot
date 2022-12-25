@@ -105,9 +105,10 @@ class BaseSession:
             url,
             bool(view),
         )
+        size = round(sys.getsizeof(buffer) / 1024 / 1024, 2)
         msg = await inter.edit_original_response(embed=self._build_embed(*args), view=view)
         novel = Novel(
-            id=await self.bot.mongo.library.get_novel_id(),
+            id=await self.bot.mongo.library.validate_position(title, language, size),
             description=description,
             download=msg.attachments[0].url if msg.attachments else url,
             title=title,
@@ -116,7 +117,7 @@ class BaseSession:
             tags=tags,
             category=category,
             rating=0,
-            size=round(sys.getsizeof(buffer) / 1024 / 1024, 2),
+            size=size,
             uploader=inter.user.id,
             thumbnail=Categories.thumbnail_from_category(category),
             crawled_source=crawled_site,

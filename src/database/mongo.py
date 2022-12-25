@@ -55,6 +55,8 @@ class Library:
         return {user_id: user_novel_count}
 
     async def add_novel(self, novel: Novel) -> None:
+        if await self._pool.count_documents({"id": novel.id}):
+            return await self.update(novel)
         await self._pool.insert_one(novel.to_dict())
 
     async def remove_novel(self, novel_id: int) -> None:
@@ -131,6 +133,14 @@ class Library:
             ]
         ).to_list(None)
         return [common_id["id"] for common_id in common_ids]
+
+    async def validate_position(self, title: str, language: str, size: float) -> int:
+        common = await self.find_common(title=title, language=language, size=size)
+        novels = await self.get_novels(common)
+        for novel in novels:
+            if novel.title == title and novel.language == language and novel.size <= size:
+                return novel.id
+        return await self.get_novel_id()
 
     async def get_random_novel(self) -> Novel:
         novel: dict[str, t.Any] = await self._pool.aggregate([{"$sample": {"size": 1}}]).next()

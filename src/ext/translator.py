@@ -1,6 +1,8 @@
 import pathlib
 import re
+import sys
 import typing as t
+import zipfile
 
 import aiofiles
 import disnake
@@ -61,6 +63,35 @@ class Translate(Cog):
         response = await self.bot.http_session.get(link)
         return await response.text(encoding="utf-8")
 
+    async def load_novel_in_chunks(self, user_id: int, link: str, name: str | None = None) -> list[pathlib.Path]:
+        files: list[pathlib.Path] = []
+        name = name or link.split("/")[-1].split(".")[0]
+        async with self.bot.http_session.get(link) as response:
+            data = bytes()
+            async for chunk in response.content.iter_chunked(6 * 1024 * 1024):
+                file = self.DOWNLOAD_DIRECTORY / f"{name}_{user_id}_{len(files)}.txt"
+                data += chunk
+                if sys.getsizeof(data) >= 6 * 1024 * 1024:
+                    async with aiofiles.open(file, "wb") as f:
+                        await f.write(data)
+                    self.bot.logger.info(f"Downloaded {file}")
+                    files.append(file)
+                    data = bytes()
+            if data:
+                file = self.DOWNLOAD_DIRECTORY / f"{name}_{user_id}_{len(files)}.txt"
+                async with aiofiles.open(file, "wb") as f:
+                    await f.write(data)
+                self.bot.logger.info(f"Downloaded {file}")
+                files.append(file)
+        return files
+
+    def _zip_files(self, user_id: int, files: list[pathlib.Path]) -> pathlib.Path:
+        with zipfile.ZipFile(self.DOWNLOAD_DIRECTORY / f"{user_id}.zip", "w", compression=zipfile.ZIP_DEFLATED) as zf:
+            for file in files:
+                zf.write(file)
+            self.bot.logger.info(f"Zipped {len(files)} files")
+        return self.DOWNLOAD_DIRECTORY / f"{user_id}.zip"
+
     async def _minimal_translate(
         self, inter: disnake.ApplicationCommandInteraction, translator: "Translator", name: str, text: str
     ) -> None:
@@ -86,7 +117,7 @@ class Translate(Cog):
         )
         await inter.edit_original_response(content="> **Translation complete**", view=None)
 
-    async def download_from_link(self, link: str) -> tuple[str, str]:
+    async def _match_discord_link(self, link: str) -> disnake.Message | None:
         if match := self.DISCORD.match(link):
             guild_id = int(match.group("guild_id"))
             channel_id = int(match.group("channel_id"))
@@ -96,6 +127,15 @@ class Translate(Cog):
                 disnake.TextChannel, guild.get_channel(channel_id) or await guild.fetch_channel(channel_id)
             )
             message = await channel.fetch_message(message_id)
+            if message is None or not message.attachments:
+                raise commands.BadArgument("Invalid message link")
+            return message
+        return None
+
+    async def download_from_link(self, link: str) -> tuple[str, str]:
+        if self.DISCORD.match(link):
+            message = await self._match_discord_link(link)
+            assert isinstance(message, disnake.Message)
             link = message.attachments[0].url
             data = await self.load_novel_from_link(link)
             name = message.attachments[0].filename
@@ -103,8 +143,6 @@ class Translate(Cog):
             file_id = match.group("file_id")
             file_key = match.group("file_key")
             link = f"https://mega.nz/#!{file_id}!{file_key}"
-            if not self.DOWNLOAD_DIRECTORY.exists():
-                self.DOWNLOAD_DIRECTORY.mkdir()
             try:
                 path = await self.bot.loop.run_in_executor(
                     None, self.bot.mega.download_url, link, self.DOWNLOAD_DIRECTORY.as_posix()
@@ -122,6 +160,8 @@ class Translate(Cog):
         return data, name
 
     async def cog_before_slash_command_invoke(self, inter: disnake.ApplicationCommandInteraction) -> None:
+        if not self.DOWNLOAD_DIRECTORY.exists():
+            self.DOWNLOAD_DIRECTORY.mkdir()
         if await self.bot.mongo.warns.blocked(inter.user.id):
             raise commands.CheckFailure(f"{inter.user} is blocked from using this bot")
 
@@ -129,6 +169,8 @@ class Translate(Cog):
     async def translate(self, _inter: disnake.ApplicationCommandInteraction) -> None:
         if psutil.virtual_memory().percent > 90:
             raise commands.CheckFailure("Bot is under heavy load")
+        if _inter.user.id in self.translator_tasks:
+            raise commands.CheckFailure("You are already translating a novel")
         await _inter.response.defer()
 
     @translate.sub_command(name="translate", description="Translate a novel")
@@ -339,3 +381,59 @@ class Translate(Cog):
                 title="Translating...", description="Translation complete...", colour=disnake.Colour.random()
             )
         )
+
+    @commands.slash_command(name="split", description="Split a novel into parts")
+    @commands.max_concurrency(1, commands.BucketType.user)
+    async def split(self, inter: disnake.ApplicationCommandInteraction, link: str) -> None:
+        """
+        Split a novel into parts.
+
+        Parameters
+        ----------
+        inter: disnake.ApplicationCommandInteraction
+            The interaction.
+        link: str
+            The link to the novel.
+        """
+        await inter.send(
+            embed=disnake.Embed(
+                title="Splitting...", description="Splitting started...", colour=disnake.Colour.random()
+            )
+        )
+        discord_check = await self._match_discord_link(link)
+        if discord_check is None:
+            novels = await self.load_novel_in_chunks(user_id=inter.user.id, link=link)
+        else:
+            file = discord_check.attachments[0]
+            novels = await self.load_novel_in_chunks(user_id=inter.user.id, link=file.url, name=file.filename)
+        if not novels:
+            raise commands.BadArgument("No novels found")
+        await inter.edit_original_response(
+            embed=disnake.Embed(
+                title="Splitting...", description="Splitting complete...", colour=disnake.Colour.random()
+            )
+        )
+        zipped = await self.bot.loop.run_in_executor(None, self._zip_files, inter.user.id, novels)
+        if sys.getsizeof(zipped) / 1024 / 1024 >= 8:
+            file = await self.bot.loop.run_in_executor(None, self.bot.mega.upload, zipped.as_posix())
+            url = await self.bot.loop.run_in_executor(None, self.bot.mega.get_upload_link, file)
+            view = disnake.ui.View()
+            view.add_item(disnake.ui.Button(label="Download", url=url, emoji="📥"))
+            await inter.edit_original_response(
+                embed=disnake.Embed(
+                    title="Novel Split",
+                    description=f"Novel split into parts, download [here]({url})",
+                    colour=disnake.Colour.random(),
+                ),
+                view=view,
+            )
+        else:
+            await inter.edit_original_response(
+                embed=disnake.Embed(
+                    title="Novel Split", description="Novel split into parts", colour=disnake.Colour.random()
+                ),
+                file=disnake.File(zipped.as_posix(), filename="novel.zip"),
+            )
+        for novel in novels:
+            novel.unlink()
+        zipped.unlink()
