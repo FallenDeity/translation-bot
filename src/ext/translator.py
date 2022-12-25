@@ -135,8 +135,9 @@ class Translate(Cog):
     async def download_from_link(self, link: str) -> tuple[str, str]:
         if self.DISCORD.match(link):
             message = await self._match_discord_link(link)
+            if message is None:
+                raise commands.BadArgument("Invalid message link")
             assert isinstance(message, disnake.Message)
-            assert isinstance(message.attachments, list[disnake.Attachment])
             link = message.attachments[0].url
             data = await self.load_novel_from_link(link)
             name = message.attachments[0].filename
