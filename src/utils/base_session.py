@@ -70,14 +70,14 @@ class BaseSession:
         thumbnail: str = "",
         description: str = "",
     ) -> Novel:
-        description = text[:300] + "..." if not description else description
+        description = text[:500] + "..." if not description else description
         buffer = BytesIO()
         buffer.write(text.encode("utf-8"))
         buffer.seek(0)
-        file = disnake.File(buffer, filename=f"{title}.txt")
         view = None
         try:
             url = ""
+            file = disnake.File(buffer, filename=f"{title}.txt")
         except disnake.HTTPException:
             if not self.DOWNLOAD_DIRECTORY.exists():
                 self.DOWNLOAD_DIRECTORY.mkdir()
@@ -102,15 +102,20 @@ class BaseSession:
             thumbnail,
             term,
             language,
-            url,
+            crawled_site,
             bool(view),
         )
         size = round(sys.getsizeof(buffer) / 1024 / 1024, 2)
-        msg = await inter.edit_original_response(embed=self._build_embed(*args), view=view)
+        embed = self._build_embed(*args)
+        if file:
+            msg = await inter.edit_original_response(embed=embed, file=file)
+        else:
+            msg = await inter.edit_original_response(embed=embed, view=view)
+        url = msg.attachments[0].url if msg.attachments else url
         novel = Novel(
             id=await self.bot.mongo.library.validate_position(title, language, size),
             description=description,
-            download=msg.attachments[0].url if msg.attachments else url,
+            download=url,
             title=title,
             language=Languages.from_string(language),
             original_language=original_language,
@@ -119,7 +124,7 @@ class BaseSession:
             rating=0,
             size=size,
             uploader=inter.user.id,
-            thumbnail=Categories.thumbnail_from_category(category),
+            thumbnail=thumbnail,
             crawled_source=crawled_site,
         )
         await self.bot.mongo.library.add_novel(novel)

@@ -27,7 +27,7 @@ class Library(Cog):
         embed.add_field(name="Size", value=f"{novel.size} MB", inline=True)
         embed.add_field(
             name="Uploader",
-            value=f"Uploaded by `{user}` {disnake.utils.format_dt(novel.date, style='R')} ago",
+            value=f"Uploaded by `{user}` {disnake.utils.format_dt(novel.date, style='R')}",
             inline=True,
         )
         embed.add_field(name="Download", value=f"[Click Here]({novel.download})", inline=True)

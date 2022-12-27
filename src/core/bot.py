@@ -34,7 +34,7 @@ class TranslationBot(commands.InteractionBot):
         self.log_channel = log_channel
         self.logger = Logger(name="TranslationBot", extention="bot")
         self.termer = Termer()
-        self._uptime = datetime.datetime.utcnow()
+        self._uptime = datetime.datetime.now()
         self.http_session = aiohttp.ClientSession()
         self.mongo = Database(self.logger)
         self._login_mega()
@@ -93,4 +93,4 @@ class TranslationBot(commands.InteractionBot):
 
     @property
     def uptime(self) -> float:
-        return (datetime.datetime.utcnow() - self._uptime).total_seconds()
+        return (datetime.datetime.now() - self._uptime).total_seconds()

@@ -13,7 +13,7 @@ __all__: tuple[str, ...] = (
 class Log:
     reason: str
     moderator: int
-    timestamp: datetime.datetime = dataclasses.field(default_factory=datetime.datetime.utcnow)
+    timestamp: datetime.datetime = dataclasses.field(default_factory=datetime.datetime.now)
 
     @classmethod
     def from_dict(cls, data: dict[str, t.Any]) -> "Log":
@@ -64,7 +64,7 @@ class Novel:
     uploader: int
     category: str
     crawled_source: str
-    date: datetime.datetime = dataclasses.field(default_factory=datetime.datetime.utcnow)
+    date: datetime.datetime = dataclasses.field(default_factory=datetime.datetime.now)
 
     @classmethod
     def from_dict(cls, data: dict[str, t.Any]) -> "Novel":
@@ -80,7 +80,7 @@ class Novel:
             size=data.get("size", 0),
             uploader=data.get("uploader", 0),
             category=data.get("category", ""),
-            date=data.get("date", datetime.datetime.utcnow()),
+            date=data.get("date", datetime.datetime.now()),
             crawled_source=data.get("crawled_source", ""),
             original_language=data.get("original_language", data.get("language", "")),
         )
