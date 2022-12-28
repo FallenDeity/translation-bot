@@ -51,8 +51,15 @@ class Library:
                 ]
             ).to_list(None)
             return {top_200_uploader["_id"]: top_200_uploader["count"] for top_200_uploader in top_200_uploaders}
-        user_novel_count: int = await self._pool.count_documents({"uploader": user_id})
-        return {user_id: user_novel_count}
+        count = await self._pool.count_documents({"uploader": user_id})
+        user_rank = await self._pool.aggregate(
+            [
+                {"$group": {"_id": "$uploader", "count": {"$sum": 1}}},
+                {"$match": {"count": {"$gt": count}}},
+                {"$count": "count"},
+            ]
+        ).to_list(None)
+        return {user_id: user_rank[0]["count"] + 1 if user_rank else 1}
 
     async def add_novel(self, novel: Novel) -> None:
         if await self._pool.count_documents({"id": novel.id}):

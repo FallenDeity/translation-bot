@@ -65,6 +65,7 @@ class Utility(Cog):
     @commands.slash_command(name="leaderboard", description="Get the bot's leaderboard.")
     async def leaderboard(self, inter: disnake.ApplicationCommandInteraction) -> None:
         """Get the bot's leaderboard."""
+        await inter.response.defer()
         user_rank = await self.bot.mongo.library.get_user_novel_count(inter.author.id)
         top_200 = await self.bot.mongo.library.get_user_novel_count(_top_200=True)
         embeds = []
@@ -82,8 +83,8 @@ class Utility(Cog):
             embed.set_thumbnail(url=inter.client.user.display_avatar)
             for user_id, count in chunk:
                 embed.add_field(
-                    name=f"{n}. <@{user_id}>",
-                    value=f"{count} novels",
+                    name=f"{n}. {count} novels",
+                    value=f"<@{user_id}>",
                     inline=False,
                 )
                 n += 1

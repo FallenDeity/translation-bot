@@ -75,4 +75,4 @@ class Paginator(disnake.ui.View):
         timeout: int = 120,
     ) -> None:
         view = cls(inter=inter, pages=pages, timeout=timeout)
-        await inter.response.send_message(embed=pages[0], view=view)
+        await inter.edit_original_response(embed=pages[0], view=view)
