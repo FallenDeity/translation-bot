@@ -58,15 +58,26 @@ class AnsiBuilder:
             buckets.append(str(self.background_color))
         if self.style is not None:
             buckets.append(str(self.style))
-        return f"\033[{';'.join(buckets)}m{text}\033[0m" if buckets else text
+        return f"\033[{';'.join(buckets)}m{text}" if buckets else text
 
     def __str__(self) -> str:
         return self.format_text(self.string)
+
+    def __add__(self, other: "AnsiBuilder") -> "AnsiBuilder":
+        return AnsiBuilder(
+            string=self.string.rstrip("\n```") + other.string.lstrip("```ansi\n"),
+            color=self.color or other.color,
+            background_color=self.background_color or other.background_color,
+            style=self.style or other.style,
+        )
+
+    def write(self, string: str) -> None:
+        self.string += string
 
     def format_text(self, text: str, *, block: bool = False) -> str:
         return f"```ansi\n{self(text)}\n```" if block else self(text)
 
     @classmethod
-    def to_ansi(cls, *colors: Colors | BackgroundColors | Styles, block: bool = False) -> str:
-        text = f"\033[{';'.join(str(color) for color in colors)}m"
+    def to_ansi(cls, string: str, *colors: Colors | BackgroundColors | Styles, block: bool = False) -> str:
+        text = f"\033[{';'.join(str(color) for color in colors)}m{string}"
         return f"```ansi\n{text}\n```" if block else text

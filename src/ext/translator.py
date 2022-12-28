@@ -52,7 +52,8 @@ class Translate(Cog):
         view = disnake.ui.View(timeout=None)
         view.add_item(disnake.ui.Button(label="Download", url=url, style=disnake.ButtonStyle.link, emoji="📥"))
         if file:
-            await channel.send(embed=embed, file=file, view=view)
+            msg = await channel.send(embed=embed, file=file, view=view)
+            await self.bot.mongo.library.update_novel(novel.id, download=msg.attachments[0].url)
             return
         await channel.send(embed=embed, view=view)
 

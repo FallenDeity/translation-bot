@@ -115,9 +115,9 @@ class Crawl(Cog):
             raise commands.BadArgument("No chapters found")
         if len(urls) > 2000:
             raise commands.BadArgument("More than 2000 chapters found")
-        text = await self.bot.loop.run_in_executor(None, crawler.scraper.get, urls[0])
-        text = trafilatura.extract(text.content)
-        language = await translator.detect(text)
+        text_ = await self.bot.loop.run_in_executor(None, crawler.scraper.get, urls[0])
+        text_ = trafilatura.extract(text_.content)
+        language = await translator.detect(text_)
         if not await crawler.check_library(inter, language, title):
             return
         text = await self.bot.loop.run_in_executor(None, crawler.bucket_scrape, urls, self.crawler_tasks, inter.user.id)
@@ -133,7 +133,7 @@ class Crawl(Cog):
                 cog.translator_tasks.pop(inter.user.id)
             await inter.edit_original_response(embed=self._build_embed("No translation required", *args))
         else:
-            translate_to = await translator.detect(text[:5000])
+            translate_to = await translator.detect(text_)
         if term:
             await inter.edit_original_response(embed=self._build_embed("Terming", *args))
             text = self.bot.termer.replace_terms(text, term)

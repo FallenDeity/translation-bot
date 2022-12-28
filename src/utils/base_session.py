@@ -34,10 +34,13 @@ class BaseSession:
         url: str,
         mega: bool,
     ) -> disnake.Embed:
+        assert isinstance(
+            cmd := inter.client.get_global_command_named(inter.application_command.name), disnake.APISlashCommand
+        )
         embed = disnake.Embed(
             title="Command Report",
             color=disnake.Colour.random(),
-            description=f"**</{inter.application_command.qualified_name}:{inter.application_id}>**\n```md\n# {title}\n{description}```",
+            description=f"**</{cmd.name}:{cmd.id}>**\n```md\n# {title}\n{description}```",
         )
         if translated:
             embed.add_field(name="Translated to", value=f"```css\n[{language}]```", inline=True)
@@ -56,6 +59,13 @@ class BaseSession:
         embed.set_thumbnail(url=thumbnail)
         return embed
 
+    @staticmethod
+    def get_buffer(text: str) -> BytesIO:
+        buffer = BytesIO()
+        buffer.write(text.encode("utf-8"))
+        buffer.seek(0)
+        return buffer
+
     async def distribute_translations(
         self,
         *,
@@ -71,9 +81,7 @@ class BaseSession:
         description: str = "",
     ) -> Novel:
         description = text[:500] + "..." if not description else description
-        buffer = BytesIO()
-        buffer.write(text.encode("utf-8"))
-        buffer.seek(0)
+        buffer = self.get_buffer(text)
         view = None
         try:
             url = ""
@@ -117,7 +125,7 @@ class BaseSession:
             description=description,
             download=url,
             title=title,
-            language=Languages.from_string(language),
+            language=language,
             original_language=original_language,
             tags=tags,
             category=category,
@@ -128,7 +136,12 @@ class BaseSession:
             crawled_source=crawled_site,
         )
         await self.bot.mongo.library.add_novel(novel)
-        self.bot.dispatch("novel_add", novel, url, file if isinstance(file, disnake.File) else None)
+        self.bot.dispatch(
+            "novel_add",
+            novel,
+            url,
+            disnake.File(self.get_buffer(text), filename=f"{title}.txt") if isinstance(file, disnake.File) else None,
+        )
         return novel
 
     async def check_library(self, inter: disnake.ApplicationCommandInteraction, language: str, name: str) -> bool:
