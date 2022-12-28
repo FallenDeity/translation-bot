@@ -23,10 +23,11 @@ class Crawl(Cog):
 
     @commands.slash_command(name="crawl", description="Crawl a website")
     async def crawl(self, _inter: disnake.ApplicationCommandInteraction) -> None:
-        if psutil.virtual_memory().percent > 90:
-            raise commands.CheckFailure("The bot is currently under heavy load")
-        if _inter.user.id in self.crawler_tasks:
-            raise commands.CheckFailure("You already have a crawl task running")
+        if _inter.application_command.qualified_name == "crawl crawl":
+            if psutil.virtual_memory().percent > 90:
+                raise commands.CheckFailure("The bot is currently under heavy load")
+            if _inter.user.id in self.crawler_tasks:
+                raise commands.CheckFailure("You already have a crawl task running")
         await _inter.response.defer()
 
     @staticmethod
@@ -186,7 +187,7 @@ class Crawl(Cog):
         await inter.send(
             embed=disnake.Embed(
                 title="Crawl progress",
-                description=f"```elixir\n{self.crawler_tasks[member.id]}%```",
+                description=f"```elixir\n{self.crawler_tasks[member.id]}```",
                 colour=disnake.Colour.random(),
             )
         )

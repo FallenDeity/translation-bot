@@ -35,9 +35,9 @@ class BaseSession:
         mega: bool,
     ) -> disnake.Embed:
         embed = disnake.Embed(
-            title=f"</{inter.application_command.qualified_name}> Command Report",
+            title="Command Report",
             color=disnake.Colour.random(),
-            description=f"```md\n# {title}\n{description}```",
+            description=f"**</{inter.application_command.qualified_name}:{inter.application_id}>**\n```md\n# {title}\n{description}```",
         )
         if translated:
             embed.add_field(name="Translated to", value=f"```css\n[{language}]```", inline=True)

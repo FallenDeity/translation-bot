@@ -25,7 +25,7 @@ class TranslationBot(commands.InteractionBot):
     def __init__(
         self,
         *args: t.Any,
-        log_channel: int = 1012229238415433768,
+        log_channel: int = 991911644831678484,
         extensions: str | pathlib.Path = "src/ext",
         **kwargs: t.Any,
     ) -> None:

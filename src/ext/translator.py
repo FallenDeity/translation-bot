@@ -169,10 +169,11 @@ class Translate(Cog):
 
     @commands.slash_command(name="translate", description="Translate a novel from one language to another")
     async def translate(self, _inter: disnake.ApplicationCommandInteraction) -> None:
-        if psutil.virtual_memory().percent > 90:
-            raise commands.CheckFailure("Bot is under heavy load")
-        if _inter.user.id in self.translator_tasks:
-            raise commands.CheckFailure("You are already translating a novel")
+        if _inter.application_command.qualified_name == "translate translate":
+            if psutil.virtual_memory().percent > 90:
+                raise commands.CheckFailure("Bot is under heavy load")
+            if _inter.user.id in self.translator_tasks:
+                raise commands.CheckFailure("A translation task from you is already running.")
         await _inter.response.defer()
 
     @translate.sub_command(name="translate", description="Translate a novel")
@@ -328,7 +329,7 @@ class Translate(Cog):
         await inter.send(
             embed=disnake.Embed(
                 title="Crawl progress",
-                description=f"```elixir\n{self.translator_tasks[member.id]}%```",
+                description=f"```elixir\n{self.translator_tasks[member.id]}```",
                 colour=disnake.Colour.random(),
             )
         )
