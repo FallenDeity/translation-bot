@@ -111,7 +111,7 @@ class Crawler(commands.Cog):
             scraper = cloudscraper.CloudScraper()
         else:
             scraper = None
-        with concurrent.futures.ThreadPoolExecutor(max_workers=8) as executor:
+        with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
             futures = [
                 executor.submit(self.easy, i, j, self.urlcss, self.chptitlecss, scraper)
                 for i, j in enumerate(urls)
@@ -272,7 +272,7 @@ class Crawler(commands.Cog):
         if "69shu" in link and "txt" in link:
             link = link.replace("/txt", "")
             link = link.replace(".htm", "/")
-        if "krmtl.com" in link and max_chapters is None:
+        if ("krmtl.com" in link or "metruyencv.com" in link) and max_chapters is None:
             return await ctx.reply("> **Provide max_chapters value in slash command for this site to be crawled**")
         if "ptwxz" in link and "bookinfo" in link:
             link = link.replace("bookinfo", "html")
@@ -486,7 +486,11 @@ class Crawler(commands.Cog):
             for i in range(1, max_chapters + 1):
                 temp_link = link + "/" + str(i)
                 urls.append(temp_link)
-
+        if "metruyencv.com" in link:
+            urls = []
+            for i in range(1, max_chapters+1):  #https://metruyencv.com/truyen/tu-la-vu-than
+                temp_link = link+ "/chuong-"+ str(i)
+                urls.append(temp_link)
         if len(urls) < 30:
             return await ctx.reply(
                 f"> ❌Provided link only got **{str(len(urls))}** links in the page.Check if you have provided correct Table of contents url. If there is no TOC page try using /crawlnext with first chapter and required urls"

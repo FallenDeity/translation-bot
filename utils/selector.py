@@ -71,6 +71,12 @@ class CssSelector:
             return "body > div.container > div.row.row-detail > div > div ::text"
         elif "m.soxscc.net" in link:
             return "#chapter > div.content ::text"
+        elif "metruyencv.com" in link:
+            return "#article ::text"
+        elif "www.gonet.cc" in link:
+            return "body > div.container > div.row.row-detail > div > div ::text"
+        elif "www.ops8.com" in link:
+            return "#BookText ::text"
         else:
             return "* ::text"
 
@@ -107,6 +113,8 @@ class CssSelector:
             return ["title", "#chapter > h1 ::text"]
         elif "www.soxscc.net" in link:
             return ["#info > h1", "body > div.content_read > div > div.bookname > h1 ::text"]
+        elif "www.ops8.com" in link:
+            return ["div.book-title", "#BookCon > h1"]
         else:
             return ["title", "title ::text"]
 
@@ -145,5 +153,7 @@ class CssSelector:
             return ["#chapter > div.pager > a:nth-child(3)", "#bookname"]
         elif "www.qcxxs.com" in link:
             return ["body > div.container > div.row.row-detail > div > div > div.read_btn > a:nth-child(4)", "body > div.container > div.row.row-detail > div > h2 > a:nth-child(3)"]
+        elif "www.gonet.cc" in link:
+            return ["body > div.container > div.row.row-detail > div > div > div.read_btn > a:nth-child(4)", "body > div.container > div.row.row-detail > div > h2 > a:nth-child(3) > font > font"]
         else:
             return [None, "title"]
