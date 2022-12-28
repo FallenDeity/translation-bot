@@ -65,7 +65,7 @@ class AnsiBuilder:
 
     def __add__(self, other: "AnsiBuilder") -> "AnsiBuilder":
         return AnsiBuilder(
-            string=self.string.rstrip("\n```") + other.string.lstrip("```ansi\n"),
+            string=self.string.replace("\n```", "") + other.string.replace("```ansi\n", ""),
             color=self.color or other.color,
             background_color=self.background_color or other.background_color,
             style=self.style or other.style,

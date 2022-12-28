@@ -25,6 +25,7 @@ class BaseSession:
     @staticmethod
     def _build_embed(
         inter: disnake.ApplicationCommandInteraction,
+        id_: int,
         translated: bool,
         title: str,
         description: str,
@@ -56,6 +57,7 @@ class BaseSession:
                 f" uploaded to mega.nz and can be downloaded from [here]({url})*",
                 inline=False,
             )
+        embed.set_footer(text=f"Requested by {inter.user} | #{id_}", icon_url=inter.user.display_avatar)
         embed.set_thumbnail(url=thumbnail)
         return embed
 
@@ -102,8 +104,11 @@ class BaseSession:
         category = Categories.from_string(title)
         tags = translator.get_tags(title) + Categories.get_tags_from_string(title)
         thumbnail = Categories.thumbnail_from_category(category) if not thumbnail else thumbnail
+        size = round(sys.getsizeof(buffer) / 1024 / 1024, 2)
+        id_ = await self.bot.mongo.library.validate_position(title, language, size)
         args = (
             inter,
+            id_,
             language == original_language,
             title,
             description,
@@ -113,7 +118,6 @@ class BaseSession:
             crawled_site,
             bool(view),
         )
-        size = round(sys.getsizeof(buffer) / 1024 / 1024, 2)
         embed = self._build_embed(*args)
         if file:
             msg = await inter.edit_original_response(embed=embed, file=file)
@@ -121,11 +125,11 @@ class BaseSession:
             msg = await inter.edit_original_response(embed=embed, view=view)
         url = msg.attachments[0].url if msg.attachments else url
         novel = Novel(
-            id=await self.bot.mongo.library.validate_position(title, language, size),
+            id=id_,
             description=description,
             download=url,
             title=title,
-            language=language,
+            language=ln if (ln := language) in Languages.language_names() else Languages.from_string(ln),
             original_language=original_language,
             tags=tags,
             category=category,

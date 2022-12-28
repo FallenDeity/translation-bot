@@ -142,7 +142,7 @@ class Library:
         return [common_id["id"] for common_id in common_ids]
 
     async def validate_position(self, title: str, language: str, size: float) -> int:
-        common = await self.find_common(title=title, language=language, size=size)
+        common = await self.find_common(title=title, language=language)
         novels = await self.get_novels(common)
         for novel in novels:
             if novel.title == title and novel.language == language and novel.size <= size:

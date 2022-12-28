@@ -59,7 +59,9 @@ class Translate(Cog):
 
     async def load_novel_from_link(self, link: str) -> str:
         head = await self.bot.http_session.head(link)
-        if int(head.headers["Content-Length"]) / 1024 / 1024 > 20:
+        headers = head.headers
+        content_headers = [v for k, v in headers.items() if "length" in k.lower() and v.isdigit()]
+        if content_headers and int(content_headers[0]) / 1024 / 1024 > 20:
             raise commands.BadArgument("File is too large")
         response = await self.bot.http_session.get(link)
         return await response.text(encoding="utf-8")

@@ -122,3 +122,7 @@ class Languages(enum.Enum):
     @classmethod
     def all_languages(cls) -> list[str]:
         return [str(language.value) for language in cls]
+
+    @classmethod
+    def language_names(cls) -> list[str]:
+        return [cls.from_string(language) for language in cls.all_languages()]

@@ -78,7 +78,7 @@ class ValidSites(enum.Enum):
         if str(cls.SHU69.value) in link and "txt" in link:
             return link.replace("/txt", "").replace(".htm", "/")
         elif str(cls.PTWXZ.value) in link and "bookinfo" in link:
-            return link.replace("bookinfo", "html").rstrip(".html")
+            return link.replace("bookinfo", "html").replace(".html", "")
         elif str(cls.XKLXSW.value) in link and "www" in link:
             return link.replace("www", "m")
         else:
@@ -87,7 +87,7 @@ class ValidSites(enum.Enum):
     @classmethod
     def get_urls(cls, soup: "BeautifulSoup", url: str) -> list[str]:
         """Returns all urls from a soup"""
-        url = url.rstrip(".html").rstrip(".htm/")
+        url = url.replace(".html", "").replace(".htm/", "")
         suffix = url.split("/")[-1]
         midfix = url.replace(f"/{suffix}", "").split("/")[-1]
         prefix = url.replace(f"/{midfix}/{suffix}", "")
@@ -131,10 +131,10 @@ class ValidSites(enum.Enum):
         elif str(cls.READLIGHTNOVEL.value) in url:
             for a in soup.find_all("a"):
                 if f"{suffix}" in str(a.get("href")) and "chapter" in str(a.get("href")):
-                    link = a.get("href")
-                    number = int(re.search(r"chapter-\d+", link).group(0).replace("chapter-", ""))  # type: ignore
-                    urls = [f"{prefix}/{midfix}/{suffix}/chapter-{n}.html" for n in range(0, number + 1)]
-                    break
+                    urls.append(a.get("href"))
+            links = [int(re.search(r"\d+", link.split("/")[-1]).group(0)) for link in urls]  # type: ignore
+            max_num = max(links)
+            urls = [f"{prefix}/{midfix}/{suffix}/chapter-{n}.html" for n in range(1, max_num + 1)]
         elif str(cls.SHUBAOW.value) in url:
             for a in soup.find_all("a"):
                 if f"/{suffix}" in str(a.get("href")):
@@ -184,7 +184,7 @@ class ValidSites(enum.Enum):
             elif any(
                 x in url for x in map(str, (cls.READWN.value, cls.NOVELMT.value, cls.WUXIAX.value, cls.FANNOVELS.value))
             ):
-                max_num = max([int(x.split("_")[-1].rstrip(".html")) for x in urls if "_" in x])
+                max_num = max([int(x.split("_")[-1].replace(".html", "")) for x in urls if "_" in x])
                 urls = [f"{prefix}/{midfix}/{suffix}_{n}.html" for n in range(1, max_num + 1)]
         return [re.sub(r"(?<!:)//", "/", link) for link in urls]
 

@@ -47,7 +47,7 @@ class Scraper(BaseSession):
         return ""
 
     def tokenize(self) -> tuple[str, ...]:
-        url = self.link.rstrip(".html").rstrip(".htm/")
+        url = self.link.replace(".html", "").replace(".htm/", "")
         suffix = url.split("/")[-1]
         midfix = url.replace(f"/{suffix}", "").split("/")[-1]
         prefix = url.replace(f"/{midfix}/{suffix}", "")
@@ -84,7 +84,7 @@ class Scraper(BaseSession):
                 status = "https" if "https" in url else "http"
                 img = f"{status}://{domain}{img}"
                 if self.scraper.get(img).status_code != 200:
-                    img = img.lstrip(f"{status}://{domain}")
+                    img = img.replace(f"{status}://{domain}", "")
                     return f"{prefix}{img}"
             return img
         meta = soup.find_all("meta")
@@ -128,7 +128,7 @@ class Scraper(BaseSession):
     async def get_link(self) -> None:
         if str(ValidSites.TXT520.value) in self.link and "-" not in self.link:
             for link in self.soup.find_all("a"):
-                if "read/" in str(link.get("href")) and self.link.split("/")[-1].rstrip(".html") in str(
+                if "read/" in str(link.get("href")) and self.link.split("/")[-1].replace(".html", "") in str(
                     link.get("href")
                 ):
                     self.link = f"https://www.txt520.com{link.get('href')}"
