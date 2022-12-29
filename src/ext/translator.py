@@ -64,7 +64,8 @@ class Translate(Cog):
         if content_headers and int(content_headers[0]) / 1024 / 1024 > 20:
             raise commands.BadArgument("File is too large")
         response = await self.bot.http_session.get(link)
-        return await response.text(encoding="utf-8")
+        encoding = Translator.get_encoding((await response.read())[0:10000])
+        return await response.text(encoding=encoding, errors="replace")
 
     async def load_novel_in_chunks(self, user_id: int, link: str, name: str | None = None) -> list[pathlib.Path]:
         files: list[pathlib.Path] = []
@@ -156,7 +157,7 @@ class Translate(Cog):
             except PermissionError:
                 path = max(self.DOWNLOAD_DIRECTORY.iterdir(), key=lambda p: p.stat().st_ctime)
                 name = path.name
-            async with aiofiles.open(path, "r", encoding="utf-8") as f:
+            async with aiofiles.open(path, "r", encoding="utf-8", errors="ignore") as f:
                 data = await f.read()
             path.unlink()
         else:
@@ -231,7 +232,8 @@ class Translate(Cog):
             )
             text, o_name = await self.download_from_link(link)
         elif file:
-            text, o_name = (await file.read()).decode("utf-8"), file.filename
+            encoding = Translator.get_encoding((await file.read())[0:10000])
+            text, o_name = (await file.read()).decode(encoding, errors="replace"), file.filename
         elif library_id:
             await inter.edit_original_response(
                 embed=disnake.Embed(
@@ -370,7 +372,8 @@ class Translate(Cog):
                 continue
         for attachment in message.attachments:
             try:
-                text, o_name = (await attachment.read()).decode("utf-8"), attachment.filename
+                encoding = Translator.get_encoding((await attachment.read())[0:10000])
+                text, o_name = (await attachment.read()).decode(encoding, errors="replace"), attachment.filename
                 await self._minimal_translate(inter, translator, o_name, text)
             except Exception as e:
                 await inter.send(

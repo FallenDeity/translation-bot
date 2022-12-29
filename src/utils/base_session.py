@@ -36,7 +36,7 @@ class BaseSession:
         mega: bool,
     ) -> disnake.Embed:
         assert isinstance(
-            cmd := inter.client.get_global_command_named(inter.application_command.name), disnake.APISlashCommand
+            cmd := inter.client.get_global_command_named(inter.application_command.name), disnake.ApplicationCommand
         )
         embed = disnake.Embed(
             title="Command Report",
@@ -64,7 +64,7 @@ class BaseSession:
     @staticmethod
     def get_buffer(text: str) -> BytesIO:
         buffer = BytesIO()
-        buffer.write(text.encode("utf-8"))
+        buffer.write(text.encode("utf-8", errors="ignore"))
         buffer.seek(0)
         return buffer
 
@@ -92,7 +92,7 @@ class BaseSession:
             if not self.DOWNLOAD_DIRECTORY.exists():
                 self.DOWNLOAD_DIRECTORY.mkdir()
             path = self.DOWNLOAD_DIRECTORY / f"{title}.txt"
-            async with aiofiles.open(path, "w", encoding="utf-8") as f:
+            async with aiofiles.open(path, "w", encoding="utf-8", errors="ignore") as f:
                 await f.write(text)
             file = await self.bot.loop.run_in_executor(None, partial(self.bot.mega.upload, path.as_posix()))
             url = await self.bot.loop.run_in_executor(None, self.bot.mega.get_upload_link, file)

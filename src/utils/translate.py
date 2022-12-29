@@ -7,6 +7,7 @@ from functools import partial
 import deep_translator.exceptions
 import textblob
 import translators.server as server
+from charset_normalizer import detect
 from deep_translator import GoogleTranslator, single_detection
 from PyDictionary import PyDictionary
 
@@ -34,6 +35,11 @@ class Translator(BaseSession):
     def get_tags(text: str) -> list[str]:
         return [i.lower() for i in textblob.TextBlob(text).noun_phrases]
 
+    @staticmethod
+    def get_encoding(data: bytes) -> str:
+        encoding = detect(data).get("encoding", "utf-8")
+        return str(encoding)
+
     async def format_name(self, name: str) -> str:
         name = await self.translate(name, target=Languages.English.value)
         name = name.split(".")[0]
@@ -44,7 +50,7 @@ class Translator(BaseSession):
     async def check_name(self, name: str) -> bool:
         name = re.sub(r"[^a-zA-Z,' ]", " ", name).strip()
         for word in name.split():
-            if await self.bot.loop.run_in_executor(None, partial(self.dictionary.meaning, word, disable_errors=True)):
+            if (w := self.dictionary.meaning(word)) and "Noun" in w and len(word) >= 3:
                 return True
         return False
 

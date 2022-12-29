@@ -119,6 +119,8 @@ class ValidSites(enum.Enum):
             for a in soup.find_all("a"):
                 if f"{suffix}" in str(a.get("href")) and "chapter" in str(a.get("href")):
                     urls.append(a["href"])
+            links = [int(re.search(r"\d+", url.strip("/").split("/")[-1]).group(0)) for url in urls]  # type: ignore
+            urls = list(dict.fromkeys([urls[i] for i in sorted(range(len(links)), key=lambda k: links[k])]))
         elif str(cls.XKLXSW.value) in url:
             for a in soup.find_all("a"):
                 if ".html" in str(a.get("href")):
