@@ -11,7 +11,7 @@ from charset_normalizer import detect
 from deep_translator import GoogleTranslator, single_detection
 from PyDictionary import PyDictionary
 
-from src.assets import Languages
+from src.assets import Languages, Termer
 
 from .base_session import BaseSession
 
@@ -49,9 +49,13 @@ class Translator(BaseSession):
 
     async def check_name(self, name: str) -> bool:
         name = re.sub(r"[^a-zA-Z,' ]", " ", name).strip()
+        segment = 0
         for word in name.split():
-            if (w := self.dictionary.meaning(word)) and "Noun" in w and len(word) >= 3:
-                return True
+            if ((w := self.dictionary.meaning(word, disable_errors=True)) and "Noun" in w and len(
+                    word) >= 3) or word.lower() in Termer().get_terms():
+                segment += 1
+                if segment > 2 or len(word) >= 6:
+                    return True
         return False
 
     def translate_(self, text: str, **kwargs: t.Any) -> str:
