@@ -11,6 +11,7 @@ import aiohttp
 import disnake
 import dotenv
 import mega
+import nltk
 from disnake.ext import commands
 
 from ..assets import Termer
@@ -49,6 +50,11 @@ class TranslationBot(commands.InteractionBot):
             self.mega = mega.Mega().login()
 
     def run(self, *args: t.Any, **kwargs: t.Any) -> None:
+        self.logger.info("Loading nltk")
+        nltk.download("brown")
+        nltk.download("punkt")
+        nltk.download("popular")
+        self.logger.info("Loaded nltk")
         self.logger.info("Loading extensions...")
         self._load_all_extensions()
         self.logger.info("Loaded all extensions!")

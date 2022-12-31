@@ -7660,3 +7660,11 @@ class Termer:
             for term, repl in TERMS[category].items():
                 text = text.replace(term, repl)
         return text
+
+    @classmethod
+    def get_terms(cls):
+        output = []
+        for words_list in TERMS.values():
+            for words in words_list.values():
+                output.append(words.lower())
+        return output
