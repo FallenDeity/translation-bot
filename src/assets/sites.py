@@ -49,6 +49,8 @@ class ValidSites(enum.Enum):
     MXINDINGDIANXSW = "m.xindingdianxsw"
     WWWXINDINGDIANXSW = "www.xindingdianxsw"
     METRUYENCV = "metruyencv"
+    SYOSETU = "ncode.syosetu"
+    OPS8 = "www.ops8.com"
 
     @staticmethod
     def rearrange(urls: list[str]) -> list[str]:
@@ -175,6 +177,14 @@ class ValidSites(enum.Enum):
             urls = [url.get("href") for url in soup.find_all("a") if "/chuong-" in str(url.get("href"))]
             max_chapter = max([int(url.split("-")[-1]) for url in urls])
             urls = [f"{prefix}/{midfix}/{suffix}/chuong-{n}" for n in range(1, max_chapter + 1)]
+        elif str(cls.SYOSETU.value) in url:
+            urls = [url.get("href") for url in soup.find_all("a") if suffix in str(url.get("href"))]
+            urls = [f"{prefix}/{midfix}/{suffix}/{n}" for n in range(1, len(urls))]
+        elif str(cls.OPS8.value) in url:
+            suffix = suffix.replace("majia", "duola")
+            urls = [url.get("href") for url in soup.find_all("a") if suffix in str(url.get("href"))]
+            urls=[*set(cls.rearrange(urls))]
+            urls = [f"{prefix}/{midfix}/{suffix}/{n}" for n in range(0, len(urls))]
         else:
             for a in soup.find_all("a"):
                 if f"/{suffix}" in str(a.get("href")):
@@ -396,6 +406,22 @@ class Sites(enum.Enum):
             "body > div.container > div.row.row-detail > div > div > div.read_btn > a:nth-child(4)",
             "body > div.container > div.row.row-detail > div > h2 > a:nth-child(3)",
         ),
+    )
+    Syosetu = Site(
+        name="ncode.syosetu",
+        url_css="#novel_honbun ::text",
+        title_css=("#novel_color > p", "#novel_color > p ::text")
+    )
+    Ops8 = Site(
+        name="www.ops8.com",
+        url_css="#BookText ::text",
+        title_css=("div.book-title", "#BookCon > h1 ::text")
+    )
+    Gonet = Site(
+        name="www.gonet.cc",
+        url_css="body > div.container > div.row.row-detail > div > div ::text",
+        next_css=("body > div.container > div.row.row-detail > div > div > div.read_btn > a:nth-child(4)"
+                  , "title ::text")
     )
 
     @classmethod
