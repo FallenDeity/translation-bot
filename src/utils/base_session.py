@@ -152,7 +152,7 @@ class BaseSession:
         if id_ := await self.bot.mongo.library.find_common(language=Languages.from_string(language), title=name):
             result = await CheckView.prompt(
                 inter,
-                message=f"This novel [`{', '.join(map(str, id_))}`]"
+                message=f"This novel [`{', '.join(list(map(str, id_))[:10])}`]"
                 f" is present in the library, would you like to continue?",
             )
             if not result:

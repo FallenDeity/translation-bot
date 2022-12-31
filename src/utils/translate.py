@@ -49,10 +49,11 @@ class Translator(BaseSession):
 
     async def check_name(self, name: str) -> bool:
         name = re.sub(r"[^a-zA-Z,' ]", " ", name).strip()
+        count = 0
         for word in name.split():
             if (w := self.dictionary.meaning(word)) and "Noun" in w and len(word) >= 3:
-                return True
-        return False
+                count += 1
+        return count >= 2
 
     def translate_(self, text: str, **kwargs: t.Any) -> str:
         self._translator._target = kwargs.get("target", self._translator.target) if kwargs else self._translator.target

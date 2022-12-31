@@ -33,6 +33,7 @@ class ValidSites(enum.Enum):
     TXT520 = "txt520"
     READWN = "readwn"
     NOVELMT = "novelmt"
+    SYOSETU = "ncode.syosetu"
     WUXIAX = "wuxiax"
     FANNOVELS = "fannovels"
     XBIQUGE = "xbiquge"
@@ -165,6 +166,9 @@ class ValidSites(enum.Enum):
                     name = f"www.{cls.QCXXS.value}" if str(cls.QCXXS.value) in url else cls.WWWXINDINGDIANXSW.value
                     urls.append(f"https://{name}.com{a['href']}")
             urls = cls.rearrange(urls)
+        elif str(cls.SYOSETU.value) in url:
+            urls = [url.get("href") for url in soup.find_all("a") if suffix in str(url.get("href"))]
+            urls = [f"{prefix}/{midfix}/{suffix}/{n}" for n in range(1, len(urls))]
         elif str(cls.KRMTL.value) in url:
             spans = soup.find_all("span")
             chapters = [span for span in spans if "Chapter" in span.text]
@@ -396,6 +400,9 @@ class Sites(enum.Enum):
             "body > div.container > div.row.row-detail > div > div > div.read_btn > a:nth-child(4)",
             "body > div.container > div.row.row-detail > div > h2 > a:nth-child(3)",
         ),
+    )
+    Syosetu = Site(
+        name="ncode.syosetu", url_css="#novel_honbun ::text", title_css=("#novel_color > p", "#novel_color > p ::text")
     )
 
     @classmethod

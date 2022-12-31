@@ -73,10 +73,9 @@ class Scraper(BaseSession):
         if imgs:
             img = imgs[0]
             for i in imgs:
-                if suffix in i or "/file" in i or midfix in i:
-                    if str(ValidSites.NOVELSKNIGHT.value) in self.link:
-                        img = i if "resize=" in i.get("src", "") else img
-                        break
+                if (str(ValidSites.NOVELSKNIGHT.value) in self.link and "resize=" in i) or (
+                    suffix in i or "/file" in i or midfix in i
+                ):
                     img = i
                     break
             if "http" not in img:
