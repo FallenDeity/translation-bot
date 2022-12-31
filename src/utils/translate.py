@@ -11,7 +11,7 @@ from charset_normalizer import detect
 from deep_translator import GoogleTranslator, single_detection
 from PyDictionary import PyDictionary
 
-from src.assets import Languages
+from src.assets import Languages, Termer
 
 from .base_session import BaseSession
 
@@ -51,7 +51,9 @@ class Translator(BaseSession):
         name = re.sub(r"[^a-zA-Z,' ]", " ", name).strip()
         count = 0
         for word in name.split():
-            if (w := self.dictionary.meaning(word)) and "Noun" in w and len(word) >= 3:
+            if (
+                (w := self.dictionary.meaning(word)) and "Noun" in w and len(word) >= 3
+            ) or word.lower() in Termer.get_terms():
                 count += 1
         return count >= 2
 

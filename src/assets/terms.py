@@ -7664,7 +7664,6 @@ class Termer:
     @classmethod
     def get_terms(cls):
         output = []
-        for words_list in TERMS.values():
-            for words in words_list.values():
-                output.append(words.lower())
+        for item in TERMS.values():
+            output.extend([x.lower() for x in item.values()])
         return output
