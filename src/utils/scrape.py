@@ -238,7 +238,7 @@ class Scraper(BaseSession):
     def _scrape(self, link: str, n: int, data: dict[int, str]) -> None:
         response = self.scraper.get(link)
         soup = BeautifulSoup(response.content, "lxml")
-        text = trafilatura.extract(response.content)
+        text = trafilatura.extract(response.content, config=self.bot.config.TRAFIL)
         title = self._get_title(soup)
         data[n] = f"\n{title}\n\n{text}\n"
 
