@@ -248,6 +248,6 @@ class Scraper(BaseSession):
             futures = [executor.submit(self._scrape, link, n, data) for n, link in enumerate(links)]
             for _ in as_completed(futures):
                 progress[user_id] = f"Crawling {round((len(data) / len(links)) * 100)}%"
-                self.bot.logger.info(f"Crawling {round((len(data) / len(links)) * 100)}% for {user_id}")
+                # self.bot.logger.info(f"Crawling {round((len(data) / len(links)) * 100)}% for {user_id}")
         ordered = [text for _, text in sorted(data.items(), key=lambda item: item[0])]
         return "\n\n\n".join(ordered)

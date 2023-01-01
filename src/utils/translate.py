@@ -92,6 +92,6 @@ class Translator(BaseSession):
             tasks = [executor.submit(self._task, chunk, i, data, target) for i, chunk in enumerate(chunks)]
             for _ in as_completed(tasks):
                 progress[user_id] = f"Translating {round((len(data) / len(chunks)) * 100)}%"
-                self.bot.logger.info(f"Translating {round((len(data) / len(chunks)) * 100)}% for {user_id}")
+                # self.bot.logger.info(f"Translating {round((len(data) / len(chunks)) * 100)}% for {user_id}")
         ordered = [text for _, text in sorted(data.items(), key=lambda item: item[0])]
         return "".join(ordered)
