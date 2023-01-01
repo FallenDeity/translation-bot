@@ -3,6 +3,7 @@ import typing as t
 from dataclasses import dataclass
 
 from dotenv import load_dotenv
+from trafilatura.settings import use_config
 
 # pyright: reportUnknownVariableType=false
 load_dotenv()
@@ -43,6 +44,8 @@ class Environment:
     MEGA_EMAIL: Variable = Variable(name="MEGA_EMAIL")
     MEGA_PASSWORD: Variable = Variable(name="MEGA_PASSWORD")
     DETECT: Variable = Variable(name="DETECT", cast=lambda x: str(x).split())
+    TRAFIL = use_config()
+    TRAFIL.set("DEFAULT", "EXTRACTION_TIMEOUT", "0")
 
 
 JARVIS = Environment()

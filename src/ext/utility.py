@@ -56,7 +56,7 @@ class Utility(Cog):
         embed.add_field(name="Users", value=f"{len(self.bot.users)}", inline=True)
         embed.add_field(name="Commands", value=f"{len(self.bot.application_commands)}", inline=True)
         embed.add_field(name="Latency", value=f"{round(self.bot.latency * 1000)}ms", inline=True)
-        embed.add_field(name="Memory", value=f"{round(psutil.virtual_memory().available / 1024 ** 3)}GB", inline=True)
+        embed.add_field(name="Memory", value=f"{round(100-psutil.virtual_memory().percent, 2)}% available", inline=True)
         embed.add_field(name="CPU", value=f"{psutil.cpu_percent()}%", inline=True)
         embed.set_footer(text="Thanks for using TranslationBot!", icon_url=self.bot.user.avatar)
         embed.set_thumbnail(url=inter.client.user.display_avatar)
