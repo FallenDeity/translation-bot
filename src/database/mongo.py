@@ -1,4 +1,3 @@
-import os
 import typing as t
 
 from motor import motor_asyncio
@@ -15,8 +14,8 @@ __all__: tuple[str, ...] = ("Database",)
 
 
 class Database:
-    def __init__(self, logger: "Logger") -> None:
-        self._client: motor_asyncio.AsyncIOMotorClient = motor_asyncio.AsyncIOMotorClient(os.getenv("MONGO_URI"))
+    def __init__(self, logger: "Logger", *, token: str) -> None:
+        self._client: motor_asyncio.AsyncIOMotorClient = motor_asyncio.AsyncIOMotorClient(token)
         self._logger = logger
         self._db: motor_asyncio.AsyncIOMotorDatabase = self._client["database"]
         self.warns: Warn = Warn(self._db)

@@ -1,7 +1,6 @@
 import datetime
 import importlib
 import inspect
-import os
 import pathlib
 import sys
 import traceback
@@ -9,17 +8,16 @@ import typing as t
 
 import aiohttp
 import disnake
-import dotenv
 import mega
 import nltk
 from disnake.ext import commands
 
 from ..assets import Termer
 from ..database import Database
+from .env import JARVIS
 from .logger import Logger
 
 __all__: tuple[str, ...] = ("TranslationBot",)
-dotenv.load_dotenv()
 
 
 class TranslationBot(commands.InteractionBot):
@@ -31,20 +29,21 @@ class TranslationBot(commands.InteractionBot):
         **kwargs: t.Any,
     ) -> None:
         super().__init__(*args, **kwargs, intents=disnake.Intents.default())
+        self.config = JARVIS
         self.extension_path = pathlib.Path(extensions)
         self.log_channel = log_channel
         self.logger = Logger(name="TranslationBot", extention="bot")
         self.termer = Termer()
         self._uptime = datetime.datetime.now()
         self.http_session = aiohttp.ClientSession()
-        self.mongo = Database(self.logger)
+        self.mongo = Database(self.logger, token=self.config.MONGO_URI())
         self._login_mega()
         self.logger.flair("Logged in to Mega!")
 
     def _login_mega(self) -> None:
         try:
             self.mega = mega.Mega()
-            self.mega.login(os.environ["MEGA_EMAIL"], os.environ["MEGA_PASSWORD"])
+            self.mega.login(self.config.MEGA_EMAIL(), self.config.MEGA_PASSWORD())
         except mega.mega.RequestError:
             self.logger.critical("Failed to login to Mega!")
             self.mega = mega.Mega().login()
@@ -59,7 +58,7 @@ class TranslationBot(commands.InteractionBot):
         self._load_all_extensions()
         self.logger.info("Loaded all extensions!")
         try:
-            super().run(os.environ["TOKEN"], *args, **kwargs)
+            super().run(self.config.TOKEN(), *args, **kwargs)
         except (KeyboardInterrupt, KeyError):
             self.logger.critical("Failed to run the bot!")
             self.logger.info("Closed!")

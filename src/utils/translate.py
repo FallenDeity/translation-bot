@@ -1,4 +1,4 @@
-import os
+import random
 import re
 import typing as t
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -74,7 +74,9 @@ class Translator(BaseSession):
         return await self.bot.loop.run_in_executor(None, partial(self._translator.translate_batch, batch, **kwargs))
 
     async def detect(self, text: str) -> str:
-        lang = await self.bot.loop.run_in_executor(None, partial(single_detection, text, os.getenv("DETECT")))
+        lang = await self.bot.loop.run_in_executor(
+            None, partial(single_detection, text, random.choice(self.bot.config.DETECT()))
+        )
         return Languages.from_string(lang)
 
     def _task(self, text: str, i: int, data: dict[int, str], target: str) -> None:
