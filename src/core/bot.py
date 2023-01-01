@@ -28,7 +28,9 @@ class TranslationBot(commands.InteractionBot):
         extensions: str | pathlib.Path = "src/ext",
         **kwargs: t.Any,
     ) -> None:
-        super().__init__(*args, **kwargs, intents=disnake.Intents.default())
+        intent = disnake.Intents.default()
+        intent.members = True
+        super().__init__(*args, **kwargs, intents=intent)
         self.config = JARVIS
         self.extension_path = pathlib.Path(extensions)
         self.log_channel = log_channel
