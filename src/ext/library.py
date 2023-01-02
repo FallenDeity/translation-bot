@@ -14,7 +14,7 @@ class Library(Cog):
     async def _build_embed(self, novel: Novel) -> disnake.Embed:
         user = self.bot.get_user(novel.uploader) or await self.bot.fetch_user(novel.uploader)
         embed = disnake.Embed(
-            title=f"#{novel.id} {novel.title}",
+            title=f"#{novel.id} {novel.title[:240]}",
             description=novel.description,
             color=disnake.Color.random(),
             url=novel.download,
