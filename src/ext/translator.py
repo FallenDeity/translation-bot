@@ -9,7 +9,7 @@ import disnake
 import psutil
 from disnake.ext import commands
 
-from src.assets import Languages
+from src.assets import AnsiBuilder, Colors, Languages, Styles
 from src.utils import Translator
 
 from . import Cog
@@ -336,10 +336,11 @@ class Translate(Cog):
         member = user or inter.user
         if member.id not in self.translator_tasks:
             raise commands.BadArgument("You have no active translations")
+        prg = AnsiBuilder.to_ansi(self.translator_tasks.get(member.id, "0%"), Colors.GREEN, Styles.BOLD)
         await inter.edit_original_response(
             embed=disnake.Embed(
                 title="Crawl progress",
-                description=f"```elixir\n{self.translator_tasks.get(member.id, '0%')}```",
+                description=f"{prg}",
                 colour=disnake.Colour.random(),
             )
         )

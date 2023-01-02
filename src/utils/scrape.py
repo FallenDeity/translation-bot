@@ -82,10 +82,11 @@ class Scraper(BaseSession):
             if "http" not in img:
                 domain = x.group() if (x := re.search(r"(?<=//)[^/]+", url)) else ""
                 status = "https" if "https" in url else "http"
-                img = f"{status}://{domain}{img}"
+                img = f"{status}://{domain.lstrip(':/')}{'/' if not img.startswith('/') else ''}{img}"
                 if self.scraper.get(img).status_code != 200:
-                    img = img.replace(f"{status}://{domain}", "")
-                    return f"{prefix}{img}"
+                    img = img.replace(f"{status}://{domain.lstrip(':/')}", "")
+                    img = re.sub(r"://+", "://", f"{prefix}{img}")
+                    return img
             return img
         meta = soup.find_all("meta")
         for i in meta:
@@ -108,14 +109,17 @@ class Scraper(BaseSession):
         return self._get_title(soup)
 
     async def is_valid(self) -> bool:
-        response = await self.bot.loop.run_in_executor(None, self.scraper.get, self.link)
-        if response.status_code == 200:
-            return True
-        if response.status_code == 404:
-            self.link = self.link + "/"
+        try:
             response = await self.bot.loop.run_in_executor(None, self.scraper.get, self.link)
-            return response.status_code == 200
-        return False
+            if response.status_code == 200:
+                return True
+            if response.status_code == 404:
+                self.link = self.link + "/"
+                response = await self.bot.loop.run_in_executor(None, self.scraper.get, self.link)
+                return response.status_code == 200
+            return False
+        except Exception:
+            return False
 
     async def get_soup(self) -> BeautifulSoup:
         response = await self.bot.loop.run_in_executor(None, self.scraper.get, self.link)
@@ -239,9 +243,9 @@ class Scraper(BaseSession):
     def _scrape(self, link: str, n: int, data: dict[int, str]) -> None:
         response = self.scraper.get(link)
         soup = BeautifulSoup(response.content, "lxml")
-        text = trafilatura.extract(response.content, config=self.bot.config.TRAFIL)
+        text = trafilatura.extract(response.content, config=self.bot.config.TRAFIL).replace("\n", "\n\n")
         title = self._get_title(soup)
-        data[n] = f"\n{title}\n\n{text}\n"
+        data[n] = f"\n{title}\n\n{text}\n" + "xxx".center(100, "-")
 
     def bucket_scrape(
         self, inter: disnake.ApplicationCommandInteraction, links: list[str], progress: dict[int, str], user_id: int
@@ -256,4 +260,4 @@ class Scraper(BaseSession):
                 # self.bot.logger.info(f"Crawling {round((len(data) / len(links)) * 100)}% for {user_id}")
         ordered = [text for _, text in sorted(data.items(), key=lambda item: item[0])]
         progress.pop(user_id)
-        return "\n\n\n".join(ordered)
+        return "\n\n".join(ordered)

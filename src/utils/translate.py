@@ -54,9 +54,7 @@ class Translator(BaseSession):
         name = re.sub(r"[^a-zA-Z,' ]", " ", name).strip()
         count = 0
         for word in name.split():
-            if (
-                (w := self.dictionary.meaning(word)) and "Noun" in w and len(word) >= 3
-            ) or word.lower() in Termer.get_terms():
+            if (self.dictionary.meaning(word) and len(word) >= 3) or word.lower() in Termer.get_terms():
                 count += 1
         return count >= 2
 
@@ -86,7 +84,7 @@ class Translator(BaseSession):
         try:
             data[i] = self.translate_(text, target=target)
         except deep_translator.exceptions.RequestError:
-            data[i] = server.google(text, to_language=target)
+            data[i] = server.yandex(text, to_language=target)
 
     def bucket_translate(
         self,

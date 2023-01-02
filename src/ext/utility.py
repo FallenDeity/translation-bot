@@ -5,6 +5,7 @@ import disnake
 import psutil
 from disnake.ext import commands, tasks
 
+from src.assets import AnsiBuilder, Colors, Styles
 from src.core.views import InviteView
 from src.core.views.paginators import Paginator
 from src.utils import Eval
@@ -114,7 +115,7 @@ class Utility(Cog):
         for n, chunk in enumerate(chunks, start=1):
             embed = disnake.Embed(
                 title="Exec",
-                description=f"```fix\n{chunk}```",
+                description=f"{AnsiBuilder.to_ansi(chunk, Colors.BLUE)}",
                 color=disnake.Color.random(),
             )
             embed.set_footer(text=f"Page {n}/{len(chunks)}")
@@ -144,7 +145,7 @@ class Utility(Cog):
         assert isinstance(channel, disnake.TextChannel)
         embed = disnake.Embed(
             title="Suggestion",
-            description=f"```fix\n{suggestion}\n```",
+            description=f"{AnsiBuilder.to_ansi(suggestion, Colors.MAGENTA, Styles.BOLD)}",
             color=disnake.Color.random(),
         )
         embed.set_footer(text=f"From {inter.author}", icon_url=inter.author.display_avatar)

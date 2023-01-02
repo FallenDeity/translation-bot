@@ -8,7 +8,7 @@ from io import BytesIO
 import aiofiles
 import disnake
 
-from src.assets import Categories, Languages
+from src.assets import AnsiBuilder, BackgroundColors, Categories, Colors, Languages, Styles
 from src.core.views import CheckView
 from src.database.models import Novel
 
@@ -27,7 +27,7 @@ class BaseSession:
         self, inter: disnake.ApplicationCommandInteraction, member: int, tasks: dict[int, str], message: str
     ) -> None:
         while True:
-            await asyncio.sleep(3)
+            await asyncio.sleep(5)
             if member not in tasks:
                 await inter.edit_original_response(embed=disnake.Embed(title=f"{message} complete.", color=0x00FF00))
                 self.bot.logger.info(f"{message} complete for {member}")
@@ -35,7 +35,7 @@ class BaseSession:
             await inter.edit_original_response(
                 embed=disnake.Embed(
                     title=f"{message} progress",
-                    description=f"```elixir\n{tasks.get(member, '0%')}```",
+                    description=f"{AnsiBuilder.to_ansi(tasks.get(member, '0%'), Colors.GREEN, Styles.BOLD)}",
                     colour=disnake.Colour.random(),
                 )
             )
@@ -59,7 +59,9 @@ class BaseSession:
         embed = disnake.Embed(
             title="Command Report",
             color=disnake.Colour.random(),
-            description=f"**</{cmd.name}:{cmd.id}>**\n```md\n# {title}\n{description}```",
+            description=f"**</{cmd.name}:{cmd.id}>**\n"
+            f"{AnsiBuilder.to_ansi(title, Colors.GREEN, Styles.BOLD, BackgroundColors.FIREFLY_DARK_BLUE)}"
+            f"{AnsiBuilder.to_ansi(description[:300], Colors.CYAN)}",
         )
         if translated:
             embed.add_field(name="Translated to", value=f"```css\n[{language}]```", inline=True)
@@ -103,10 +105,10 @@ class BaseSession:
         description = text[:500] + "..." if not description else description
         buffer = self.get_buffer(text)
         view = None
-        try:
+        if sys.getsizeof(buffer) / 1024**2 < 7.5:
             url = ""
             file = disnake.File(buffer, filename=f"{title}.txt")
-        except disnake.HTTPException:
+        else:
             if not self.DOWNLOAD_DIRECTORY.exists():
                 self.DOWNLOAD_DIRECTORY.mkdir()
             path = self.DOWNLOAD_DIRECTORY / f"{title}.txt"
@@ -137,7 +139,7 @@ class BaseSession:
             bool(view),
         )
         embed = self._build_embed(*args)
-        if file:
+        if isinstance(file, disnake.File):
             msg = await inter.edit_original_response(embed=embed, file=file)
         else:
             msg = await inter.edit_original_response(embed=embed, view=view)

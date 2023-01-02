@@ -5,7 +5,7 @@ import psutil
 import trafilatura
 from disnake.ext import commands
 
-from src.assets import Languages, Sites, ValidSites
+from src.assets import AnsiBuilder, BackgroundColors, Colors, Languages, Sites, Styles, ValidSites
 from src.utils import Scraper, Translator
 
 from . import Cog
@@ -43,7 +43,8 @@ class Crawl(Cog):
     ) -> disnake.Embed:
         embed = disnake.Embed(
             title=title,
-            description=f"```diff\n- {status}...\n{'+ ' + description if description else ''}```",
+            description=f"{AnsiBuilder.to_ansi(status, Colors.RED, Styles.BOLD, BackgroundColors.INDIGO)}\n"
+            f"{AnsiBuilder.to_ansi(description, Colors.CYAN) if description else ''}",
             url=link,
             color=disnake.Colour.random(),
         )
@@ -123,7 +124,9 @@ class Crawl(Cog):
         language = await translator.detect(text_)
         if not await crawler.check_library(inter, language, title):
             return
-        text = await self.bot.loop.run_in_executor(None, crawler.bucket_scrape, urls, self.crawler_tasks, inter.user.id)
+        text = await self.bot.loop.run_in_executor(
+            None, crawler.bucket_scrape, inter, urls, self.crawler_tasks, inter.user.id
+        )
         await inter.edit_original_response(embed=self._build_embed("Crawling complete", *args))
         if translate:
             if language != Languages.from_string(translate_to):
@@ -140,7 +143,7 @@ class Crawl(Cog):
                 await inter.edit_original_response(embed=self._build_embed("Translation complete", *args))
             await inter.edit_original_response(embed=self._build_embed("No translation required", *args))
         else:
-            translate_to = await translator.detect(text_)
+            translate_to = await translator.detect(text[:10000])
         if term:
             await inter.edit_original_response(embed=self._build_embed("Terming", *args))
             text = self.bot.termer.replace_terms(text, term)
@@ -190,10 +193,11 @@ class Crawl(Cog):
         member = user or inter.user
         if member.id not in self.crawler_tasks:
             raise commands.BadArgument("You have no active crawls")
+        prg = AnsiBuilder.to_ansi(self.crawler_tasks.get(member.id, "0%"), Colors.GREEN, Styles.BOLD)
         await inter.edit_original_response(
             embed=disnake.Embed(
                 title="Crawl progress",
-                description=f"```elixir\n{self.crawler_tasks.get(member.id, '0%')}```",
+                description=f"{prg}",
                 colour=disnake.Colour.random(),
             )
         )

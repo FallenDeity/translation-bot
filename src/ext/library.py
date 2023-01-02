@@ -1,7 +1,7 @@
 import disnake
 from disnake.ext import commands
 
-from src.assets import Categories, Languages
+from src.assets import AnsiBuilder, BackgroundColors, Categories, Colors, Languages, Styles
 from src.core.views.paginators import LazyPaginator
 from src.database.models import Novel
 
@@ -15,7 +15,7 @@ class Library(Cog):
         user = self.bot.get_user(novel.uploader) or await self.bot.fetch_user(novel.uploader)
         embed = disnake.Embed(
             title=f"#{novel.id} {novel.title[:240]}",
-            description=novel.description,
+            description=f"{AnsiBuilder.to_ansi(novel.description[:300], Colors.CYAN, Styles.BOLD)}",
             color=disnake.Color.random(),
             url=novel.download,
         )
@@ -23,7 +23,11 @@ class Library(Cog):
         embed.add_field(name="Language", value=novel.language, inline=True)
         embed.add_field(name="Original Language", value=novel.original_language, inline=True)
         embed.add_field(name="Category", value=novel.category, inline=True)
-        embed.add_field(name="Tags", value=f"```fix\n{', '.join(novel.tags)}```", inline=True)
+        embed.add_field(
+            name="Tags",
+            value=f"{AnsiBuilder.to_ansi(', '.join(novel.tags), Colors.MAGENTA, BackgroundColors.FIREFLY_DARK_BLUE)}",
+            inline=True,
+        )
         embed.add_field(name="Size", value=f"{novel.size} MB", inline=True)
         embed.add_field(
             name="Uploader",
