@@ -86,6 +86,9 @@ class Crawl(Cog):
             raise commands.BadArgument("Invalid language")
         if term and term not in self.bot.termer.get_categories():
             raise commands.BadArgument("Invalid term")
+        translator_cog: "Translate" = t.cast("Translate", self.bot.get_cog("Translate"))
+        if translate and inter.user.id in translator_cog.translator_tasks:
+            raise commands.CheckFailure("You already have a translation task running")
         link = ValidSites.format_link(url)
         crawler = Scraper(bot=self.bot, link=link)
         translator = Translator(bot=self.bot, target=translate_to)
@@ -125,12 +128,16 @@ class Crawl(Cog):
         if translate:
             if language != Languages.from_string(translate_to):
                 await inter.edit_original_response(embed=self._build_embed("Translating", *args))
-                cog: "Translate" = t.cast("Translate", self.bot.get_cog("Translate"))
                 text = await self.bot.loop.run_in_executor(
-                    None, translator.bucket_translate, text, cog.translator_tasks, inter.user.id, translate_to
+                    None,
+                    translator.bucket_translate,
+                    inter,
+                    text,
+                    translator_cog.translator_tasks,
+                    inter.user.id,
+                    translate_to,
                 )
                 await inter.edit_original_response(embed=self._build_embed("Translation complete", *args))
-                cog.translator_tasks.pop(inter.user.id)
             await inter.edit_original_response(embed=self._build_embed("No translation required", *args))
         else:
             translate_to = await translator.detect(text_)
@@ -151,7 +158,6 @@ class Crawl(Cog):
             thumbnail=thumbnail,
             description=description,
         )
-        self.crawler_tasks.pop(inter.user.id)
 
     @crawl_.autocomplete("translate_to")
     async def crawl_translate_to_autocomplete(
@@ -184,10 +190,10 @@ class Crawl(Cog):
         member = user or inter.user
         if member.id not in self.crawler_tasks:
             raise commands.BadArgument("You have no active crawls")
-        await inter.send(
+        await inter.edit_original_response(
             embed=disnake.Embed(
                 title="Crawl progress",
-                description=f"```elixir\n{self.crawler_tasks[member.id]}```",
+                description=f"```elixir\n{self.crawler_tasks.get(member.id, '0%')}```",
                 colour=disnake.Colour.random(),
             )
         )

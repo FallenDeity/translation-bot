@@ -1,3 +1,4 @@
+import asyncio
 import pathlib
 import sys
 import typing as t
@@ -21,6 +22,23 @@ class BaseSession:
 
     def __init__(self, *, bot: "TranslationBot") -> None:
         self.bot = bot
+
+    async def _progress_bar(
+        self, inter: disnake.ApplicationCommandInteraction, member: int, tasks: dict[int, str], message: str
+    ) -> None:
+        while True:
+            await asyncio.sleep(3)
+            if member not in tasks:
+                await inter.edit_original_response(embed=disnake.Embed(title=f"{message} complete.", color=0x00FF00))
+                self.bot.logger.info(f"{message} complete for {member}")
+                return
+            await inter.edit_original_response(
+                embed=disnake.Embed(
+                    title=f"{message} progress",
+                    description=f"```elixir\n{tasks.get(member, '0%')}```",
+                    colour=disnake.Colour.random(),
+                )
+            )
 
     @staticmethod
     def _build_embed(

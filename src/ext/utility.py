@@ -35,6 +35,7 @@ class Utility(Cog):
     @commands.slash_command(name="invite", description="Get the bot's invite link.")
     async def invite(self, inter: disnake.ApplicationCommandInteraction) -> None:
         """Get the bot's invite link."""
+        await inter.response.defer()
         embed = disnake.Embed(
             title="Invite",
             description="**Invite the bot to your server!**",
@@ -42,11 +43,12 @@ class Utility(Cog):
         )
         embed.set_footer(text="Thanks for using TranslationBot!", icon_url=self.bot.user.avatar)
         embed.set_thumbnail(url=inter.client.user.display_avatar)
-        await inter.response.send_message(embed=embed, view=InviteView(self.bot))
+        await inter.edit_original_response(embed=embed, view=InviteView(self.bot))
 
     @commands.slash_command(name="stats", description="Get the bot's stats.")
     async def stats(self, inter: disnake.ApplicationCommandInteraction) -> None:
         """Get the bot's stats."""
+        await inter.response.defer()
         embed = disnake.Embed(
             title="Stats",
             description="**Stats of the bot!**",
@@ -60,7 +62,7 @@ class Utility(Cog):
         embed.add_field(name="CPU", value=f"{psutil.cpu_percent()}%", inline=True)
         embed.set_footer(text="Thanks for using TranslationBot!", icon_url=self.bot.user.avatar)
         embed.set_thumbnail(url=inter.client.user.display_avatar)
-        await inter.response.send_message(embed=embed, view=InviteView(self.bot))
+        await inter.edit_original_response(embed=embed, view=InviteView(self.bot))
 
     @commands.slash_command(name="leaderboard", description="Get the bot's leaderboard.")
     async def leaderboard(self, inter: disnake.ApplicationCommandInteraction) -> None:
@@ -95,20 +97,29 @@ class Utility(Cog):
     @commands.is_owner()
     async def exec(self, inter: disnake.ApplicationCommandInteraction, message: disnake.Message) -> None:
         """Execute python code"""
+        await inter.response.defer()
         code = message.content
         code = code.replace("```py", "").replace("```", "").strip()
-        evaluator = Eval()
         renv = {
             "bot": self.bot,
             "inter": inter,
         }
-        stdout, stderr = await evaluator.f_eval(code=code, renv=renv)
+        self.bot.logger.info(f"Executing code: {code}")
+        stdout, stderr = await Eval().f_eval(code=code, renv=renv)
         string = ""
-        if stdout:
-            string += f"**Output**:\n```py\n{stdout}\n```\n"
-        if stderr:
-            string += f"**Error**:\n```py\n{stderr}\n```\n"
-        await inter.send(content=string)
+        for n, i in enumerate((stdout + stderr).splitlines()):
+            string += f"{n+1}. {i}"
+        embeds = []
+        chunks = [string[i : i + 1000] for i in range(0, len(string), 1000)]
+        for n, chunk in enumerate(chunks, start=1):
+            embed = disnake.Embed(
+                title="Exec",
+                description=f"```fix\n{chunk}```",
+                color=disnake.Color.random(),
+            )
+            embed.set_footer(text=f"Page {n}/{len(chunks)}")
+            embeds.append(embed)
+        await Paginator.paginate(inter, self.bot, embeds)
 
     @commands.slash_command(name="restart", description="Restart the bot")
     @commands.is_owner()
@@ -128,6 +139,7 @@ class Utility(Cog):
         suggestion: str
             The suggestion.
         """
+        await inter.response.defer()
         channel = self.bot.get_channel(1055445441958916167) or await self.bot.fetch_channel(1055445441958916167)
         assert isinstance(channel, disnake.TextChannel)
         embed = disnake.Embed(
@@ -137,4 +149,4 @@ class Utility(Cog):
         )
         embed.set_footer(text=f"From {inter.author}", icon_url=inter.author.display_avatar)
         await channel.send(embed=embed)
-        await inter.response.send_message("Suggestion sent!", ephemeral=True)
+        await inter.edit_original_response("Suggestion sent!")

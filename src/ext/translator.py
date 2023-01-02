@@ -64,8 +64,8 @@ class Translate(Cog):
         if content_headers and int(content_headers[0]) / 1024 / 1024 > 20:
             raise commands.BadArgument("File is too large")
         response = await self.bot.http_session.get(link)
-        encoding = Translator.get_encoding((await response.read())[0:10000])
-        return await response.text(encoding=encoding, errors="replace")
+        encoding = Translator.get_encoding((await response.read())[0:30000])
+        return await response.text(encoding=encoding, errors="ignore")
 
     async def load_novel_in_chunks(self, user_id: int, link: str, name: str | None = None) -> list[pathlib.Path]:
         files: list[pathlib.Path] = []
@@ -109,7 +109,13 @@ class Translate(Cog):
         if not await translator.check_library(inter, str(Languages.English.value), name):
             return
         translated = await self.bot.loop.run_in_executor(
-            None, translator.bucket_translate, text, self.translator_tasks, inter.user.id, Languages.English.value
+            None,
+            translator.bucket_translate,
+            inter,
+            text,
+            self.translator_tasks,
+            inter.user.id,
+            Languages.English.value,
         )
         await translator.distribute_translations(
             inter=inter,
@@ -232,8 +238,8 @@ class Translate(Cog):
             )
             text, o_name = await self.download_from_link(link)
         elif file:
-            encoding = Translator.get_encoding((await file.read())[0:10000])
-            text, o_name = (await file.read()).decode(encoding, errors="replace"), file.filename
+            encoding = Translator.get_encoding((await file.read())[0:30000])
+            text, o_name = (await file.read()).decode(encoding, errors="ignore"), file.filename
         elif library_id:
             await inter.edit_original_response(
                 embed=disnake.Embed(
@@ -284,7 +290,7 @@ class Translate(Cog):
         if not await translator.check_library(inter, language, name):
             return
         translated = await self.bot.loop.run_in_executor(
-            None, translator.bucket_translate, text, self.translator_tasks, inter.user.id, language
+            None, translator.bucket_translate, inter, text, self.translator_tasks, inter.user.id, language
         )
         language = Languages.from_string(language)
         await inter.edit_original_response(
@@ -300,7 +306,6 @@ class Translate(Cog):
             original_language=original_language,
             language=language,
         )
-        self.translator_tasks.pop(inter.user.id)
 
     @translate_.autocomplete("language")
     async def translate_language_autocomplete(
@@ -331,10 +336,10 @@ class Translate(Cog):
         member = user or inter.user
         if member.id not in self.translator_tasks:
             raise commands.BadArgument("You have no active translations")
-        await inter.send(
+        await inter.edit_original_response(
             embed=disnake.Embed(
                 title="Crawl progress",
-                description=f"```elixir\n{self.translator_tasks[member.id]}```",
+                description=f"```elixir\n{self.translator_tasks.get(member.id, '0%')}```",
                 colour=disnake.Colour.random(),
             )
         )
@@ -372,8 +377,8 @@ class Translate(Cog):
                 continue
         for attachment in message.attachments:
             try:
-                encoding = Translator.get_encoding((await attachment.read())[0:10000])
-                text, o_name = (await attachment.read()).decode(encoding, errors="replace"), attachment.filename
+                encoding = Translator.get_encoding((await attachment.read())[0:30000])
+                text, o_name = (await attachment.read()).decode(encoding, errors="ignore"), attachment.filename
                 await self._minimal_translate(inter, translator, o_name, text)
             except Exception as e:
                 await inter.send(

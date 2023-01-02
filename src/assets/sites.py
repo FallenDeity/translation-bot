@@ -23,7 +23,7 @@ class ValidSites(enum.Enum):
     BIQUGEABC = "biqugeabc"
     UUKANSHU = "uukanshu"
     QBTR = "qbtr"
-    SJKS88 = "sjks88"
+    SJKS = "sjks"
     SHU69 = "69shu"
     PTWXZ = "ptwxz"
     JPXS = "jpxs"

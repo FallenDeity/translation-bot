@@ -4,7 +4,9 @@ import typing as t
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from functools import partial
 
+import chardet
 import deep_translator.exceptions
+import disnake
 import textblob
 import translators.server as server
 from charset_normalizer import detect
@@ -37,10 +39,9 @@ class Translator(BaseSession):
 
     @staticmethod
     def get_encoding(data: bytes) -> str:
-        encoding = detect(data).get("encoding", "utf-8")
-        if encoding is None:
-            encoding = "utf-8"
-        return str(encoding)
+        encoding = detect(data).get("encoding")
+        encoding = chardet.detect(data).get("encoding") if not encoding else encoding
+        return str(encoding or "utf-8")
 
     async def format_name(self, name: str) -> str:
         name = await self.translate(name, target=Languages.English.value)
@@ -87,13 +88,23 @@ class Translator(BaseSession):
         except deep_translator.exceptions.RequestError:
             data[i] = server.google(text, to_language=target)
 
-    def bucket_translate(self, text: str, progress: dict[int, str], user_id: int, target: str) -> str:
+    def bucket_translate(
+        self,
+        inter: disnake.ApplicationCommandInteraction,
+        text: str,
+        progress: dict[int, str],
+        user_id: int,
+        target: str,
+    ) -> str:
         chunks = [text[i : i + 2000] for i in range(0, len(text), 2000)]
         data: dict[int, str] = {}
+        progress[user_id] = "0%"
+        self.bot.loop.create_task(self._progress_bar(inter, user_id, progress, "Translating"))
         with ThreadPoolExecutor(max_workers=9) as executor:
             tasks = [executor.submit(self._task, chunk, i, data, target) for i, chunk in enumerate(chunks)]
             for _ in as_completed(tasks):
                 progress[user_id] = f"Translating {round((len(data) / len(chunks)) * 100)}%"
                 # self.bot.logger.info(f"Translating {round((len(data) / len(chunks)) * 100)}% for {user_id}")
         ordered = [text for _, text in sorted(data.items(), key=lambda item: item[0])]
+        progress.pop(user_id)
         return "".join(ordered)

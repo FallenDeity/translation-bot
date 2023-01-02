@@ -4,6 +4,7 @@ import typing as t
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 import cloudscraper
+import disnake
 import trafilatura
 from bs4 import BeautifulSoup
 
@@ -242,12 +243,17 @@ class Scraper(BaseSession):
         title = self._get_title(soup)
         data[n] = f"\n{title}\n\n{text}\n"
 
-    def bucket_scrape(self, links: list[str], progress: dict[int, str], user_id: int) -> str:
+    def bucket_scrape(
+        self, inter: disnake.ApplicationCommandInteraction, links: list[str], progress: dict[int, str], user_id: int
+    ) -> str:
         data: dict[int, str] = {}
+        progress[user_id] = "0%"
+        self.bot.loop.create_task(self._progress_bar(inter, user_id, progress, "Crawl"))
         with ThreadPoolExecutor(max_workers=10) as executor:
             futures = [executor.submit(self._scrape, link, n, data) for n, link in enumerate(links)]
             for _ in as_completed(futures):
                 progress[user_id] = f"Crawling {round((len(data) / len(links)) * 100)}%"
                 # self.bot.logger.info(f"Crawling {round((len(data) / len(links)) * 100)}% for {user_id}")
         ordered = [text for _, text in sorted(data.items(), key=lambda item: item[0])]
+        progress.pop(user_id)
         return "\n\n\n".join(ordered)

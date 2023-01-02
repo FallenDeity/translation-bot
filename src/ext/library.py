@@ -85,6 +85,8 @@ class Library(Cog):
         total_novels = await self.bot.mongo.library.find_common(
             title, rating, language, original_language, user, category, tag, size
         )
+        if not total_novels:
+            raise commands.BadArgument("No novels found.")
         await LazyPaginator.paginate(inter=inter, bot=self.bot, pages=total_novels)
 
     @library_search.autocomplete("title")
@@ -152,7 +154,7 @@ class Library(Cog):
         novel = await self.bot.mongo.library.get_random_novel()
         await inter.edit_original_response(embed=await self._build_embed(novel))
 
-    @commands.slash_command(name="review", description="Review a novel.")
+    @library.sub_command(name="review", description="Review a novel.")
     async def review(
         self, inter: disnake.ApplicationCommandInteraction, novel_id: int, rating: commands.Range[0, 5.0], review: str
     ) -> None:
