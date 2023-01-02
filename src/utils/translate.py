@@ -38,6 +38,8 @@ class Translator(BaseSession):
     @staticmethod
     def get_encoding(data: bytes) -> str:
         encoding = detect(data).get("encoding", "utf-8")
+        if encoding is None:
+            encoding = "utf-8"
         return str(encoding)
 
     async def format_name(self, name: str) -> str:
