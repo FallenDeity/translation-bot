@@ -43,7 +43,7 @@ class Crawl(Cog):
     ) -> disnake.Embed:
         embed = disnake.Embed(
             title=title,
-            description=f"{AnsiBuilder.to_ansi(status, Colors.RED, Styles.BOLD, BackgroundColors.INDIGO)}\n"
+            description=f"{AnsiBuilder.to_ansi(status, Colors.RED, Styles.BOLD, BackgroundColors.FIREFLY_DARK_BLUE)}\n"
             f"{AnsiBuilder.to_ansi(description, Colors.CYAN) if description else ''}",
             url=link,
             color=disnake.Colour.random(),
