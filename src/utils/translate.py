@@ -84,7 +84,7 @@ class Translator(BaseSession):
         try:
             data[i] = self.translate_(text, target=target)
         except deep_translator.exceptions.RequestError:
-            data[i] = server.yandex(text, to_language=target)
+            data[i] = server.bing(text, to_language=target)
 
     def bucket_translate(
         self,
