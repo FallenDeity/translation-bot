@@ -5,7 +5,6 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from functools import partial
 
 import chardet
-import deep_translator.exceptions
 import disnake
 import textblob
 import translators.server as server
