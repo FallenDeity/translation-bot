@@ -29,7 +29,6 @@ class BaseSession:
         while True:
             await asyncio.sleep(5)
             if member not in tasks:
-                await inter.edit_original_response(embed=disnake.Embed(title=f"{message} complete.", color=0x00FF00))
                 self.bot.logger.info(f"{message} complete for {member}")
                 return
             await inter.edit_original_response(
