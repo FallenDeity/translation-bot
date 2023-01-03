@@ -109,7 +109,7 @@ class Translator(BaseSession):
             for _ in as_completed(tasks):
                 progress[user_id] = f"Translating {round((len(data) / len(chunks)) * 100)}%"
                 # self.bot.logger.info(f"Translating {round((len(data) / len(chunks)) * 100)}% for {user_id}")
-        # print(set(range(len(chunks))) - set(data.keys()))
+        self.bot.logger.error(f"Missing chunks: {set(range(len(chunks))) - set(data.keys())}")
         ordered = [text for _, text in sorted(data.items(), key=lambda item: item[0])]
         progress.pop(user_id)
         return "".join(ordered)
