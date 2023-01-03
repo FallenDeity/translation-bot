@@ -1,6 +1,7 @@
 import ast
 import contextlib
 import io
+import traceback
 import typing
 
 
@@ -51,5 +52,6 @@ class Eval:
                 with contextlib.redirect_stderr(stderr):
                     await fn()
         except Exception as e:
-            return stdout.getvalue(), stderr.getvalue() + str(e)
+            tb = "".join(traceback.format_exception(type(e), e, e.__traceback__))
+            return stdout.getvalue(), stderr.getvalue() + tb
         return stdout.getvalue(), stderr.getvalue()

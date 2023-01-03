@@ -82,11 +82,13 @@ class Translator(BaseSession):
     def _task(self, text: str, i: int, data: dict[int, str], target: str) -> None:
         while True:
             try:
-                data[i] = self.translate_(text, target=target)
+                data[i] = server.google(text, target=target)
             except Exception as e:
                 self.bot.logger.error(e)
                 try:
-                    data[i] = server.google(text, to_language=target)
+                    data[i] = server.translate_text(
+                        text, to_language=target, translator=random.choice(server.translators_pool)
+                    )
                 except Exception as e:
                     self.bot.logger.error(e)
                     continue

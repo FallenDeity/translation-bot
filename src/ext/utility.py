@@ -107,6 +107,7 @@ class Utility(Cog):
         }
         self.bot.logger.info(f"Executing code: {code}")
         stdout, stderr = await Eval().f_eval(code=code, renv=renv)
+        stdout = stdout if stdout else "[No output]"
         string = ""
         for n, i in enumerate((stdout + stderr).splitlines()):
             string += f"{n+1}. {i}"

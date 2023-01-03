@@ -186,6 +186,13 @@ class Translate(Cog):
                 raise commands.CheckFailure("A translation task from you is already running.")
         await _inter.response.defer()
 
+    @translate.sub_command(name="cancel", description="Cancel a translation task")
+    async def cancel(self, inter: disnake.ApplicationCommandInteraction) -> None:
+        if inter.user.id not in self.translator_tasks:
+            raise commands.CheckFailure("You have no translation tasks running")
+        self.translator_tasks.pop(inter.user.id)
+        await inter.edit_original_response(embed=disnake.Embed(title="Translation cancelled", color=0x2F3136))
+
     @translate.sub_command(name="translate", description="Translate a novel")
     @commands.max_concurrency(1, commands.BucketType.user)
     async def translate_(
