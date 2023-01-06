@@ -496,9 +496,12 @@ class Crawler(commands.Cog):
                 f"> ❌Provided link only got **{str(len(urls))}** links in the page.Check if you have provided correct Table of contents url. If there is no TOC page try using /crawlnext with first chapter and required urls"
             )
         try:
-            description = GoogleTranslator(source="auto", target="english").translate(FileHandler.get_description()).strip()
+            description = GoogleTranslator(source="auto", target="english").translate(FileHandler.get_description()[:600]).strip()
         except:
-            pass
+            try:
+                description = FileHandler.get_description()
+            except:
+                description = ""
 
         if 'b.faloo' in link or 'wap.faloo' in link:
             urls = urls[:200]
