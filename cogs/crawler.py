@@ -496,10 +496,10 @@ class Crawler(commands.Cog):
                 f"> ❌Provided link only got **{str(len(urls))}** links in the page.Check if you have provided correct Table of contents url. If there is no TOC page try using /crawlnext with first chapter and required urls"
             )
         try:
-            description = GoogleTranslator(source="auto", target="english").translate(FileHandler.get_description()[:600]).strip()
+            description = GoogleTranslator(source="auto", target="english").translate(FileHandler.get_description(soup)[:500]).strip()
         except:
             try:
-                description = FileHandler.get_description()
+                description = FileHandler.get_description(soup)
             except:
                 description = ""
 
@@ -630,7 +630,7 @@ class Crawler(commands.Cog):
             async with aiofiles.open(f"{title}.txt", "w", encoding="utf-8") as f:
                 await f.write(text)
             if description is None or description.strip() == "":
-                description = GoogleTranslator(source="auto", target="english").translate(text[:600].strip().replace("\n\n", "\n"))
+                description = GoogleTranslator(source="auto", target="english").translate(text[:500].strip().replace("\n\n", "\n"))
             download_url = await FileHandler().crawlnsend(ctx, self.bot, title, title_name, original_Language, description)
         except Exception as e:
             await ctx.send("> Error occurred .Please report to admin +\n" + str(e))
