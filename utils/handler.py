@@ -37,7 +37,7 @@ class FileHandler:
     TOTAL: int = len(ENCODING)
 
     @staticmethod
-    def get_desc_from_text(text: str):
+    async def get_desc_from_text(text: str):
         desc = ["introduction", "description", "简介", "描述", "描写", "summary"]
         for d in desc:
             if d in text.lower():
