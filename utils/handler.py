@@ -16,6 +16,7 @@ from deep_translator import single_detection
 from discord.ext import commands
 from ebooklib import epub
 from textblob import TextBlob
+from bs4 import BeautifulSoup
 
 from core.bot import Raizel
 from core.views.linkview import LinkView
@@ -33,6 +34,17 @@ def chapter_to_str(chapter):
 class FileHandler:
     ENCODING: list[str] = ["utf-8", "cp936", "utf-16", "cp949"]
     TOTAL: int = len(ENCODING)
+
+    @staticmethod
+    def get_description(soup: "BeautifulSoup") -> str:
+        aliases = ("description", "Description", "DESCRIPTION", "desc", "Desc", "DESC")
+        description = ""
+        for meta in soup.find_all("meta"):
+            if meta.get("name") in aliases:
+                description += meta.get("content")
+        if description is None:
+            description = ""
+        return description
 
     @staticmethod
     def get_tags(text: str) -> list[str]:
@@ -310,12 +322,14 @@ class FileHandler:
                         no_of_tries += 1
 
     async def crawlnsend(
-            self, ctx: commands.Context, bot: Raizel, title: str, title_name: str, originallanguage: str
+            self, ctx: commands.Context, bot: Raizel, title: str, title_name: str, originallanguage: str, description: str = None
     ) -> str:
         download_url = None
         next_no = await bot.mongo.library.next_number
         category = "uncategorized"
         bot.crawler_count = bot.crawler_count + 1
+        if description is None:
+            description = ""
         try:
             category = await Categorizer().find_category(title_name)
         except Exception as e:
@@ -373,7 +387,7 @@ class FileHandler:
             novel_data = [
                 await bot.mongo.library.next_number,
                 title_name,
-                "",
+                description,
                 0,
                 originallanguage,
                 self.get_tags(title_name),
