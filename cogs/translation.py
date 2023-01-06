@@ -344,7 +344,7 @@ class Translate(commands.Cog):
             story = await translate.start(liz)
             async with aiofiles.open(f"{ctx.author.id}.txt", "w", encoding="utf-8") as f:
                 await f.write(story)
-            description = FileHandler.get_desc_from_text(story[:10000])
+            description = await FileHandler.get_desc_from_text(story[:10000])
             await FileHandler().distribute(self.bot, ctx, name, language, original_Language, rawname, description)
         except Exception as e:
             if "Translation stopped" in str(e):
