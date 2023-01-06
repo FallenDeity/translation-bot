@@ -2,6 +2,7 @@ import asyncio
 import datetime
 import os
 import random
+import re
 import typing
 
 import PyPDF2
@@ -34,6 +35,14 @@ def chapter_to_str(chapter):
 class FileHandler:
     ENCODING: list[str] = ["utf-8", "cp936", "utf-16", "cp949"]
     TOTAL: int = len(ENCODING)
+
+    @staticmethod
+    def get_desc_from_text(text: str):
+        desc = ["introduction", "description", "简介", "描述", "描写", "summary"]
+        for d in desc:
+            if d in text.lower():
+                return re.split(d, text, flags=re.IGNORECASE)[1][:500].replace(":", "").replace("\n\n", "").strip()
+        return text[:500].strip()
 
     @staticmethod
     def get_description(soup: "BeautifulSoup") -> str:
@@ -215,7 +224,7 @@ class FileHandler:
         return string
 
     async def distribute(
-            self, bot: Raizel, ctx: commands.Context, name: str, language: str, original_language: str, raw_name: str
+            self, bot: Raizel, ctx: commands.Context, name: str, language: str, original_language: str, raw_name: str, description: str =""
     ) -> None:
         download_url = None
         next_no = await bot.mongo.library.next_number
@@ -294,7 +303,7 @@ class FileHandler:
             novel_data = [
                 await bot.mongo.library.next_number,
                 name,
-                "",
+                description,
                 0,
                 language,
                 self.get_tags(name),

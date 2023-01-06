@@ -327,7 +327,8 @@ class Termer(commands.Cog):
             story = await translate.start(liz)
             async with aiofiles.open(f"{ctx.author.id}.txt", "w", encoding="utf-8") as f:
                 await f.write(story)
-            await FileHandler().distribute(self.bot, ctx, name, language, original_Language, raw_name=rawname)
+            description = FileHandler.get_desc_from_text(story[:10000])
+            await FileHandler().distribute(self.bot, ctx, name, language, original_Language, raw_name=rawname, description=description)
         except Exception as e:
             if "Translation stopped" in str(e):
                 return await ctx.send("Translation stopped")
