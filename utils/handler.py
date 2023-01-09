@@ -286,10 +286,12 @@ class FileHandler:
             if category == "Uncategorised":
                 category = Categories.from_string(description)
             if thumbnail.strip() == "":
-                thumbnail = Categories.thumbnail_from_category("Uncategorised")
+                thumbnail = Categories.thumbnail_from_category(category)
         except Exception as e:
             print("exception in  getting category")
             print(e)
+            if thumbnail.strip() == "":
+                thumbnail = Categories.thumbnail_from_category(category)
         if (size := os.path.getsize(f"{ctx.author.id}.txt")) > 8 * 10 ** 6:
             bot.translation_count = bot.translation_count + 1
             if (size := os.path.getsize(f"{ctx.author.id}.txt")) > 13 * 10 ** 6:
@@ -403,6 +405,8 @@ class FileHandler:
         except Exception as e:
             print("exception in  getting category")
             print(e)
+            if thumbnail.strip() == "":
+                thumbnail = Categories.thumbnail_from_category(category)
         if (size := os.path.getsize(f"{title}.txt")) > 8 * 10 ** 6:
             bot.crawler_count = bot.crawler_count + 1
             if size > 32 * 10 ** 6 and int(bot.crawler[ctx.author.id].split("/")[1]) < 2000:
