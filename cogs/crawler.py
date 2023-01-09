@@ -616,6 +616,7 @@ class Crawler(commands.Cog):
             msg_content = f"> **:white_check_mark: Started Crawling the novel --  📔   {title_name.split('__')[0].strip()}.**"
             msg = await msg.edit(
                 content=msg_content)
+            thumbnail = await FileHandler().get_thumbnail(soup, link)
             asyncio.create_task(self.cc_prog(msg, msg_content, ctx.author.id))
             book = await self.bot.loop.run_in_executor(
                 None, self.direct, urls, novel, ctx.author.id, cloudscrape,
@@ -631,7 +632,7 @@ class Crawler(commands.Cog):
                 await f.write(text)
             if description is None or description.strip() == "":
                 description = GoogleTranslator(source="auto", target="english").translate(text[:500].strip().replace("\n\n", "\n"))
-            download_url = await FileHandler().crawlnsend(ctx, self.bot, title, title_name, original_Language, description)
+            download_url = await FileHandler().crawlnsend(ctx, self.bot, title, title_name, original_Language, description, thumbnail)
         except Exception as e:
             await ctx.send("> Error occurred .Please report to admin +\n" + str(e))
             raise e

@@ -8,7 +8,7 @@ from reactionmenu import ViewButton, ViewMenu
 
 from core.bot import Raizel
 from databases.data import Novel
-from utils.category import Categorizer
+from utils.category import Categories
 
 
 class Library(commands.Cog):
@@ -80,7 +80,7 @@ class Library(commands.Cog):
         uploader = self.bot.get_user(data.uploader) or await self.bot.fetch_user(
             data.uploader
         )
-        embed.set_thumbnail(url=self.bot.user.display_avatar)
+        embed.set_thumbnail(url=data.thumbnail)
         embed.set_footer(
             text=f"ON {datetime.datetime.fromtimestamp(data.date).strftime('%m/%d/%Y, %H:%M:%S')} • {uploader} • {'⭐' * int(data.rating)}",
             icon_url=uploader.display_avatar,
@@ -312,7 +312,7 @@ class Library(commands.Cog):
     async def translate_complete(
             self, inter: discord.Interaction, category: str
     ) -> list[app_commands.Choice]:
-        lst = [i for i in Categorizer.get_categories() if category.lower() in i.lower()][:25]
+        lst = [str(cat.value.name) for cat in Categories if cat.value.name.lower().startswith(category.lower())][0:25]
         return [app_commands.Choice(name=i, value=i) for i in lst]
 
     @search.autocomplete("sort_by")
@@ -352,6 +352,7 @@ class Library(commands.Cog):
             await ctx.send("No novel found.")
             return
         embed = await self.make_base_embed(novel)
+        print(novel)
         await ctx.send(embed=embed)
 
     @library.command(name="review", help="reviews a novel.")
@@ -371,21 +372,6 @@ class Library(commands.Cog):
         await self.bot.mongo.library.update_rating(novel._id, rating)
         await ctx.send("Novel reviewed.")
 
-    @commands.has_role(1020638168237740042)
-    @library.command(name="category")
-    async def category(self, ctx: commands.Context):
-        await ctx.send("started categorizing")
-        for i in range(1, await self.bot.mongo.library.next_number):
-            # print(i)
-            try:
-                title: str = await self.bot.mongo.library.get_title_by_id(i)
-                category = await Categorizer().find_category(title)
-                await self.bot.mongo.library.update_category(i, category)
-                print(f"{str(i)} : category {category} updated for {title}")
-            except Exception as e:
-                print(f"error in {str(i)}")
-                print(e)
-        await ctx.send("finished categorizing")
 
 async def setup(bot: Raizel) -> None:
     await bot.add_cog(Library(bot))

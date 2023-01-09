@@ -8,6 +8,7 @@ import typing
 import PyPDF2
 import aiofiles
 import chardet
+import cloudscraper
 import discord
 import docx
 import ebooklib
@@ -23,7 +24,7 @@ from core.bot import Raizel
 from core.views.linkview import LinkView
 from databases.data import Novel
 from languages import languages
-from utils.category import Categorizer
+from utils.category import Categories
 
 
 def chapter_to_str(chapter):
@@ -73,7 +74,8 @@ class FileHandler:
     @staticmethod
     def find_language(text: str, link: str = None) -> str:
         if link is not None:
-            for l in ["bixiange", "trxs", "txt520", "powanjuan", "tongrenquan", "jpxs", "ptwxz", "qidian", "xindingdian", "longteng", "akshu8", "qbtr"]:
+            for l in ["bixiange", "trxs", "txt520", "powanjuan", "tongrenquan", "jpxs", "ptwxz", "qidian",
+                      "xindingdian", "longteng", "akshu8", "qbtr"]:
                 if l in link:
                     return 'chinese (simplified)'
         api_keys = ['8ca7a29f3b7c8ac85487451129f35c89', '1c2d644450cb8923818607150e7766d4',
@@ -103,7 +105,7 @@ class FileHandler:
             original_Language = original_Language.pop()
         except:
             try:
-                original_Language = original_Language.replace("['", "").replace("']",  "")
+                original_Language = original_Language.replace("['", "").replace("']", "")
             except:
                 pass
         return original_Language
@@ -223,17 +225,68 @@ class FileHandler:
         )
         return string
 
+    def tokenize(link) -> tuple[str, ...]:
+        url = link.replace(".html", "").replace(".htm/", "")
+        suffix = url.split("/")[-1]
+        midfix = url.replace(f"/{suffix}", "").split("/")[-1]
+        prefix = url.replace(f"/{midfix}/{suffix}", "")
+        return url, suffix, midfix, prefix
+
+    async def get_thumbnail(self, soup, link) -> str:
+        url, suffix, midfix, prefix = FileHandler.tokenize(link)
+        compound = (
+            "readwn",
+            "fannovels",
+            "novelmt",
+            "wuxiax",
+        )
+        imgs = []
+        tag = "src" if not any(str(i) in link for i in compound) else "data-src"
+        for img in soup.find_all("img"):
+            if any(x in img.get(tag, "") for x in ("cover", "thumb", ".jpg", "upload")) and ".png" not in img.get(
+                    tag, ""
+            ):
+                imgs.append(img.get(tag, ""))
+        if imgs:
+            img = imgs[0]
+            for i in imgs:
+                if (str("novelsknight") in link and "resize=" in i) or (
+                        suffix in i or "/file" in i or midfix in i
+                ):
+                    img = i
+                    break
+            if "http" not in img:
+                domain = x.group() if (x := re.search(r"(?<=//)[^/]+", url)) else ""
+                status = "https" if "https" in url else "http"
+                img = f"{status}://{domain.lstrip(':/')}{'/' if not img.startswith('/') else ''}{img}"
+                scraper = cloudscraper.create_scraper()
+                if scraper.get(img).status_code != 200:
+                    img = img.replace(f"{status}://{domain.lstrip(':/')}", "")
+                    img = re.sub(r"://+", "://", f"{prefix}{img}")
+                    return img
+            return img
+        meta = soup.find_all("meta")
+        for i in meta:
+            if i.get("property") == "og:image":
+                return i.get("content", "")
+        return ""
+
     async def distribute(
-            self, bot: Raizel, ctx: commands.Context, name: str, language: str, original_language: str, raw_name: str, description: str =""
+            self, bot: Raizel, ctx: commands.Context, name: str, language: str, original_language: str, raw_name: str,
+            description: str = "", thumbnail: str = ""
     ) -> None:
         download_url = None
         next_no = await bot.mongo.library.next_number
-        category = "uncategorized"
+        category = "Uncategorised"
         bot.translation_count = bot.translation_count + 1
         if (os.path.getsize(f"{ctx.author.id}.txt")) > 4 * 10 ** 6:
             bot.translation_count = bot.translation_count + 1
         try:
-            category = await Categorizer().find_category(name)
+            category = Categories.from_string(name)
+            if category == "Uncategorised":
+                category = Categories.from_string(description)
+            if thumbnail.strip() == "":
+                thumbnail = Categories.thumbnail_from_category("Uncategorised")
         except Exception as e:
             print("exception in  getting category")
             print(e)
@@ -311,6 +364,7 @@ class FileHandler:
                 size,
                 ctx.author.id,
                 datetime.datetime.utcnow().timestamp(),
+                thumbnail,
                 original_language,
                 category
             ]
@@ -331,16 +385,21 @@ class FileHandler:
                         no_of_tries += 1
 
     async def crawlnsend(
-            self, ctx: commands.Context, bot: Raizel, title: str, title_name: str, originallanguage: str, description: str = None
+            self, ctx: commands.Context, bot: Raizel, title: str, title_name: str, originallanguage: str,
+            description: str = None, thumbnail: str = ""
     ) -> str:
         download_url = None
         next_no = await bot.mongo.library.next_number
-        category = "uncategorized"
+        category = "Uncategorised"
         bot.crawler_count = bot.crawler_count + 1
         if description is None:
             description = ""
         try:
-            category = await Categorizer().find_category(title_name)
+            category = Categories.from_string(title)
+            if category == "Uncategorised":
+                category = Categories.from_string(description)
+            if thumbnail.strip() == "":
+                thumbnail = Categories.thumbnail_from_category(category)
         except Exception as e:
             print("exception in  getting category")
             print(e)
@@ -404,6 +463,7 @@ class FileHandler:
                 size,
                 ctx.author.id,
                 datetime.datetime.utcnow().timestamp(),
+                thumbnail,
                 originallanguage,
                 category
             ]
@@ -414,7 +474,7 @@ class FileHandler:
                 loop = True
                 no_of_tries = 0
                 while loop and no_of_tries < 6:
-                    print(f"couldn't add to library... trying for {no_of_tries+2} times")
+                    print(f"couldn't add to library... trying for {no_of_tries + 2} times")
                     try:
                         await asyncio.sleep(3)
                         data[0] = await bot.mongo.library.next_number
