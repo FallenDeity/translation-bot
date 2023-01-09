@@ -866,6 +866,14 @@ class Crawler(commands.Cog):
         crawled_urls = []
         repeats = 0
         try:
+            description = GoogleTranslator(source="auto", target="english").translate(FileHandler.get_description(soup)[:500]).strip()
+        except:
+            try:
+                description = FileHandler.get_description(soup)
+            except:
+                description = ""
+
+        try:
             self.bot.crawler[ctx.author.id] = f"0/{noofchapters}"
             for i in range(1, noofchapters):
                 try:
@@ -928,8 +936,14 @@ class Crawler(commands.Cog):
 
             with open(title + '.txt', 'w', encoding='utf-8') as f:
                 f.write(full_text)
+            try:
+                if description is None or description.strip() == "":
+                    description = GoogleTranslator(source="auto", target="english").translate(
+                        await FileHandler.get_desc_from_text()[:500]).strip()
+            except:
+                pass
             await ctx.send(f"> **crawled {i} chapters**")
-            return await FileHandler().crawlnsend(ctx, self.bot, title, title_name, original_Language)
+            return await FileHandler().crawlnsend(ctx, self.bot, title, title_name, original_Language, description=description)
         except Exception as e:
             await ctx.send("> Error occurred .Please report to admin +\n" + str(e))
             raise e
