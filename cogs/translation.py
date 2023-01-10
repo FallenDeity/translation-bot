@@ -3,9 +3,12 @@ import gc
 import os
 import random
 import typing
+from urllib.parse import urljoin
 
 import aiofiles
+import cloudscraper
 import discord
+from bs4 import BeautifulSoup
 from deep_translator import GoogleTranslator
 from discord import app_commands
 from discord.ext import commands
@@ -69,13 +72,15 @@ class Translate(commands.Cog):
             except:
                 return await ctx.reply("send a valid id")
         if self.bot.app_status == "restart":
-            return await ctx.reply(f"> Bot is scheduled to restart within 60 sec or after all current tasks are completed.. Please try after bot is restarted")
+            return await ctx.reply(
+                f"> Bot is scheduled to restart within 60 sec or after all current tasks are completed.. Please try after bot is restarted")
         if ctx.author.id == 925597069748621353:
-            while len(asyncio.all_tasks())>=10 or (ctx.author.id in self.bot.translator and not self.bot.translator[ctx.author.id] == "waiting"):
+            while len(asyncio.all_tasks()) >= 10 or (
+                    ctx.author.id in self.bot.translator and not self.bot.translator[ctx.author.id] == "waiting"):
                 if ctx.author.id not in self.bot.translator:
                     self.bot.translator[ctx.author.id] = f"waiting"
                 await asyncio.sleep(20)
-                if self.bot.translator[ctx.author.id] == "waiting" and len(self.bot.translator) <=1:
+                if self.bot.translator[ctx.author.id] == "waiting" and len(self.bot.translator) <= 1:
                     break
         file = link or file
         if ctx.author.id in self.bot.blocked:
@@ -136,7 +141,8 @@ class Translate(commands.Cog):
             if "txt" not in file_type and "epub" not in file_type and "pdf" not in file_type:
                 os.remove(path)
                 await rep_msg.delete()
-                return await ctx.send("> **❌Only .txt, .pdf and .epub supported** use txt for best results", ephemeral=True)
+                return await ctx.send("> **❌Only .txt, .pdf and .epub supported** use txt for best results",
+                                      ephemeral=True)
             name = name.replace(".txt", "").replace(".docx", "").replace(".epub", "").replace(".pdf", "")
             name = name[:100]
             # os.rename(path, f"{ctx.author.id}.{file_type}")
@@ -198,7 +204,8 @@ class Translate(commands.Cog):
         elif "pdf" in file_type.lower():
             file_type = "pdf"
         else:
-            return await ctx.send("> **❌Only .txt , .pdf and .epub supported** Use txt for best results", ephemeral=True)
+            return await ctx.send("> **❌Only .txt , .pdf and .epub supported** Use txt for best results",
+                                  ephemeral=True)
         if novelname is not None:
             name = novelname
         name_check = FileHandler.checkname(name, self.bot)
@@ -250,9 +257,9 @@ class Translate(commands.Cog):
                         name_lib_check = True
                         try:
                             size_found = round(os.path.getsize(f"{ctx.author.id}.txt") / (1024 ** 2), 2) - 0.10
-                            size_found = size_found - 0.1*size_found
+                            size_found = size_found - 0.1 * size_found
                             lib_size = round(n.size / (1024 ** 2), 2)
-                            if size_found <= lib_size <= 2*size_found:
+                            if size_found <= lib_size <= 2 * size_found:
                                 size_check = True
                         except:
                             pass
@@ -260,7 +267,8 @@ class Translate(commands.Cog):
                 ids = ids[:20]
                 rep_msg = await rep_msg.edit(content="Novel is already in our library")
                 ctx.command = await self.bot.get_command("library search").callback(Library(self.bot), ctx, name,
-                                                                                    language, None, None, None, None, None,
+                                                                                    language, None, None, None, None,
+                                                                                    None,
                                                                                     None, None, False, "size", 20)
                 if len(ids) < 5 or name_lib_check:
                     await ctx.send("**Please check from above library**", delete_after=20)
@@ -326,6 +334,45 @@ class Translate(commands.Cog):
             return await ctx.reply("The provided file is bigger than 20mb. Please split the file and translate")
         msg_content = f"> **✅ Started translating 📔 {name}. Translating to {language}.**"
         rep_msg = await rep_msg.edit(content=msg_content)
+        urls = FileHandler.find_urls_from_text(novel[:3000])
+        print(f"urls : {urls}")
+        scraper = cloudscraper.create_scraper()
+        try:
+            thumbnail = ""
+            temp = []
+            for url in urls:
+                try:
+                    response = scraper.get(url, headers={
+                        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.142 Safari/537.36"
+                    })
+                    soup = BeautifulSoup(response.text, "lxml")
+                    print(f"url  {url}")
+                    thumbnail: str = await FileHandler().get_thumbnail(soup=soup, link=link)
+                    print(f"thub {thumbnail}")
+                    if thumbnail is not None and thumbnail.strip() != "":
+                        if scraper.get(thumbnail).status_code == 200:
+                            print("break")
+                            break
+                        else:
+                            print("else")
+                            thumbnail = ""
+                    if thumbnail == "":
+                        try:
+                            for img in soup.find_all('img'):
+                                img_url = urljoin(url, img.get('src'))
+                                if scraper.get(img_url).status_code == 200:
+                                    if "jpg" in img_url.lower() or "jpeg" in img_url.lower():
+                                        temp.insert(0, img_url)
+                        except:
+                            pass
+                except Exception as e:
+                    print(e)
+            if urls != [] and temp != []:
+                thumbnail = random.choice(temp[0:3])
+
+        except:
+            thumbnail = ""
+        print(f"thumbnail {thumbnail}")
         try:
             try:
                 original_Language = FileHandler.find_language(novel)
@@ -345,10 +392,12 @@ class Translate(commands.Cog):
             async with aiofiles.open(f"{ctx.author.id}.txt", "w", encoding="utf-8") as f:
                 await f.write(story)
             try:
-                description = GoogleTranslator(source="auto", target="english").translate(await FileHandler.get_desc_from_text(story[:10000])).strip()
+                description = GoogleTranslator(source="auto", target="english").translate(
+                    await FileHandler.get_desc_from_text(story[:10000])).strip()
             except:
                 description = await FileHandler.get_desc_from_text(story[:10000])
-            await FileHandler().distribute(self.bot, ctx, name, language, original_Language, rawname, description)
+            await FileHandler().distribute(self.bot, ctx, name, language, original_Language, rawname, description,
+                                           thumbnail=thumbnail)
         except Exception as e:
             if "Translation stopped" in str(e):
                 return await ctx.send("Translation stopped")
@@ -369,8 +418,9 @@ class Translate(commands.Cog):
             except:
                 pass
             try:
-                if self.bot.translation_count >=16 or self.bot.crawler_count >=20:
-                    await ctx.reply("> **Bot will be Restarted when the bot is free due to max limit is reached.. Please be patient")
+                if self.bot.translation_count >= 16 or self.bot.crawler_count >= 20:
+                    await ctx.reply(
+                        "> **Bot will be Restarted when the bot is free due to max limit is reached.. Please be patient")
                     chan = self.bot.get_channel(
                         991911644831678484
                     ) or await self.bot.fetch_channel(991911644831678484)
@@ -450,7 +500,8 @@ class Translate(commands.Cog):
             count = count + 1
             await asyncio.sleep(0.5)
             try:
-                ctx.command = await self.bot.get_command("translate").callback(Translate(self.bot), ctx_new, attached.url,
+                ctx.command = await self.bot.get_command("translate").callback(Translate(self.bot), ctx_new,
+                                                                               attached.url,
                                                                                None,
                                                                                None,
                                                                                language)
