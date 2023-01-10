@@ -363,6 +363,8 @@ class Translate(commands.Cog):
                                 if scraper.get(img_url).status_code == 200:
                                     if "jpg" in img_url.lower() or "jpeg" in img_url.lower():
                                         temp.insert(0, img_url)
+                                    else:
+                                        temp.append(img_url)
                         except:
                             pass
                 except Exception as e:
