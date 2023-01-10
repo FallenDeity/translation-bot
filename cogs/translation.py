@@ -367,7 +367,7 @@ class Translate(commands.Cog):
                             pass
                 except Exception as e:
                     print(e)
-            if urls != [] and temp != []:
+            if urls != [] and temp != [] and thumbnail == "":
                 thumbnail = random.choice(temp[0:3])
 
         except:
