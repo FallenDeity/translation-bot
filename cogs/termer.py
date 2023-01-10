@@ -3,9 +3,12 @@ import gc
 import os
 import random
 import typing
+from urllib.parse import urljoin
 
 import aiofiles
+import cloudscraper
 import discord
+from bs4 import BeautifulSoup
 from deep_translator import GoogleTranslator
 from discord import app_commands
 from discord.ext import commands
@@ -317,6 +320,45 @@ class Termer(commands.Cog):
         rep_msg = await rep_msg.edit(
             content=msg_content
         )
+        urls = FileHandler.find_urls_from_text(novel[:3000])
+        print(f"urls : {urls}")
+        scraper = cloudscraper.create_scraper()
+        try:
+            thumbnail = ""
+            temp = []
+            for url in urls:
+                try:
+                    response = scraper.get(url, headers={
+                        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.142 Safari/537.36"
+                    })
+                    soup = BeautifulSoup(response.text, "lxml")
+                    print(f"url  {url}")
+                    thumbnail: str = await FileHandler().get_thumbnail(soup=soup, link=link)
+                    print(f"thub {thumbnail}")
+                    if thumbnail is not None and thumbnail.strip() != "":
+                        if scraper.get(thumbnail).status_code == 200:
+                            print("break")
+                            break
+                        else:
+                            print("else")
+                            thumbnail = ""
+                    if thumbnail == "":
+                        try:
+                            for img in soup.find_all('img'):
+                                img_url = urljoin(url, img.get('src'))
+                                if scraper.get(img_url).status_code == 200:
+                                    if "jpg" in img_url.lower() or "jpeg" in img_url.lower():
+                                        temp.insert(0, img_url)
+                        except:
+                            pass
+                except Exception as e:
+                    print(e)
+            if urls != [] and temp != []:
+                thumbnail = random.choice(temp[0:3])
+
+        except:
+            thumbnail = ""
+        print(f"thumbnail {thumbnail}")
         try:
             os.remove(f"{ctx.author.id}.txt")
             original_Language = FileHandler.find_language(novel)
