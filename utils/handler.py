@@ -50,8 +50,10 @@ class FileHandler:
         desc = ["introduction", "description", "简介", "描述", "描写", "summary"]
         for d in desc:
             if d in text.lower():
-                return re.split(d, text, flags=re.IGNORECASE)[1][:500].replace(":", "").replace("\n\n", "").strip()
-        return text[:500].strip()
+                description = re.split(d, text, flags=re.IGNORECASE)[1][:500].replace(":", "").replace("\n\n", "").strip()
+                description = re.sub(r'(\n\s*)+\n', '\n', description)
+                return description
+        return re.sub(r'(\n\s*)+\n', '\n', text[:500].strip())
 
     @staticmethod
     def get_description(soup: "BeautifulSoup") -> str:
