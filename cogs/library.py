@@ -64,7 +64,7 @@ class Library(commands.Cog):
 
     async def make_base_embed(self, data: Novel) -> discord.Embed:
         embed = discord.Embed(
-            title=f"**#{data._id} \t•\t {data.title[:250].strip()}**",
+            title=f"**#{data._id} \t•\t {data.title[:240].strip()}**",
             url=data.download,
             description=f"*{data.description}*"
             if data.description
@@ -95,7 +95,7 @@ class Library(commands.Cog):
 
     async def make_base_list_embed(self, data: list[Novel], page: int) -> discord.Embed:
         output = [
-            f"**#{novel._id}\t💠\t[{novel.title.split('__')[0].strip()}]({novel.download})**\n💠\tSize: **{round(novel.size / (1024 ** 2), 2)} MB**\t💠\tLanguage:** {novel.language}** "
+            f"**#{novel._id}\t💠\t[{novel.title.split('__')[0].strip()[:200]}]({novel.download})**\n💠\tSize: **{round(novel.size / (1024 ** 2), 2)} MB**\t💠\tLanguage:** {novel.language}** "
             for novel in data]
         out_str = ""
         for out in output:
