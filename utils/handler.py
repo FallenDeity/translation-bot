@@ -302,6 +302,11 @@ class FileHandler:
             print(e)
             if thumbnail.strip() == "":
                 thumbnail = Categories.thumbnail_from_category(category)
+        embed = discord.Embed(title=str(f"#{next_no} : "+name[:240]), description=description, colour=discord.Colour.dark_gold())
+        embed.add_field(name="Category", value=category)
+        embed.add_field(name="Language", value=language)
+        embed.set_thumbnail(url=thumbnail)
+        embed.set_footer(text=f"Uploaded by {ctx.author}", icon_url=ctx.author.display_avatar)
         if (size := os.path.getsize(f"{ctx.author.id}.txt")) > 8 * 10 ** 6:
             bot.translation_count = bot.translation_count + 1
             if (size := os.path.getsize(f"{ctx.author.id}.txt")) > 13 * 10 ** 6:
@@ -327,10 +332,8 @@ class FileHandler:
                     channel = bot.get_channel(
                         1005668482475643050
                     ) or await bot.fetch_channel(1005668482475643050)
-                user = str(ctx.author)
                 await channel.send(
-                    f"> **#{next_no}** {name.replace('_', ' ')} \nuploaded by {user} {ctx.author.mention} Translated from: {original_language} to: {language}\n Added in Category : {category}",
-                    view=view, allowed_mentions=discord.AllowedMentions(users=False)
+                        embed=embed, view=view, allowed_mentions=discord.AllowedMentions(users=False)
                 )
                 download_url = filelnk
             except Exception as e:
@@ -350,10 +353,8 @@ class FileHandler:
                 channel = bot.get_channel(
                     1005668482475643050
                 ) or await bot.fetch_channel(1005668482475643050)
-            user = str(ctx.author)
             msg = await channel.send(
-                f'> **#{next_no}** {name.replace("_", " ")} \nUploaded by {user} {ctx.author.mention} Translated from: {original_language} to: {language}\n Added in Category : {category}',
-                file=discord.File(f"{ctx.author.id}.txt", f"{name}.txt"),
+                embed=embed, file=discord.File(f"{ctx.author.id}.txt", f"{name}.txt"),
                 allowed_mentions=discord.AllowedMentions(users=False)
             )
             os.remove(f"{ctx.author.id}.txt")
@@ -417,9 +418,14 @@ class FileHandler:
             print(e)
             if thumbnail.strip() == "":
                 thumbnail = Categories.thumbnail_from_category(category)
+        embed = discord.Embed(title=str(f"#{next_no} : "+title[:240]), description=description, colour=discord.Colour.dark_gold())
+        embed.add_field(name="Category", value=category)
+        embed.add_field(name="Language", value=originallanguage)
+        embed.set_thumbnail(url=thumbnail)
+        embed.set_footer(text=f"Uploaded by {ctx.author}", icon_url=ctx.author.display_avatar)
         if (size := os.path.getsize(f"{title}.txt")) > 8 * 10 ** 6:
             bot.crawler_count = bot.crawler_count + 1
-            if size > 32 * 10 ** 6 and int(bot.crawler[ctx.author.id].split("/")[1]) < 2000:
+            if size > 32 * 10 ** 6 and int(bot.crawler[ctx.author.id].split("/")[1]) < 3000:
                 os.remove(f"{title}.txt")
                 bot.crawler_count = bot.crawler_count + 1
                 return await ctx.send('Crawled file is too big. there is some problem in crawler')
@@ -438,9 +444,8 @@ class FileHandler:
                 channel = bot.get_channel(
                     1020980703229382706
                 ) or await bot.fetch_channel(1020980703229382706)
-                user = str(ctx.author)
                 await channel.send(
-                    f"> **#{next_no}** {title_name} \nCrawled by {user} {ctx.author.mention} Source language : {originallanguage}\n Added in Category : {category}",
+                    embed=embed,
                     view=view, allowed_mentions=discord.AllowedMentions(users=False)
                 )
                 download_url = filelnk
@@ -454,9 +459,9 @@ class FileHandler:
             channel = bot.get_channel(
                 1020980703229382706
             ) or await bot.fetch_channel(1020980703229382706)
-            user = str(ctx.author)
+
             msg = await channel.send(
-                f'> **#{next_no}** {title_name} \nCrawled by {user} {ctx.author.mention} Source language : {originallanguage} \n Added in Category : {category}',
+                embed=embed,
                 file=discord.File(f"{title}.txt"), allowed_mentions=discord.AllowedMentions(users=False)
             )
             download_url = msg.attachments[0].url
