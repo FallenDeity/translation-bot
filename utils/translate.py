@@ -1,7 +1,7 @@
 import concurrent.futures
 import typing as t
 
-from deep_translator import GoogleTranslator
+from deep_translator import GoogleTranslator, MyMemoryTranslator
 
 from core.bot import Raizel
 
@@ -14,9 +14,12 @@ class Translator:
         self.order = {}
 
     def translate(self, chapter: t.List[str], num: int) -> t.Tuple[int, t.List[str]]:
-        translated = GoogleTranslator(
-            source="auto", target=self.language
-        ).translate_batch(chapter)
+        try:
+            translated = GoogleTranslator(
+                source="auto", target=self.language
+            ).translate_batch(chapter)
+        except:
+            translated = MyMemoryTranslator(source="auto", target=self.language).translate_batch(chapter)
         return num, translated
 
     def translates(self, chapters: t.List[str]) -> None:

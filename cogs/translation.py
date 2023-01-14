@@ -363,11 +363,13 @@ class Translate(commands.Cog):
                                 if scraper.get(img_url).status_code == 200:
                                     if "jpg" in img_url.lower() or "jpeg" in img_url.lower():
                                         temp.insert(0, img_url)
+                                    else:
+                                        temp.append(img_url)
                         except:
                             pass
                 except Exception as e:
                     print(e)
-            if urls != [] and temp != []:
+            if urls != [] and temp != [] and thumbnail == "":
                 thumbnail = random.choice(temp[0:3])
 
         except:
