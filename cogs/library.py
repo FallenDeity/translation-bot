@@ -352,7 +352,6 @@ class Library(commands.Cog):
             await ctx.send("No novel found.")
             return
         embed = await self.make_base_embed(novel)
-        print(novel)
         await ctx.send(embed=embed)
 
     @library.command(name="review", help="reviews a novel.")
