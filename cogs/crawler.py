@@ -240,7 +240,7 @@ class Crawler(commands.Cog):
     @commands.hybrid_command(
         help="Crawls other sites for novels. \nselector: give the css selector for the content page. It will try to auto select if not given\n Reverse: give any value if Table of Content is reversed in the given link(or if crawled novel needs to be reversed)")
     async def crawl(
-            self, ctx: commands.Context, link: str = None, reverse: str = None, selector: str = None,
+            self, ctx: commands.Context, link: str, reverse: str = None, selector: str = None,
             cloudscrape: bool = False,
             translate_to: str = None,
             add_terms: str = None,
