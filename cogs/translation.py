@@ -411,7 +411,6 @@ class Translate(commands.Cog):
                     await FileHandler.get_desc_from_text(story[:10000])).strip()
             except:
                 description = await FileHandler.get_desc_from_text(story[:10000])
-            input("waitin")
             await FileHandler().distribute(self.bot, ctx, name, language, original_Language, rawname, description,
                                            thumbnail=thumbnail)
         except Exception as e:

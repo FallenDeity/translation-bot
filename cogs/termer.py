@@ -322,7 +322,6 @@ class Termer(commands.Cog):
             content=msg_content
         )
         urls = FileHandler.find_urls_from_text(novel[:3000])
-        print(f"urls : {urls}")
         scraper = cloudscraper.create_scraper()
         try:
             thumbnail = ""
@@ -333,7 +332,7 @@ class Termer(commands.Cog):
                         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.142 Safari/537.36"
                     })
                     soup = BeautifulSoup(response.text, "lxml")
-                    print(f"url  {url}")
+                    # print(f"url  {url}")
                     thumbnail: str = await FileHandler().get_thumbnail(soup=soup, link=link)
                     print(f"thub {thumbnail}")
                     if thumbnail is not None and thumbnail.strip() != "":
@@ -341,7 +340,7 @@ class Termer(commands.Cog):
                             print("break")
                             break
                         else:
-                            print("else")
+                            # print("else")
                             thumbnail = ""
                     if thumbnail == "":
                         try:
@@ -361,7 +360,7 @@ class Termer(commands.Cog):
 
         except:
             thumbnail = ""
-        print(f"thumbnail {thumbnail}")
+        # print(f"thumbnail {thumbnail}")
         try:
             os.remove(f"{ctx.author.id}.txt")
             original_Language = FileHandler.find_language(novel)
