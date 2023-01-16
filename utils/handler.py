@@ -57,9 +57,18 @@ class FileHandler:
         return re.sub(r'(\n\s*)+\n', '\n', text[:500].strip())
 
     @staticmethod
-    def get_description(soup: "BeautifulSoup") -> str:
+    async def get_description(soup: "BeautifulSoup", link: str = "empty") -> str:
         aliases = ("description", "Description", "DESCRIPTION", "desc", "Desc", "DESC")
         description = ""
+        if "69shu" in link:
+            scraper = cloudscraper.CloudScraper()  # CloudScraper inherits from requests.Session
+            href = urljoin(link, parsel.Selector(scraper.get(link).text).css("div.titxt ::attr(href)").extract_first())
+            response = scraper.get(href)
+            response.encoding = response.apparent_encoding
+            description = "\n".join(parsel.Selector(response.text).css("div.navtxt ::text").extract())
+            description = await FileHandler.get_desc_from_text(description)
+            if description is not None and description.strip() != "":
+                return description
         for meta in soup.find_all("meta"):
             if meta.get("name") in aliases:
                 description += meta.get("content")
@@ -244,6 +253,11 @@ class FileHandler:
         return url, suffix, midfix, prefix
 
     async def get_thumbnail(self, soup, link) -> str:
+        scraper = cloudscraper.create_scraper()
+        if "69shu" in link and "txt" not in link:
+            link = urljoin(link, parsel.Selector(scraper.get(link).text).css("div.titxt ::attr(href)").extract_first())
+            response = scraper.get(link)
+            soup = BeautifulSoup(response.text, "html.parser")
         url, suffix, midfix, prefix = FileHandler.tokenize(link)
         compound = (
             "readwn",
@@ -252,7 +266,7 @@ class FileHandler:
             "wuxiax",
         )
         imgs = []
-        scraper = cloudscraper.create_scraper()
+
         tag = "src" if not any(str(i) in link for i in compound) else "data-src"
         for img in soup.find_all("img"):
             if any(x in img.get(tag, "") for x in ("cover", "thumb", ".jpg", "upload")) and ".png" not in img.get(

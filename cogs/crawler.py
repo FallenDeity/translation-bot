@@ -500,10 +500,10 @@ class Crawler(commands.Cog):
             )
         try:
             description = GoogleTranslator(source="auto", target="english").translate(
-                FileHandler.get_description(soup)[:500]).strip()
+                (await FileHandler.get_description(soup, link))[:500]).strip()
         except:
             try:
-                description = FileHandler.get_description(soup)
+                description = await FileHandler.get_description(soup, link)
             except:
                 description = ""
 
@@ -875,10 +875,10 @@ class Crawler(commands.Cog):
         repeats = 0
         try:
             description = GoogleTranslator(source="auto", target="english").translate(
-                FileHandler.get_description(soup)[:500]).strip()
+                (await FileHandler.get_description(soup))[:500]).strip()
         except:
             try:
-                description = FileHandler.get_description(soup)
+                description = await FileHandler.get_description(soup)
             except:
                 description = ""
 
