@@ -9,7 +9,7 @@ import aiohttp
 import discord
 import nltk
 from discord.ext import commands
-from filestack import Client
+# from filestack import Client
 from mega import Mega
 
 from languages.languages import choices
@@ -23,7 +23,7 @@ class Raizel(commands.Bot):
     con: aiohttp.ClientSession
     boot: datetime.datetime.utcnow()
     allowed: list[str]
-    drive: Client
+    # drive: Client
     mongo: Mongo
 
     def __init__(self) -> None:
@@ -69,7 +69,7 @@ class Raizel(commands.Bot):
         await self.load_extension("jishaku")
         self.allowed = sites
         self.con = aiohttp.ClientSession()
-        self.drive = Client(os.getenv("FILE"))
+        # self.drive = Client(os.getenv("FILE"))
         self.mongo = Mongo()
         print("Connected to mongo db")
         self.blocked: list[int] = await self.mongo.blocker.get_all_banned_users()
