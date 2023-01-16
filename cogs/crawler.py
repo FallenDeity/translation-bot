@@ -15,6 +15,7 @@ import aiofiles
 import discord
 import parsel
 import requests
+from StringProgressBar import progressBar
 from bs4 import BeautifulSoup
 from deep_translator import GoogleTranslator
 from discord import app_commands
@@ -199,30 +200,25 @@ class Crawler(commands.Cog):
             )
         await ctx.send(f"> **🚄`{self.bot.crawler[ctx.author.id]}`**")
 
-    async def cc_prog(self, msg: discord.Message, msg_content: str, author_id: int) -> typing.Optional[discord.Message]:
-        value = 0
+    async def cc_prog(self, msg: discord.Message, embed: discord.Embed, author_id: int) -> typing.Optional[
+        discord.Message]:
+        bardata = progressBar.filledBar(100, 0, size=20, line="🟥", slider="🟩")
+        print(bardata[0])
+        embed.add_field(name="Progress", value=f"{bardata[0]}")
         while author_id in self.bot.crawler:
-            await asyncio.sleep(10)
-            if author_id not in self.bot.crawler:
-                content = msg_content + f"\nProgress > **🚄`Completed`    {100}%**"
-                msg = await msg.edit(content=content)
-                return None
-            try:
-                if eval(self.bot.crawler[author_id]) < value:
-                    content = msg_content + f"\nProgress > **🚄`Completed`    {100}%**"
-                    msg = await msg.edit(content=content)
-                    return None
-                else:
-                    value = eval(self.bot.crawler[author_id])
-                    out = str(round(value * 100, 2))
-            except Exception as e:
-                print(e)
-                out = ""
-            content = msg_content + f"\nProgress > **🚄`{self.bot.crawler[author_id]}`    {out}%**"
-            try:
-                msg = await msg.edit(content=content)
-            except:
-                pass
+            split = self.bot.crawler[author_id].split("/")
+            print(type(split[0]))
+            if split[0].isnumeric():
+                embed.set_field_at(index=0,
+                                   name=f"Progress :  {str(round(eval(self.bot.crawler[author_id]) * 100, 2))}%",
+                                   value=progressBar.filledBar(int(split[1]), int(split[0]),
+                                                               size=20, line="🟥", slider="🟩")[
+                                       0])
+                # print(embed)
+                await msg.edit(embed=embed)
+            else:
+                return
+            await asyncio.sleep(8)
         return
 
     @commands.hybrid_command(help="stops the tasks initiated by user", aliases=["st"])
@@ -488,15 +484,16 @@ class Crawler(commands.Cog):
                 urls.append(temp_link)
         if "metruyencv.com" in link:
             urls = []
-            for i in range(1, max_chapters+1):  #https://metruyencv.com/truyen/tu-la-vu-than
-                temp_link = link+ "/chuong-"+ str(i)
+            for i in range(1, max_chapters + 1):  # https://metruyencv.com/truyen/tu-la-vu-than
+                temp_link = link + "/chuong-" + str(i)
                 urls.append(temp_link)
         if len(urls) < 30:
             return await ctx.reply(
                 f"> ❌Provided link only got **{str(len(urls))}** links in the page.Check if you have provided correct Table of contents url. If there is no TOC page try using /crawlnext with first chapter and required urls"
             )
         try:
-            description = GoogleTranslator(source="auto", target="english").translate(FileHandler.get_description(soup)[:500]).strip()
+            description = GoogleTranslator(source="auto", target="english").translate(
+                FileHandler.get_description(soup)[:500]).strip()
         except:
             try:
                 description = FileHandler.get_description(soup)
@@ -613,11 +610,13 @@ class Crawler(commands.Cog):
                 await asyncio.sleep(10)
         try:
             self.bot.crawler[ctx.author.id] = f"0/{len(urls)}"
-            msg_content = f"> **:white_check_mark: Started Crawling the novel --  📔   {title_name.split('__')[0].strip()}.**"
-            msg = await msg.edit(
-                content=msg_content)
             thumbnail = await FileHandler().get_thumbnail(soup, link)
-            asyncio.create_task(self.cc_prog(msg, msg_content, ctx.author.id))
+            embed = discord.Embed(title=str(f"{title[:240]}"), description=description,
+                                  colour=discord.Colour.blurple())
+            embed.set_thumbnail(url=thumbnail)
+            msg = await msg.edit(content="",
+                                 embed=embed)
+            asyncio.create_task(self.cc_prog(msg, embed, ctx.author.id))
             book = await self.bot.loop.run_in_executor(
                 None, self.direct, urls, novel, ctx.author.id, cloudscrape,
             )
@@ -631,8 +630,10 @@ class Crawler(commands.Cog):
             async with aiofiles.open(f"{title}.txt", "w", encoding="utf-8") as f:
                 await f.write(text)
             if description is None or description.strip() == "":
-                description = GoogleTranslator(source="auto", target="english").translate(text[:500].strip().replace("\n\n", "\n"))
-            download_url = await FileHandler().crawlnsend(ctx, self.bot, title, title_name, original_Language, description, thumbnail)
+                description = GoogleTranslator(source="auto", target="english").translate(
+                    text[:500].strip().replace("\n\n", "\n"))
+            download_url = await FileHandler().crawlnsend(ctx, self.bot, title, title_name, original_Language,
+                                                          description, thumbnail)
         except Exception as e:
             await ctx.send("> Error occurred .Please report to admin +\n" + str(e))
             raise e
@@ -866,7 +867,8 @@ class Crawler(commands.Cog):
         crawled_urls = []
         repeats = 0
         try:
-            description = GoogleTranslator(source="auto", target="english").translate(FileHandler.get_description(soup)[:500]).strip()
+            description = GoogleTranslator(source="auto", target="english").translate(
+                FileHandler.get_description(soup)[:500]).strip()
         except:
             try:
                 description = FileHandler.get_description(soup)
@@ -945,7 +947,8 @@ class Crawler(commands.Cog):
             except:
                 pass
             await ctx.send(f"> **crawled {i} chapters**")
-            return await FileHandler().crawlnsend(ctx, self.bot, title, title_name, original_Language, description=description)
+            return await FileHandler().crawlnsend(ctx, self.bot, title, title_name, original_Language,
+                                                  description=description)
         except Exception as e:
             await ctx.send("> Error occurred .Please report to admin +\n" + str(e))
             raise e

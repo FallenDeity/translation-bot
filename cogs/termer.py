@@ -316,7 +316,7 @@ class Termer(commands.Cog):
             return await ctx.reply("The provided file is bigger than 20mb. Please split the file and translate")
         rep_msg = await rep_msg.edit(content=f"> **✅Terming started. **")
         novel = self.term_raw(novel, term_dict)
-        msg_content = f"> **✅Terming completed.. Started Translating 📔{novelname} Translating to {language}.**"
+        msg_content = f"> **✅Terming completed.. Started Translating 📔{name} Translating to {language}.**"
         rep_msg = await rep_msg.edit(
             content=msg_content
         )
