@@ -4,6 +4,7 @@ import os
 import random
 import re
 import typing
+from urllib.parse import urljoin
 
 import PyPDF2
 import aiofiles
@@ -251,6 +252,7 @@ class FileHandler:
             "wuxiax",
         )
         imgs = []
+        scraper = cloudscraper.create_scraper()
         tag = "src" if not any(str(i) in link for i in compound) else "data-src"
         for img in soup.find_all("img"):
             if any(x in img.get(tag, "") for x in ("cover", "thumb", ".jpg", "upload")) and ".png" not in img.get(
@@ -264,17 +266,10 @@ class FileHandler:
                         suffix in i or "/file" in i or midfix in i
                 ):
                     img = i
-                    break
-            if "http" not in img:
-                domain = x.group() if (x := re.search(r"(?<=//)[^/]+", url)) else ""
-                status = "https" if "https" in url else "http"
-                img = f"{status}://{domain.lstrip(':/')}{'/' if not img.startswith('/') else ''}{img}"
-                scraper = cloudscraper.create_scraper()
-                if scraper.get(img).status_code != 200:
-                    img = img.replace(f"{status}://{domain.lstrip(':/')}", "")
-                    img = re.sub(r"://+", "://", f"{prefix}{img}")
-                    return img
-            return img
+                    if "http" not in img:
+                        img = urljoin(link, img)
+                    if scraper.get(img).status_code == 200:
+                        return img
         meta = soup.find_all("meta")
         for i in meta:
             if i.get("property") == "og:image":
