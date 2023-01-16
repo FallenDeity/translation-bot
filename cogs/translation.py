@@ -346,7 +346,7 @@ class Translate(commands.Cog):
                     })
                     soup = BeautifulSoup(response.text, "lxml")
                     # print(f"url  {url}")
-                    thumbnail: str = await FileHandler().get_thumbnail(soup=soup, link=link)
+                    thumbnail: str = await FileHandler().get_thumbnail(soup=soup, link=url)
                     # print(f"thub {thumbnail}")
                     if thumbnail is not None and thumbnail.strip() != "":
                         if scraper.get(thumbnail).status_code == 200:

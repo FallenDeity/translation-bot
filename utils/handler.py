@@ -256,8 +256,7 @@ class FileHandler:
         scraper = cloudscraper.create_scraper()
         if "69shu" in link and "txt" not in link:
             link = urljoin(link, parsel.Selector(scraper.get(link).text).css("div.titxt ::attr(href)").extract_first())
-            response = scraper.get(link)
-            soup = BeautifulSoup(response.text, "html.parser")
+            soup = BeautifulSoup(scraper.get(link).text, "html.parser")
         url, suffix, midfix, prefix = FileHandler.tokenize(link)
         compound = (
             "readwn",
