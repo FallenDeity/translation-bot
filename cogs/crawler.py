@@ -895,10 +895,12 @@ class Crawler(commands.Cog):
                         return await ctx.send(" There is some problem with the provided selector")
                     else:
                         return await ctx.send(" There is some problem with the detected selector")
-                if "readwn" in current_link or "wuxiax.co" in current_link or "novelmt.com" in current_link or "fannovels.com" in current_link:
-                    await asyncio.sleep(1.3)
+                if "readwn" in current_link or "wuxiax.co" in current_link or "novelmt.com" in current_link or "fannovels.com" in current_link or "novelmtl.com" in current_link:
+                    await asyncio.sleep(1.0)
                     if i % 25 == 0:
-                        await asyncio.sleep(4.1)
+                        await asyncio.sleep(3)
+                    if i % 50 == 0:
+                        await asyncio.sleep(4.5)
                 try:
                     output = await self.getcontent(current_link, css, path, self.bot, sel_tag, scraper)
                     chp_text = output[0]
