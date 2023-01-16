@@ -334,7 +334,7 @@ class Translate(commands.Cog):
             os.remove(f"{ctx.author.id}.txt")
             return await ctx.reply("The provided file is bigger than 20mb. Please split the file and translate")
         urls = FileHandler.find_urls_from_text(novel[:3000])
-        print(f"urls : {urls}")
+        # print(f"urls : {urls}")
         scraper = cloudscraper.create_scraper()
         try:
             thumbnail = ""
@@ -345,15 +345,15 @@ class Translate(commands.Cog):
                         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.142 Safari/537.36"
                     })
                     soup = BeautifulSoup(response.text, "lxml")
-                    print(f"url  {url}")
+                    # print(f"url  {url}")
                     thumbnail: str = await FileHandler().get_thumbnail(soup=soup, link=link)
-                    print(f"thub {thumbnail}")
+                    # print(f"thub {thumbnail}")
                     if thumbnail is not None and thumbnail.strip() != "":
                         if scraper.get(thumbnail).status_code == 200:
-                            print("break")
+                            # print("break")
                             break
                         else:
-                            print("else")
+                            # print("else")
                             thumbnail = ""
                     if thumbnail == "":
                         try:
@@ -373,18 +373,26 @@ class Translate(commands.Cog):
 
         except:
             thumbnail = ""
-        print(f"thumbnail {thumbnail}")
+        # print(f"thumbnail {thumbnail}")
         try:
             try:
                 original_Language = FileHandler.find_language(novel)
             except:
                 original_Language = 'NA'
             os.remove(f"{ctx.author.id}.txt")
-            embed = discord.Embed(title=str(f"{name[:240]}"),
+            try:
+                if thumbnail is not None and thumbnail.strip() != "":
+                    avatar = thumbnail
+                else:
+                    avatar = ctx.author.display_avatar
+                des = await FileHandler.get_desc_from_text(GoogleTranslator().translate(novel[:400]))
+            except:
+                des = novel[:400]
+            embed = discord.Embed(title=str(f"{name[:240]}"), description=des,
                                   colour=discord.Colour.blurple())
-            embed.set_thumbnail(url=ctx.author.display_avatar)
-            embed.add_field(name="Translating to", value=language, inline=True)
-            embed.add_field(name="From", value=original_Language, inline=True)
+            embed.set_thumbnail(url=avatar)
+            embed.add_field(name="Translating to", value=language, inline=False)
+            embed.add_field(name="From", value=original_Language, inline=False)
             rep_msg = await rep_msg.edit(content="", embed=embed)
             poke_words = ["elves ", "pokemon", "pokémon", " elf "]
             if any(word in name.lower() for word in poke_words):
@@ -403,6 +411,7 @@ class Translate(commands.Cog):
                     await FileHandler.get_desc_from_text(story[:10000])).strip()
             except:
                 description = await FileHandler.get_desc_from_text(story[:10000])
+            input("waitin")
             await FileHandler().distribute(self.bot, ctx, name, language, original_Language, rawname, description,
                                            thumbnail=thumbnail)
         except Exception as e:
@@ -451,23 +460,32 @@ class Translate(commands.Cog):
         return [app_commands.Choice(name=i, value=i) for i in lst]
 
     async def cc_prog(self, msg: discord.Message, embed: discord.Embed, author_id: int) -> typing.Optional[discord.Message]:
-        bardata = progressBar.filledBar(100, 0, size=20, line="🟥", slider="🟩")
-        embed.add_field(name="Progress", value=f"{bardata[0]}")
-        while author_id in self.bot.crawler:
-            split = self.bot.translator[author_id].split("/")
-            print(type(split[0]))
-            if split[0].isnumeric():
+        bardata = progressBar.filledBar(100, 0, size=10, line="🟥", slider="🟩")
+        embed.add_field(name="Progress", value=f"{bardata[0]}", inline=False)
+        value = 0
+        while author_id in self.bot.translator:
+            out = self.bot.translator[author_id]
+            split = out.split("/")
+            if split[0].isnumeric() and value <= eval(out):
                 embed.set_field_at(index=2,
-                                   name=f"Progress :  {str(round(eval(self.bot.translator[author_id]) * 100, 2))}%",
+                                   name=f"Progress :  {str(round(eval(out) * 100, 2))}%",
                                    value=progressBar.filledBar(int(split[1]), int(split[0]),
-                                                               size=20, line="🟥", slider="🟩")[
+                                                               size=10, line="🟥", slider="🟩")[
                                        0])
                 # print(embed)
                 await msg.edit(embed=embed)
+                value = eval(out)
             else:
-                return
+                break
             await asyncio.sleep(8)
-        return
+
+        embed.set_field_at(index=2,
+                           name=f"Progress :  100%",
+                           value=progressBar.filledBar(100, 100,
+                                                       size=10, line="🟥", slider="🟩")[
+                               0])
+        # print(embed)
+        return await msg.edit(embed=embed)
 
     @commands.hybrid_command(
         help="translate multiple files together one at a time"

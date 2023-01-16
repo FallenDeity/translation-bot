@@ -202,23 +202,31 @@ class Crawler(commands.Cog):
 
     async def cc_prog(self, msg: discord.Message, embed: discord.Embed, author_id: int) -> typing.Optional[
         discord.Message]:
-        bardata = progressBar.filledBar(100, 0, size=20, line="🟥", slider="🟩")
+        value = 0
+        bardata = progressBar.filledBar(100, 0, size=10, line="🟥", slider="🟩")
         embed.add_field(name="Progress", value=f"{bardata[0]}")
         while author_id in self.bot.crawler:
-            split = self.bot.crawler[author_id].split("/")
-            print(type(split[0]))
-            if split[0].isnumeric():
+            out = self.bot.crawler[author_id]
+            split = out.split("/")
+            if split[0].isnumeric() and value <= eval(out):
                 embed.set_field_at(index=0,
-                                   name=f"Progress :  {str(round(eval(self.bot.crawler[author_id]) * 100, 2))}%",
+                                   name=f"Progress :  {str(round(eval(out) * 100, 2))}%",
                                    value=progressBar.filledBar(int(split[1]), int(split[0]),
-                                                               size=20, line="🟥", slider="🟩")[
+                                                               size=10, line="🟥", slider="🟩")[
                                        0])
                 # print(embed)
                 await msg.edit(embed=embed)
+                value = eval(out)
             else:
-                return
+                break
             await asyncio.sleep(8)
-        return
+        embed.set_field_at(index=0,
+                           name=f"Progress :  100%",
+                           value=progressBar.filledBar(100, 100,
+                                                       size=10, line="🟥", slider="🟩")[
+                               0])
+        # print(embed)
+        return await msg.edit(embed=embed)
 
     @commands.hybrid_command(help="stops the tasks initiated by user", aliases=["st"])
     async def stop(self, ctx: commands.Context) -> typing.Optional[discord.Message]:
