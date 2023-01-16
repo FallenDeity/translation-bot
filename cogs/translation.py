@@ -8,6 +8,7 @@ from urllib.parse import urljoin
 import aiofiles
 import cloudscraper
 import discord
+from StringProgressBar import progressBar
 from bs4 import BeautifulSoup
 from deep_translator import GoogleTranslator
 from discord import app_commands
@@ -332,8 +333,6 @@ class Translate(commands.Cog):
         if (size := os.path.getsize(f"{ctx.author.id}.txt")) > 18 * 10 ** 6:
             os.remove(f"{ctx.author.id}.txt")
             return await ctx.reply("The provided file is bigger than 20mb. Please split the file and translate")
-        msg_content = f"> **✅ Started translating 📔 {name}. Translating to {language}.**"
-        rep_msg = await rep_msg.edit(content=msg_content)
         urls = FileHandler.find_urls_from_text(novel[:3000])
         print(f"urls : {urls}")
         scraper = cloudscraper.create_scraper()
@@ -381,6 +380,12 @@ class Translate(commands.Cog):
             except:
                 original_Language = 'NA'
             os.remove(f"{ctx.author.id}.txt")
+            embed = discord.Embed(title=str(f"{name[:240]}"),
+                                  colour=discord.Colour.blurple())
+            embed.set_thumbnail(url=ctx.author.display_avatar)
+            embed.add_field("Translating to", value=language, inline=True)
+            embed.add_field("From", value=original_Language, inline=True)
+            rep_msg = await rep_msg.edit(content="", embed=embed)
             poke_words = ["elves ", "pokemon", "pokémon", " elf "]
             if any(word in name.lower() for word in poke_words):
                 term_dict = terms("pokemon")
@@ -388,7 +393,7 @@ class Translate(commands.Cog):
                 await ctx.send("Added pokemon terms", delete_after=5)
             liz = [novel[i: i + 1800] for i in range(0, len(novel), 1800)]
             self.bot.translator[ctx.author.id] = f"0/{len(liz)}"
-            asyncio.create_task(self.cc_prog(rep_msg, msg_content, ctx.author.id))
+            asyncio.create_task(self.cc_prog(rep_msg, embed=embed, author_id=ctx.author.id))
             translate = Translator(self.bot, ctx.author.id, language)
             story = await translate.start(liz)
             async with aiofiles.open(f"{ctx.author.id}.txt", "w", encoding="utf-8") as f:
@@ -445,27 +450,23 @@ class Translate(commands.Cog):
         lst = [i for i in self.bot.all_langs if language.lower() in i.lower()][:25]
         return [app_commands.Choice(name=i, value=i) for i in lst]
 
-    async def cc_prog(self, msg: discord.Message, msg_content: str, author_id: int) -> typing.Optional[discord.Message]:
-        value = 0
-        while author_id in self.bot.translator:
-            await asyncio.sleep(10)
-            if author_id not in self.bot.translator:
-                content = msg_content + f"\nProgress > **🚄`Completed`    {100}%**"
-                msg = await msg.edit(content=content)
-                return None
-            try:
-                if eval(self.bot.translator[author_id]) < value:
-                    content = msg_content + f"\nProgress > **🚄`Completed`    {100}%**"
-                    msg = await msg.edit(content=content)
-                    return None
-                else:
-                    value = eval(self.bot.translator[author_id])
-                    out = str(round(value * 100, 2))
-            except Exception as e:
-                print(e)
-                out = ""
-            content = msg_content + f"\nProgress > **🚄`{self.bot.translator[author_id]}`    {out}%**"
-            msg = await msg.edit(content=content)
+    async def cc_prog(self, msg: discord.Message, embed: discord.Embed, author_id: int) -> typing.Optional[discord.Message]:
+        bardata = progressBar.filledBar(100, 0, size=20, line="🟥", slider="🟩")
+        embed.add_field(name="Progress", value=f"{bardata[0]}")
+        while author_id in self.bot.crawler:
+            split = self.bot.translator[author_id].split("/")
+            print(type(split[0]))
+            if split[0].isnumeric():
+                embed.set_field_at(index=2,
+                                   name=f"Progress :  {str(round(eval(self.bot.translator[author_id]) * 100, 2))}%",
+                                   value=progressBar.filledBar(int(split[1]), int(split[0]),
+                                                               size=20, line="🟥", slider="🟩")[
+                                       0])
+                # print(embed)
+                await msg.edit(embed=embed)
+            else:
+                return
+            await asyncio.sleep(8)
         return
 
     @commands.hybrid_command(

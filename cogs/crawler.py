@@ -203,7 +203,6 @@ class Crawler(commands.Cog):
     async def cc_prog(self, msg: discord.Message, embed: discord.Embed, author_id: int) -> typing.Optional[
         discord.Message]:
         bardata = progressBar.filledBar(100, 0, size=20, line="🟥", slider="🟩")
-        print(bardata[0])
         embed.add_field(name="Progress", value=f"{bardata[0]}")
         while author_id in self.bot.crawler:
             split = self.bot.crawler[author_id].split("/")
