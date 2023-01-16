@@ -286,7 +286,7 @@ class FileHandler:
         meta = soup.find_all("meta")
         for i in meta:
             if i.get("property") == "og:image":
-                return i.get("content", "")
+                return urljoin(link, i.get("content", ""))
         return ""
 
     async def distribute(
