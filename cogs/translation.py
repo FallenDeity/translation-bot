@@ -383,8 +383,8 @@ class Translate(commands.Cog):
             embed = discord.Embed(title=str(f"{name[:240]}"),
                                   colour=discord.Colour.blurple())
             embed.set_thumbnail(url=ctx.author.display_avatar)
-            embed.add_field("Translating to", value=language, inline=True)
-            embed.add_field("From", value=original_Language, inline=True)
+            embed.add_field(name="Translating to", value=language, inline=True)
+            embed.add_field(name="From", value=original_Language, inline=True)
             rep_msg = await rep_msg.edit(content="", embed=embed)
             poke_words = ["elves ", "pokemon", "pokémon", " elf "]
             if any(word in name.lower() for word in poke_words):
