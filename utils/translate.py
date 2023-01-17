@@ -18,8 +18,22 @@ class Translator:
             translated = GoogleTranslator(
                 source="auto", target=self.language
             ).translate_batch(chapter)
-        except:
-            translated = MyMemoryTranslator(source="auto", target=self.language).translate_batch(chapter)
+        except Exception as e:
+            try:
+                if "text must be a valid text" in str(e):
+                    for c in chapter:
+                        if not isinstance(c, str) or c.isdigit():
+                            chapter.remove(c)
+                    translated = GoogleTranslator(source="auto", target=self.language).translate_batch(chapter)
+                else:
+                    chp1 = chapter[:len(chapter) // 2]
+                    chp2 = chapter[len(chapter) // 2:]
+                    translated = GoogleTranslator(source="auto", target=self.language).translate_batch(chp1)
+                    new_tr = GoogleTranslator(source="auto", target=self.language).translate_batch(chp2)
+                    for tr in new_tr:
+                        translated.append(tr)
+            except:
+                translated = MyMemoryTranslator(source="auto", target=self.language).translate_batch(chapter)
         return num, translated
 
     def translates(self, chapters: t.List[str]) -> None:
