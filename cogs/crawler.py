@@ -577,7 +577,6 @@ class Crawler(commands.Cog):
                         timeout=16.0,
                     )
                 except asyncio.TimeoutError:
-                    print(' Timeout error')
                     try:
                         os.remove(f"{ctx.author.id}.txt")
                     except:
@@ -851,7 +850,6 @@ class Crawler(commands.Cog):
                         timeout=16.0,
                     )
                 except asyncio.TimeoutError:
-                    print(' Timeout error')
                     try:
                         os.remove(f"{ctx.author.id}.txt")
                     except:
