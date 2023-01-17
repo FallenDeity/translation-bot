@@ -880,7 +880,7 @@ class Crawler(commands.Cog):
                     soup=soup, link=firstchplink)).strip()
             except:
                 description = await FileHandler.get_description(soup=soup)
-        embed = discord.Embed(title=str(f"{title_name[:240]}"), description=description,
+        embed = discord.Embed(title=str(f"{title_name[:240]}"), description=description[:400],
                               colour=discord.Colour.blurple())
         embed.set_thumbnail(url=ctx.author.display_avatar)
         embed.set_image(url="https://cdn.discordapp.com/attachments/1004050326606852237/1064751851481870396"
@@ -914,9 +914,17 @@ class Crawler(commands.Cog):
                 if "readwn" in current_link or "wuxiax.co" in current_link or "novelmt.com" in current_link or "fannovels.com" in current_link or "novelmtl.com" in current_link:
                     await asyncio.sleep(1.0)
                     if i % 25 == 0:
-                        await asyncio.sleep(3)
+                        await asyncio.sleep(2.5)
                     if i % 50 == 0:
-                        await asyncio.sleep(4.5)
+                        await asyncio.sleep(4)
+                    if random.randint(0, 28) == 10:
+                        try:
+                            embed.set_field_at(index=0, name="Progress",
+                                               value=f"Crawled {chp_count} pages  "
+                                                     f"{discord.utils.format_dt(datetime.datetime.now(), style='R')}")
+                            msg = await msg.edit(embed=embed)
+                        except:
+                            pass
                 try:
                     output = await self.getcontent(current_link, css, path, self.bot, sel_tag, scraper)
                     chp_text = output[0]
@@ -944,7 +952,7 @@ class Crawler(commands.Cog):
                 chp_count += 1
                 crawled_urls.append(current_link)
                 current_link = output[1]
-                if random.randint(0, 65) == 10 or chp_count % 100 == 0:
+                if random.randint(0, 54) == 10 or chp_count % 100 == 0:
                     try:
                         embed.set_field_at(index=0, name="Progress",
                                            value=f"Crawled {chp_count} pages  "
@@ -962,6 +970,10 @@ class Crawler(commands.Cog):
                         await FileHandler.get_desc_from_text()[:500]).strip()
             except:
                 pass
+            embed.set_image(url="")
+            embed.set_field_at(index=0, name="Progress",
+                               value=f"Completed crawling {chp_count} pages")
+            msg = await msg.edit(embed=embed)
             await ctx.send(f"> **crawled {i} chapters**")
             return await FileHandler().crawlnsend(ctx, self.bot, title, title_name, original_Language,
                                                   description=description)
