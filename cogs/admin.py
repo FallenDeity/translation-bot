@@ -1,10 +1,8 @@
 import asyncio
 import datetime
 import gc
-import os
 
 import discord
-import heroku3
 from discord.ext import commands
 
 from core import Raizel
@@ -187,15 +185,6 @@ class Admin(commands.Cog):
         # h = heroku3.from_key(os.getenv("APIKEY"))
         # app = h.app(os.getenv("APPNAME"))
         # app.restart()
-
-    @commands.has_role(1020638168237740042)
-    @commands.hybrid_command(help="Gives the logger for debug")
-    async def logger(self, ctx: commands.Context, lines: int = 20):
-        h = heroku3.from_key(os.getenv("APIKEY"))
-        log = h.get_app_log(os.getenv("APPNAME"), lines=lines, timeout=10)
-        return await ctx.send(embed=discord.Embed(title=f"Logs of {os.getenv('APPNAME')}", description=str(log)[:3500]),
-                              ephemeral=True, delete_after=60)
-        # app = h.app(os.getenv("APPNAME"))
 
     @commands.hybrid_command(help="Give the latency and uptime of the bot... ")
     async def status(self, ctx: commands.Context):
