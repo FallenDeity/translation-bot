@@ -778,7 +778,8 @@ class Crawler(commands.Cog):
                     psrt = url
             if psrt == '':
                 return await ctx.send(
-                    "We couldn't find the selector for next chapter. Please check the links or provide the css selector or check with turning on cloudscrape as true")
+                    "We couldn't find the selector for next chapter. Please check the links or provide the css "
+                    "selector or check with turning on cloudscrape as true")
             href = [i for i in soup.find_all("a") if i.get("href") == psrt]
             # print(href)
             path = self.xpath_soup(href[0])
@@ -870,18 +871,25 @@ class Crawler(commands.Cog):
                             pass
                         await chk_msg.delete()
                         return None
-        msg = await msg.edit(content=f"> :white_check_mark:  Started crawling from 📔 {title_name}")
         crawled_urls = []
         repeats = 0
         try:
-            description = GoogleTranslator(source="auto", target="english").translate(
-                (await FileHandler.get_description(soup))[:500]).strip()
+            description = GoogleTranslator().translate(await FileHandler.get_description(
+                soup=soup, link=firstchplink, next="true")).strip()
         except:
             try:
-                description = await FileHandler.get_description(soup)
+                description = GoogleTranslator().translate(await FileHandler.get_description(
+                    soup=soup, link=firstchplink)).strip()
             except:
-                description = ""
-
+                description = await FileHandler.get_description(soup=soup)
+        embed = discord.Embed(title=str(f"{title_name[:240]}"), description=description,
+                              colour=discord.Colour.blurple())
+        embed.set_thumbnail(url=ctx.author.display_avatar)
+        embed.set_image(url="https://cdn.discordapp.com/attachments/1004050326606852237/1064751851481870396"
+                            "/loading_pi.gif")
+        msg = await msg.edit(content="",
+                             embed=embed)
+        embed.add_field(name="Progress",  value=chp_count)
         try:
             self.bot.crawler[ctx.author.id] = f"0/{noofchapters}"
             for i in range(1, noofchapters):
@@ -899,7 +907,8 @@ class Crawler(commands.Cog):
                     del self.bot.crawler[ctx.author.id]
                     if current_link == firstchplink and i < 10:
                         return await ctx.reply(
-                            'Error occurred . Some problem in the site. please try with second and third chapter or give valid css selector for next page button')
+                            'Error occurred . Some problem in the site. please try with second and third chapter or '
+                            'give valid css selector for next page button')
                     if sel_tag:
                         return await ctx.send(" There is some problem with the provided selector")
                     else:
@@ -939,8 +948,8 @@ class Crawler(commands.Cog):
                 current_link = output[1]
                 if random.randint(0, 65) == 10 or chp_count % 100 == 0:
                     try:
-                        msg = await msg.edit(
-                            content=f"> :white_check_mark:  Started crawling from 📔 {title_name}\n**Crawled {chp_count} pages**")
+                        embed.set_field_at(index=0, name="Progress", value=f"Crawled {chp_count} pages")
+                        msg = await msg.edit(embed=embed)
                     except:
                         pass
                     await asyncio.sleep(0.5)

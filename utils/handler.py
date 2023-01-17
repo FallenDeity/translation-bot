@@ -18,6 +18,7 @@ from PyDictionary import PyDictionary
 from deep_translator import single_detection
 from discord.ext import commands
 from ebooklib import epub
+from readabilipy import simple_json_from_html_string
 from textblob import TextBlob
 from bs4 import BeautifulSoup
 
@@ -57,9 +58,21 @@ class FileHandler:
         return re.sub(r'(\n\s*)+\n', '\n', text[:500].strip())
 
     @staticmethod
-    async def get_description(soup: "BeautifulSoup", link: str = "empty") -> str:
+    async def get_description(soup: "BeautifulSoup", link: str = "empty", next: str = None) -> str:
         aliases = ("description", "Description", "DESCRIPTION", "desc", "Desc", "DESC")
         description = ""
+        if next:
+            scraper = cloudscraper.CloudScraper()
+            response = scraper.get(link)
+            response.encoding = response.apparent_encoding
+            article = simple_json_from_html_string(response.text)
+            text = ""
+            temp = article['plain_text']
+            for i in temp:
+                text += i['text'] + "\n"
+            description = await FileHandler.get_desc_from_text(text)
+            if description is not None and description.strip() != "":
+                return description
         if "69shu" in link:
             scraper = cloudscraper.CloudScraper()  # CloudScraper inherits from requests.Session
             href = urljoin(link, parsel.Selector(scraper.get(link).text).css("div.titxt ::attr(href)").extract_first())
