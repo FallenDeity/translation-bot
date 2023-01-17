@@ -8,6 +8,7 @@ from urllib.parse import urljoin
 import aiofiles
 import cloudscraper
 import discord
+from StringProgressBar import progressBar
 from bs4 import BeautifulSoup
 from deep_translator import GoogleTranslator
 from discord import app_commands
@@ -311,17 +312,16 @@ class Termer(commands.Cog):
             if "pdf" in file_type:
                 await FileHandler.pdf_to_txt(ctx)
             novel = await FileHandler().read_file(ctx)
-        if (size := os.path.getsize(f"{ctx.author.id}.txt")) > 21 * 10 ** 6:
+        if (size := os.path.getsize(f"{ctx.author.id}.txt")) > 18 * 10 ** 6:
             os.remove(f"{ctx.author.id}.txt")
             return await ctx.reply("The provided file is bigger than 20mb. Please split the file and translate")
         rep_msg = await rep_msg.edit(content=f"> **✅Terming started. **")
         novel = self.term_raw(novel, term_dict)
-        msg_content = f"> **✅Terming completed.. Started Translating 📔{novelname} Translating to {language}.**"
+        msg_content = f"> **✅Terming completed.. Started Translating 📔{name} Translating to {language}.**"
         rep_msg = await rep_msg.edit(
             content=msg_content
         )
         urls = FileHandler.find_urls_from_text(novel[:3000])
-        print(f"urls : {urls}")
         scraper = cloudscraper.create_scraper()
         try:
             thumbnail = ""
@@ -332,15 +332,15 @@ class Termer(commands.Cog):
                         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.142 Safari/537.36"
                     })
                     soup = BeautifulSoup(response.text, "lxml")
-                    print(f"url  {url}")
-                    thumbnail: str = await FileHandler().get_thumbnail(soup=soup, link=link)
+                    # print(f"url  {url}")
+                    thumbnail: str = await FileHandler().get_thumbnail(soup=soup, link=url)
                     print(f"thub {thumbnail}")
                     if thumbnail is not None and thumbnail.strip() != "":
                         if scraper.get(thumbnail).status_code == 200:
                             print("break")
                             break
                         else:
-                            print("else")
+                            # print("else")
                             thumbnail = ""
                     if thumbnail == "":
                         try:
@@ -360,13 +360,27 @@ class Termer(commands.Cog):
 
         except:
             thumbnail = ""
-        print(f"thumbnail {thumbnail}")
+        # print(f"thumbnail {thumbnail}")
         try:
             os.remove(f"{ctx.author.id}.txt")
             original_Language = FileHandler.find_language(novel)
+            try:
+                if thumbnail is not None and thumbnail.strip() != "":
+                    avatar = thumbnail
+                else:
+                    avatar = ctx.author.display_avatar
+                des = await FileHandler.get_desc_from_text(GoogleTranslator().translate(novel[:400]))
+            except:
+                des = novel[:400]
+            embed = discord.Embed(title=str(f"{name[:240]}"), description=des,
+                                  colour=discord.Colour.blurple())
+            embed.set_thumbnail(url=avatar)
+            embed.add_field(name="Translating to", value=language, inline=False)
+            embed.add_field(name="From", value=original_Language, inline=False)
+            rep_msg = await rep_msg.edit(content="", embed=embed)
             liz = [novel[i: i + 1800] for i in range(0, len(novel), 1800)]
             self.bot.translator[ctx.author.id] = f"0/{len(liz)}"
-            asyncio.create_task(self.cc_prog(rep_msg, msg_content, ctx.author.id))
+            asyncio.create_task(self.cc_prog(rep_msg, embed, ctx.author.id))
             translate = Translator(self.bot, ctx.author.id, language)
             story = await translate.start(liz)
             async with aiofiles.open(f"{ctx.author.id}.txt", "w", encoding="utf-8") as f:
@@ -407,28 +421,34 @@ class Termer(commands.Cog):
         lst = [i for i in self.bot.all_langs if language.lower() in i.lower()][:25]
         return [app_commands.Choice(name=i, value=i) for i in lst]
 
-    async def cc_prog(self, msg: discord.Message, msg_content: str, author_id: int) -> typing.Optional[discord.Message]:
+    async def cc_prog(self, msg: discord.Message, embed: discord.Embed, author_id: int) -> typing.Optional[
+        discord.Message]:
+        bardata = progressBar.filledBar(100, 0, size=10, line="🟥", slider="🟩")
+        embed.add_field(name="Progress", value=f"{bardata[0]}", inline=False)
         value = 0
         while author_id in self.bot.translator:
-            await asyncio.sleep(10)
-            if author_id not in self.bot.translator:
-                content = msg_content + f"\nProgress > **🚄`Completed`    {100}%**"
-                msg = await msg.edit(content=content)
-                return None
-            try:
-                if eval(self.bot.translator[author_id]) < value:
-                    content = msg_content + f"\nProgress > **🚄`Completed`    {100}%**"
-                    msg = await msg.edit(content=content)
-                    return None
-                else:
-                    value = eval(self.bot.translator[author_id])
-                    out = str(round(value * 100, 2))
-            except Exception as e:
-                print(e)
-                out = ""
-            content = msg_content + f"\nProgress > **🚄`{self.bot.translator[author_id]}`    {out}%**"
-            msg = await msg.edit(content=content)
-        return
+            out = self.bot.translator[author_id]
+            split = out.split("/")
+            if split[0].isnumeric() and value <= eval(out):
+                embed.set_field_at(index=2,
+                                   name=f"Progress :  {str(round(eval(out) * 100, 2))}%",
+                                   value=progressBar.filledBar(int(split[1]), int(split[0]),
+                                                               size=10, line="🟥", slider="🟩")[
+                                       0])
+                # print(embed)
+                await msg.edit(embed=embed)
+                value = eval(out)
+            else:
+                break
+            await asyncio.sleep(8)
+
+        embed.set_field_at(index=2,
+                           name=f"Progress :  100%",
+                           value=progressBar.filledBar(100, 100,
+                                                       size=10, line="🟥", slider="🟩")[
+                               0])
+        # print(embed)
+        return await msg.edit(embed=embed)
 
     @termer.autocomplete("term")
     async def translate_complete(

@@ -250,6 +250,8 @@ class Library(commands.Cog):
                     allnovels.reverse()
         print("got all novels")
         full_size = 0
+        if not allnovels:
+            return await ctx.send("> **No results found.**")
         if show_list is True and no_of_novels == 300:
             no_of_novels = 1000
         if len(allnovels) >= no_of_novels:

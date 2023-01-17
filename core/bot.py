@@ -9,7 +9,7 @@ import aiohttp
 import discord
 import nltk
 from discord.ext import commands
-from filestack import Client
+# from filestack import Client
 from mega import Mega
 
 from languages.languages import choices
@@ -23,7 +23,7 @@ class Raizel(commands.Bot):
     con: aiohttp.ClientSession
     boot: datetime.datetime.utcnow()
     allowed: list[str]
-    drive: Client
+    # drive: Client
     mongo: Mongo
 
     def __init__(self) -> None:
@@ -69,7 +69,7 @@ class Raizel(commands.Bot):
         await self.load_extension("jishaku")
         self.allowed = sites
         self.con = aiohttp.ClientSession()
-        self.drive = Client(os.getenv("FILE"))
+        # self.drive = Client(os.getenv("FILE"))
         self.mongo = Mongo()
         print("Connected to mongo db")
         self.blocked: list[int] = await self.mongo.blocker.get_all_banned_users()
@@ -83,12 +83,15 @@ class Raizel(commands.Bot):
         except Exception as e:
             try:
                 self.mega = Mega().login()
-                await channel.send("> <@&1020638168237740042> **Couldn't connect with Mega. some problem occured with mega acount**", allowed_mentions=discord.AllowedMentions(roles=False))
+                await channel.send(f"> <@&1020638168237740042> **Couldn't connect with Mega. some problem occured "
+                                   f"with mega account**\n{e}", allowed_mentions=discord.AllowedMentions(roles=False))
                 print("mega connection failed...connected anonymously....Please check password or account status")
             except:
                 await channel.send(
-                    "> <@&1020638168237740042> **Couldn't connect with Mega servers. some problem with connection")
-                print("mega login anonymously failed ..something wrong with mega", allowed_mentions=discord.AllowedMentions(roles=False))
+                    f"> <@&1020638168237740042> **Couldn't connect with Mega servers. "
+                    f"some problem with connection \n{e}",
+                    allowed_mentions=discord.AllowedMentions(roles=False))
+                print("mega login anonymously failed ..something wrong with mega",)
             print(e)
         # await self.tree.sync()
         await channel.send(embed=discord.Embed(description=f"Bot is up now"))
