@@ -215,7 +215,6 @@ class Crawler(commands.Cog):
                                    value=progressBar.filledBar(int(split[1]), int(split[0]),
                                                                size=10, line="🟥", slider="🟩")[
                                        0] + f"  {discord.utils.format_dt(datetime.datetime.now(), style='R')}")
-                # print(embed)
                 await msg.edit(embed=embed)
                 value = eval(out)
             else:
