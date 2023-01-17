@@ -84,12 +84,14 @@ class Raizel(commands.Bot):
             try:
                 self.mega = Mega().login()
                 await channel.send(f"> <@&1020638168237740042> **Couldn't connect with Mega. some problem occured "
-                                   f"with mega acount**\n{e}", allowed_mentions=discord.AllowedMentions(roles=False))
+                                   f"with mega account**\n{e}", allowed_mentions=discord.AllowedMentions(roles=False))
                 print("mega connection failed...connected anonymously....Please check password or account status")
             except:
                 await channel.send(
-                    "> <@&1020638168237740042> **Couldn't connect with Mega servers. some problem with connection")
-                print("mega login anonymously failed ..something wrong with mega", allowed_mentions=discord.AllowedMentions(roles=False))
+                    f"> <@&1020638168237740042> **Couldn't connect with Mega servers. "
+                    f"some problem with connection \n{e}",
+                    allowed_mentions=discord.AllowedMentions(roles=False))
+                print("mega login anonymously failed ..something wrong with mega",)
             print(e)
         # await self.tree.sync()
         await channel.send(embed=discord.Embed(description=f"Bot is up now"))
