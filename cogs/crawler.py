@@ -974,7 +974,6 @@ class Crawler(commands.Cog):
             embed.set_field_at(index=0, name="Progress",
                                value=f"Completed crawling {chp_count} pages")
             msg = await msg.edit(embed=embed)
-            await ctx.send(f"> **crawled {i} chapters**")
             return await FileHandler().crawlnsend(ctx, self.bot, title, title_name, original_Language,
                                                   description=description)
         except Exception as e:
