@@ -1,5 +1,6 @@
 import asyncio
 import concurrent.futures
+import datetime
 import gc
 import itertools
 import os
@@ -213,7 +214,7 @@ class Crawler(commands.Cog):
                                    name=f"Progress :  {str(round(eval(out) * 100, 2))}%",
                                    value=progressBar.filledBar(int(split[1]), int(split[0]),
                                                                size=10, line="🟥", slider="🟩")[
-                                       0])
+                                       0] + f"  {discord.utils.format_dt(datetime.datetime.now(), style='R')}")
                 # print(embed)
                 await msg.edit(embed=embed)
                 value = eval(out)
@@ -948,7 +949,9 @@ class Crawler(commands.Cog):
                 current_link = output[1]
                 if random.randint(0, 65) == 10 or chp_count % 100 == 0:
                     try:
-                        embed.set_field_at(index=0, name="Progress", value=f"Crawled {chp_count} pages")
+                        embed.set_field_at(index=0, name="Progress",
+                                           value=f"Crawled {chp_count} pages  "
+                                                 f"{discord.utils.format_dt(datetime.datetime.now(), style='R')}")
                         msg = await msg.edit(embed=embed)
                     except:
                         pass

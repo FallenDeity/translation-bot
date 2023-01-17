@@ -1,4 +1,5 @@
 import asyncio
+import datetime
 import gc
 import os
 import random
@@ -470,8 +471,7 @@ class Translate(commands.Cog):
                                    name=f"Progress :  {str(round(eval(out) * 100, 2))}%",
                                    value=progressBar.filledBar(int(split[1]), int(split[0]),
                                                                size=10, line="🟥", slider="🟩")[
-                                       0])
-                # print(embed)
+                                       0] + f"  {discord.utils.format_dt(datetime.datetime.now(), style='R')}")
                 await msg.edit(embed=embed)
                 value = eval(out)
             else:
