@@ -137,7 +137,7 @@ class CssSelector:
             return ["#A3", "div.con_top > a:nth-child(3)"]
         elif "m.longteng788.com/" in link:
             return ["#pb_next", "#_52mb_h1"]
-        elif "m.75zw.com/" in link:
+        elif "m.75zw.com/" in link or "m.77z5.com" in link:
             return ["#chapter > div.pager.z1 > a:nth-child(3)", "#chapter > div.path > a:nth-child(3) > font > font"]
         elif "www.wnmtl.org" in link:
             return ["#nextBtn", "#navBookName"]
