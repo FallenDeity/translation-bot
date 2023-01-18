@@ -217,6 +217,10 @@ class ErrorHandler(commands.Cog):
             )
         elif "CloudflareChallengeError" in str(error):
             await ctx.send(embed=discord.Embed(description="Error occured in bypassing cloudflare challenge. This site is not supported by bot for now.", colour=discord.Color.red()))
+        elif "Missing Access" in str(error):
+            await ctx.send(embed=discord.Embed(
+                description="> **Couldn't access the link provided. Bot doesn't have access to it**",
+                colour=discord.Color.red()))
         else:
             print(error)
             await ctx.send(
