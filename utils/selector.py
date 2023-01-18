@@ -77,6 +77,8 @@ class CssSelector:
             return "body > div.container > div.row.row-detail > div > div ::text"
         elif "www.ops8.com" in link:
             return "#BookText ::text"
+        elif "m.77z5.com" in link:
+            return "#chaptercontent ::text"
         else:
             return "* ::text"
 
@@ -137,12 +139,14 @@ class CssSelector:
             return ["#A3", "div.con_top > a:nth-child(3)"]
         elif "m.longteng788.com/" in link:
             return ["#pb_next", "#_52mb_h1"]
-        elif "m.75zw.com/" in link or "m.77z5.com" in link:
+        elif "m.75zw.com/" in link:
             return ["#chapter > div.pager.z1 > a:nth-child(3)", "#chapter > div.path > a:nth-child(3) > font > font"]
         elif "www.wnmtl.org" in link:
             return ["#nextBtn", "#navBookName"]
         elif "m.akshu8.com" in link or "soruncg.com" in link:
             return ["#container > div > div > div.reader-main > div.section-opt.m-bottom-opt > a:nth-child(5)", "title"]
+        elif "m.77z5.com" in link:
+            return ["#pt_next", "#top > span > font > font:nth-child(3)"]
         elif "m.yifan.net/" in link:
             return ["#pb_next", "#read > div.header > span.title"]
         elif "www.yifan.net" in link:
