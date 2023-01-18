@@ -500,10 +500,10 @@ class Crawler(commands.Cog):
             )
         try:
             description = GoogleTranslator(source="auto", target="english").translate(
-                (await FileHandler.get_description(soup, link))[:500]).strip()
+                (await FileHandler.get_description(soup, link, title=title_name))[:500]).strip()
         except:
             try:
-                description = await FileHandler.get_description(soup, link)
+                description = await FileHandler.get_description(soup, link, title=title_name)
             except:
                 description = ""
 
@@ -793,6 +793,7 @@ class Crawler(commands.Cog):
         full_text = "Source : " + firstchplink + '\n\n'
         no_of_tries = 0
         original_Language = FileHandler.find_language("title_name " + title)
+        org_title = title
         if title is None or str(title).strip() == "" or title == "None":
             title = f"{ctx.author.id}_crl"
             title_name = firstchplink
@@ -873,13 +874,13 @@ class Crawler(commands.Cog):
         repeats = 0
         try:
             description = GoogleTranslator().translate(await FileHandler.get_description(
-                soup=soup, link=firstchplink, next="true")).strip()
+                soup=soup, link=firstchplink, next="true", title=org_title)).strip()
         except:
             try:
                 description = GoogleTranslator().translate(await FileHandler.get_description(
-                    soup=soup, link=firstchplink)).strip()
+                    soup=soup, link=firstchplink, title=org_title)).strip()
             except:
-                description = await FileHandler.get_description(soup=soup)
+                description = await FileHandler.get_description(soup=soup, title=org_title)
         embed = discord.Embed(title=str(f"{title_name[:240]}"), description=description[:400],
                               colour=discord.Colour.blurple())
         embed.set_thumbnail(url=ctx.author.display_avatar)
@@ -967,7 +968,7 @@ class Crawler(commands.Cog):
             try:
                 if description is None or description.strip() == "":
                     description = GoogleTranslator(source="auto", target="english").translate(
-                        await FileHandler.get_desc_from_text()[:500]).strip()
+                        await FileHandler.get_desc_from_text(full_text[:5000], title=org_title)[:500]).strip()
             except:
                 pass
             embed.set_image(url="")
