@@ -177,6 +177,17 @@ class FileHandler:
         return False
 
     @staticmethod
+    async def find_toc_next(soup, link: str = None):
+        selectors = ("下一页", "next page") #下一页  "下一章"- next chp
+        for a in soup.find_all("a"):
+            # print(a.get('href'))
+            if any(selector in a.get_text() for selector in selectors):
+                # print("toc true")
+                return urljoin(link, a.get('href'))
+        print("tocfalse")
+        return None
+
+    @staticmethod
     async def docx_to_txt(ctx: commands.Context, file_type: str):
         msg = await ctx.reply(
             "> **✔Docx file detected please wait while we finish converting.**"

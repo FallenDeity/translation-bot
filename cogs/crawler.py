@@ -6,6 +6,7 @@ import itertools
 import os
 import random
 import time
+import traceback
 import typing
 import typing as t
 from urllib.parse import urljoin
@@ -34,6 +35,27 @@ from utils.selector import CssSelector
 headers = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.142 Safari/537.36"
 }
+
+
+async def find_urls(soup, link, name):
+
+    urls = [
+        f"{j}"
+        for j in [str(i.get("href")) for i in soup.find_all("a")]
+        if name in j and "txt" not in j
+    ]
+    host = urlparse(link).netloc
+    if urls == [] or len(urls) < 30:
+        urls = [
+            f"{j}"
+            for j in [str(i.get("href")) for i in soup.find_all("a")]
+            if "txt" not in j
+        ]
+    utemp = []
+    for url in urls:
+        utemp.append(urljoin(link, url))
+    urls = [u for u in utemp if host in u]
+    return urls
 
 
 class Crawler(commands.Cog):
@@ -214,7 +236,7 @@ class Crawler(commands.Cog):
                                    name=f"Progress :  {str(round(eval(out) * 100, 2))}%",
                                    value=progressBar.filledBar(int(split[1]), int(split[0]),
                                                                size=10, line="🟥", slider="🟩")[
-                                       0] + f"  {discord.utils.format_dt(datetime.datetime.now(), style='R')}")
+                                             0] + f"  {discord.utils.format_dt(datetime.datetime.now(), style='R')}")
                 await msg.edit(embed=embed)
                 value = eval(out)
             else:
@@ -295,6 +317,8 @@ class Crawler(commands.Cog):
             await msg.delete()
             return await ctx.send("We couldn't connect to the provided link. Please check the link")
         novel = {}
+        if int(str(res.status)[0]) == 4:
+            cloudscrape = True
         if cloudscrape:
             scraper = cloudscraper.CloudScraper()  # CloudScraper inherits from requests.Session
             response = scraper.get(link)
@@ -429,7 +453,6 @@ class Crawler(commands.Cog):
         if urls == [] or len(urls) < 30:
             if link[-1] == '/':
                 link = link[:-1]
-
             try:
                 response = requests.get(link, headers=headers, timeout=20)
             except:
@@ -457,26 +480,11 @@ class Crawler(commands.Cog):
             # print(urls)
             title_name = sel.css(maintitleCSS + " ::text").extract_first()
             # print(urls)
+        scraper = cloudscraper.CloudScraper()
         if urls == [] or len(urls) < 30:
-            scraper = cloudscraper.CloudScraper()  # CloudScraper inherits from requests.Session
             response = scraper.get(link)
             soup = BeautifulSoup(response.text, "html.parser", from_encoding=response.encoding)
-            urls = [
-                f"{j}"
-                for j in [str(i.get("href")) for i in soup.find_all("a")]
-                if name in j and "txt" not in j
-            ]
-            host = urlparse(link).netloc
-            if urls == [] or len(urls) < 30:
-                urls = [
-                    f"{j}"
-                    for j in [str(i.get("href")) for i in soup.find_all("a")]
-                    if "txt" not in j
-                ]
-            utemp = []
-            for url in urls:
-                utemp.append(urljoin(link, url))
-            urls = [u for u in utemp if host in u]
+            urls = await find_urls(soup, link, name)
             if len(urls) > 30:
                 cloudscrape = True
                 await ctx.send("Cloudscraper is turned on as cloudflare is detected", delete_after=5)
@@ -484,6 +492,32 @@ class Crawler(commands.Cog):
                 title_name = str(soup.select(maintitleCSS)[0].text)
             except:
                 title_name = "None"
+        if (next_link := await FileHandler.find_toc_next(soup, link)) is not None:
+            print("Multi TOC found")
+            toc_list = [link]
+            while True:
+                toc_list.append(next_link)
+                print(next_link)
+                if cloudscrape:
+                    response = scraper.get(next_link, timeout=10)
+                    soup = BeautifulSoup(response.text, "html.parser")
+                else:
+                    response = await self.bot.con.get(next_link)
+                    soup = BeautifulSoup(await response.read(), "html.parser")
+                toc_urls = await find_urls(soup, next_link, name)
+                for u in toc_urls:
+                    urls.append(u)
+                next_link = await FileHandler.find_toc_next(soup, link)
+                if next_link is None or next_link in toc_list:
+                    break
+            print(len(urls))
+            print(toc_list)
+
+            urls = list(dict.fromkeys(urls))
+            # urls = [*set(urls)]
+        # print(urls)
+        print(len(urls))
+
         if "krmtl.com" in link:
             urls = []
             for i in range(1, max_chapters + 1):
@@ -616,7 +650,10 @@ class Crawler(commands.Cog):
                 await asyncio.sleep(10)
         try:
             self.bot.crawler[ctx.author.id] = f"0/{len(urls)}"
-            thumbnail = await FileHandler().get_thumbnail(soup, link)
+            try:
+                thumbnail = await FileHandler().get_thumbnail(soup, link)
+            except:
+                thumbnail = ""
             embed = discord.Embed(title=str(f"{title[:240]}"), description=description,
                                   colour=discord.Colour.blurple())
             embed.set_thumbnail(url=thumbnail)
@@ -642,6 +679,7 @@ class Crawler(commands.Cog):
                                                           description, thumbnail)
         except Exception as e:
             await ctx.send("> Error occurred .Please report to admin +\n" + str(e))
+            print(traceback.format_exc())
             raise e
         finally:
             try:
@@ -888,7 +926,7 @@ class Crawler(commands.Cog):
                             "/loading_pi.gif")
         msg = await msg.edit(content="",
                              embed=embed)
-        embed.add_field(name="Progress",  value=chp_count)
+        embed.add_field(name="Progress", value=chp_count)
         try:
             self.bot.crawler[ctx.author.id] = f"0/{noofchapters}"
             for i in range(1, noofchapters):
