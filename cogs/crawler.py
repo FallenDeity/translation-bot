@@ -918,7 +918,7 @@ class Crawler(commands.Cog):
                         await asyncio.sleep(2.5)
                     if i % 50 == 0:
                         await asyncio.sleep(4)
-                    if random.randint(0, 28) == 10:
+                    if random.randint(0, 20) == 10:
                         try:
                             embed.set_field_at(index=0, name="Progress",
                                                value=f"Crawled {chp_count} pages  "
@@ -953,7 +953,7 @@ class Crawler(commands.Cog):
                 chp_count += 1
                 crawled_urls.append(current_link)
                 current_link = output[1]
-                if random.randint(0, 54) == 10 or chp_count % 100 == 0:
+                if random.randint(0, 50) == 10 or chp_count % 100 == 0:
                     try:
                         embed.set_field_at(index=0, name="Progress",
                                            value=f"Crawled {chp_count} pages  "
@@ -961,7 +961,7 @@ class Crawler(commands.Cog):
                         msg = await msg.edit(embed=embed)
                     except:
                         pass
-                    await asyncio.sleep(0.5)
+                    await asyncio.sleep(0.1)
 
             with open(title + '.txt', 'w', encoding='utf-8') as f:
                 f.write(full_text)
