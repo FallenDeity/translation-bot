@@ -232,8 +232,8 @@ class Translate(commands.Cog):
             data = await resp.read()
             async with aiofiles.open(f"{ctx.author.id}.{file_type}", "wb") as f:
                 await f.write(data)
-            if "docx" in file_type:
-                await FileHandler.docx_to_txt(ctx, file_type)
+            # if "docx" in file_type:
+            #     await FileHandler.docx_to_txt(ctx, file_type)
             if "epub" in file_type:
                 await FileHandler.epub_to_txt(ctx)
             if "pdf" in file_type:
