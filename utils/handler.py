@@ -25,6 +25,7 @@ from bs4 import BeautifulSoup
 from core.bot import Raizel
 from core.views.linkview import LinkView
 from databases.data import Novel
+from databases.mongo import get_regex_from_name
 from languages import languages
 from utils.category import Categories
 
@@ -48,17 +49,20 @@ class FileHandler:
         return [x[0] for x in url]
 
     @staticmethod
-    async def get_desc_from_text(text: str):
-        desc = ["introduction", "description", "简介", "描述", "描写", "summary"]
+    async def get_desc_from_text(text: str, title: str = None):
+        desc = ["introduction", "description", "简介", "描述", "描写", "summary", "prologue"]
+        if title:
+            text = re.sub(re.compile(get_regex_from_name(title), flags=re.IGNORECASE), "", text)
         for d in desc:
             if d in text.lower():
-                description = re.split(d, text, flags=re.IGNORECASE)[1][:500].replace(":", "").replace("\n\n", "").strip()
+                description = re.split(d, text, flags=re.IGNORECASE)[1][:500].replace(":", "").replace("\n\n",
+                                                                                                       "").strip()
                 description = re.sub(r'(\n\s*)+\n', '\n', description)
                 return description
         return re.sub(r'(\n\s*)+\n', '\n', text[:500].strip())
 
     @staticmethod
-    async def get_description(soup: "BeautifulSoup", link: str = "empty", next: str = None) -> str:
+    async def get_description(soup: "BeautifulSoup", link: str = "empty", next: str = None, title: str = None) -> str:
         aliases = ("description", "Description", "DESCRIPTION", "desc", "Desc", "DESC")
         description = ""
         if next:
@@ -70,7 +74,9 @@ class FileHandler:
             temp = article['plain_text']
             for i in temp:
                 text += i['text'] + "\n"
-            description = await FileHandler.get_desc_from_text(text)
+            if title:
+                text = text.replace(title, "")
+            description = await FileHandler.get_desc_from_text(text, title)
             if description is not None and description.strip() != "":
                 return description
         if "69shu" in link:
@@ -79,7 +85,7 @@ class FileHandler:
             response = scraper.get(href)
             response.encoding = response.apparent_encoding
             description = "\n".join(parsel.Selector(response.text).css("div.navtxt ::text").extract())
-            description = await FileHandler.get_desc_from_text(description)
+            description = await FileHandler.get_desc_from_text(description, title)
             if description is not None and description.strip() != "":
                 return description
         for meta in soup.find_all("meta"):
@@ -170,6 +176,27 @@ class FileHandler:
                 else:
                     segment += 1
         return False
+
+    @staticmethod
+    async def find_toc_next(soup, link: str = None):
+        selectors = ("下一页", "next page", ">") #下一页  "下一章"- next chp 下一页
+        for a in soup.find_all("a"):
+            # print(a.get('href'))
+            if any(selector in a.get_text() for selector in selectors):
+                # print("toc true")
+                return urljoin(link, a.get('href'))
+        print("tocfalse")
+        return None
+
+    @staticmethod
+    async def find_next_chps(soup: BeautifulSoup, link: str = None):
+        selectors = ("下一页", "next page", "下一章", "next chapter")  # 下一页  "下一章"- next chp 下一页
+        for a in soup.find_all("a"):
+            # print(a.get('href'))
+            if any(selector in a.get_text().lower() for selector in selectors):
+                # print("next true")
+                return urljoin(link, a.get('href'))
+        return None
 
     @staticmethod
     async def docx_to_txt(ctx: commands.Context, file_type: str):
@@ -292,8 +319,13 @@ class FileHandler:
                         suffix in i or "/file" in i or midfix in i
                 ):
                     img = i
+                    if "images/logo.png" in img:
+                        continue
                     if "http" not in img:
                         img = urljoin(link, img)
+                    if img == "https://novelsknight.com/wp-content/uploads/2022/10/knight.jpg" or \
+                            "bixiange.me/images/logo.png" in img or "powanjuan.cc/images/logo.png" in img:
+                        continue
                     if scraper.get(img).status_code == 200:
                         return img
         meta = soup.find_all("meta")
@@ -323,7 +355,8 @@ class FileHandler:
             print(e)
             if thumbnail.strip() == "":
                 thumbnail = Categories.thumbnail_from_category(category)
-        embed = discord.Embed(title=str(f"#{next_no} : "+name[:240]), description=description, colour=discord.Colour.dark_gold())
+        embed = discord.Embed(title=str(f"#{next_no} : " + name[:240]), description=description,
+                              colour=discord.Colour.dark_gold())
         embed.add_field(name="Category", value=category)
         embed.add_field(name="Language", value=language)
         embed.set_thumbnail(url=thumbnail)
@@ -354,7 +387,7 @@ class FileHandler:
                         1005668482475643050
                     ) or await bot.fetch_channel(1005668482475643050)
                 await channel.send(
-                        embed=embed, view=view, allowed_mentions=discord.AllowedMentions(users=False)
+                    embed=embed, view=view, allowed_mentions=discord.AllowedMentions(users=False)
                 )
                 download_url = filelnk
             except Exception as e:
@@ -439,7 +472,8 @@ class FileHandler:
             print(e)
             if thumbnail.strip() == "":
                 thumbnail = Categories.thumbnail_from_category(category)
-        embed = discord.Embed(title=str(f"#{next_no} : "+title[:240]), description=description, colour=discord.Colour.dark_gold())
+        embed = discord.Embed(title=str(f"#{next_no} : " + title[:240]), description=description,
+                              colour=discord.Colour.dark_gold())
         embed.add_field(name="Category", value=category)
         embed.add_field(name="Language", value=originallanguage)
         embed.set_thumbnail(url=thumbnail)

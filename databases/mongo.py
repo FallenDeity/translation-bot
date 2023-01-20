@@ -89,6 +89,26 @@ class Library(Database):
             {"_id": _id}, {"$set": {"description": description}}
         )
 
+    async def get_user_novel_count(self, user_id: int = None, _top_200: bool = False) -> dict[int, int]:
+        if user_id is None:
+            top_200_uploaders = await self.library.aggregate(
+                [
+                    {"$group": {"_id": "$uploader", "count": {"$sum": 1}}},
+                    {"$sort": {"count": -1}},
+                    {"$limit": 200},
+                ]
+            ).to_list(None)
+            return {top_200_uploader["_id"]: top_200_uploader["count"] for top_200_uploader in top_200_uploaders}
+        count = await self.library.count_documents({"uploader": user_id})
+        user_rank = await self.library.aggregate(
+            [
+                {"$group": {"_id": "$uploader", "count": {"$sum": 1}}},
+                {"$match": {"count": {"$gt": count}}},
+                {"$count": "count"},
+            ]
+        ).to_list(None)
+        return {user_id: user_rank[0]["count"] + 1 if user_rank else 1}
+
     @property
     async def next_number(self) -> int:
         return await self.get_total_novels + 1

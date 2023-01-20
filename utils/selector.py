@@ -61,7 +61,7 @@ class CssSelector:
             return "#nr1 ::text"
         elif "www.xindingdianxsw.com/" in link:
             return "p ::text"
-        elif "m.akshu8.com" in link or "soruncg.com" in link or "www.630shu.net" in link or "www.yifan.net" in link or "www.soxscc.net" in link:
+        elif "m.akshu8.com" in link or "soruncg.com" in link or "www.630shu.net" in link or "www.yifan.net" in link or "www.soxscc.net" in link or "feixs.com" in link:
             return "#content ::text"
         elif "www.wnmtl.org" in link:
             return "#reader > div > div.chapter-container ::text"
@@ -77,6 +77,14 @@ class CssSelector:
             return "body > div.container > div.row.row-detail > div > div ::text"
         elif "www.ops8.com" in link:
             return "#BookText ::text"
+        elif "m.77z5.com" in link or "m.lw52.com" in link:
+            return "#chaptercontent ::text"
+        elif "mtl-novel.net" in link or "novelnext.com" in link:
+            return "#chr-content ::text"
+        elif "ncode.syosetu.com" in link:
+            return "#novel_p ::text"
+        elif "m.75zw.com/" in link:
+            return "#chapter > div.a75zwcom_i63c9e1d ::text"
         else:
             return "* ::text"
 
@@ -115,6 +123,9 @@ class CssSelector:
             return ["#info > h1", "body > div.content_read > div > div.bookname > h1 ::text"]
         elif "www.ops8.com" in link:
             return ["div.book-title", "#BookCon > h1"]
+        elif "feixs.com" in link:
+            return ["title", "#main > "
+                                                                                                   "div.bookinfo.m10.clearfix > div.info > p.chaptertitle ::text"]
         else:
             return ["title", "title ::text"]
 
@@ -143,17 +154,21 @@ class CssSelector:
             return ["#nextBtn", "#navBookName"]
         elif "m.akshu8.com" in link or "soruncg.com" in link:
             return ["#container > div > div > div.reader-main > div.section-opt.m-bottom-opt > a:nth-child(5)", "title"]
+        elif "m.77z5.com" in link:
+            return ["#pt_next", "#top > span > font > font:nth-child(3)"]
         elif "m.yifan.net/" in link:
             return ["#pb_next", "#read > div.header > span.title"]
         elif "www.yifan.net" in link:
             return ["#book > div.content > div:nth-child(5) > ul > li:nth-child(3) > a", "title"]
         elif "m.630shu.net" in link:
             return ["#pb_next", "title"]
-        elif "m.soxscc.net" in link:
-            return ["#chapter > div.pager > a:nth-child(3)", "#bookname"]
+        # elif "m.soxscc.net" in link:
+        #     return ["#chapter > div.pager > a:nth-child(3)", "#bookname"]
         elif "www.qcxxs.com" in link:
             return ["body > div.container > div.row.row-detail > div > div > div.read_btn > a:nth-child(4)", "body > div.container > div.row.row-detail > div > h2 > a:nth-child(3)"]
         elif "www.gonet.cc" in link:
             return ["body > div.container > div.row.row-detail > div > div > div.read_btn > a:nth-child(4)", "body > div.container > div.row.row-detail > div > h2 > a:nth-child(3) > font > font"]
+        elif "mtl-novel.net" in link:
+            return ["#next_chap", "#chapter > div > div > a"]
         else:
             return [None, "title"]

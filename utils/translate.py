@@ -1,4 +1,5 @@
 import concurrent.futures
+import time
 import typing as t
 
 from deep_translator import GoogleTranslator, MyMemoryTranslator
@@ -14,12 +15,47 @@ class Translator:
         self.order = {}
 
     def translate(self, chapter: t.List[str], num: int) -> t.Tuple[int, t.List[str]]:
+        translated = []
         try:
-            translated = GoogleTranslator(
-                source="auto", target=self.language
-            ).translate_batch(chapter)
-        except:
-            translated = MyMemoryTranslator(source="auto", target=self.language).translate_batch(chapter)
+            try:
+                translated = GoogleTranslator(
+                    source="auto", target=self.language
+                ).translate_batch(chapter)
+            except:
+                time.sleep(3)
+                translated = GoogleTranslator(
+                    source="auto", target=self.language
+                ).translate_batch(chapter)
+        except Exception as e:
+            try:
+                if "text must be a valid text" in str(e):
+                    for c in chapter:
+                        if not isinstance(c, str) or c.isdigit():
+                            chapter.remove(c)
+                    translated = GoogleTranslator(source="auto", target=self.language).translate_batch(chapter)
+                else:
+                    time.sleep(5)
+                    while True:
+                        chp1 = chapter[:len(chapter) // 2]
+                        chp2 = chapter[len(chapter) // 2:]
+                        try:
+                            translated = GoogleTranslator(source="auto", target=self.language).translate_batch(chp1)
+                        except:
+                            translated = chp1
+                            translated.insert(0, "\n\n--->couldn't translate this part")
+                            chapter = chp1
+                        try:
+                            new_tr = GoogleTranslator(source="auto", target=self.language).translate_batch(chp2)
+                        except:
+                            chp2.insert(0, "\n\n--->couldn't translate this part")
+                            chapter = chp2
+                        for tr in new_tr:
+                            translated.append(tr)
+            except:
+                for tr in chapter:
+                    translated.append("\n\n--->couldn't translate this part")
+                    translated.append(tr)
+
         return num, translated
 
     def translates(self, chapters: t.List[str]) -> None:

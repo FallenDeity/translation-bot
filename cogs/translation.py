@@ -232,8 +232,8 @@ class Translate(commands.Cog):
             data = await resp.read()
             async with aiofiles.open(f"{ctx.author.id}.{file_type}", "wb") as f:
                 await f.write(data)
-            if "docx" in file_type:
-                await FileHandler.docx_to_txt(ctx, file_type)
+            # if "docx" in file_type:
+            #     await FileHandler.docx_to_txt(ctx, file_type)
             if "epub" in file_type:
                 await FileHandler.epub_to_txt(ctx)
             if "pdf" in file_type:
@@ -386,7 +386,7 @@ class Translate(commands.Cog):
                     avatar = thumbnail
                 else:
                     avatar = ctx.author.display_avatar
-                des = await FileHandler.get_desc_from_text(GoogleTranslator().translate(novel[:400]))
+                des = await FileHandler.get_desc_from_text(GoogleTranslator().translate(novel[:400]), title=name)
             except:
                 des = novel[:400]
             embed = discord.Embed(title=str(f"{name[:240]}"), description=des,
@@ -409,9 +409,9 @@ class Translate(commands.Cog):
                 await f.write(story)
             try:
                 description = GoogleTranslator(source="auto", target="english").translate(
-                    await FileHandler.get_desc_from_text(story[:10000])).strip()
+                    await FileHandler.get_desc_from_text(story[:10000], title=name)).strip()
             except:
-                description = await FileHandler.get_desc_from_text(story[:10000])
+                description = await FileHandler.get_desc_from_text(story[:10000], title=name)
             await FileHandler().distribute(self.bot, ctx, name, language, original_Language, rawname, description,
                                            thumbnail=thumbnail)
         except Exception as e:
