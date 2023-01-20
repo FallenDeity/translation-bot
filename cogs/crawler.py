@@ -150,7 +150,7 @@ class Crawler(commands.Cog):
                 self.bot.crawler[name] = f"{len(novel)}/{len(urls)}"
             return novel
 
-    async def getcontent(self, links: str, css: str, next_xpath, bot, tag, scraper):
+    async def getcontent(self, links: str, css: str, next_xpath, bot, tag, scraper, next_chp_finder: bool = False):
         try:
             if scraper is not None:
                 response = await self.bot.loop.run_in_executor(None, self.scrape, scraper, links)
@@ -187,17 +187,16 @@ class Crawler(commands.Cog):
                 return ""
             full_chp = full_chp + "\n".join(text)
         try:
-            if tag:
-                raise Exception
-            next_href = sel.xpath(next_xpath + '/@href').extract()[0]
-            next_href = urljoin(links, next_href)
-        except:
-            try:
-                # if css selector is given it will come here due to exception
+            if next_chp_finder:
+                next_href = await FileHandler.find_next_chps(soup, links)
+            elif tag:
                 next_href = sel.css(next_xpath).extract_first()
                 next_href = urljoin(links, next_href)
-            except:
-                next_href = None
+            else:
+                next_href = sel.xpath(next_xpath + '/@href').extract()[0]
+                next_href = urljoin(links, next_href)
+        except:
+            next_href = None
 
         full_chp = full_chp + "\n---------------------xxx---------------------\n\n"
 
@@ -321,9 +320,13 @@ class Crawler(commands.Cog):
             cloudscrape = True
         if cloudscrape:
             scraper = cloudscraper.CloudScraper()  # CloudScraper inherits from requests.Session
-            response = scraper.get(link)
+            response = scraper.get(link, timeout=10)
             soup = BeautifulSoup(response.text, "html.parser", from_encoding=response.encoding)
             soup1 = soup
+            if int(str(response.status_code)[0]) == 4:
+                return await ctx.send(f"couldn't connect to the provided link. its returning {response.status_code} error")
+            else:
+                await ctx.send("> **Cloudflare is detected.. Turned on  the cloudscraper**", delete_after=10)
         else:
             soup = BeautifulSoup(await res.read(), "html.parser", from_encoding=res.get_encoding())
             data = await res.read()
@@ -339,7 +342,8 @@ class Crawler(commands.Cog):
             print(e)
             try:
                 title_name = ""
-                response = requests.get(link, headers=headers)
+                scraper = cloudscraper.CloudScraper()  # CloudScraper inherits from requests.Session
+                response = scraper.get(link, timeout=10)
                 response.encoding = response.apparent_encoding
                 html = response.text
                 sel = parsel.Selector(html)
@@ -450,7 +454,7 @@ class Crawler(commands.Cog):
             for url in urls:
                 utemp.append(urljoin(link, url))
             urls = [u for u in utemp if host in u]
-        if urls == [] or len(urls) < 30:
+        if (urls == [] or len(urls) < 30) and cloudscrape is False:
             if link[-1] == '/':
                 link = link[:-1]
             try:
@@ -758,6 +762,14 @@ class Crawler(commands.Cog):
             return await ctx.reply(
                 f"> Bot is scheduled to restart within 60 sec or after all current tasks are completed.. Please try after bot is restarted")
         title_css = "title"
+        try:
+            res = await self.bot.con.get(firstchplink)
+            # print(await res.text())
+        except Exception as e:
+            print(e)
+            return await ctx.send("We couldn't connect to the provided link. Please check the link")
+        if int(str(res.status)[0]) == 4:
+            cloudscrape = True
         if nextselector is None:
             nextsel = CssSelector.find_next_selector(firstchplink)
             if nextsel[0] is not None:
@@ -767,9 +779,8 @@ class Crawler(commands.Cog):
                 cloudscrape = True
             if "fannovels.com" in firstchplink or "xindingdianxsw.com" in firstchplink or "longteng788.com" in firstchplink or "75zw.com" in firstchplink or "longteng788.com" in firstchplink or "m.akshu8.com" in firstchplink or "www.wnmtl.org" in firstchplink:
                 cloudscrape = False
-        if secondchplink is None and nextselector is None:
-            return await ctx.send("You must give second chapter link or next page css selector")
         msg = await ctx.send("Crawling will be started soon")
+        next_chp_find = False
         if cssselector:
             css = cssselector
             if '::text' not in css:
@@ -797,13 +808,20 @@ class Crawler(commands.Cog):
         htm = response.text
         sel = parsel.Selector(htm)
         sel_tag = False
-        if nextselector is not None:
+        if secondchplink is None and nextselector is None:
+            next_chp_find = True
+            path = ""
+            secondchplink = await FileHandler.find_next_chps(soup, firstchplink)
 
+        if nextselector is not None:
             sel_tag = True
             if '::attr(href)' not in nextselector:
                 nextselector += ' ::attr(href)'
             # print(nextselector)
             path = nextselector
+        elif next_chp_find:
+            if secondchplink is None or secondchplink.strip() == "":
+                return await ctx.send("> couldn't find the next chapters. please report to developer")
         else:
 
             urls = sel.css('a ::attr(href)').extract()
@@ -814,12 +832,20 @@ class Crawler(commands.Cog):
                 if full_url == secondchplink:
                     psrt = url
             if psrt == '':
-                return await ctx.send(
-                    "We couldn't find the selector for next chapter. Please check the links or provide the css "
-                    "selector or check with turning on cloudscrape as true")
-            href = [i for i in soup.find_all("a") if i.get("href") == psrt]
-            # print(href)
-            path = self.xpath_soup(href[0])
+                secondchplink: str = await FileHandler.find_next_chps(soup, firstchplink)
+                if secondchplink is not None and secondchplink.strip() != "":
+                    next_chp_find = True
+                    path = ""
+                    await ctx.send("> bot couldn't find the xpath automatically with given second link. but used "
+                                   "default finder to get the same", delete_after=5)
+                else:
+                    return await ctx.send(
+                        "We couldn't find the selector for next chapter. Please check the links or provide the css "
+                        "selector or check with turning on cloudscrape as true")
+            else:
+                href = [i for i in soup.find_all("a") if i.get("href") == psrt]
+                # print(href)
+                path = self.xpath_soup(href[0])
 
         title = sel.css(f'{title_css} ::text').extract_first()
         if title is None or str(title).strip() == "":
@@ -965,7 +991,7 @@ class Crawler(commands.Cog):
                         except:
                             pass
                 try:
-                    output = await self.getcontent(current_link, css, path, self.bot, sel_tag, scraper)
+                    output = await self.getcontent(current_link, css, path, self.bot, sel_tag, scraper, next_chp_find)
                     chp_text = output[0]
                 except Exception as e:
                     if i <= 10:
@@ -1016,6 +1042,7 @@ class Crawler(commands.Cog):
             return await FileHandler().crawlnsend(ctx, self.bot, title, title_name, original_Language,
                                                   description=description)
         except Exception as e:
+            print(traceback.format_exc())
             await ctx.send("> Error occurred .Please report to admin +\n" + str(e))
             raise e
         finally:

@@ -178,13 +178,23 @@ class FileHandler:
 
     @staticmethod
     async def find_toc_next(soup, link: str = None):
-        selectors = ("下一页", "next page") #下一页  "下一章"- next chp
+        selectors = ("下一页", "next page", ">") #下一页  "下一章"- next chp 下一页
         for a in soup.find_all("a"):
             # print(a.get('href'))
             if any(selector in a.get_text() for selector in selectors):
                 # print("toc true")
                 return urljoin(link, a.get('href'))
         print("tocfalse")
+        return None
+
+    @staticmethod
+    async def find_next_chps(soup: BeautifulSoup, link: str = None):
+        selectors = ("下一页", "next page", "下一章", "next chapter")  # 下一页  "下一章"- next chp 下一页
+        for a in soup.find_all("a"):
+            # print(a.get('href'))
+            if any(selector in a.get_text().lower() for selector in selectors):
+                # print("next true")
+                return urljoin(link, a.get('href'))
         return None
 
     @staticmethod
