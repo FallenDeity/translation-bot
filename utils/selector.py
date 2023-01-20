@@ -77,7 +77,7 @@ class CssSelector:
             return "body > div.container > div.row.row-detail > div > div ::text"
         elif "www.ops8.com" in link:
             return "#BookText ::text"
-        elif "m.77z5.com" in link:
+        elif "m.77z5.com" in link or "m.lw52.com" in link:
             return "#chaptercontent ::text"
         else:
             return "* ::text"
