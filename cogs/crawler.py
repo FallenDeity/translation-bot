@@ -497,6 +497,7 @@ class Crawler(commands.Cog):
             except:
                 title_name = "None"
         if (next_link := await FileHandler.find_toc_next(soup, link)) is not None:
+            await ctx.send("> Multiple TOC's found.. getting the urls from TOC's", delete_after=8)
             print("Multi TOC found")
             toc_list = [link]
             while True:
@@ -514,6 +515,7 @@ class Crawler(commands.Cog):
                 next_link = await FileHandler.find_toc_next(soup, link)
                 if next_link is None or next_link in toc_list:
                     break
+            await ctx.send(f"> {len(toc_list)+1} toc's automatically detected ...", delete_after=8)
             print(len(urls))
             print(toc_list)
 
