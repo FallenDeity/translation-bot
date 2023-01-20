@@ -323,8 +323,8 @@ class FileHandler:
                         continue
                     if "http" not in img:
                         img = urljoin(link, img)
-                    if img == "https://novelsknight.com/wp-content/uploads/2022/10/knight.jpg" or "bixiange.me/images" \
-                                                                                                  "/logo.png" in img:
+                    if img == "https://novelsknight.com/wp-content/uploads/2022/10/knight.jpg" or \
+                            "bixiange.me/images/logo.png" in img or "powanjuan.cc/images/logo.png" in img:
                         continue
                     if scraper.get(img).status_code == 200:
                         return img

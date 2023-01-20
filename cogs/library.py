@@ -373,6 +373,36 @@ class Library(commands.Cog):
         await self.bot.mongo.library.update_rating(novel._id, rating)
         await ctx.send("Novel reviewed.")
 
+    @commands.hybrid_command(name="leaderboard", description="Get the bot's leaderboard.")
+    async def leaderboard(self, ctx: commands.Context) -> None:
+        """Get the bot's leaderboard."""
+        msg = await ctx.send("getting leaderboard...please  wait....")
+        user_rank = await self.bot.mongo.library.get_user_novel_count(ctx.author.id)
+        top_200 = await self.bot.mongo.library.get_user_novel_count(_top_200=True)
+        embeds = []
+        top_200 = [(user_id, count) for user_id, count in top_200.items()]
+        chunks = [top_200[i: i + 10] for i in range(0, len(top_200), 10)]
+        n = 1
+        for chunk in chunks:
+            embed = discord.Embed(
+                title="Leaderboard",
+                description=f"**Leaderboard of the bot!**\
+                        \n\n**Your Rank:** {user_rank[ctx.author.id]}",
+                color=discord.Color.random(),
+            )
+            embed.set_footer(text="Thanks for using TranslationBot!", icon_url=self.bot.user.display_avatar)
+            embed.set_thumbnail(url=ctx.author.display_avatar)
+            for user_id, count in chunk:
+                embed.add_field(
+                    name=f"{n}. {count} novels",
+                    value=f"<@{user_id}>",
+                    inline=False,
+                )
+                n += 1
+            embeds.append(embed)
+        await msg.delete(delay=1)
+        await self.buttons(embeds, ctx)
+
 
 async def setup(bot: Raizel) -> None:
     await bot.add_cog(Library(bot))
