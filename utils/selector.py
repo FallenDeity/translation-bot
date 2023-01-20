@@ -124,7 +124,7 @@ class CssSelector:
         elif "www.ops8.com" in link:
             return ["div.book-title", "#BookCon > h1"]
         elif "feixs.com" in link:
-            return ["#main > div.bookinfo.clearfix > div.info > p:nth-child(2) > a > font > font", "#main > "
+            return ["title", "#main > "
                                                                                                    "div.bookinfo.m10.clearfix > div.info > p.chaptertitle ::text"]
         else:
             return ["title", "title ::text"]
