@@ -25,6 +25,7 @@ from bs4 import BeautifulSoup
 from core.bot import Raizel
 from core.views.linkview import LinkView
 from databases.data import Novel
+from databases.mongo import get_regex_from_name
 from languages import languages
 from utils.category import Categories
 
@@ -51,7 +52,7 @@ class FileHandler:
     async def get_desc_from_text(text: str, title: str = None):
         desc = ["introduction", "description", "简介", "描述", "描写", "summary", "prologue"]
         if title:
-            text = text.replace(title, "")
+            text = re.sub(re.compile(get_regex_from_name(title), flags=re.IGNORECASE), "", text)
         for d in desc:
             if d in text.lower():
                 description = re.split(d, text, flags=re.IGNORECASE)[1][:500].replace(":", "").replace("\n\n",
@@ -318,8 +319,13 @@ class FileHandler:
                         suffix in i or "/file" in i or midfix in i
                 ):
                     img = i
+                    if "images/logo.png" in img:
+                        continue
                     if "http" not in img:
                         img = urljoin(link, img)
+                    if img == "https://novelsknight.com/wp-content/uploads/2022/10/knight.jpg" or "bixiange.me/images" \
+                                                                                                  "/logo.png" in img:
+                        continue
                     if scraper.get(img).status_code == 200:
                         return img
         meta = soup.find_all("meta")
