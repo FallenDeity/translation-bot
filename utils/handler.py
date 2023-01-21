@@ -392,7 +392,7 @@ class FileHandler:
                 filelnk = bot.mega.get_upload_link(file)
                 view = LinkView({"Novel": [filelnk, "📔"]})
                 await ctx.reply(
-                    f"> **✔{ctx.author.mention} your novel {name} is ready.**",
+                    content=f"> **✔{ctx.author.mention} your novel #{next_no} {name} is ready.**",
                     view=view,
                 )
                 if original_language.lower() == "korean":
@@ -415,7 +415,7 @@ class FileHandler:
             os.remove(f"{name}.txt")
         else:
             file = discord.File(f"{ctx.author.id}.txt", f"{name}.txt")
-            await ctx.reply("**🎉Here is your translated novel**", file=file)
+            await ctx.reply(content=f"**🎉Here is your translated novel #{next_no}**", file=file)
             if original_language.lower() == "korean":
                 channel = bot.get_channel(
                     1032638028868501554
@@ -510,7 +510,7 @@ class FileHandler:
                 filelnk = bot.mega.get_upload_link(file)
                 view = LinkView({"Novel": [filelnk, "📔"]})
                 await ctx.reply(
-                    f"> **✔{ctx.author.mention} your novel {title_name} is ready.**",
+                    content=f"> **✔{ctx.author.mention} your novel #{next_no} {title_name} is ready.**",
                     view=view,
                 )
                 channel = bot.get_channel(
@@ -527,7 +527,7 @@ class FileHandler:
             os.remove(f"{title}.txt")
         else:
             file = discord.File(f"{title}.txt", f"{title_name[:100]}.txt")
-            await ctx.reply("**🎉Here is your crawled novel**", file=file)
+            await ctx.reply(content=f"**🎉Here is your crawled novel #{next_no}**", file=file)
             channel = bot.get_channel(
                 1020980703229382706
             ) or await bot.fetch_channel(1020980703229382706)

@@ -775,6 +775,7 @@ class Crawler(commands.Cog):
             nextselector: str = None, noofchapters: int = None,
             cssselector: str = None, cloudscrape: bool = False
     ) -> typing.Optional[discord.Message]:
+        await ctx.defer()
         if ctx.author.id in self.bot.crawler:
             return await ctx.reply(
                 "> **❌You cannot crawl two novels at the same time.**"
