@@ -119,14 +119,14 @@ class Termer(commands.Cog):
             )
             file_type = path.suffix.replace(".", "")
             name = name.replace(".txt", "").replace(".docx", "").replace(".epub", "").replace(".pdf", "")
-            if "txt" not in file_type and "docx" not in file_type and "epub" not in file_type:
+            if "txt" not in file_type and "epub" not in file_type:
                 os.remove(path)
                 await rep_msg.delete()
-                return await ctx.send("> **❌Only .txt, .docx, .pdf and .epub supported**")
+                return await ctx.send("> **❌Only .txt, .pdf and .epub supported**")
             name = name[:100]
             # os.rename(path, f"{ctx.author.id}.{file_type}")
-            if "docx" in file_type:
-                await FileHandler.docx_to_txt(ctx, file_type)
+            # if "docx" in file_type:
+            #     await FileHandler.docx_to_txt(ctx, file_type)
             if "epub" in file_type:
                 await FileHandler.epub_to_txt(ctx)
             if "pdf" in file_type:

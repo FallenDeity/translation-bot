@@ -136,6 +136,7 @@ class Library(commands.Cog):
             sort_by: str = None,
             no_of_novels: int = 300,
     ) -> None:
+        await ctx.defer()
         msg = await ctx.send("Searching...")
         tags = [i.strip() for i in tags.split() if i] if tags else None
         if (
@@ -349,6 +350,7 @@ class Library(commands.Cog):
 
     @library.command(name="info", help="shows info about a novel.")
     async def info(self, ctx: commands.Context, _id: int) -> None:
+        await ctx.defer()
         novel = await self.bot.mongo.library.get_novel_by_id(_id)
         if not novel:
             await ctx.send("No novel found.")
@@ -360,6 +362,7 @@ class Library(commands.Cog):
     async def review(
             self, ctx: commands.Context, _id: int, rating: int, summary: str
     ) -> None:
+        await ctx.defer()
         if not 0 <= rating <= 5:
             await ctx.send("Rating must be between 0 and 5.")
             return
@@ -376,7 +379,7 @@ class Library(commands.Cog):
     @commands.hybrid_command(name="leaderboard", description="Get the bot's leaderboard.")
     async def leaderboard(self, ctx: commands.Context) -> None:
         """Get the bot's leaderboard."""
-        msg = await ctx.send("getting leaderboard...please  wait....")
+        await ctx.defer()
         user_rank = await self.bot.mongo.library.get_user_novel_count(ctx.author.id)
         top_200 = await self.bot.mongo.library.get_user_novel_count(_top_200=True)
         embeds = []
@@ -400,7 +403,6 @@ class Library(commands.Cog):
                 )
                 n += 1
             embeds.append(embed)
-        await msg.delete(delay=1)
         await self.buttons(embeds, ctx)
 
 

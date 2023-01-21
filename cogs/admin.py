@@ -21,6 +21,7 @@ class Admin(commands.Cog):
     @commands.hybrid_command(help="ban user.. Admin only command")
     async def ban(self, ctx: commands.Context, id: str,
                   reason: str = "continuous use of improper names in novel name translation"):
+        await ctx.defer()
         if '#' in id:
             name_spl = id.split('#')
             name = name_spl[0]
@@ -78,6 +79,7 @@ class Admin(commands.Cog):
     @commands.has_role(1020638168237740042)
     @commands.hybrid_command(help="Unban user.. Admin only command")
     async def unban(self, ctx: commands.Context, id: str):
+        await ctx.defer()
         if '#' in id:
             name_spl = id.split('#')
             name = name_spl[0]
@@ -114,6 +116,7 @@ class Admin(commands.Cog):
     @commands.hybrid_command(help="send warning to user..Admin only command")
     async def warn(self, ctx: commands.Context, id: str,
                    reason: str = "continuous use of improper names in novel name translation"):
+        await ctx.defer()
         if '#' in id:
             name_spl = id.split('#')
             name = name_spl[0]
@@ -132,6 +135,7 @@ class Admin(commands.Cog):
     @commands.has_role(1020638168237740042)
     @commands.hybrid_command(help="get id of the user if name and discriminator provided. Admin only command")
     async def get_id(self, ctx: commands.Context, name: str, discriminator: str = None):
+        await ctx.defer()
         if '#' in name:
             name_spl = name.split('#')
             name = name_spl[0]
@@ -142,6 +146,7 @@ class Admin(commands.Cog):
     @commands.has_role(1020638168237740042)
     @commands.hybrid_command(help="Restart the bot incase of bot crash. Ping any BOT-admins to restart bot")
     async def restart(self, ctx: commands.Context):
+        await ctx.defer()
         self.bot.app_status = "restart"
         while True:
             print("Started restart")
@@ -189,6 +194,7 @@ class Admin(commands.Cog):
     @commands.hybrid_command(help="Give the latency and uptime of the bot... ")
     async def status(self, ctx: commands.Context):
         # await ctx.send(str(datetime.datetime.utcnow())+".-"+str(ctx.message.created_at))
+        await ctx.defer()
         await ctx.send(f"Latency is {int(self.bot.ws.latency*1000)} ms")
         for roles in ctx.author.roles:
             if roles.id == 1020638168237740042:
@@ -207,6 +213,7 @@ class Admin(commands.Cog):
     @commands.has_role(1020638168237740042)
     @commands.hybrid_command(help="Give the progress of all current tasks of the bot(only for bot-admins)... ")
     async def tasks(self, ctx: commands.Context):
+        await ctx.defer()
         out = "**Crawler Tasks**\n"
         if not self.bot.crawler.items():
             out = out + "No tasks currently\n"

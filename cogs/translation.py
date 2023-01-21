@@ -60,6 +60,7 @@ class Translate(commands.Cog):
             rawname: str = None,
             library_id: int = None,
     ):
+        await ctx.defer()
         if link is not None and link.startswith("#"):
             try:
                 novel_id = int(link.replace("#", ""))

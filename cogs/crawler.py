@@ -261,16 +261,18 @@ class Crawler(commands.Cog):
                                          f"{discord.utils.format_dt(datetime.datetime.now(), style='R')}")
                 msg = await msg.edit(embed=embed)
                 value = int(current_progress)
+                await asyncio.sleep(wait_time)
             else:
                 break
-            await asyncio.sleep(wait_time)
         embed.set_image(url="")
         embed.set_field_at(index=0, name="Progress",
                            value=f"Completed crawling")
         await msg.edit(embed=embed)
+        return
 
     @commands.hybrid_command(help="stops the tasks initiated by user", aliases=["st"])
     async def stop(self, ctx: commands.Context) -> typing.Optional[discord.Message]:
+        await ctx.defer()
         if ctx.author.id not in self.bot.crawler and ctx.author.id not in self.bot.translator:
             return await ctx.send(
                 "> **❌You have no tasks currently running.**"
@@ -290,6 +292,7 @@ class Crawler(commands.Cog):
             add_terms: str = None,
             max_chapters: int = None,
     ) -> typing.Optional[discord.Message]:
+        await ctx.defer()
         if ctx.author.id in self.bot.crawler:
             return await ctx.reply(
                 "> **❌You cannot crawl two novels at the same time.**"
