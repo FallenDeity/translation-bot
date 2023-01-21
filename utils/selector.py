@@ -85,6 +85,12 @@ class CssSelector:
             return "#novel_p ::text"
         elif "m.75zw.com/" in link:
             return "#chapter > div.a75zwcom_i63c9e1d ::text"
+        elif "www.webnovelpub.com" in link:
+            return "#chapter-container ::text"
+        elif "m.tsxsw.net" in link:
+            return "#nr ::text"
+        elif "www.tsxsw.net" in link:
+            return "#content ::text"
         else:
             return "* ::text"
 
@@ -124,8 +130,11 @@ class CssSelector:
         elif "www.ops8.com" in link:
             return ["div.book-title", "#BookCon > h1"]
         elif "feixs.com" in link:
-            return ["title", "#main > "
-                                                                                                   "div.bookinfo.m10.clearfix > div.info > p.chaptertitle ::text"]
+            return ["title", "#main > div.bookinfo.m10.clearfix > div.info > p.chaptertitle ::text"]
+        elif "m.tsxsw.net" in link:
+            return ["title", "h2 ::text"]
+        elif "www.tsxsw.net" in link:
+            return ["div.articleinfo > div.r > div.l2 > div > h1", "title ::text"]
         else:
             return ["title", "title ::text"]
 
