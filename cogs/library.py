@@ -249,7 +249,7 @@ class Library(commands.Cog):
                 elif sort_by == "date":
                     allnovels.sort(key=lambda x: x.date)
                     allnovels.reverse()
-        print("got all novels")
+        # print("got all novels")
         full_size = 0
         if not allnovels:
             return await ctx.send("> **No results found.**")

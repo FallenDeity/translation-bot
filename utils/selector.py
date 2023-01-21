@@ -82,7 +82,7 @@ class CssSelector:
         elif "mtl-novel.net" in link or "novelnext.com" in link:
             return "#chr-content ::text"
         elif "ncode.syosetu.com" in link:
-            return "#novel_p ::text"
+            return "#novel_honbun ::text"
         elif "m.75zw.com/" in link:
             return "#chapter > div.a75zwcom_i63c9e1d ::text"
         elif "www.webnovelpub.com" in link:
@@ -177,7 +177,7 @@ class CssSelector:
             return ["body > div.container > div.row.row-detail > div > div > div.read_btn > a:nth-child(4)", "body > div.container > div.row.row-detail > div > h2 > a:nth-child(3)"]
         elif "www.gonet.cc" in link:
             return ["body > div.container > div.row.row-detail > div > div > div.read_btn > a:nth-child(4)", "body > div.container > div.row.row-detail > div > h2 > a:nth-child(3) > font > font"]
-        elif "mtl-novel.net" in link:
+        elif "mtl-novel.net" in link or "novelnext.com" in link:
             return ["#next_chap", "#chapter > div > div > a"]
         else:
             return [None, "title"]

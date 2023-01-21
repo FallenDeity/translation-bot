@@ -559,7 +559,7 @@ class Crawler(commands.Cog):
             )
         try:
             description = GoogleTranslator(source="auto", target="english").translate(
-                (await FileHandler.get_description(soup, link, title=title_name))[:500]).strip()
+                (await FileHandler.get_description(soup, link, title=title_name))).strip()
         except:
             try:
                 description = await FileHandler.get_description(soup, link, title=title_name)

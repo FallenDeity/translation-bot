@@ -35,7 +35,7 @@ class ErrorHandler(commands.Cog):
         return f"`{'` , `'.join(perms).title().replace('guild', 'server').replace('_', ' ')}`"
 
     @commands.Cog.listener()
-    async def on_command_error(self, ctx, error: Exception):
+    async def on_command_error(self, ctx: commands.Context, error: Exception):
         if isinstance(error, commands.CommandNotFound):
             return
         elif isinstance(error, commands.MissingRequiredArgument):
@@ -231,10 +231,10 @@ class ErrorHandler(commands.Cog):
             ) or await self.bot.fetch_channel(991911644831678484)
             try:
                 await channel.send(
-                    f"```yaml\n{''.join(traceback.format_exception(error, error, error.__traceback__))}\n```"
+                    f"```yaml\n{ctx.message.jump_url} \n{''.join(traceback.format_exception(error, error, error.__traceback__))}\n```"
                 )
             except:
-                await channel.send(str(error))
+                await channel.send(f"{ctx.message.jump_url} \n{str(error)}")
                 await channel.send(error.__traceback__[:4000])
             raise error
 

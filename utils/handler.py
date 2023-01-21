@@ -5,6 +5,7 @@ import random
 import re
 import typing
 from urllib.parse import urljoin
+from collections import OrderedDict
 
 import PyPDF2
 import aiofiles
@@ -50,9 +51,10 @@ class FileHandler:
 
     @staticmethod
     async def get_desc_from_text(text: str, title: str = None):
-        desc = ["introduction", "description", "简介", "描述", "描写", "summary", "prologue"]
+        desc = ["introduction", "description", "简介", "描述", "描写", "summary", "prologue", "概括", "摘要", "总结", "序幕", "开场白"]
+        text = '\n'.join(OrderedDict.fromkeys(text.split('\n')))# remove  duplicate lines from description
         if title:
-            text = re.sub(re.compile(get_regex_from_name(title), flags=re.IGNORECASE), "", text)
+            text = re.sub(re.compile(get_regex_from_name(title), flags=re.IGNORECASE), "", text) #remove title from description
         for d in desc:
             if d in text.lower():
                 description = re.split(d, text, flags=re.IGNORECASE)[1][:500].replace(":", "").replace("\n\n",

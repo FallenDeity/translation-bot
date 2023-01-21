@@ -387,7 +387,7 @@ class Translate(commands.Cog):
                     avatar = thumbnail
                 else:
                     avatar = ctx.author.display_avatar
-                des = await FileHandler.get_desc_from_text(GoogleTranslator().translate(novel[:400]), title=name)
+                des = GoogleTranslator().translate(await FileHandler.get_desc_from_text(novel[:5000], title=name)).strip()
             except:
                 des = novel[:400]
             embed = discord.Embed(title=str(f"{name[:240]}"), description=des,
