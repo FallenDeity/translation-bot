@@ -178,11 +178,11 @@ class FileHandler:
         return False
 
     @staticmethod
-    async def find_toc_next(soup, link: str = None):
-        selectors = ("下一页", "next page", ">") #下一页  "下一章"- next chp 下一页
+    async def find_toc_next(soup: BeautifulSoup, link: str = None):
+        selectors = ("下一页", "next page", ">", "next") #下一页  "下一章"- next chp 下一页
         for a in soup.find_all("a"):
             # print(a.get('href'))
-            if any(selector in a.get_text() for selector in selectors):
+            if any(selector == a.get_text().lower() for selector in selectors):
                 # print("toc true")
                 return urljoin(link, a.get('href'))
         print("tocfalse")
@@ -190,10 +190,10 @@ class FileHandler:
 
     @staticmethod
     async def find_next_chps(soup: BeautifulSoup, link: str = None):
-        selectors = ("下一页", "next page", "下一章", "next chapter")  # 下一页  "下一章"- next chp 下一页
+        selectors = ("下一页", "next page", "下一章", "next chapter", "next")  # 下一页  "下一章"- next chp 下一页
         for a in soup.find_all("a"):
             # print(a.get('href'))
-            if any(selector in a.get_text().lower() for selector in selectors):
+            if any(selector == a.get_text().lower() for selector in selectors):
                 # print("next true")
                 return urljoin(link, a.get('href'))
         return None
@@ -211,7 +211,7 @@ class FileHandler:
             await msg.delete()
             os.remove(f"{ctx.author.id}.docx")
         except Exception as e:
-            ctx.send("error occured in converting docx to txt")
+            await ctx.send("error occured in converting docx to txt")
 
     @staticmethod
     async def epub_to_txt(ctx: commands.Context):
@@ -285,7 +285,8 @@ class FileHandler:
         )
         return string
 
-    def tokenize(link) -> tuple[str, ...]:
+    @staticmethod
+    def tokenize(link: str) -> tuple[str, ...]:
         url = link.replace(".html", "").replace(".htm/", "")
         suffix = url.split("/")[-1]
         midfix = url.replace(f"/{suffix}", "").split("/")[-1]

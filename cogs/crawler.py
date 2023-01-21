@@ -38,7 +38,6 @@ headers = {
 
 
 async def find_urls(soup, link, name):
-
     urls = [
         f"{j}"
         for j in [str(i.get("href")) for i in soup.find_all("a")]
@@ -222,7 +221,8 @@ class Crawler(commands.Cog):
             )
         await ctx.send(f"> **🚄`{self.bot.crawler[ctx.author.id]}`**")
 
-    async def cc_prog(self, msg: discord.Message, embed: discord.Embed, author_id: int) -> typing.Optional[
+    async def cc_prog(self, msg: discord.Message, embed: discord.Embed, author_id: int, wait_time: float = 8) -> \
+    typing.Optional[
         discord.Message]:
         value = 0
         bardata = progressBar.filledBar(100, 0, size=10, line="🟥", slider="🟩")
@@ -240,7 +240,7 @@ class Crawler(commands.Cog):
                 value = eval(out)
             else:
                 break
-            await asyncio.sleep(8)
+            await asyncio.sleep(wait_time)
         embed.set_field_at(index=0,
                            name=f"Progress :  100%",
                            value=progressBar.filledBar(100, 100,
@@ -248,6 +248,24 @@ class Crawler(commands.Cog):
                                0])
         # print(embed)
         return await msg.edit(embed=embed)
+
+    async def cc_prog_cr_next(self, msg: discord.Message, embed: discord.Embed, author_id: int, wait_time: float = 20):
+        value = 0
+        while author_id in self.bot.crawler:
+            current_progress = self.bot.crawler[author_id].split("/")
+            if current_progress.isnumeric() and value <= current_progress:
+                embed.set_field_at(index=0, name="Progress",
+                                   value=f"Crawled {current_progress} pages  "
+                                         f"{discord.utils.format_dt(datetime.datetime.now(), style='R')}")
+                msg = await msg.edit(embed=embed)
+                value = current_progress
+            else:
+                break
+            await asyncio.sleep(wait_time)
+        embed.set_image(url="")
+        embed.set_field_at(index=0, name="Progress",
+                           value=f"Completed crawling")
+        await msg.edit(embed=embed)
 
     @commands.hybrid_command(help="stops the tasks initiated by user", aliases=["st"])
     async def stop(self, ctx: commands.Context) -> typing.Optional[discord.Message]:
@@ -324,7 +342,8 @@ class Crawler(commands.Cog):
             soup = BeautifulSoup(response.text, "html.parser", from_encoding=response.encoding)
             soup1 = soup
             if int(str(response.status_code)[0]) == 4:
-                return await ctx.send(f"couldn't connect to the provided link. its returning {response.status_code} error")
+                return await ctx.send(
+                    f"couldn't connect to the provided link. its returning {response.status_code} error")
             else:
                 await ctx.send("> **Cloudflare is detected.. Turned on  the cloudscraper**", delete_after=10)
         else:
@@ -515,15 +534,10 @@ class Crawler(commands.Cog):
                 next_link = await FileHandler.find_toc_next(soup, link)
                 if next_link is None or next_link in toc_list:
                     break
-            await ctx.send(f"> {len(toc_list)+1} toc's automatically detected ...", delete_after=8)
+            await ctx.send(f"> {len(toc_list) + 1} toc's automatically detected ...", delete_after=8)
             print(len(urls))
-            print(toc_list)
 
             urls = list(dict.fromkeys(urls))
-            # urls = [*set(urls)]
-        # print(urls)
-        print(len(urls))
-
         if "krmtl.com" in link:
             urls = []
             for i in range(1, max_chapters + 1):
@@ -957,6 +971,7 @@ class Crawler(commands.Cog):
         embed.add_field(name="Progress", value=chp_count)
         try:
             self.bot.crawler[ctx.author.id] = f"0/{noofchapters}"
+            asyncio.create_task(self.cc_prog_cr_next(msg, embed, ctx.author.id, 20))
             for i in range(1, noofchapters):
                 try:
                     if self.bot.crawler[ctx.author.id] == "break":
@@ -983,15 +998,7 @@ class Crawler(commands.Cog):
                     if i % 25 == 0:
                         await asyncio.sleep(2.5)
                     if i % 50 == 0:
-                        await asyncio.sleep(4)
-                    if random.randint(0, 20) == 10:
-                        try:
-                            embed.set_field_at(index=0, name="Progress",
-                                               value=f"Crawled {chp_count} pages  "
-                                                     f"{discord.utils.format_dt(datetime.datetime.now(), style='R')}")
-                            msg = await msg.edit(embed=embed)
-                        except:
-                            pass
+                        await asyncio.sleep(4.5)
                 try:
                     output = await self.getcontent(current_link, css, path, self.bot, sel_tag, scraper, next_chp_find)
                     chp_text = output[0]
@@ -1020,14 +1027,7 @@ class Crawler(commands.Cog):
                 crawled_urls.append(current_link)
                 current_link = output[1]
                 if random.randint(0, 50) == 10 or chp_count % 100 == 0:
-                    try:
-                        embed.set_field_at(index=0, name="Progress",
-                                           value=f"Crawled {chp_count} pages  "
-                                                 f"{discord.utils.format_dt(datetime.datetime.now(), style='R')}")
-                        msg = await msg.edit(embed=embed)
-                    except:
-                        pass
-                    await asyncio.sleep(0.1)
+                    await asyncio.sleep(0.2)
 
             with open(title + '.txt', 'w', encoding='utf-8') as f:
                 f.write(full_text)
@@ -1037,10 +1037,7 @@ class Crawler(commands.Cog):
                         await FileHandler.get_desc_from_text(full_text[:5000], title=org_title)[:500]).strip()
             except:
                 pass
-            embed.set_image(url="")
-            embed.set_field_at(index=0, name="Progress",
-                               value=f"Completed crawling {chp_count} pages")
-            msg = await msg.edit(embed=embed)
+            await ctx.send(f"Crawled {chp_count} pages.")
             return await FileHandler().crawlnsend(ctx, self.bot, title, title_name, original_Language,
                                                   description=description)
         except Exception as e:
