@@ -136,7 +136,7 @@ class Library(commands.Cog):
             sort_by: str = None,
             no_of_novels: int = 300,
     ) -> None:
-        await ctx.defer()
+        # await ctx.defer()
         msg = await ctx.send("Searching...")
         tags = [i.strip() for i in tags.split() if i] if tags else None
         if (

@@ -146,7 +146,7 @@ class Admin(commands.Cog):
     @commands.has_role(1020638168237740042)
     @commands.hybrid_command(help="Restart the bot incase of bot crash. Ping any BOT-admins to restart bot")
     async def restart(self, ctx: commands.Context):
-        await ctx.defer()
+        msg = await ctx.send("Please wait")
         self.bot.app_status = "restart"
         while True:
             print("Started restart")
@@ -167,7 +167,8 @@ class Admin(commands.Cog):
                 self.bot.crawler = {}
                 await asyncio.sleep(40)
 
-        await ctx.send(
+        await msg.edit(
+            content="",
             embed=discord.Embed(
                 description=f"Bot is restarting...",
                 color=discord.Color.random(),
