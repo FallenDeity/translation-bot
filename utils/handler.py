@@ -306,7 +306,7 @@ class FileHandler:
             "wuxiax",
         )
         imgs = []
-
+        meta = soup.find_all("meta")
         tag = "src" if not any(str(i) in link for i in compound) else "data-src"
         for img in soup.find_all("img"):
             if any(x in img.get(tag, "") for x in ("cover", "thumb", ".jpg", "upload")) and ".png" not in img.get(
@@ -333,7 +333,23 @@ class FileHandler:
         for i in meta:
             if i.get("property") == "og:image":
                 return urljoin(link, i.get("content", ""))
+        for i in meta:
+            if i.get("property") == "twitter:image":
+                print(i.get("content"))
+                return urljoin(link, i.get("content", ""))
         return ""
+
+    async def get_og_image(self, soup: BeautifulSoup, link: str):
+        meta = soup.find_all("meta")
+        for i in meta:
+            if i.get("property") == "og:image":
+                print(i.get("content"))
+                return urljoin(link, i.get("content", ""))
+        for i in meta:
+            if i.get("property") == "twitter:image":
+                print(i.get("content"))
+                return urljoin(link, i.get("content", ""))
+        return await FileHandler().get_thumbnail(soup, link)
 
     async def distribute(
             self, bot: Raizel, ctx: commands.Context, name: str, language: str, original_language: str, raw_name: str,

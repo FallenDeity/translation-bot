@@ -227,6 +227,7 @@ class Crawler(commands.Cog):
         value = 0
         bardata = progressBar.filledBar(100, 0, size=10, line="🟥", slider="🟩")
         embed.add_field(name="Progress", value=f"{bardata[0]}")
+        await asyncio.sleep(2)
         while author_id in self.bot.crawler:
             out = self.bot.crawler[author_id]
             split = out.split("/")
@@ -251,14 +252,15 @@ class Crawler(commands.Cog):
 
     async def cc_prog_cr_next(self, msg: discord.Message, embed: discord.Embed, author_id: int, wait_time: float = 20):
         value = 0
+        await asyncio.sleep(5)
         while author_id in self.bot.crawler:
-            current_progress = self.bot.crawler[author_id].split("/")
-            if current_progress.isnumeric() and value <= current_progress:
+            current_progress = self.bot.crawler[author_id].split("/")[0]
+            if current_progress.isnumeric() and value <= int(current_progress):
                 embed.set_field_at(index=0, name="Progress",
                                    value=f"Crawled {current_progress} pages  "
                                          f"{discord.utils.format_dt(datetime.datetime.now(), style='R')}")
                 msg = await msg.edit(embed=embed)
-                value = current_progress
+                value = int(current_progress)
             else:
                 break
             await asyncio.sleep(wait_time)
@@ -961,9 +963,18 @@ class Crawler(commands.Cog):
                     soup=soup, link=firstchplink, title=org_title)).strip()
             except:
                 description = await FileHandler.get_description(soup=soup, title=org_title)
+        try:
+            thumbnail = await FileHandler().get_og_image(soup=soup, link=firstchplink)
+            if thumbnail is None or thumbnail.strip() == "":
+                thumbnail = ""
+                display_avatar = ctx.author.display_avatar
+            else:
+                display_avatar = thumbnail
+        except:
+            display_avatar = ctx.author.display_avatar
         embed = discord.Embed(title=str(f"{title_name[:240]}"), description=description[:400],
                               colour=discord.Colour.blurple())
-        embed.set_thumbnail(url=ctx.author.display_avatar)
+        embed.set_thumbnail(url=display_avatar)
         embed.set_image(url="https://cdn.discordapp.com/attachments/1004050326606852237/1064751851481870396"
                             "/loading_pi.gif")
         msg = await msg.edit(content="",
@@ -1039,7 +1050,7 @@ class Crawler(commands.Cog):
                 pass
             await ctx.send(f"Crawled {chp_count} pages.")
             return await FileHandler().crawlnsend(ctx, self.bot, title, title_name, original_Language,
-                                                  description=description)
+                                                  description=description, thumbnail=thumbnail)
         except Exception as e:
             print(traceback.format_exc())
             await ctx.send("> Error occurred .Please report to admin +\n" + str(e))
