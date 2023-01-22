@@ -58,8 +58,8 @@ class FileHandler:
         for d in desc:
             if d in text.lower():
                 description = re.split(d, text, flags=re.IGNORECASE)[1][:500].replace(":", "").replace("\n\n",
-                                                                                                       "").strip()
-                description = re.sub(r'(\n\s*)+\n', '\n', description)
+                                                                                                       "").strip().lstrip(":")
+                description = re.sub(r'(\n\s*)+\n', '\n', description).strip()
                 return description
         return re.sub(r'(\n\s*)+\n', '\n', text[:500].strip())
 
