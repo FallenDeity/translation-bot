@@ -679,7 +679,7 @@ class Crawler(commands.Cog):
                 thumbnail = await FileHandler().get_thumbnail(soup, link)
             except:
                 thumbnail = ""
-            embed = discord.Embed(title=str(f"{title[:240]}"), description=description,
+            embed = discord.Embed(title=str(f"{title[:240]}"), description=description[:350],
                                   colour=discord.Colour.blurple())
             embed.set_thumbnail(url=thumbnail)
             msg = await msg.edit(content="",
@@ -976,7 +976,7 @@ class Crawler(commands.Cog):
                 display_avatar = thumbnail
         except:
             display_avatar = ctx.author.display_avatar
-        embed = discord.Embed(title=str(f"{title_name[:240]}"), description=description[:400],
+        embed = discord.Embed(title=str(f"{title_name[:240]}"), description=description[:350],
                               colour=discord.Colour.blurple())
         embed.set_thumbnail(url=display_avatar)
         embed.set_image(url="https://cdn.discordapp.com/attachments/1004050326606852237/1064751851481870396"

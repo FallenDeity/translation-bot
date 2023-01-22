@@ -372,9 +372,11 @@ class Termer(commands.Cog):
                     avatar = ctx.author.display_avatar
                 des = GoogleTranslator().translate(
                     await FileHandler.get_desc_from_text(novel[:5000], title=name)).strip()
+                description = des
             except:
+                description = ""
                 des = novel[:400]
-            embed = discord.Embed(title=str(f"{name[:240]}"), description=des,
+            embed = discord.Embed(title=str(f"{name[:240]}"), description=des[:350],
                                   colour=discord.Colour.blurple())
             embed.set_thumbnail(url=avatar)
             embed.add_field(name="Translating to", value=language, inline=False)
@@ -387,12 +389,14 @@ class Termer(commands.Cog):
             story = await translate.start(liz)
             async with aiofiles.open(f"{ctx.author.id}.txt", "w", encoding="utf-8") as f:
                 await f.write(story)
-            try:
-                description = GoogleTranslator(source="auto", target="english").translate(
-                    await FileHandler.get_desc_from_text(story[:5000])).strip()
-            except:
-                description = await FileHandler.get_desc_from_text(story[:10000])
-            await FileHandler().distribute(self.bot, ctx, name, language, original_Language, raw_name=rawname, description=description)
+            if description.strip() == "":
+                try:
+                    description = GoogleTranslator(source="auto", target="english").translate(
+                        await FileHandler.get_desc_from_text(story[:5000])).strip()
+                except:
+                    description = await FileHandler.get_desc_from_text(story[:10000])
+            await FileHandler().distribute(self.bot, ctx, name, language, original_Language,
+                                           raw_name=rawname, description=description)
         except Exception as e:
             if "Translation stopped" in str(e):
                 return await ctx.send("Translation stopped")
