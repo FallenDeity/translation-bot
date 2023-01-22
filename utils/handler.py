@@ -55,6 +55,8 @@ class FileHandler:
         text = '\n'.join(OrderedDict.fromkeys(text.split('\n')))# remove  duplicate lines from description
         if title:
             text = re.sub(re.compile(get_regex_from_name(title), flags=re.IGNORECASE), "", text) #remove title from description
+        if "69shu.com" in text or "jiu mu" in text.lower() or "jiumu" in text.lower():
+            desc.append("chapter")
         for d in desc:
             if d in text.lower():
                 description = re.split(d, text, flags=re.IGNORECASE)[1][:500].replace(":", "").replace("\n\n",
