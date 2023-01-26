@@ -495,6 +495,9 @@ class Translate(commands.Cog):
     )
     async def multi(self, ctx: commands.Context, language: str = "english", messageid: int = None, ):
         # await ctx.defer()
+        if language is not None and ("discord.com/channels" in language or language.isnumeric()):
+            messageid = language
+            language = "english"
         if messageid:
             channel = self.bot.get_channel(ctx.channel.id)
             message = await channel.fetch_message(messageid)

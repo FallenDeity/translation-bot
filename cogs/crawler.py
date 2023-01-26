@@ -324,8 +324,8 @@ class Crawler(commands.Cog):
         if "ptwxz" in link and "bookinfo" in link:
             link = link.replace("bookinfo", "html")
             link = link.replace(".html", "/")
-        if link[-1] == "/" and "69shu" not in link and "uukanshu.cc" not in link and not num == len(allowed):
-            link = link[:-1]
+        # if link[-1] == "/" and "69shu" not in link and "uukanshu.cc" not in link and not num == len(allowed):
+        #     link = link[:-1]
         # if "m.uuks" in link:
         #     link = link.replace("m.", "")
         if "novelsemperor" in link or "novelsknight.com" in link:
@@ -979,8 +979,8 @@ class Crawler(commands.Cog):
         embed = discord.Embed(title=str(f"{title_name[:240]}"), description=description[:350],
                               colour=discord.Colour.blurple())
         embed.set_thumbnail(url=display_avatar)
-        embed.set_image(url="https://cdn.discordapp.com/attachments/1004050326606852237/1064751851481870396"
-                            "/loading_pi.gif")
+        embed.set_image(url="https://cdn.discordapp.com/attachments/984664133570031666/1068145559942213642/ezgif-2"
+                            "-4c16817ddf.gif")
         msg = await msg.edit(content="",
                              embed=embed)
         embed.add_field(name="Progress", value=chp_count)
