@@ -297,9 +297,9 @@ class Crawler(commands.Cog):
             return await ctx.reply(
                 "> **❌You cannot crawl two novels at the same time.**"
             )
-        if self.bot.app_status == "restart":
-            return await ctx.reply(
-                f"> Bot is scheduled to restart within 60 sec or after all current tasks are completed.. Please try after bot is restarted")
+        # if self.bot.app_status == "restart":
+        #     return await ctx.reply(
+        #         f"> Bot is scheduled to restart within 60 sec or after all current tasks are completed.. Please try after bot is restarted")
         if link is None:
             return await ctx.reply(f"> **❌Enter a link for crawling.**")
         allowed = self.bot.allowed
@@ -780,9 +780,9 @@ class Crawler(commands.Cog):
             return await ctx.reply(
                 "> **❌You cannot crawl two novels at the same time.**"
             )
-        if self.bot.app_status == "restart":
-            return await ctx.reply(
-                f"> Bot is scheduled to restart within 60 sec or after all current tasks are completed.. Please try after bot is restarted")
+        # if self.bot.app_status == "restart":
+        #     return await ctx.reply(
+        #         f"> Bot is scheduled to restart within 60 sec or after all current tasks are completed.. Please try after bot is restarted")
         title_css = "title"
         try:
             res = await self.bot.con.get(firstchplink)
