@@ -60,7 +60,10 @@ class Translate(commands.Cog):
             rawname: str = None,
             library_id: int = None,
     ):
-        # await ctx.defer()
+        try:
+            await ctx.defer()
+        except:
+            pass
         if link is not None and link.startswith("#"):
             try:
                 novel_id = int(link.replace("#", ""))
@@ -494,7 +497,10 @@ class Translate(commands.Cog):
         help="translate multiple files together one at a time"
     )
     async def multi(self, ctx: commands.Context, language: str = "english", messageid: int = None, ):
-        # await ctx.defer()
+        try:
+            await ctx.defer()
+        except:
+            pass
         if language is not None and ("discord.com/channels" in language or language.isnumeric()):
             messageid = language
             language = "english"

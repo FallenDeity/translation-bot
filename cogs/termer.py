@@ -48,7 +48,10 @@ class Termer(commands.Cog):
             rawname: str = None,
             library_id: str = None,
     ):
-        # await ctx.defer()
+        try:
+            await ctx.defer()
+        except:
+            pass
         if link is not None and link.startswith("#"):
             try:
                 novel_id = int(link.replace("#", ""))
