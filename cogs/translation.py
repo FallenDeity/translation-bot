@@ -131,7 +131,7 @@ class Translate(commands.Cog):
             link = ctx.message.attachments[0].url
         elif messageid is None and ("mega.nz" in link or "mega.co.nz" in link):
             await ctx.send("Mega link found.... downloading from mega", delete_after=10, ephemeral=True)
-            info = self.bot.mega.get_public_url_info(link)
+            info = await self.bot.loop.run_in_executor(None, self.bot.mega.get_public_url_info, link)
             size = int(info.get("size")) / 1000
             if size >= 21 * 1000:
                 await rep_msg.delete()
@@ -141,9 +141,8 @@ class Translate(commands.Cog):
             name = info.get("name")
             name = bytes(name, encoding="raw_unicode_escape", errors="ignore").decode()
             file_type = name.split(".")[-1]
-            path = self.bot.mega.download_url(
-                link, dest_filename=f"{ctx.author.id}.{file_type}"
-            )
+            path = await self.bot.loop.run_in_executor(None, self.bot.mega.download_url,
+                                                       link, None, f"{ctx.author.id}.{file_type}")
             if "txt" not in file_type and "epub" not in file_type and "pdf" not in file_type:
                 os.remove(path)
                 await rep_msg.delete()

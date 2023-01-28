@@ -49,7 +49,7 @@ class CssSelector:
             return "div.reading-content ::text"
         elif "readlightnovel" in link:
             return "#growfoodsmart ::text"
-        elif "m.qidian" in link:
+        elif "m.qidian" in link or "m.bqg28.cc" in link:
             return "#chapterContent ::text"
             #         elif "read.qidian" in link or "book.qidian" in link or "www.qidian" in link:
             #             return "p ::text"
@@ -91,6 +91,14 @@ class CssSelector:
             return "#nr ::text"
         elif "www.tsxsw.net" in link:
             return "#content ::text"
+        elif "www.4ksw.com/" in link:
+            return "div.panel-body.content-body.content-ext ::text"
+        elif "tw.ixdzs.com" in link:
+            return "#page > article ::text"
+        elif "www.shulinw.com/" in link:
+            return "#htmlContent ::text"
+        elif "www.piaoyuxuan.com" in link:
+            return "#content > div.content ::text"
         else:
             return "* ::text"
 
@@ -135,6 +143,8 @@ class CssSelector:
             return ["title", "h2 ::text"]
         elif "www.tsxsw.net" in link:
             return ["div.articleinfo > div.r > div.l2 > div > h1", "title ::text"]
+        elif "tw.ixdzs.com" in link:
+            return ["h1", "title ::text"]
         else:
             return ["title", "title ::text"]
 
