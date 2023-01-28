@@ -119,7 +119,8 @@ class Library(commands.Cog):
         if ctx.invoked_subcommand is None:
             await ctx.send_help(ctx.command)
 
-    @library.command(name="search", help="searches a novel in library. Shuffle is turned on by default. Use sort_by for sorting novels")
+    @library.command(name="search",
+                     help="searches a novel in library. Shuffle is turned on by default. Use sort_by for sorting novels")
     async def search(
             self,
             ctx: commands.Context,
@@ -263,7 +264,7 @@ class Library(commands.Cog):
             allnovels = allnovels[:no_of_novels]
         if show_list:
             embeds = await self.make_list_embed_list(allnovels)
-            if full_size !=0:
+            if full_size != 0:
                 msg = await msg.edit(content=f"> Showing first **{str(no_of_novels)} out of {str(full_size)}**")
             else:
                 msg = await msg.edit(content=f"> Found **{len(allnovels)}** novels")
@@ -393,17 +394,20 @@ class Library(commands.Cog):
             embed = discord.Embed(
                 title="Leaderboard",
                 description=f"**Leaderboard of the bot!**\
-                        \n\n**Your Rank:** {user_rank[ctx.author.id]}",
+                        \n\n**Your Rank: {user_rank[ctx.author.id]}**",
                 color=discord.Color.random(),
             )
             embed.set_footer(text="Thanks for using TranslationBot!", icon_url=self.bot.user.display_avatar)
             embed.set_thumbnail(url=ctx.author.display_avatar)
             for user_id, count in chunk:
-                embed.add_field(
-                    name=f"{n}. {count} novels",
-                    value=f"<@{user_id}>",
-                    inline=False,
-                )
+                try:
+                    embed.add_field(
+                        name=f"{n}. {count} novels",
+                        value=f"**{(self.bot.get_user(user_id)).name} **-> <@{user_id}>",
+                        inline=False,
+                    )
+                except:
+                    pass
                 n += 1
             embeds.append(embed)
         await self.buttons(embeds, ctx)
