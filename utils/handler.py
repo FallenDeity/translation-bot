@@ -498,6 +498,10 @@ class FileHandler:
         embed.add_field(name="Language", value=originallanguage)
         embed.set_thumbnail(url=thumbnail)
         embed.set_footer(text=f"Uploaded by {ctx.author}", icon_url=ctx.author.display_avatar)
+        if originallanguage == "english":
+            channel_id = 1005668482475643050
+        else:
+            channel_id = 1020980703229382706
         if (size := os.path.getsize(f"{title}.txt")) > 8 * 10 ** 6:
             bot.crawler_count = bot.crawler_count + 1
             if size > 35 * 10 ** 6:
@@ -517,8 +521,8 @@ class FileHandler:
                     view=view,
                 )
                 channel = bot.get_channel(
-                    1020980703229382706
-                ) or await bot.fetch_channel(1020980703229382706)
+                    channel_id
+                ) or await bot.fetch_channel(channel_id)
                 await channel.send(
                     embed=embed,
                     view=view, allowed_mentions=discord.AllowedMentions(users=False)
@@ -532,8 +536,8 @@ class FileHandler:
             file = discord.File(f"{title}.txt", f"{title_name[:100]}.txt")
             await ctx.reply(content=f"**🎉Here is your crawled novel #{next_no}**", file=file)
             channel = bot.get_channel(
-                1020980703229382706
-            ) or await bot.fetch_channel(1020980703229382706)
+                channel_id
+            ) or await bot.fetch_channel(channel_id)
 
             msg = await channel.send(
                 embed=embed,
