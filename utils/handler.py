@@ -391,8 +391,8 @@ class FileHandler:
                     delete_after=5,
                 )
                 os.rename(f"{ctx.author.id}.txt", f"{name}.txt")
-                file = bot.mega.upload(f"{name}.txt")
-                filelnk = bot.mega.get_upload_link(file)
+                file = await self.bot.loop.run_in_executor(None, bot.mega.upload, f"{name}.txt")
+                filelnk = await self.bot.loop.run_in_executor(None, bot.mega.get_upload_link, file)
                 view = LinkView({"Novel": [filelnk, "📔"]})
                 await ctx.reply(
                     content=f"> **✔{ctx.author.mention} your novel #{next_no} {name} is ready.**",
@@ -500,17 +500,17 @@ class FileHandler:
         embed.set_footer(text=f"Uploaded by {ctx.author}", icon_url=ctx.author.display_avatar)
         if (size := os.path.getsize(f"{title}.txt")) > 8 * 10 ** 6:
             bot.crawler_count = bot.crawler_count + 1
-            if size > 32 * 10 ** 6 and int(bot.crawler[ctx.author.id].split("/")[1]) < 3000:
+            if size > 35 * 10 ** 6:
                 os.remove(f"{title}.txt")
                 bot.crawler_count = bot.crawler_count + 1
                 return await ctx.send('Crawled file is too big. there is some problem in crawler')
             try:
-                file = bot.mega.upload(f"{title}.txt")
+                file = await self.bot.loop.run_in_executor(None, bot.mega.upload, f"{title}.txt")
                 await ctx.send(
                     "Crawling Completed... Your novel is too big.We are uploading to Mega.. Please wait",
                     delete_after=5,
                 )
-                filelnk = bot.mega.get_upload_link(file)
+                filelnk = await self.bot.loop.run_in_executor(None, bot.mega.get_upload_link, file)
                 view = LinkView({"Novel": [filelnk, "📔"]})
                 await ctx.reply(
                     content=f"> **✔{ctx.author.mention} your novel #{next_no} {title_name} is ready.**",
