@@ -2,7 +2,7 @@
 class CssSelector:
 
     def findURLCSS(link):
-        if "bixiange" in link:
+        if "bixiange" in link or "bixiang" in link:
             return "p ::text"
         elif "sj.uukanshu" in link or "t.uukanshu" in link:
             return "#read-page p ::text"
@@ -113,7 +113,7 @@ class CssSelector:
             return [".infos>h1:first-child", ""]
         elif "txt520" in link or "powanjuan" in link or "ffxs" in link:
             return ["title", ""]
-        elif "bixiange" in link:
+        elif "bixiang" in link:
             return [".desc>h1", ""]
         elif "sjks" in link:
             return [".box-artic>h1", ""]
