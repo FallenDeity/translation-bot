@@ -69,7 +69,7 @@ class CssSelector:
             return "#chaptercontent ::text"
         elif "www.qcxxs.com" in link:
             return "body > div.container > div.row.row-detail > div > div ::text"
-        elif "m.soxscc.net" in link:
+        elif "m.soxscc.net" in link or "m.ttshu8.com" in link:
             return "#chapter > div.content ::text"
         elif "metruyencv.com" in link:
             return "#article ::text"
@@ -89,7 +89,7 @@ class CssSelector:
             return "#chapter-container ::text"
         elif "m.tsxsw.net" in link:
             return "#nr ::text"
-        elif "www.tsxsw.net" in link:
+        elif "www.tsxsw.net" in link or "www.ttshu8.com" in link:
             return "#content ::text"
         elif "www.4ksw.com/" in link:
             return "div.panel-body.content-body.content-ext ::text"
@@ -131,7 +131,7 @@ class CssSelector:
             return [".bread>a:nth-of-type(3)", "title ::text"]
         elif "m.qidian" in link:
             return ["#header > h1", ""]
-        elif "m.soxscc.net" in link:
+        elif "m.soxscc.net" in link or "m.ttshu8.com" in link:
             return ["title", "#chapter > h1 ::text"]
         elif "www.soxscc.net" in link:
             return ["#info > h1", "body > div.content_read > div > div.bookname > h1 ::text"]
