@@ -1,6 +1,7 @@
 import asyncio
 import datetime
 import gc
+import platform
 
 import discord
 from discord.ext import commands
@@ -200,20 +201,14 @@ class Admin(commands.Cog):
     async def status(self, ctx: commands.Context):
         # await ctx.send(str(datetime.datetime.utcnow())+".-"+str(ctx.message.created_at))
         await ctx.defer()
-        await ctx.send(f"Latency is {int(self.bot.ws.latency*1000)} ms")
-        for roles in ctx.author.roles:
-            if roles.id == 1020638168237740042:
-                td = datetime.datetime.utcnow() - self.bot.boot
-                td = days_hours_minutes(td)
-                await ctx.send(
-                    f"Bot is up for {str(td[0]) + ' days ' if td[0] > 0 else ''}{str(td[1]) + ' hours ' if td[1] > 0 else ''}{str(td[2]) + ' minutes' if td[2] > 0 else ''}",
-                    ephemeral=True)
-                try:
-                    await ctx.send(f"** Bot has done {str(self.bot.translation_count)} translation and crawled {str(self.bot.crawler_count)} novels**")
-                    await ctx.send(embed=discord.Embed(title=f"**Bot has {str(len(asyncio.all_tasks()))} tasks running at the moment**", description=f"\n{str(asyncio.all_tasks())[:2000]}", colour=discord.Colour.dark_blue()))
-                except Exception as e:
-                    print(e)
-        return None
+        embed = discord.Embed(title="Status", description="Status of the bot")
+        embed.set_footer(text="Thanks for  using the bot!",  icon_url=ctx.author.avatar)
+        embed.add_field(name="Guilds", value=f"{len(self.bot.guilds)}", inline=True)
+        embed.add_field(name="Users", value=f"{len(self.bot.users)}", inline=True)
+        embed.add_field(name="Commands", value=f"{len(self.bot.application_commands)}", inline=True)
+        embed.add_field(name="Latency", value=f"{round(self.bot.latency * 1000)}ms", inline=True)
+        embed.add_field(name="OS", value=platform.system())
+        await ctx.send(embed=embed)
 
     @commands.has_role(1020638168237740042)
     @commands.hybrid_command(help="Give the progress of all current tasks of the bot(only for bot-admins)... ")
