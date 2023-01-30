@@ -205,7 +205,6 @@ class Admin(commands.Cog):
         embed.set_footer(text="Thanks for  using the bot!",  icon_url=ctx.author.avatar)
         embed.add_field(name="Guilds", value=f"{len(self.bot.guilds)}", inline=True)
         embed.add_field(name="Users", value=f"{len(self.bot.users)}", inline=True)
-        embed.add_field(name="Commands", value=f"{len(self.bot.application_commands)}", inline=True)
         embed.add_field(name="Latency", value=f"{round(self.bot.latency * 1000)}ms", inline=True)
         embed.add_field(name="OS", value=platform.system())
         await ctx.send(embed=embed)
