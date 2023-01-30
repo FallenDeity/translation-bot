@@ -210,13 +210,13 @@ class Admin(commands.Cog):
         embed.add_field(name="Guilds", value=f"{len(self.bot.guilds)}", inline=True)
         embed.add_field(name="Users", value=f"{len(self.bot.users)}", inline=True)
         embed.add_field(name="Latency", value=f"{round(self.bot.latency * 1000)}ms", inline=False)
+        embed.add_field(name="OS", value=platform.system(), inline=True)
         try:
             embed.add_field(name="CPU usage", value=str(round(float(os.popen(
                 '''grep 'cpu ' /proc/stat | awk '{usage=($2+$4)*100/($2+$4+$5)} END {print usage }' ''').readline()),
-                                                         2)), inline=False)
+                                                         2)) + " %", inline=True)
             mem = str(os.popen('free -t -m').readlines())
-            T_ind = mem.index('T')
-            mem_G = mem[T_ind + 14:-4]
+            mem_G = mem[mem.index('T') + 14:-4]
             S1_ind = mem_G.index(' ')
             mem_G1 = mem_G[S1_ind + 8:]
             S2_ind = mem_G1.index(' ')
@@ -231,7 +231,6 @@ class Admin(commands.Cog):
                 embed1 = discord.Embed(title="Status", description="Status of the bot", color=discord.Color.dark_gold())
                 embed1.set_thumbnail(url=self.bot.user.avatar)
                 embed1.set_footer(text="Thanks for  using the bot!", icon_url=ctx.author.avatar)
-                embed1.add_field(name="OS", value=platform.system())
                 td = datetime.datetime.utcnow() - self.bot.boot
                 td = days_hours_minutes(td)
                 embed1.add_field(name="UpTime",
@@ -240,7 +239,8 @@ class Admin(commands.Cog):
                 embed1.add_field(name="Tasks Completed", value=f"{str(self.bot.translation_count)} translated, "
                                                                f"{str(self.bot.crawler_count)} crawled", inline=False)
                 embed1.add_field(name="Current Tasks", value=f"{len(self.bot.crawler)} Crawl,"
-                                                             f" {len(self.bot.translator)} translate", inline=False)
+                                                             f" {len(self.bot.translator)} translate", inline=True)
+                embed1.add_field(name="Tasks Count", value=str(len(asyncio.all_tasks())), inline=True)
         if admin:
             await Library.buttons([embed, embed1], ctx)
         else:
