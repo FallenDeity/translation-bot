@@ -99,6 +99,8 @@ class CssSelector:
             return "#htmlContent ::text"
         elif "www.piaoyuxuan.com" in link:
             return "#content > div.content ::text"
+        elif "ranobes.com" in link:
+            return "div.block.story.shortstory ::text"
         else:
             return "* ::text"
 
@@ -189,5 +191,7 @@ class CssSelector:
             return ["body > div.container > div.row.row-detail > div > div > div.read_btn > a:nth-child(4)", "body > div.container > div.row.row-detail > div > h2 > a:nth-child(3) > font > font"]
         elif "mtl-novel.net" in link or "novelnext.com" in link:
             return ["#next_chap", "#chapter > div > div > a"]
+        elif "ranobes.com" in link:
+            return ["#next", "#dle-speedbar > span > font:nth-child(2) > span:nth-child(4) > a > span"]
         else:
             return [None, "title"]

@@ -804,6 +804,7 @@ class Crawler(commands.Cog):
             if cloudscrape:
                 scraper = cloudscraper.CloudScraper()
                 response = scraper.get(firstchplink, headers=headers, timeout=20)
+                await ctx.send("Cloudscrape is turned ON", delete_after=8)
                 await asyncio.sleep(0.25)
             else:
                 scraper = None
