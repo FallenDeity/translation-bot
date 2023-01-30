@@ -199,18 +199,21 @@ class Admin(commands.Cog):
         # app = h.app(os.getenv("APPNAME"))
         # app.restart()
 
+    @commands.guild_only()
     @commands.hybrid_command(help="Give the latency and uptime of the bot... ")
     async def status(self, ctx: commands.Context):
         # await ctx.send(str(datetime.datetime.utcnow())+".-"+str(ctx.message.created_at))
         await ctx.defer()
         embed = discord.Embed(title="Status", description="Status of the bot", color=discord.Color.dark_gold())
         embed.set_thumbnail(url=self.bot.user.avatar)
-        embed.set_footer(text="Thanks for  using the bot!",  icon_url=ctx.author.avatar)
+        embed.set_footer(text="Thanks for  using the bot!", icon_url=ctx.author.avatar)
         embed.add_field(name="Guilds", value=f"{len(self.bot.guilds)}", inline=True)
         embed.add_field(name="Users", value=f"{len(self.bot.users)}", inline=True)
         embed.add_field(name="Latency", value=f"{round(self.bot.latency * 1000)}ms", inline=False)
         try:
-            embed.add_field("CPU usage", value=str(round(float(os.popen('''grep 'cpu ' /proc/stat | awk '{usage=($2+$4)*100/($2+$4+$5)} END {print usage }' ''').readline()), 2)), inline=False)
+            embed.add_field(name="CPU usage", value=str(round(float(os.popen(
+                '''grep 'cpu ' /proc/stat | awk '{usage=($2+$4)*100/($2+$4+$5)} END {print usage }' ''').readline()),
+                                                         2)), inline=False)
             mem = str(os.popen('free -t -m').readlines())
             T_ind = mem.index('T')
             mem_G = mem[T_ind + 14:-4]
@@ -218,7 +221,7 @@ class Admin(commands.Cog):
             mem_G1 = mem_G[S1_ind + 8:]
             S2_ind = mem_G1.index(' ')
             mem_F = mem_G1[S2_ind + 8:]
-            embed.add_field("RAM available", value=f"{mem_F} MB", inline=True)
+            embed.add_field(name="RAM available", value=f"{mem_F} MB", inline=True)
         except Exception as e:
             print(e)
         admin = False
@@ -231,11 +234,13 @@ class Admin(commands.Cog):
                 embed1.add_field(name="OS", value=platform.system())
                 td = datetime.datetime.utcnow() - self.bot.boot
                 td = days_hours_minutes(td)
-                embed1.add_field(name="UpTime", value=f"{str(td[0]) + ' days ' if td[0] > 0 else ''}{str(td[1]) + 'hours ' if td[1] > 0 else ''}{str(td[2]) + ' minutes' if td[2] > 0 else ''}", inline=False)
+                embed1.add_field(name="UpTime",
+                                 value=f"{str(td[0]) + ' days ' if td[0] > 0 else ''}{str(td[1]) + 'hours ' if td[1] > 0 else ''}{str(td[2]) + ' minutes' if td[2] > 0 else ''}",
+                                 inline=False)
                 embed1.add_field(name="Tasks Completed", value=f"{str(self.bot.translation_count)} translated, "
-                                                              f"{str(self.bot.crawler_count)} crawled", inline=False)
+                                                               f"{str(self.bot.crawler_count)} crawled", inline=False)
                 embed1.add_field(name="Current Tasks", value=f"{len(self.bot.crawler)} Crawl,"
-                                                            f" {len(self.bot.translator)} translate", inline=False)
+                                                             f" {len(self.bot.translator)} translate", inline=False)
         if admin:
             await Library.buttons([embed, embed1], ctx)
         else:
