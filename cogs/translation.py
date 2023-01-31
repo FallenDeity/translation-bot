@@ -3,6 +3,7 @@ import datetime
 import gc
 import os
 import random
+import traceback
 import typing
 from urllib.parse import urljoin
 
@@ -322,7 +323,10 @@ class Translate(commands.Cog):
                 1054014022019715092
             ) or await self.bot.fetch_channel(1054014022019715092)
             msg_new_id = new_ch.last_message_id
-            msg_new = await new_ch.fetch_message(msg_new_id)
+            try:
+                msg_new = await new_ch.fetch_message(msg_new_id)
+            except:
+                msg_new = await new_ch.fetch_message(1069535943738019840)
             context_new = await self.bot.get_context(msg_new)
             try:
                 asyncio.create_task(self.bot.get_command("translate").callback(Translate(self.bot), context_new, link,
@@ -424,6 +428,8 @@ class Translate(commands.Cog):
             if "Translation stopped" in str(e):
                 return await ctx.send("Translation stopped")
             else:
+                print(e)
+                traceback.print_exc()
                 raise e
         finally:
             try:
