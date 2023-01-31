@@ -603,12 +603,12 @@ class Crawler(commands.Cog):
                 if len(ids) < 5 or name_lib_check:
                     await ctx.send("**Please check from above library**", delete_after=20)
                     await asyncio.sleep(15)
-                for l in ["bixiange", "trxs", "txt520", "powanjuan", "tongrenquan", "jpxs"]:
+                for l in ["bixiang", "trxs", "txt520", "powanjuan", "tongrenquan", "jpxs"]:
                     if l in link and name_lib_check:
                         await ctx.send("Novel is already in our library. if its not ping Admin")
                         return None
                     else:
-                        await asyncio.sleep(1)
+                        await asyncio.sleep(0.1)
                 chk_msg = await ctx.send(embed=discord.Embed(
                     description=f"This novel **{title}** is already in our library with ids **{ids.__str__()}**...use arrow marks  in above  to navigate...  \n\nIf you want to continue crawling react with 🇳 \n\n**Note : Some files are in docx format, so file size maybe half the size of txt. and try to minimize translating if its already in library**"))
                 await chk_msg.add_reaction('🇾')
