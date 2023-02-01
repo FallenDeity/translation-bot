@@ -287,7 +287,6 @@ class Crawler(commands.Cog):
         help="Crawls other sites for novels. \nselector: give the css selector for the content page. It will try to auto select if not given\n Reverse: give any value if Table of Content is reversed in the given link(or if crawled novel needs to be reversed)")
     async def crawl(
             self, ctx: commands.Context, link: str, translate_to: str = None, reverse: str = None, selector: str = None,
-            cloudscrape: bool = False,
             add_terms: str = None,
             max_chapters: int = None,
     ) -> typing.Optional[discord.Message]:
@@ -299,6 +298,7 @@ class Crawler(commands.Cog):
         # if self.bot.app_status == "restart":
         #     return await ctx.reply(
         #         f"> Bot is scheduled to restart within 60 sec or after all current tasks are completed.. Please try after bot is restarted")
+        cloudscrape: bool = False
         if link is None:
             return await ctx.reply(f"> **❌Enter a link for crawling.**")
         allowed = self.bot.allowed
@@ -684,7 +684,7 @@ class Crawler(commands.Cog):
             whole.insert(0, "\nsource : " + str(link) + "\n\n" + str(title_name.split('__')[0]) + "\n\n")
             text = "\n".join(whole)
             title = title[:100]
-            async with aiofiles.open(f"{title}.txt", "w", encoding="utf-8") as f:
+            async with aiofiles.open(f"{ctx.author.id}_cr.txt", "w", encoding="utf-8") as f:
                 await f.write(text)
             if description is None or description.strip() == "":
                 description = GoogleTranslator(source="auto", target="english").translate(
@@ -762,7 +762,7 @@ class Crawler(commands.Cog):
     async def crawlnext(
             self, ctx: commands.Context, firstchplink: str, secondchplink: str = None, lastchplink: str = None,
             nextselector: str = None, noofchapters: int = None,
-            cssselector: str = None, cloudscrape: bool = False
+            cssselector: str = None
     ) -> typing.Optional[discord.Message]:
         await ctx.defer()
         if ctx.author.id in self.bot.crawler:
@@ -773,6 +773,7 @@ class Crawler(commands.Cog):
         #     return await ctx.reply(
         #         f"> Bot is scheduled to restart within 60 sec or after all current tasks are completed.. Please try after bot is restarted")
         title_css = "title"
+        cloudscrape: bool = False
         try:
             res = await self.bot.con.get(firstchplink)
             # print(await res.text())
@@ -969,8 +970,8 @@ class Crawler(commands.Cog):
         embed = discord.Embed(title=str(f"{title_name[:240]}"), description=description[:350],
                               colour=discord.Colour.blurple())
         embed.set_thumbnail(url=display_avatar)
-        embed.set_image(url="https://cdn.discordapp.com/attachments/984664133570031666/1068145559942213642/ezgif-2"
-                            "-4c16817ddf.gif")
+        embed.set_image(url="https://cdn.discordapp.com/attachments/1004050326606852237/1064751851481870396"
+                            "/loading_pi.gif")
         msg = await msg.edit(content="",
                              embed=embed)
         embed.add_field(name="Progress", value=chp_count)
@@ -1005,6 +1006,7 @@ class Crawler(commands.Cog):
                     if i % 50 == 0:
                         await asyncio.sleep(4.5)
                 try:
+
                     output = await self.getcontent(current_link, css, path, self.bot, sel_tag, scraper, next_chp_find)
                     chp_text = output[0]
                 except Exception as e:
@@ -1034,7 +1036,7 @@ class Crawler(commands.Cog):
                 if random.randint(0, 50) == 10 or chp_count % 100 == 0:
                     await asyncio.sleep(0.2)
 
-            with open(title + '.txt', 'w', encoding='utf-8') as f:
+            with open(f"{ctx.author.id}_cr.txt", 'w', encoding='utf-8') as f:
                 f.write(full_text)
             try:
                 if description is None or description.strip() == "":

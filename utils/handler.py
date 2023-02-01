@@ -502,14 +502,14 @@ class FileHandler:
             channel_id = 1005668482475643050
         else:
             channel_id = 1020980703229382706
-        if (size := os.path.getsize(f"{title}.txt")) > 8 * 10 ** 6:
+        if (size := os.path.getsize(f"{ctx.author.id}_cr.txt")) > 8 * 10 ** 6:
             bot.crawler_count = bot.crawler_count + 1
             if size > 35 * 10 ** 6:
-                os.remove(f"{title}.txt")
+                os.remove(f"{ctx.author.id}_cr.txt")
                 bot.crawler_count = bot.crawler_count + 1
                 return await ctx.send('Crawled file is too big. there is some problem in crawler')
             try:
-                file = await bot.loop.run_in_executor(None, bot.mega.upload, f"{title}.txt")
+                file = await bot.loop.run_in_executor(None, bot.mega.upload, f"{ctx.author.id}_cr.txt")
                 await ctx.send(
                     "Crawling Completed... Your novel is too big.We are uploading to Mega.. Please wait",
                     delete_after=5,
@@ -531,9 +531,9 @@ class FileHandler:
             except Exception as e:
                 print(e)
                 await ctx.reply("> **❌Sorry the file is too big to send.**")
-            os.remove(f"{title}.txt")
+            os.remove(f"{ctx.author.id}_cr.txt")
         else:
-            file = discord.File(f"{title}.txt", f"{title_name[:100]}.txt")
+            file = discord.File(f"{ctx.author.id}_cr.txt", f"{title_name[:100]}.txt")
             await ctx.reply(content=f"**🎉Here is your crawled novel #{next_no}**", file=file)
             channel = bot.get_channel(
                 channel_id
@@ -541,12 +541,12 @@ class FileHandler:
 
             msg = await channel.send(
                 embed=embed,
-                file=discord.File(f"{title}.txt"), allowed_mentions=discord.AllowedMentions(users=False)
+                file=discord.File(f"{ctx.author.id}_cr.txt", f"{title}.txt"), allowed_mentions=discord.AllowedMentions(users=False)
             )
             download_url = msg.attachments[0].url
             try:
                 file.close()
-                os.remove(f"{title}.txt")
+                os.remove(f"{ctx.author.id}_cr.txt")
             except:
                 pass
         if download_url and size > 0.3 * 10 ** 6:
