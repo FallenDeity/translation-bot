@@ -242,9 +242,9 @@ class Admin(commands.Cog):
                                                              f" {len(self.bot.translator)} translate", inline=True)
                 embed1.add_field(name="Tasks Count", value=str(len(asyncio.all_tasks())), inline=True)
         if admin:
-            await Library.buttons([embed, embed1], ctx)
+            return await Library.buttons([embed, embed1], ctx)
         else:
-            await ctx.send(embed=embed)
+            return await ctx.send(embed=embed)
 
     @commands.has_role(1020638168237740042)
     @commands.hybrid_command(help="Give the progress of all current tasks of the bot(only for bot-admins)... ")

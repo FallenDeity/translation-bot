@@ -813,7 +813,7 @@ class Crawler(commands.Cog):
         except Exception as e:
             print(e)
             return await ctx.reply(
-                "> Couldn't connect to the provided link.... Please check the link or try with cloudscraper true")
+                "> Couldn't connect to the provided link.... Please check the link")
         if response.status_code == 404:
             return await ctx.reply("> Provided link gives 404 error... Please check the link")
         response.encoding = response.apparent_encoding
