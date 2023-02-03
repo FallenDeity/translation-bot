@@ -381,10 +381,14 @@ class Library(commands.Cog):
         await ctx.send("Novel reviewed.")
 
     @commands.hybrid_command(name="leaderboard", description="Get the bot's leaderboard.")
-    async def leaderboard(self, ctx: commands.Context) -> None:
+    async def leaderboard(self, ctx: commands.Context, user: discord.User = None) -> None:
         """Get the bot's leaderboard."""
         await ctx.defer()
-        user_rank = await self.bot.mongo.library.get_user_novel_count(ctx.author.id)
+        if user is None:
+            user_id = ctx.author.id
+        else:
+            user_id = user.id
+        user_rank = await self.bot.mongo.library.get_user_novel_count(user_id=user_id)
         top_200 = await self.bot.mongo.library.get_user_novel_count(_top_200=True)
         embeds = []
         top_200 = [(user_id, count) for user_id, count in top_200.items()]
