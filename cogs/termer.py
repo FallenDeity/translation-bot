@@ -386,6 +386,7 @@ class Termer(commands.Cog):
             embed.set_thumbnail(url=avatar)
             embed.add_field(name="Translating to", value=language, inline=False)
             embed.add_field(name="From", value=original_Language, inline=False)
+            embed.add_field(name="Size", value=size, inline=True)
             rep_msg = await rep_msg.edit(content="", embed=embed)
             liz = [novel[i: i + 1800] for i in range(0, len(novel), 1800)]
             self.bot.translator[ctx.author.id] = f"0/{len(liz)}"

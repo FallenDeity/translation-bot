@@ -405,6 +405,7 @@ class Translate(commands.Cog):
             embed.set_thumbnail(url=avatar)
             embed.add_field(name="Translating to", value=language, inline=False)
             embed.add_field(name="From", value=original_Language, inline=False)
+            embed.add_field(name="Size", value=size, inline=True)
             rep_msg = await rep_msg.edit(content="", embed=embed)
             poke_words = ["elves ", "pokemon", "pokémon", " elf "]
             if any(word in name.lower() for word in poke_words):
@@ -448,7 +449,7 @@ class Translate(commands.Cog):
             except:
                 pass
             try:
-                if self.bot.translation_count >= 16 or self.bot.crawler_count >= 20:
+                if self.bot.translation_count >= 17 or self.bot.crawler_count >= 20:
                     await ctx.reply(
                         "> **Bot will be Restarted when the bot is free due to max limit is reached.. Please be patient")
                     chan = self.bot.get_channel(

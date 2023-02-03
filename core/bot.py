@@ -9,7 +9,6 @@ import aiohttp
 import discord
 import nltk
 from discord.ext import commands
-# from filestack import Client
 from mega import Mega
 
 from languages.languages import choices
@@ -37,7 +36,7 @@ class Raizel(commands.Bot):
         self.dictionary: str = get_dictionary()
         self.boot = datetime.datetime.utcnow()
         self.app_status: str = "up"
-        self.translation_count = 0
+        self.translation_count: float = 0
         self.crawler_count = 0
         super().__init__(
             command_prefix=commands.when_mentioned_or(".t"),
@@ -91,7 +90,7 @@ class Raizel(commands.Bot):
                     f"> <@&1020638168237740042> **Couldn't connect with Mega servers. "
                     f"some problem with connection \n{e}",
                     allowed_mentions=discord.AllowedMentions(roles=False))
-                print("mega login anonymously failed ..something wrong with mega",)
+                print("mega login anonymously failed ..something wrong with mega", )
             print(e)
         # await self.tree.sync()
         await channel.send(embed=discord.Embed(description=f"Bot is up now"))
@@ -154,8 +153,9 @@ class Raizel(commands.Bot):
                         991911644831678484
                     ) or await self.bot.fetch_channel(991911644831678484)
                     try:
-                        await channel.send(embed=discord.Embed(description=f"Bot has been auto-restarted. \nBot has translated {str(self.translation_count)} novels and crawled {str(self.crawler_count)} novels"
-                                                               , colour=discord.Colour.brand_green()))
+                        await channel.send(embed=discord.Embed(
+                            description=f"Bot has been auto-restarted. \nBot has translated {str(int(self.translation_count))} novels and crawled {str(self.crawler_count)} novels"
+                            , colour=discord.Colour.brand_green()))
                         del self.titles
                         gc.collect()
                     except:

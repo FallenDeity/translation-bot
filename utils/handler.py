@@ -362,9 +362,6 @@ class FileHandler:
         download_url = None
         next_no = await bot.mongo.library.next_number
         category = "Uncategorised"
-        bot.translation_count = bot.translation_count + 1
-        if (os.path.getsize(f"{ctx.author.id}.txt")) > 4 * 10 ** 6:
-            bot.translation_count = bot.translation_count + 1
         try:
             category = Categories.from_string(name)
             if category == "Uncategorised":
@@ -383,9 +380,6 @@ class FileHandler:
         embed.set_thumbnail(url=thumbnail)
         embed.set_footer(text=f"Uploaded by {ctx.author}", icon_url=ctx.author.display_avatar)
         if (size := os.path.getsize(f"{ctx.author.id}.txt")) > 8 * 10 ** 6:
-            bot.translation_count = bot.translation_count + 1
-            if (size := os.path.getsize(f"{ctx.author.id}.txt")) > 13 * 10 ** 6:
-                bot.translation_count = bot.translation_count + 2
             try:
                 await ctx.send(
                     "Translation Completed... Your novel is too big.We are uploading to Mega.. Please wait",
@@ -443,6 +437,7 @@ class FileHandler:
             except:
                 pass
             download_url = msg.attachments[0].url
+        bot.translation_count = bot.translation_count + (size/2)
         if raw_name is not None:
             name = name + "__" + raw_name
         if download_url and size > 0.3 * 10 ** 6:

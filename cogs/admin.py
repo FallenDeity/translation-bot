@@ -186,7 +186,7 @@ class Admin(commands.Cog):
         ) or await self.bot.fetch_channel(991911644831678484)
         try:
             await channel.send(
-                f"Bot has been restarted by user : {ctx.author.name} \nBot has translated {str(self.bot.translation_count)} novels and crawled {str(self.bot.crawler_count)} novels"
+                f"Bot has been restarted by user : {ctx.author.name} \nBot has translated {str(int(self.bot.translation_count))} novels and crawled {str(self.bot.crawler_count)} novels"
             )
             del self.bot.titles
             gc.collect()
@@ -236,7 +236,7 @@ class Admin(commands.Cog):
                 embed1.add_field(name="UpTime",
                                  value=f"{str(td[0]) + ' days ' if td[0] > 0 else ''}{str(td[1]) + 'hours ' if td[1] > 0 else ''}{str(td[2]) + ' minutes' if td[2] > 0 else ''}",
                                  inline=False)
-                embed1.add_field(name="Tasks Completed", value=f"{str(self.bot.translation_count)} translated, "
+                embed1.add_field(name="Tasks Completed", value=f"{str(int(self.bot.translation_count))} translated, "
                                                                f"{str(self.bot.crawler_count)} crawled", inline=False)
                 embed1.add_field(name="Current Tasks", value=f"{len(self.bot.crawler)} Crawl,"
                                                              f" {len(self.bot.translator)} translate", inline=True)
