@@ -398,7 +398,7 @@ class Library(commands.Cog):
             embed = discord.Embed(
                 title="Leaderboard",
                 description=f"**Leaderboard of the bot!**\
-                        \n\n**Your Rank: {user_rank[ctx.author.id]}**",
+                        \n\n**User Rank: {user_rank[ctx.author.id]}**",
                 color=discord.Color.random(),
             )
             embed.set_footer(text="Thanks for using TranslationBot!", icon_url=self.bot.user.display_avatar)
