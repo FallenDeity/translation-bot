@@ -691,7 +691,7 @@ class Crawler(commands.Cog):
                 description = GoogleTranslator(source="auto", target="english").translate(
                     text[:500].strip().replace("\n\n", "\n"))
             download_url = await FileHandler().crawlnsend(ctx, self.bot, title, title_name, original_Language,
-                                                          description, thumbnail)
+                                                          description, thumbnail, link=link)
         except Exception as e:
             await ctx.send("> Error occurred .Please report to admin +\n" + str(e))
             print(traceback.format_exc())
@@ -1047,7 +1047,7 @@ class Crawler(commands.Cog):
                 pass
             await ctx.send(f"Crawled {chp_count} pages.")
             return await FileHandler().crawlnsend(ctx, self.bot, title, title_name, original_Language,
-                                                  description=description, thumbnail=thumbnail)
+                                                  description=description, thumbnail=thumbnail, link=firstchplink)
         except Exception as e:
             print(traceback.format_exc())
             await ctx.send("> Error occurred .Please report to admin +\n" + str(e))

@@ -59,7 +59,7 @@ class Translator:
         return num, translated
 
     def translates(self, chapters: t.List[str]) -> None:
-        with concurrent.futures.ThreadPoolExecutor(max_workers=9) as executor:
+        with concurrent.futures.ThreadPoolExecutor(max_workers=8) as executor:
             futures = [
                 executor.submit(self.translate, [url], num)
                 for num, url in enumerate(chapters)

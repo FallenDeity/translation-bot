@@ -474,7 +474,7 @@ class FileHandler:
 
     async def crawlnsend(
             self, ctx: commands.Context, bot: Raizel, title: str, title_name: str, originallanguage: str,
-            description: str = None, thumbnail: str = ""
+            description: str = None, thumbnail: str = "", link: str = None
     ) -> str:
         download_url = None
         next_no = await bot.mongo.library.next_number
@@ -497,6 +497,8 @@ class FileHandler:
                               colour=discord.Colour.dark_gold())
         embed.add_field(name="Category", value=category)
         embed.add_field(name="Language", value=originallanguage)
+        if link:
+            embed.add_field(name="Crawled from :", value=f"[{link}]({link})")
         embed.set_thumbnail(url=thumbnail)
         embed.set_footer(text=f"Uploaded by {ctx.author}", icon_url=ctx.author.display_avatar)
         if originallanguage == "english":
