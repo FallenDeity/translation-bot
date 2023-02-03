@@ -343,6 +343,7 @@ class Crawler(commands.Cog):
         if cloudscrape:
             scraper = cloudscraper.CloudScraper()  # CloudScraper inherits from requests.Session
             response = scraper.get(link, timeout=10)
+            response.encoding = response.apparent_encoding
             soup = BeautifulSoup(response.text, "html.parser", from_encoding=response.encoding)
             soup1 = soup
             if int(str(response.status_code)[0]) == 4:
