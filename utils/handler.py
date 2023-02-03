@@ -437,7 +437,7 @@ class FileHandler:
             except:
                 pass
             download_url = msg.attachments[0].url
-        bot.translation_count = bot.translation_count + (size/2)
+        bot.translation_count = bot.translation_count + (round(size / (1024 ** 2), 2)/2)
         if raw_name is not None:
             name = name + "__" + raw_name
         if download_url and size > 0.3 * 10 ** 6:

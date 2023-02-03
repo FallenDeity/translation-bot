@@ -385,7 +385,7 @@ class Termer(commands.Cog):
                                   colour=discord.Colour.blurple())
             embed.set_thumbnail(url=avatar)
             embed.add_field(name="Translating to", value=language, inline=True)
-            embed.add_field(name="From", value=original_Language, inline=False)
+            embed.add_field(name="From", value=original_Language, inline=True)
             embed.add_field(name="Size", value=f"{round(size / (1024 ** 2), 2)} MB", inline=False)
             rep_msg = await rep_msg.edit(content="", embed=embed)
             liz = [novel[i: i + 1800] for i in range(0, len(novel), 1800)]
@@ -454,7 +454,7 @@ class Termer(commands.Cog):
                 break
             await asyncio.sleep(8)
 
-        embed.set_field_at(index=2,
+        embed.set_field_at(index=3,
                            name=f"Progress :  100%",
                            value=progressBar.filledBar(100, 100,
                                                        size=10, line="🟥", slider="🟩")[
