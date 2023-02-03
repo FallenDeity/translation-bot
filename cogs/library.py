@@ -383,10 +383,10 @@ class Library(commands.Cog):
         """Get the bot's leaderboard."""
         await ctx.defer()
         if user is None:
-            user_id = ctx.author.id
+            ld_user_id = ctx.author.id
         else:
-            user_id = user.id
-        user_rank = await self.bot.mongo.library.get_user_novel_count(user_id=user_id)
+            ld_user_id = user.id
+        user_rank = await self.bot.mongo.library.get_user_novel_count(user_id=ld_user_id)
         top_200 = await self.bot.mongo.library.get_user_novel_count(_top_200=True)
         embeds = []
         top_200 = [(user_id, count) for user_id, count in top_200.items()]
@@ -396,7 +396,7 @@ class Library(commands.Cog):
             embed = discord.Embed(
                 title="Leaderboard",
                 description=f"**Leaderboard of the bot!**\
-                        \n\n**User Rank: {user_rank[user_id]}**",
+                        \n\n**User Rank: {user_rank[ld_user_id]}**",
                 color=discord.Color.random(),
             )
             embed.set_footer(text="Thanks for using TranslationBot!", icon_url=self.bot.user.display_avatar)
