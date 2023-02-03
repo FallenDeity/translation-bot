@@ -390,8 +390,9 @@ class FileHandler:
                     "Translation Completed... Your novel is too big.We are uploading to Mega.. Please wait",
                     delete_after=5,
                 )
-                os.rename(f"{ctx.author.id}.txt", f"{name}.txt")
-                file = await bot.loop.run_in_executor(None, bot.mega.upload, f"{name}.txt")
+                filename = f"{str(ctx.author.id)}_trans{random.randint(100,10000)}.txt"
+                os.rename(f"{ctx.author.id}.txt", f"{filename}")
+                file = await bot.loop.run_in_executor(None, bot.mega.upload, f"{filename}")
                 filelnk = await bot.loop.run_in_executor(None, bot.mega.get_upload_link, file)
                 view = LinkView({"Novel": [filelnk, "📔"]})
                 await ctx.reply(
@@ -415,7 +416,10 @@ class FileHandler:
                 await ctx.reply(
                     "**Sorry your file was too big please split it and try again.**"
                 )
-            os.remove(f"{name}.txt")
+            try:
+                os.remove(f"{filename}")
+            except:
+                pass
         else:
             file = discord.File(f"{ctx.author.id}.txt", f"{name}.txt")
             await ctx.reply(content=f"**🎉Here is your translated novel #{next_no}**", file=file)
@@ -509,7 +513,9 @@ class FileHandler:
                 bot.crawler_count = bot.crawler_count + 1
                 return await ctx.send('Crawled file is too big. there is some problem in crawler')
             try:
-                file = await bot.loop.run_in_executor(None, bot.mega.upload, f"{ctx.author.id}_cr.txt")
+                filename = f"{str(ctx.author.id)}_cr{random.randint(100, 10000)}.txt"
+                os.rename(f"{ctx.author.id}_cr.txt", f"{filename}")
+                file = await bot.loop.run_in_executor(None, bot.mega.upload, f"{filename}")
                 await ctx.send(
                     "Crawling Completed... Your novel is too big.We are uploading to Mega.. Please wait",
                     delete_after=5,
@@ -531,7 +537,10 @@ class FileHandler:
             except Exception as e:
                 print(e)
                 await ctx.reply("> **❌Sorry the file is too big to send.**")
-            os.remove(f"{ctx.author.id}_cr.txt")
+            try:
+                os.remove(f"{filename}")
+            except:
+                pass
         else:
             file = discord.File(f"{ctx.author.id}_cr.txt", f"{title_name[:100]}.txt")
             await ctx.reply(content=f"**🎉Here is your crawled novel #{next_no}**", file=file)
