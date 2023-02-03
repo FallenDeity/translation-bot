@@ -68,8 +68,7 @@ class Translate(commands.Cog):
         if link is not None and link.startswith("#"):
             try:
                 novel_id = int(link.replace("#", ""))
-                novel_data = await self.bot.mongo.library.get_novel_by_id(novel_id)
-                link = novel_data.download
+                library_id = novel_id
             except:
                 return await ctx.reply("send a valid id")
         if library_id is not None:
@@ -224,6 +223,9 @@ class Translate(commands.Cog):
                     name_check = FileHandler.checkname(name, self.bot)
                 except:
                     pass
+        if (not name_check) and library_id is not None:
+            name = self.bot.mongo.library.get_title_by_id(library_id)
+            name_check = FileHandler.checkname(name, self.bot)
         if not name_check:
             await rep_msg.delete()
             return await ctx.reply(

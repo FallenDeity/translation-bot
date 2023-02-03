@@ -211,6 +211,9 @@ class Termer(commands.Cog):
                     name_check = FileHandler.checkname(name, self.bot)
                 except:
                     pass
+        if (not name_check) and library_id is not None:
+            name = self.bot.mongo.library.get_title_by_id(library_id)
+            name_check = FileHandler.checkname(name, self.bot)
         if not name_check:
             await rep_msg.delete()
             return await ctx.reply(
