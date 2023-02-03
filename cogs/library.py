@@ -272,7 +272,7 @@ class Library(commands.Cog):
                 del allnovels
             except:
                 pass
-            await self.buttons(embeds, ctx)
+            return await self.buttons(embeds, ctx)
         else:
             embeds = await self.make_list_embed(allnovels)
             if full_size != 0:
@@ -283,7 +283,7 @@ class Library(commands.Cog):
                 del allnovels
             except:
                 pass
-            await self.buttons(embeds, ctx)
+            return await self.buttons(embeds, ctx)
 
     @library.command(name="random", help="Gives 10 random novel in library.")
     async def random(
@@ -298,8 +298,7 @@ class Library(commands.Cog):
                 novels.append(await self.bot.mongo.library.get_novel_by_id(r))
             except:
                 pass
-        await self.buttons(await self.make_list_embed(novels), ctx)
-        return
+        return await self.buttons(await self.make_list_embed(novels), ctx)
 
     @search.autocomplete("language")
     async def translate_complete(
@@ -357,10 +356,9 @@ class Library(commands.Cog):
         await ctx.defer()
         novel = await self.bot.mongo.library.get_novel_by_id(_id)
         if not novel:
-            await ctx.send("No novel found.")
-            return
+            return await ctx.send("No novel found.")
         embed = await self.make_base_embed(novel)
-        await ctx.send(embed=embed)
+        return await ctx.send(embed=embed)
 
     @library.command(name="review", help="reviews a novel.")
     async def review(
@@ -378,7 +376,7 @@ class Library(commands.Cog):
             novel._id, summary + f" • Reviewed by {ctx.author}"
         )
         await self.bot.mongo.library.update_rating(novel._id, rating)
-        await ctx.send("Novel reviewed.")
+        return await ctx.send("Novel reviewed.")
 
     @commands.hybrid_command(name="leaderboard", description="Get the bot's leaderboard.")
     async def leaderboard(self, ctx: commands.Context, user: discord.User = None) -> None:
@@ -414,7 +412,7 @@ class Library(commands.Cog):
                     pass
                 n += 1
             embeds.append(embed)
-        await self.buttons(embeds, ctx)
+        return await self.buttons(embeds, ctx)
 
 
 async def setup(bot: Raizel) -> None:

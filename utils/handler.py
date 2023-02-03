@@ -3,6 +3,7 @@ import datetime
 import os
 import random
 import re
+import string
 import typing
 from urllib.parse import urljoin
 from collections import OrderedDict
@@ -390,7 +391,8 @@ class FileHandler:
                     "Translation Completed... Your novel is too big.We are uploading to Mega.. Please wait",
                     delete_after=5,
                 )
-                filename = f"{str(ctx.author.id)}_trans{random.randint(100,10000)}.txt"
+                filename = f"{random.choice(string.ascii_letters)}{random.choice(string.digits)}{str(ctx.author.id)}_" \
+                           f"trans{random.choice(string.ascii_letters)}{random.randint(100,1000)}.txt"
                 os.rename(f"{ctx.author.id}.txt", f"{filename}")
                 file = await bot.loop.run_in_executor(None, bot.mega.upload, f"{filename}")
                 filelnk = await bot.loop.run_in_executor(None, bot.mega.get_upload_link, file)
@@ -513,7 +515,8 @@ class FileHandler:
                 bot.crawler_count = bot.crawler_count + 1
                 return await ctx.send('Crawled file is too big. there is some problem in crawler')
             try:
-                filename = f"{str(ctx.author.id)}_cr{random.randint(100, 10000)}.txt"
+                filename = f"{random.choice(string.ascii_letters)}{random.choice(string.digits)}{str(ctx.author.id)}_" \
+                           f"trans{random.choice(string.ascii_letters)}{random.randint(100, 1000)}.txt"
                 os.rename(f"{ctx.author.id}_cr.txt", f"{filename}")
                 file = await bot.loop.run_in_executor(None, bot.mega.upload, f"{filename}")
                 await ctx.send(
