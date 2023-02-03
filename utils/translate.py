@@ -58,8 +58,9 @@ class Translator:
 
         return num, translated
 
-    def translates(self, chapters: t.List[str]) -> None:
-        with concurrent.futures.ThreadPoolExecutor(max_workers=8) as executor:
+    def translates(self, chapters: t.List[str], no_tasks: int) -> None:
+        workers = self.get_no_of_workers(no_tasks, len(chapters))
+        with concurrent.futures.ThreadPoolExecutor(max_workers=workers) as executor:
             futures = [
                 executor.submit(self.translate, [url], num)
                 for num, url in enumerate(chapters)
@@ -73,10 +74,38 @@ class Translator:
                     break
                 self.bot.translator[self.user] = f"{len(self.order)}/{len(chapters)}"
 
-    async def start(self, chapters: t.List[str]) -> str:
-        await self.bot.loop.run_in_executor(None, self.translates, chapters)
+    async def start(self, chapters: t.List[str], no_of_tasks: int = 8) -> str:
+        await self.bot.loop.run_in_executor(None, self.translates, chapters, no_of_tasks)
         ordered_story = {
             k: v for k, v in sorted(self.order.items(), key=lambda item: item[0])
         }
         full_story = [i[0] for i in list(ordered_story.values()) if i[0] is not None]
         return "".join(full_story)
+
+    @staticmethod
+    def get_no_of_workers(no_tasks, size) -> int:
+        workers: int = 8
+        if size <= 700:
+            if no_tasks > 8:
+                workers = 8
+            else:
+                workers = 10
+        elif size <= 1400:
+            if no_tasks > 8:
+                workers = 7
+            else:
+                workers = 9
+        elif size <= 2000:
+            if no_tasks > 8:
+                workers = 6
+            else:
+                workers = 8
+        else:
+            if no_tasks > 8:
+                workers = 5
+            else:
+                if size <= 2500:
+                    workers = 7
+                else:
+                    workers = 6
+        return workers

@@ -403,9 +403,9 @@ class Translate(commands.Cog):
             embed = discord.Embed(title=str(f"{name[:240]}"), description=des[:350],
                                   colour=discord.Colour.blurple())
             embed.set_thumbnail(url=avatar)
-            embed.add_field(name="Translating to", value=language, inline=False)
+            embed.add_field(name="Translating to", value=language, inline=True)
             embed.add_field(name="From", value=original_Language, inline=False)
-            embed.add_field(name="Size", value=size, inline=True)
+            embed.add_field(name="Size", value=f"{round(size / (1024 ** 2), 2)} MB", inline=False)
             rep_msg = await rep_msg.edit(content="", embed=embed)
             poke_words = ["elves ", "pokemon", "pokémon", " elf "]
             if any(word in name.lower() for word in poke_words):
@@ -416,7 +416,7 @@ class Translate(commands.Cog):
             self.bot.translator[ctx.author.id] = f"0/{len(liz)}"
             asyncio.create_task(self.cc_prog(rep_msg, embed=embed, author_id=ctx.author.id))
             translate = Translator(self.bot, ctx.author.id, language)
-            story = await translate.start(liz)
+            story = await translate.start(liz, len(asyncio.all_tasks()))
             async with aiofiles.open(f"{ctx.author.id}.txt", "w", encoding="utf-8") as f:
                 await f.write(story)
             if description.strip() == "":
@@ -482,7 +482,7 @@ class Translate(commands.Cog):
             out = self.bot.translator[author_id]
             split = out.split("/")
             if split[0].isnumeric() and value <= eval(out):
-                embed.set_field_at(index=2,
+                embed.set_field_at(index=3,
                                    name=f"Progress :  {str(round(eval(out) * 100, 2))}%",
                                    value=progressBar.filledBar(int(split[1]), int(split[0]),
                                                                size=10, line="🟥", slider="🟩")[
