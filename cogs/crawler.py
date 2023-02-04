@@ -762,16 +762,15 @@ class Crawler(commands.Cog):
     async def crawlnext(
             self, ctx: commands.Context, firstchplink: str, secondchplink: str = None, lastchplink: str = None,
             nextselector: str = None, noofchapters: int = None,
-            cssselector: str = None
+            cssselector: str = None, waittime: float = None,
     ) -> typing.Optional[discord.Message]:
         await ctx.defer()
         if ctx.author.id in self.bot.crawler:
             return await ctx.reply(
                 "> **❌You cannot crawl two novels at the same time.**"
             )
-        # if self.bot.app_status == "restart":
-        #     return await ctx.reply(
-        #         f"> Bot is scheduled to restart within 60 sec or after all current tasks are completed.. Please try after bot is restarted")
+        # if self.bot.app_status == "restart": return await ctx.reply( f"> Bot is scheduled to restart within 60 sec
+        # or after all current tasks are completed.. Please try after bot is restarted")
         title_css = "title"
         cloudscrape: bool = False
         try:
@@ -825,7 +824,8 @@ class Crawler(commands.Cog):
             next_chp_find = True
             path = ""
             secondchplink = await FileHandler.find_next_chps(soup, firstchplink)
-
+        if "readwn" in firstchplink or "wuxiax.co" in firstchplink or "novelmt.com" in firstchplink or "fannovels.com" in firstchplink or "novelmtl.com" in firstchplink or "booktoki216.com" in firstchplink:
+            waittime = 1.0
         if nextselector is not None:
             sel_tag = True
             if '::attr(href)' not in nextselector:
@@ -999,12 +999,6 @@ class Crawler(commands.Cog):
                         return await ctx.send(" There is some problem with the provided selector")
                     else:
                         return await ctx.send(" There is some problem with the detected selector")
-                if "readwn" in current_link or "wuxiax.co" in current_link or "novelmt.com" in current_link or "fannovels.com" in current_link or "novelmtl.com" in current_link:
-                    await asyncio.sleep(1.0)
-                    if i % 25 == 0:
-                        await asyncio.sleep(2.5)
-                    if i % 50 == 0:
-                        await asyncio.sleep(4.5)
                 try:
 
                     output = await self.getcontent(current_link, css, path, self.bot, sel_tag, scraper, next_chp_find)
@@ -1025,6 +1019,8 @@ class Crawler(commands.Cog):
                         # await msg.delete()
                         del self.bot.crawler[ctx.author.id]
                         return await ctx.send('Error occurred when crawling. Please Report to my developer')
+                    else:
+                        await asyncio.sleep(1)
                 full_text += chp_text
                 # print(current_link)
                 if current_link == lastchplink or i >= noofchapters or output[1] is None:
@@ -1033,8 +1029,16 @@ class Crawler(commands.Cog):
                 chp_count += 1
                 crawled_urls.append(current_link)
                 current_link = output[1]
-                if random.randint(0, 50) == 10 or chp_count % 100 == 0:
-                    await asyncio.sleep(0.2)
+                if waittime:
+                    await asyncio.sleep(waittime)
+                    if random.randint(0, 200) == 10:
+                        await asyncio.sleep(5*waittime)
+                    if i % 25 == 0:
+                        await asyncio.sleep(2.5*waittime)
+                    if i % 50 == 0:
+                        await asyncio.sleep(4.5*waittime)
+                elif random.randint(0, 50) == 10 or chp_count % 100 == 0:
+                    await asyncio.sleep(1)
 
             with open(f"{ctx.author.id}_cr.txt", 'w', encoding='utf-8') as f:
                 f.write(full_text)
