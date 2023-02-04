@@ -506,10 +506,10 @@ class FileHandler:
             channel_id = 1020980703229382706
         if (size := os.path.getsize(f"{ctx.author.id}_cr.txt")) > 8 * 10 ** 6:
             bot.crawler_count = bot.crawler_count + 1
-            if size > 35 * 10 ** 6:
-                os.remove(f"{ctx.author.id}_cr.txt")
-                bot.crawler_count = bot.crawler_count + 1
-                return await ctx.send('Crawled file is too big. there is some problem in crawler')
+            # if size > 35 * 10 ** 6:
+            #     os.remove(f"{ctx.author.id}_cr.txt")
+            #     bot.crawler_count = bot.crawler_count + 1
+            #     return await ctx.send('Crawled file is too big. there is some problem in crawler')
             try:
                 # filename = f"{random.choice(string.ascii_letters)}{random.choice(string.digits)}{str(ctx.author.id)}_" \
                 #            f"trans{random.choice(string.ascii_letters)}{random.randint(100, 1000)}.txt"
