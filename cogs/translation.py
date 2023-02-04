@@ -427,10 +427,11 @@ class Translate(commands.Cog):
                 await ctx.reply(content=f"> Found large file... bot  will split  it into  chunks  and translate  the  file  and "
                                 "merge it automatically... so  progress wouldn't work correctly. Please be patient")
                 cnt = 0
-                for liz in chunks:
+                for liz_t in chunks:
                     cnt += 1
+                    print(len(liz_t))
                     await ctx.reply(content=f"> Translating {str(cnt)} chunks out of {str(len(chunks))}")
-                    story += await translate.start(liz, len(asyncio.all_tasks()))
+                    story += await translate.start(liz_t, len(asyncio.all_tasks()))
                 await ctx.reply(content=f"Completed translating {str(len(chunks))}")
             async with aiofiles.open(f"{ctx.author.id}.txt", "w", encoding="utf-8") as f:
                 await f.write(story)
