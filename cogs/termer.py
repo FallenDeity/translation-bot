@@ -418,7 +418,6 @@ class Termer(commands.Cog):
             try:
                 del self.bot.translator[ctx.author.id]
                 self.bot.titles.append(name)
-                self.bot.titles = random.sample(self.bot.titles, len(self.bot.titles))
             except:
                 pass
             try:

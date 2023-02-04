@@ -385,10 +385,9 @@ class FileHandler:
                     "Translation Completed... Your novel is too big.We are uploading to Mega.. Please wait",
                     delete_after=5,
                 )
-                filename = f"{random.choice(string.ascii_letters)}{random.choice(string.digits)}{str(ctx.author.id)}_" \
-                           f"trans{random.choice(string.ascii_letters)}{random.randint(100,1000)}.txt"
-                os.rename(f"{ctx.author.id}.txt", f"{filename}")
-                file = await bot.loop.run_in_executor(None, bot.mega.upload, f"{filename}")
+                # filename = f"{random.choice(string.ascii_letters)}{random.choice(string.digits)}{str(
+                # ctx.author.id)}_" \ f"trans{random.choice(string.ascii_letters)}{random.randint(100,1000)}.txt"
+                file = await bot.loop.run_in_executor(None, bot.mega.upload, f"{ctx.author.id}.txt", None, f"{name[:100]}.txt")
                 filelnk = await bot.loop.run_in_executor(None, bot.mega.get_upload_link, file)
                 view = LinkView({"Novel": [filelnk, "📔"]})
                 await ctx.reply(
@@ -413,7 +412,7 @@ class FileHandler:
                     "**Sorry your file was too big please split it and try again.**"
                 )
             try:
-                os.remove(f"{filename}")
+                os.remove(f"{ctx.author.id}.txt")
             except:
                 pass
         else:
@@ -431,9 +430,9 @@ class FileHandler:
                 embed=embed, file=discord.File(f"{ctx.author.id}.txt", f"{name}.txt"),
                 allowed_mentions=discord.AllowedMentions(users=False)
             )
-            os.remove(f"{ctx.author.id}.txt")
             try:
                 file.close()
+                os.remove(f"{ctx.author.id}.txt")
             except:
                 pass
             download_url = msg.attachments[0].url
@@ -512,10 +511,9 @@ class FileHandler:
                 bot.crawler_count = bot.crawler_count + 1
                 return await ctx.send('Crawled file is too big. there is some problem in crawler')
             try:
-                filename = f"{random.choice(string.ascii_letters)}{random.choice(string.digits)}{str(ctx.author.id)}_" \
-                           f"trans{random.choice(string.ascii_letters)}{random.randint(100, 1000)}.txt"
-                os.rename(f"{ctx.author.id}_cr.txt", f"{filename}")
-                file = await bot.loop.run_in_executor(None, bot.mega.upload, f"{filename}")
+                # filename = f"{random.choice(string.ascii_letters)}{random.choice(string.digits)}{str(ctx.author.id)}_" \
+                #            f"trans{random.choice(string.ascii_letters)}{random.randint(100, 1000)}.txt"
+                file = await bot.loop.run_in_executor(None, bot.mega.upload, f"{ctx.author.id}_cr.txt", None, f"{title_name[:100]}.txt")
                 await ctx.send(
                     "Crawling Completed... Your novel is too big.We are uploading to Mega.. Please wait",
                     delete_after=5,
@@ -538,7 +536,7 @@ class FileHandler:
                 print(e)
                 await ctx.reply("> **❌Sorry the file is too big to send.**")
             try:
-                os.remove(f"{filename}")
+                os.remove(f"{ctx.author.id}_cr.txt")
             except:
                 pass
         else:

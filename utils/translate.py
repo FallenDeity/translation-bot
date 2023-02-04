@@ -70,8 +70,11 @@ class Translator:
                 try:
                     if self.bot.translator[self.user] == "break":
                         raise Exception("Translation stopped")
-                except:
-                    break
+                except Exception as e:
+                    if "Translation stopped" in str(e):
+                        raise e
+                    else:
+                        pass
                 self.bot.translator[self.user] = f"{len(self.order)}/{len(chapters)}"
 
     async def start(self, chapters: t.List[str], no_of_tasks: int = 8) -> str:

@@ -172,7 +172,7 @@ class Admin(commands.Cog):
                 self.bot.app_status = "restart"
                 self.bot.translator = {}
                 self.bot.crawler = {}
-                await asyncio.sleep(40)
+                await asyncio.sleep(60)
 
         await msg.edit(
             content="",

@@ -711,7 +711,6 @@ class Crawler(commands.Cog):
             try:
                 del self.bot.crawler[ctx.author.id]
                 self.bot.titles.append(name)
-                self.bot.titles = random.sample(self.bot.titles, len(self.bot.titles))
             except:
                 pass
             if translate_to is None and add_terms is None:

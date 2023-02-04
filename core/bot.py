@@ -64,8 +64,11 @@ class Raizel(commands.Bot):
         nltk.download("brown")
         nltk.download("punkt")
         nltk.download("popular")
-        await self._load_cogs()
-        await self.load_extension("jishaku")
+        try:
+            await self._load_cogs()
+            await self.load_extension("jishaku")
+        except:
+            print("cogs already loaded")
         self.allowed = sites
         self.con = aiohttp.ClientSession()
         # self.drive = Client(os.getenv("FILE"))
@@ -186,4 +189,4 @@ class Raizel(commands.Bot):
                         colour=discord.Colour.random()))
                     self.bot.translator = {}
                     self.bot.crawler = {}
-                    await asyncio.sleep(40)
+                    await asyncio.sleep(60)

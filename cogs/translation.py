@@ -414,7 +414,8 @@ class Translate(commands.Cog):
                 await ctx.send("Added pokemon terms", delete_after=5)
             liz = [novel[i: i + 1800] for i in range(0, len(novel), 1800)]
             self.bot.translator[ctx.author.id] = f"0/{len(liz)}"
-            asyncio.create_task(self.cc_prog(rep_msg, embed=embed, author_id=ctx.author.id))
+            if ctx.author.id != 925597069748621353:
+                asyncio.create_task(self.cc_prog(rep_msg, embed=embed, author_id=ctx.author.id))
             translate = Translator(self.bot, ctx.author.id, language)
             story = await translate.start(liz, len(asyncio.all_tasks()))
             async with aiofiles.open(f"{ctx.author.id}.txt", "w", encoding="utf-8") as f:
@@ -444,8 +445,6 @@ class Translate(commands.Cog):
             try:
                 del self.bot.translator[ctx.author.id]
                 self.bot.titles.append(name)
-                # print(self.bot.titles[-1])
-                self.bot.titles = random.sample(self.bot.titles, len(self.bot.titles))
             except:
                 pass
             try:
