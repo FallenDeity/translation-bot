@@ -57,6 +57,7 @@ class Translate(commands.Cog):
             file: typing.Optional[discord.Attachment] = None,
             messageid: str = None,
             language: str = "english",
+            term: str = None,
             novelname: str = None,
             rawname: str = None,
             library_id: int = None,
@@ -345,6 +346,7 @@ class Translate(commands.Cog):
         #     return await ctx.reply("The provided file is bigger than 30mb. Please split the file and translate")
         urls = FileHandler.find_urls_from_text(novel[:3000])
         # print(f"urls : {urls}")
+        size = os.path.getsize(f"{ctx.author.id}.txt")
         scraper = cloudscraper.create_scraper()
         try:
             thumbnail = ""

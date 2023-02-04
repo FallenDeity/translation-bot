@@ -75,7 +75,14 @@ class Raizel(commands.Bot):
         self.mongo = Mongo()
         print("Connected to mongo db")
         self.blocked: list[int] = await self.mongo.blocker.get_all_banned_users()
-        self.titles = list(await self.mongo.library.get_all_titles)
+        self.titles = list(dict.fromkeys(list(await self.mongo.library.get_all_titles)))
+        temp = self.titles
+        self.titles: list[str] = []
+        for it in temp:
+            it = it[:150]
+            self.titles.append(it)
+        del temp
+        self.titles = list(dict.fromkeys(self.titles))
         print("Loaded titles")
         self.titles = random.sample(self.titles, len(self.titles))
         channel = await self.fetch_channel(991911644831678484)
