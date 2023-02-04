@@ -323,6 +323,8 @@ class Crawler(commands.Cog):
         if "ptwxz" in link and "bookinfo" in link:
             link = link.replace("bookinfo", "html")
             link = link.replace(".html", "/")
+        if "m.bixiang.me" in link:
+            link = link.replace("m.bixiang.me", "m.bixiange.me")
         # if link[-1] == "/" and "69shu" not in link and "uukanshu.cc" not in link and not num == len(allowed):
         #     link = link[:-1]
         # if "m.uuks" in link:
