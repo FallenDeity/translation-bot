@@ -419,7 +419,7 @@ class Translate(commands.Cog):
             if ctx.author.id != 925597069748621353:
                 asyncio.create_task(self.cc_prog(rep_msg, embed=embed, author_id=ctx.author.id))
             translate = Translator(self.bot, ctx.author.id, language)
-            if len(liz) < 3000:
+            if len(liz) < 2750:
                 story = await translate.start(liz, len(asyncio.all_tasks()))
             else:
                 chunks = [liz[x:x + 2000] for x in range(0, len(liz), 2000)]
@@ -430,8 +430,10 @@ class Translate(commands.Cog):
                 for liz_t in chunks:
                     cnt += 1
                     print(len(liz_t))
+                    translate = Translator(self.bot, ctx.author.id, language)
                     await ctx.reply(content=f"> Translating {str(cnt)} chunks out of {str(len(chunks))}")
                     story += await translate.start(liz_t, len(asyncio.all_tasks()))
+                    del translate
                 await ctx.reply(content=f"Completed translating {str(len(chunks))}")
             async with aiofiles.open(f"{ctx.author.id}.txt", "w", encoding="utf-8") as f:
                 await f.write(story)
