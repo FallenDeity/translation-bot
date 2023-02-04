@@ -318,7 +318,7 @@ class Termer(commands.Cog):
             if "pdf" in file_type:
                 await FileHandler.pdf_to_txt(ctx)
             novel = await FileHandler().read_file(ctx)
-        if (size := os.path.getsize(f"{ctx.author.id}.txt")) > 30 * 10 ** 6:
+        if (size := os.path.getsize(f"{ctx.author.id}.txt")) > 25 * 10 ** 6:
             os.remove(f"{ctx.author.id}.txt")
             return await ctx.reply("The provided file is bigger than 20mb. Please split the file and translate")
         rep_msg = await rep_msg.edit(content=f"> **✅Terming started. **")
