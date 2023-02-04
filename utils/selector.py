@@ -193,5 +193,7 @@ class CssSelector:
             return ["#next_chap", "#chapter > div > div > a"]
         elif "ranobes.com" in link:
             return ["#next", "#dle-speedbar > span > font:nth-child(2) > span:nth-child(4) > a > span"]
+        elif "booktoki216.com" in link:
+            return ["#goNextBtn", "title"]
         else:
             return [None, "title"]
