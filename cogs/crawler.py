@@ -26,7 +26,6 @@ from readabilipy import simple_json_from_html_string
 
 from cogs.admin import Admin
 from cogs.library import Library
-from cogs.termer import Termer
 from cogs.translation import Translate
 from core.bot import Raizel
 from utils.handler import FileHandler
@@ -734,17 +733,12 @@ class Crawler(commands.Cog):
                 translate_to = "english"
             if translate_to not in self.bot.all_langs and original_Language not in ["english", "en"]:
                 translate_to = "english"
-            if add_terms is not None:
-                ctx.command = await self.bot.get_command("termer").callback(Termer(self.bot), ctx, add_terms,
-                                                                            download_url,
-                                                                            None,
-                                                                            None,
-                                                                            translate_to, title_name[:100])
-            else:
+            if True:
                 ctx.command = await self.bot.get_command("translate").callback(Translate(self.bot), ctx, download_url,
                                                                                None,
                                                                                None,
-                                                                               translate_to, title_name[:100])
+                                                                               translate_to, title_name[:100], None,  None,
+                                                                               add_terms)
 
     @commands.hybrid_command(
         help="Clears any stagnant novels which were deposited for crawling."
