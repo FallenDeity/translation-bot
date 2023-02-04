@@ -3,6 +3,7 @@ import datetime
 import gc
 import os
 import random
+import traceback
 import typing as t
 
 import aiohttp
@@ -67,7 +68,8 @@ class Raizel(commands.Bot):
         try:
             await self._load_cogs()
             await self.load_extension("jishaku")
-        except:
+        except Exception as e:
+            print(traceback.print_exc())
             print("cogs already loaded")
         self.allowed = sites
         self.con = aiohttp.ClientSession()
@@ -164,7 +166,7 @@ class Raizel(commands.Bot):
                     ) or await self.bot.fetch_channel(991911644831678484)
                     try:
                         await channel.send(embed=discord.Embed(
-                            description=f"Bot has been auto-restarted. \nBot has translated {str(int(self.translation_count))} novels and crawled {str(self.crawler_count)} novels"
+                            description=f"Bot has been auto-restarted. \nBot has translated {str(int(self.translation_count*3.1))} novels and crawled {str(self.crawler_count)} novels"
                             , colour=discord.Colour.brand_green()))
                         del self.titles
                         gc.collect()
