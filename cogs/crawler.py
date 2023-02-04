@@ -717,7 +717,7 @@ class Crawler(commands.Cog):
                 pass
             if translate_to is None and add_terms is None:
                 try:
-                    if self.bot.translation_count >= 20 or self.bot.crawler_count >= 20:
+                    if (self.bot.translation_count >= 18 or self.bot.crawler_count >= 20) and self.bot.app_status == "up":
                         await ctx.reply(
                             "> **Bot will be Restarted when the bot is free due to max limit is reached.. Please be patient")
                         chan = self.bot.get_channel(
@@ -725,8 +725,7 @@ class Crawler(commands.Cog):
                         ) or await self.bot.fetch_channel(991911644831678484)
                         msg_new2 = await chan.fetch_message(1052750970557308988)
                         context_new2 = await self.bot.get_context(msg_new2)
-                        asyncio.create_task(
-                            self.bot.get_command("restart").callback(Admin(self.bot), context_new2))
+                        asyncio.create_task(self.bot.get_command("restart").callback(Admin(self.bot), context_new2))
                 except:
                     pass
         if (
