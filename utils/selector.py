@@ -19,8 +19,8 @@ class CssSelector:
             return ".read_chapterDetail ::text"
         elif "biqugeabc" in link:
             return ".text_row_txt >p ::text"
-        elif "uuks" in link:
-            return "div#contentbox > p ::text"
+        # elif "uuks" in link:
+        #     return "div#contentbox > p ::text"
         elif "jpxs" in link:
             return ".read_chapterDetail p ::text"
         elif "powanjuan" in link or "ffxs" in link or "sjks" in link:

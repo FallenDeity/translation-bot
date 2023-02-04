@@ -429,7 +429,7 @@ class Translate(commands.Cog):
             if ctx.author.id != 925597069748621353:
                 asyncio.create_task(self.cc_prog(rep_msg, embed=embed, author_id=ctx.author.id))
             translate = Translator(self.bot, ctx.author.id, language)
-            if len(liz) < 2750:
+            if len(liz) < 2300:
                 story = await translate.start(liz, len(asyncio.all_tasks()))
             else:
                 chunks = [liz[x:x + 2000] for x in range(0, len(liz), 2000)]
