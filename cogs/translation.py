@@ -133,7 +133,7 @@ class Translate(commands.Cog):
             await ctx.send("Mega link found.... downloading from mega", delete_after=10, ephemeral=True)
             info = await self.bot.loop.run_in_executor(None, self.bot.mega.get_public_url_info, link)
             size = int(info.get("size")) / 1000
-            if size >= 21 * 1000:
+            if size >= 30 * 1000:
                 await rep_msg.delete()
                 return await ctx.reply(
                     "> **❌ File size is too big... Please split the file and translate**"
@@ -340,9 +340,9 @@ class Translate(commands.Cog):
                 pass
         if ctx.author.id in self.bot.translator and not ctx.author.id == 925597069748621353:
             return await ctx.send("> **❌You cannot translate two novels at a time.**", ephemeral=True)
-        if (size := os.path.getsize(f"{ctx.author.id}.txt")) > 18 * 10 ** 6:
+        if (size := os.path.getsize(f"{ctx.author.id}.txt")) > 30 * 10 ** 6:
             os.remove(f"{ctx.author.id}.txt")
-            return await ctx.reply("The provided file is bigger than 20mb. Please split the file and translate")
+            return await ctx.reply("The provided file is bigger than 30mb. Please split the file and translate")
         urls = FileHandler.find_urls_from_text(novel[:3000])
         # print(f"urls : {urls}")
         scraper = cloudscraper.create_scraper()

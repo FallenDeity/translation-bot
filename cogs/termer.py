@@ -110,7 +110,7 @@ class Termer(commands.Cog):
             await ctx.send("Mega link found.... downloading from mega", delete_after=5)
             info = await self.bot.loop.run_in_executor(None, self.bot.mega.get_public_url_info, link)
             size = int(info.get("size")) / 1000
-            if size >= 21 * 1000:
+            if size >= 30 * 1000:
                 await rep_msg.delete()
                 return await ctx.reply(
                     "> **❌ File size is too big... Please split the file and translate"
@@ -318,7 +318,7 @@ class Termer(commands.Cog):
             if "pdf" in file_type:
                 await FileHandler.pdf_to_txt(ctx)
             novel = await FileHandler().read_file(ctx)
-        if (size := os.path.getsize(f"{ctx.author.id}.txt")) > 18 * 10 ** 6:
+        if (size := os.path.getsize(f"{ctx.author.id}.txt")) > 30 * 10 ** 6:
             os.remove(f"{ctx.author.id}.txt")
             return await ctx.reply("The provided file is bigger than 20mb. Please split the file and translate")
         rep_msg = await rep_msg.edit(content=f"> **✅Terming started. **")

@@ -109,6 +109,8 @@ class Translator:
             else:
                 if size <= 2500:
                     workers = 7
-                else:
+                elif size <= 4000:
                     workers = 6
+                else:
+                    workers = 5
         return workers
