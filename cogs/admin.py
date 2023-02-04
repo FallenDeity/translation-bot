@@ -148,7 +148,7 @@ class Admin(commands.Cog):
 
     @commands.has_role(1020638168237740042)
     @commands.hybrid_command(help="Restart the bot incase of bot crash. Ping any BOT-admins to restart bot")
-    async def restart(self, ctx: commands.Context, instant: str = False):
+    async def restart(self, ctx: commands.Context, instant: bool = False):
         try:
             await ctx.defer()
         except:
