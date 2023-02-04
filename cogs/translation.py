@@ -57,10 +57,10 @@ class Translate(commands.Cog):
             file: typing.Optional[discord.Attachment] = None,
             messageid: str = None,
             language: str = "english",
-            term: str = None,
             novelname: str = None,
             rawname: str = None,
             library_id: int = None,
+            term: str = None,
     ):
         try:
             await ctx.defer()
@@ -348,6 +348,16 @@ class Translate(commands.Cog):
         # print(f"urls : {urls}")
         size = os.path.getsize(f"{ctx.author.id}.txt")
         scraper = cloudscraper.create_scraper()
+        if term:
+            term_dict = terms(term)
+            if term_dict == {}:
+                return await ctx.reply(
+                    f"**Please try again with the validterms to be applied :\n\t"
+                    f"1 : Naruto \n\t2 : One-Piece \n\t3 : Pokemon\n\t4 : Mixed anime terms\n\t"
+                    f"5 : Prince of Tennis\n\t6 : Anime + Marvel + DC\n\t7 : Cultivation terms\n\t"
+                )
+            novel = term_raw(novel, term_dict)
+            await ctx.reply(content=f"> Added terms {term}")
         try:
             thumbnail = ""
             temp = []
@@ -430,9 +440,11 @@ class Translate(commands.Cog):
                 for liz_t in chunks:
                     cnt += 1
                     print(len(liz_t))
+                    self.bot.translator[ctx.author.id] = f"0/{len(liz)}"
                     translate = Translator(self.bot, ctx.author.id, language)
                     await ctx.reply(content=f"> Translating {str(cnt)} chunks out of {str(len(chunks))}")
                     story += await translate.start(liz_t, len(asyncio.all_tasks()))
+
                     del translate
                 await ctx.reply(content=f"Completed translating {str(len(chunks))}")
             async with aiofiles.open(f"{ctx.author.id}.txt", "w", encoding="utf-8") as f:
@@ -577,6 +589,22 @@ class Translate(commands.Cog):
             self, inter: discord.Interaction, language: str
     ) -> list[app_commands.Choice]:
         lst = [i for i in self.bot.all_langs if language.lower() in i.lower()][:25]
+        return [app_commands.Choice(name=i, value=i) for i in lst]
+
+    @translate.autocomplete("term")
+    async def translate_complete(
+            self, inter: discord.Interaction, term: str
+    ) -> list[app_commands.Choice]:
+        lst = [
+                  "naruto",
+                  "one-piece",
+                  "pokemon",
+                  "mixed",
+                  "prince-of-tennis",
+                  "marvel",
+                  "dc",
+                  "xianxia",
+              ] + list(map(str, range(1, 8)))
         return [app_commands.Choice(name=i, value=i) for i in lst]
 
     @commands.hybrid_command(
