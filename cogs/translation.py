@@ -133,11 +133,11 @@ class Translate(commands.Cog):
             await ctx.send("Mega link found.... downloading from mega", delete_after=10, ephemeral=True)
             info = await self.bot.loop.run_in_executor(None, self.bot.mega.get_public_url_info, link)
             size = int(info.get("size")) / 1000
-            if size >= 30 * 1000:
-                await rep_msg.delete()
-                return await ctx.reply(
-                    "> **❌ File size is too big... Please split the file and translate**"
-                )
+            # if size >= 30 * 1000:
+            #     await rep_msg.delete()
+            #     return await ctx.reply(
+            #         "> **❌ File size is too big... Please split the file and translate**"
+            #     )
             name = info.get("name")
             name = bytes(name, encoding="raw_unicode_escape", errors="ignore").decode()
             file_type = name.split(".")[-1]
@@ -340,9 +340,9 @@ class Translate(commands.Cog):
                 pass
         if ctx.author.id in self.bot.translator and not ctx.author.id == 925597069748621353:
             return await ctx.send("> **❌You cannot translate two novels at a time.**", ephemeral=True)
-        if (size := os.path.getsize(f"{ctx.author.id}.txt")) > 25 * 10 ** 6:
-            os.remove(f"{ctx.author.id}.txt")
-            return await ctx.reply("The provided file is bigger than 30mb. Please split the file and translate")
+        # if (size := os.path.getsize(f"{ctx.author.id}.txt")) > 25 * 10 ** 6:
+        #     os.remove(f"{ctx.author.id}.txt")
+        #     return await ctx.reply("The provided file is bigger than 30mb. Please split the file and translate")
         urls = FileHandler.find_urls_from_text(novel[:3000])
         # print(f"urls : {urls}")
         scraper = cloudscraper.create_scraper()
@@ -417,7 +417,19 @@ class Translate(commands.Cog):
             if ctx.author.id != 925597069748621353:
                 asyncio.create_task(self.cc_prog(rep_msg, embed=embed, author_id=ctx.author.id))
             translate = Translator(self.bot, ctx.author.id, language)
-            story = await translate.start(liz, len(asyncio.all_tasks()))
+            if len(liz) <= 4000:
+                story = await translate.start(liz, len(asyncio.all_tasks()))
+            else:
+                chunks = [liz[x:x + 3000] for x in range(0, len(liz), 3000)]
+                story = ""
+                await ctx.reply(content=f"> Found large file... bot  will split  it into  chunks  and translate  the  file  and "
+                                "merge it automatically... so  progress wouldn't work correctly. Please be patient")
+                cnt = 0
+                for liz in chunks:
+                    cnt += 1
+                    await ctx.reply(content=f"> Translating {str(cnt)} chunks out of {str(len(chunks))}")
+                    story += await translate.start(liz, len(asyncio.all_tasks()))
+                await ctx.reply(content=f"Completed translating {str(len(chunks))}")
             async with aiofiles.open(f"{ctx.author.id}.txt", "w", encoding="utf-8") as f:
                 await f.write(story)
             if description.strip() == "":

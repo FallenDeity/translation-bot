@@ -89,33 +89,14 @@ class Translator:
     def get_no_of_workers(no_tasks, size) -> int:
         workers: int = 8
         if size <= 700:
-            if no_tasks > 8:
-                workers = 8
-            else:
-                workers = 10
+            workers = 10
         elif size <= 1400:
+            workers = 9
+        elif size <= 2000:
+            workers = 8
+        else:
             if no_tasks > 8:
                 workers = 7
             else:
-                workers = 9
-        elif size <= 2000:
-            if no_tasks > 8:
-                workers = 6
-            else:
                 workers = 8
-        else:
-            if no_tasks > 8:
-                if size <= 2500:
-                    workers = 5
-                elif size <= 4000:
-                    workers = 4
-                else:
-                    workers = 3
-            else:
-                if size <= 2500:
-                    workers = 7
-                elif size <= 4000:
-                    workers = 5
-                else:
-                    workers = 4
         return workers
