@@ -702,13 +702,13 @@ class Crawler(commands.Cog):
                 text = "\nsource : " + str(link) + "\n\n" + str(title_name.split('__')[0]) + "\n\n"
                 chunks: list[list[str]] = [urls[x:x + 1000] for x in range(0, len(urls), 1000)]
                 cnt = 0
+                await ctx.reply(
+                    content=f"> Found a large novel with {len(urls)} chapters..  so novel will be crawled  in chunks and  merged automatically "
+                            f"please be patient. Progess wouldn't work properly ..please  use .tcp to  check  progress of chunks")
                 filename = f"{str(random.randint(1000, 10000))}.txt"
                 for chunk in chunks:
                     cnt += 1
                     novel = {}
-                    await ctx.reply(
-                        content=f"> Found a large novel with {len(urls)} chapters..  so novel will be crawled  in chunks and  merged automatically "
-                                f"please be patient. Progess wouldn't work properly ..please  use .tcp to  check  progress of chunks")
                     await ctx.reply(content=f"> Crawling {str(cnt)} chunks out of {str(len(chunks))}... use .tcp to "
                                             f"check progress")
                     book = await self.bot.loop.run_in_executor(
