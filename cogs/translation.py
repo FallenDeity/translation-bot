@@ -119,11 +119,13 @@ class Translate(commands.Cog):
                     content=f"> **Currently bot is busy.Please wait some time. Please wait till bot become free. will retry automatically in 20sec  ** {str(no_tries)} try")
             except:
                 pass
+            if no_tries >= 7:
+                await ctx.reply(content="> Currently bot is busy.. please try after some time")
             if no_tries >= 5:
                 self.bot.translator = {}
                 if len(self.bot.translator) < 2:
                     break
-                await asyncio.sleep(10)
+                await asyncio.sleep(20)
             await asyncio.sleep(10)
         if link is not None and ("discord.com/channels" in link or link.isnumeric()):
             messageid = link
@@ -432,21 +434,22 @@ class Translate(commands.Cog):
             if len(liz) < 2300:
                 story = await translate.start(liz, len(asyncio.all_tasks()))
             else:
-                chunks = [liz[x:x + 2000] for x in range(0, len(liz), 2000)]
+                chunks = [liz[x:x + 1500] for x in range(0, len(liz), 1500)]
                 story = ""
-                await ctx.reply(content=f"> Found large file... bot  will split  it into  chunks  and translate  the  file  and "
-                                "merge it automatically... so  progress wouldn't work correctly. Please be patient")
+                await ctx.reply(content=f"> Found large file... bot  will split it into  chunks  and translate  the  "
+                                        f"file  and merge it automatically... so  progress wouldn't work correctly. "
+                                        f"Please be patient")
                 cnt = 0
                 for liz_t in chunks:
                     cnt += 1
                     print(len(liz_t))
                     self.bot.translator[ctx.author.id] = f"0/{len(liz)}"
                     translate = Translator(self.bot, ctx.author.id, language)
-                    await ctx.reply(content=f"> Translating {str(cnt)} chunks out of {str(len(chunks))}")
+                    await ctx.reply(content=f"> Translating {str(cnt)} chunks out of {str(len(chunks))}... use .tp to "
+                                            f"check progress")
                     story += await translate.start(liz_t, len(asyncio.all_tasks()))
-
                     del translate
-                await ctx.reply(content=f"Completed translating {str(len(chunks))}")
+                await ctx.reply(content=f"Translated {str(len(chunks))} chunks")
             async with aiofiles.open(f"{ctx.author.id}.txt", "w", encoding="utf-8") as f:
                 await f.write(story)
             if description.strip() == "":
