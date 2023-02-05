@@ -227,7 +227,7 @@ class Translate(commands.Cog):
                 except:
                     pass
         if (not name_check) and library_id is not None:
-            name =await self.bot.mongo.library.get_title_by_id(library_id)
+            name = await self.bot.mongo.library.get_title_by_id(library_id)
             name_check = FileHandler.checkname(name, self.bot)
         if not name_check:
             await rep_msg.delete()
@@ -261,7 +261,8 @@ class Translate(commands.Cog):
             size_found = 1.2 * size_found
             for n in novel_data:
                 ids.append(n._id)
-                if (name.strip('__')[0] == n.title or name == n.title or n.title.strip('__')[0] == name) and language == n.language and size_found >= round(n.size / (1024 ** 2), 2):
+                if (name.strip('__')[0] == n.title or name == n.title or n.title.strip('__')[
+                    0] == name) and language == n.language and size_found >= round(n.size / (1024 ** 2), 2):
                     library = n._id
                 if "english" == str(n.language).lower():
                     eng_check = True
@@ -349,9 +350,9 @@ class Translate(commands.Cog):
                 pass
         if ctx.author.id in self.bot.translator and not ctx.author.id == 925597069748621353:
             return await ctx.send("> **❌You cannot translate two novels at a time.**", ephemeral=True)
-        if (size := os.path.getsize(f"{ctx.author.id}.txt")) > 20 * 10 ** 6:
+        if (size := os.path.getsize(f"{ctx.author.id}.txt")) > 25 * 10 ** 6:
             os.remove(f"{ctx.author.id}.txt")
-            return await ctx.reply("The provided file is bigger than 20mb. Please split the file and translate")
+            return await ctx.reply("The provided file is bigger than 25mb. Please split the file and translate")
         urls = FileHandler.find_urls_from_text(novel[:3000])
         # print(f"urls : {urls}")
         size = os.path.getsize(f"{ctx.author.id}.txt")
@@ -416,7 +417,8 @@ class Translate(commands.Cog):
                     avatar = thumbnail
                 else:
                     avatar = ctx.author.display_avatar
-                des = GoogleTranslator().translate(await FileHandler.get_desc_from_text(novel[:5000], title=name)).strip()
+                des = GoogleTranslator().translate(
+                    await FileHandler.get_desc_from_text(novel[:5000], title=name)).strip()
                 description = des
             except:
                 description = ""
@@ -442,7 +444,8 @@ class Translate(commands.Cog):
                 story = await translate.start(liz, len(asyncio.all_tasks()))
             else:
                 chunks = [liz[x:x + 1000] for x in range(0, len(liz), 1000)]
-                story = ""
+                del liz
+                filename = f"{str(random.randint(1000, 10000))}.txt"
                 await ctx.reply(content=f"> Found large file... bot  will split it into  chunks  and translate  the  "
                                         f"file  and merge it automatically... so  progress wouldn't work correctly. "
                                         f"Please be patient")
@@ -450,20 +453,32 @@ class Translate(commands.Cog):
                 for liz_t in chunks:
                     cnt += 1
                     print(len(liz_t))
-                    self.bot.translator[ctx.author.id] = f"0/{len(liz)}"
+                    self.bot.translator[ctx.author.id] = f"0/{len(liz_t)}"
                     translate = Translator(self.bot, ctx.author.id, language)
                     try:
-                        pr_msg = await ctx.reply(content=f"> Translating {str(cnt)} chunks out of {str(len(chunks))}... use .tp to "
-                                            f"check progress")
+                        pr_msg = await ctx.reply(
+                            content=f"> Translating {str(cnt)} chunks out of {str(len(chunks))}... use .tp to "
+                                    f"check progress")
                     except:
                         pass
-                    story += await translate.start(liz_t, len(asyncio.all_tasks()))
+                    story = await translate.start(liz_t, len(asyncio.all_tasks()))
+                    async with aiofiles.open(filename, "a+", encoding="utf-8") as f:
+                        await f.write("\n")
+                        await f.write(story)
                     del translate
+                    del story
+                    gc.collect()
                     try:
                         await pr_msg.delete()
                     except:
                         pass
                 await ctx.reply(content=f"Translated {str(len(chunks))} chunks")
+                try:
+                    async with aiofiles.open(filename, "r", encoding="utf-8") as f:
+                        story = await f.read()
+                    os.remove(filename)
+                except:
+                    pass
             async with aiofiles.open(f"{ctx.author.id}.txt", "w", encoding="utf-8") as f:
                 await f.write(story)
             if description.strip() == "":
@@ -519,7 +534,8 @@ class Translate(commands.Cog):
         lst = [i for i in self.bot.all_langs if language.lower() in i.lower()][:25]
         return [app_commands.Choice(name=i, value=i) for i in lst]
 
-    async def cc_prog(self, msg: discord.Message, embed: discord.Embed, author_id: int) -> typing.Optional[discord.Message]:
+    async def cc_prog(self, msg: discord.Message, embed: discord.Embed, author_id: int) -> typing.Optional[
+        discord.Message]:
         bardata = progressBar.filledBar(100, 0, size=10, line="🟥", slider="🟩")
         embed.add_field(name="Progress", value=f"{bardata[0]}", inline=False)
         value = 0
@@ -531,7 +547,7 @@ class Translate(commands.Cog):
                                    name=f"Progress :  {str(round(eval(out) * 100, 2))}%",
                                    value=progressBar.filledBar(int(split[1]), int(split[0]),
                                                                size=10, line="🟥", slider="🟩")[
-                                       0] + f"  {discord.utils.format_dt(datetime.datetime.now(), style='R')}")
+                                             0] + f"  {discord.utils.format_dt(datetime.datetime.now(), style='R')}")
                 await msg.edit(embed=embed)
                 value = eval(out)
             else:

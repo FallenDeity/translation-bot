@@ -696,6 +696,7 @@ class Crawler(commands.Cog):
                 text = "\nsource : " + str(link) + "\n\n" + str(title_name.split('__')[0]) + "\n\n"
                 chunks: list[list[str]] = [urls[x:x + 1000] for x in range(0, len(urls), 1000)]
                 cnt = 0
+                filename = f"{str(random.randint(1000, 10000))}.txt"
                 for chunk in chunks:
                     cnt += 1
                     novel = {}
@@ -711,7 +712,19 @@ class Crawler(commands.Cog):
                         return await ctx.reply("Crawling stopped")
                     parsed = {k: v for k, v in sorted(book.items(), key=lambda item: item[0])}
                     whole = [i for i in list(parsed.values())]
-                    text = text + ("\n".join(whole))
+                    text = "\n".join(whole)
+                    async with aiofiles.open(filename, "a+", encoding="utf-8") as f:
+                        await f.write(text)
+                    del parsed
+                    del whole
+                    del text
+                    gc.collect()
+                try:
+                    async with aiofiles.open(filename, "r", encoding="utf-8") as f:
+                        text = await f.read()
+                    os.remove(filename)
+                except:
+                    pass
             title = title[:100]
             async with aiofiles.open(f"{ctx.author.id}_cr.txt", "w", encoding="utf-8") as f:
                 await f.write(text)
