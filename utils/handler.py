@@ -52,10 +52,12 @@ class FileHandler:
 
     @staticmethod
     async def get_desc_from_text(text: str, title: str = None):
-        desc = ["introduction", "description", "简介", "描述", "描写", "summary", "prologue", "概括", "摘要", "总结", "序幕", "开场白"]
-        text = '\n'.join(OrderedDict.fromkeys(text.split('\n')))# remove  duplicate lines from description
+        desc = ["introduction", "description", "简介", "描述", "描写", "summary", "prologue", "概括", "摘要", "总结",
+                "序幕", "开场白"]
+        text = '\n'.join(OrderedDict.fromkeys(text.split('\n')))  # remove  duplicate lines from description
         if title:
-            text = re.sub(re.compile(get_regex_from_name(title), flags=re.IGNORECASE), "", text) #remove title from description
+            text = re.sub(re.compile(get_regex_from_name(title), flags=re.IGNORECASE), "",
+                          text)  # remove title from description
         if "69shu.com" in text or "jiu mu" in text.lower() or "jiumu" in text.lower():
             desc.append("chapter")
         for d in desc:
@@ -183,7 +185,7 @@ class FileHandler:
 
     @staticmethod
     async def find_toc_next(soup: BeautifulSoup, link: str = None):
-        selectors = ("下一页", "next page", ">", "next", "»»", "»", "下一节") #下一页  "下一章"- next chp 下一页
+        selectors = ("下一页", "next page", ">", "next", "»»", "»", "下一节")  # 下一页  "下一章"- next chp 下一页
         for a in soup.find_all("a"):
             # print(a.get('href'))
             if any(selector == a.get_text().lower() for selector in selectors):
@@ -194,7 +196,9 @@ class FileHandler:
 
     @staticmethod
     async def find_next_chps(soup: BeautifulSoup, link: str = None):
-        selectors = ("下一页", "next page", "下一章", "next chapter", "next", "Вперёд »»", "Вперёд", "»»", "»", "下一节", "chương sau")  # 下一页  "下一章"- next chp 下一页
+        selectors = (
+        "下一页", "next page", "下一章", "next chapter", "next", "Вперёд »»", "Вперёд", "»»", "»", "下一节",
+        "chương sau")  # 下一页  "下一章"- next chp 下一页
         for a in soup.find_all("a"):
             # print(a.get_text())
             if any(selector == a.get_text().lower().strip() for selector in selectors):
@@ -387,7 +391,8 @@ class FileHandler:
                 )
                 # filename = f"{random.choice(string.ascii_letters)}{random.choice(string.digits)}{str(
                 # ctx.author.id)}_" \ f"trans{random.choice(string.ascii_letters)}{random.randint(100,1000)}.txt"
-                file = await bot.loop.run_in_executor(None, bot.mega.upload, f"{ctx.author.id}.txt", None, f"{name[:100]}.txt")
+                file = await bot.loop.run_in_executor(None, bot.mega.upload, f"{ctx.author.id}.txt", None,
+                                                      f"{name[:100]}.txt")
                 filelnk = await bot.loop.run_in_executor(None, bot.mega.get_upload_link, file)
                 view = LinkView({"Novel": [filelnk, "📔"]})
                 await ctx.reply(
@@ -436,7 +441,7 @@ class FileHandler:
             except:
                 pass
             download_url = msg.attachments[0].url
-        bot.translation_count = bot.translation_count + (round(size / (1024 ** 2), 2)/3.1)
+        bot.translation_count = bot.translation_count + (round(size / (1024 ** 2), 2) / 3.1)
         if raw_name is not None:
             name = name + "__" + raw_name
         if download_url and size > 0.3 * 10 ** 6:
@@ -473,10 +478,13 @@ class FileHandler:
 
     async def crawlnsend(
             self, ctx: commands.Context, bot: Raizel, title: str, title_name: str, originallanguage: str,
-            description: str = None, thumbnail: str = "", link: str = None
+            description: str = None, thumbnail: str = "", link: str = None, library: int = None
     ) -> str:
         download_url = None
-        next_no = await bot.mongo.library.next_number
+        if library is None:
+            next_no = await bot.mongo.library.next_number
+        else:
+            next_no = library
         category = "Uncategorised"
         bot.crawler_count = bot.crawler_count + 1
         if description is None:
@@ -513,7 +521,8 @@ class FileHandler:
             try:
                 # filename = f"{random.choice(string.ascii_letters)}{random.choice(string.digits)}{str(ctx.author.id)}_" \
                 #            f"trans{random.choice(string.ascii_letters)}{random.randint(100, 1000)}.txt"
-                file = await bot.loop.run_in_executor(None, bot.mega.upload, f"{ctx.author.id}_cr.txt", None, f"{title_name[:100]}.txt")
+                file = await bot.loop.run_in_executor(None, bot.mega.upload, f"{ctx.author.id}_cr.txt", None,
+                                                      f"{title_name[:100]}.txt")
                 await ctx.send(
                     "Crawling Completed... Your novel is too big.We are uploading to Mega.. Please wait",
                     delete_after=5,
@@ -548,7 +557,8 @@ class FileHandler:
 
             msg = await channel.send(
                 embed=embed,
-                file=discord.File(f"{ctx.author.id}_cr.txt", f"{title}.txt"), allowed_mentions=discord.AllowedMentions(users=False)
+                file=discord.File(f"{ctx.author.id}_cr.txt", f"{title}.txt"),
+                allowed_mentions=discord.AllowedMentions(users=False)
             )
             download_url = msg.attachments[0].url
             try:
@@ -556,35 +566,40 @@ class FileHandler:
                 os.remove(f"{ctx.author.id}_cr.txt")
             except:
                 pass
-        if download_url and size > 0.3 * 10 ** 6:
-            novel_data = [
-                await bot.mongo.library.next_number,
-                title_name,
-                description,
-                0,
-                originallanguage,
-                self.get_tags(title_name),
-                download_url,
-                size,
-                ctx.author.id,
-                datetime.datetime.utcnow().timestamp(),
-                thumbnail,
-                originallanguage,
-                category
-            ]
-            data = Novel(*novel_data)
-            try:
-                await bot.mongo.library.add_novel(data)
-            except:
-                loop = True
-                no_of_tries = 0
-                while loop and no_of_tries < 6:
-                    print(f"couldn't add to library... trying for {no_of_tries + 2} times")
-                    try:
-                        await asyncio.sleep(3)
-                        data[0] = await bot.mongo.library.next_number
-                        await bot.mongo.library.add_novel(data)
-                        loop = False
-                    except:
-                        no_of_tries += 1
+        if library is None:
+            if download_url and size > 0.3 * 10 ** 6:
+                novel_data = [
+                    await bot.mongo.library.next_number,
+                    title_name,
+                    description,
+                    0,
+                    originallanguage,
+                    self.get_tags(title_name),
+                    download_url,
+                    size,
+                    ctx.author.id,
+                    datetime.datetime.utcnow().timestamp(),
+                    thumbnail,
+                    originallanguage,
+                    category
+                ]
+                data = Novel(*novel_data)
+                try:
+                    await bot.mongo.library.add_novel(data)
+                except:
+                    loop = True
+                    no_of_tries = 0
+                    while loop and no_of_tries < 6:
+                        print(f"couldn't add to library... trying for {no_of_tries + 2} times")
+                        try:
+                            await asyncio.sleep(3)
+                            data[0] = await bot.mongo.library.next_number
+                            await bot.mongo.library.add_novel(data)
+                            loop = False
+                        except:
+                            no_of_tries += 1
+        else:
+            await bot.mongo.library.update_download(_id=library, download=download_url)
+            await bot.mongo.library.update_date(_id=library, date=datetime.datetime.utcnow().timestamp())
+            await bot.mongo.library.update_thumbnail(_id=library, thumbnail=thumbnail)
         return download_url

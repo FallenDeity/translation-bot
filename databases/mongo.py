@@ -89,6 +89,21 @@ class Library(Database):
             {"_id": _id}, {"$set": {"description": description}}
         )
 
+    async def update_download(self, _id: int, download: str) -> None:
+        await self.library.update_one(
+            {"_id": _id}, {"$set": {"download": download}}
+        )
+
+    async def update_thumbnail(self, _id: int, thumbnail: str) -> None:
+        await self.library.update_one(
+            {"_id": _id}, {"$set": {"thumbnail": thumbnail}}
+        )
+
+    async def update_date(self, _id: int, date: float) -> None:
+        await self.library.update_one(
+            {"_id": _id}, {"$set": {"date": date}}
+        )
+
     async def get_user_novel_count(self, user_id: int = None, _top_200: bool = False) -> dict[int, int]:
         if user_id is None:
             top_200_uploaders = await self.library.aggregate(

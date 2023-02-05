@@ -328,6 +328,8 @@ class Crawler(commands.Cog):
             link = link.replace(".html", "/")
         if "m.bixiang.me" in link:
             link = link.replace("m.bixiang.me", "m.bixiange.me")
+        if "https://ffxs8.com/"  in link:
+            link = link.replace("https://ffxs8.com/", "https://ffxs8.com/")
         # if link[-1] == "/" and "69shu" not in link and "uukanshu.cc" not in link and not num == len(allowed):
         #     link = link[:-1]
         # if "m.uuks" in link:
@@ -560,7 +562,8 @@ class Crawler(commands.Cog):
                 description = await FileHandler.get_description(soup, link, title=title_name)
             except:
                 description = ""
-
+        library_update:bool = False
+        library: int = None
         if 'b.faloo' in link or 'wap.faloo' in link:
             urls = urls[:200]
         if reverse is not None:
@@ -599,6 +602,10 @@ class Crawler(commands.Cog):
                 lib_str = ''.join(e for e in n.title if e.isalnum())
                 if title.strip('__')[0] in n.title or org_str in lib_str:
                     name_lib_check = True
+                if (title_name.strip('__')[0] == n.title or title_name == n.title or title == n.title) and original_Language == n.org_language:
+                    library_update = True
+                    library = n._id
+                    print(library)
             if True:
                 ids = ids[:20]
                 ctx.command = await self.bot.get_command("library search").callback(Library(self.bot), ctx,
@@ -609,12 +616,7 @@ class Crawler(commands.Cog):
                 if len(ids) < 5 or name_lib_check:
                     await ctx.send("**Please check from above library**", delete_after=20)
                     await asyncio.sleep(15)
-                for l in ["bixiang", "trxs", "txt520", "powanjuan", "tongrenquan", "jpxs"]:
-                    if l in link and name_lib_check:
-                        await ctx.send("Novel is already in our library. if its not ping Admin")
-                        return None
-                    else:
-                        await asyncio.sleep(0.1)
+                await asyncio.sleep(0.1)
                 chk_msg = await ctx.send(embed=discord.Embed(
                     description=f"This novel **{title}** is already in our library with ids **{ids.__str__()}**...use arrow marks  in above  to navigate...  \n\nIf you want to continue crawling react with 🇳 \n\n**Note : Some files are in docx format, so file size maybe half the size of txt. and try to minimize translating if its already in library**"))
                 await chk_msg.add_reaction('🇾')
@@ -717,7 +719,7 @@ class Crawler(commands.Cog):
                 description = GoogleTranslator(source="auto", target="english").translate(
                     text[:500].strip().replace("\n\n", "\n"))
             download_url = await FileHandler().crawlnsend(ctx, self.bot, title, title_name, original_Language,
-                                                          description, thumbnail, link=link)
+                                                          description, thumbnail, link=link, library=library)
         except Exception as e:
             await ctx.send("> Error occurred .Please report to admin +\n" + str(e))
             print(traceback.format_exc())
@@ -914,6 +916,8 @@ class Crawler(commands.Cog):
                 title = title.replace(tag, '')
         novel_data = await self.bot.mongo.library.get_novel_by_name(title_name.split('__')[0])
         # print(title_name)
+        library_update: bool = False
+        library: int = None
         if novel_data is not None:
             novel_data = list(novel_data)
             name_lib_check = False
@@ -922,6 +926,11 @@ class Crawler(commands.Cog):
                 ids.append(n._id)
                 if title_name.strip('__')[0] in n.title:
                     name_lib_check = True
+                if (title_name.strip('__')[0] == n.title or title_name == n.title or title == n.title) and original_Language == n.org_language:
+                    library_update = True
+                    library = n._id
+                    print(library)
+
             if True:
                 ids = ids[:20]
                 ctx.command = await self.bot.get_command("library search").callback(Library(self.bot), ctx,
@@ -1070,7 +1079,7 @@ class Crawler(commands.Cog):
                 pass
             await ctx.send(f"Crawled {chp_count} pages.")
             return await FileHandler().crawlnsend(ctx, self.bot, title, title_name, original_Language,
-                                                  description=description, thumbnail=thumbnail, link=firstchplink)
+                                                  description=description, thumbnail=thumbnail, link=firstchplink, library=library)
         except Exception as e:
             print(traceback.format_exc())
             await ctx.send("> Error occurred .Please report to admin +\n" + str(e))
