@@ -404,7 +404,7 @@ class Translate(commands.Cog):
         except:
             thumbnail = ""
         # print(f"thumbnail {thumbnail}")
-        input(f"if {library}")
+        # input(f"if {library}")
         try:
             try:
                 original_Language = FileHandler.find_language(novel)
