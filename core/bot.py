@@ -161,12 +161,21 @@ class Raizel(commands.Bot):
                 print("Started restart")
                 if (not self.crawler.items() and not self.translator.items()) or i == 20:
                     print("restart " + str(datetime.datetime.now()))
+                    try:
+                        for x in os.listdir():
+                            if x.endswith("txt") and "requirements" not in x:
+                                os.remove(x)
+                    except Exception as e:
+                        print("exception occurred  in deleting")
+                        await channel.send(f"error occurred in deleting {x} {e}")
                     channel = self.get_channel(
                         991911644831678484
                     ) or await self.bot.fetch_channel(991911644831678484)
                     try:
                         await channel.send(embed=discord.Embed(
-                            description=f"Bot has been auto-restarted. \nBot has translated {str(int(self.translation_count*3.1))} novels and crawled {str(self.crawler_count)} novels"
+                            description=f"Bot has been auto-restarted. \nBot has "
+                                        f"translated {str(int(self.translation_count*3.1))}MB novels and"
+                                        f" crawled {str(self.crawler_count)} novels"
                             , colour=discord.Colour.brand_green()))
                         del self.titles
                         gc.collect()

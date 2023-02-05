@@ -343,9 +343,9 @@ class Translate(commands.Cog):
                 pass
         if ctx.author.id in self.bot.translator and not ctx.author.id == 925597069748621353:
             return await ctx.send("> **❌You cannot translate two novels at a time.**", ephemeral=True)
-        if (size := os.path.getsize(f"{ctx.author.id}.txt")) > 31 * 10 ** 6:
+        if (size := os.path.getsize(f"{ctx.author.id}.txt")) > 25 * 10 ** 6:
             os.remove(f"{ctx.author.id}.txt")
-            return await ctx.reply("The provided file is bigger than 30mb. Please split the file and translate")
+            return await ctx.reply("The provided file is bigger than 25mb. Please split the file and translate")
         urls = FileHandler.find_urls_from_text(novel[:3000])
         # print(f"urls : {urls}")
         size = os.path.getsize(f"{ctx.author.id}.txt")
@@ -445,10 +445,17 @@ class Translate(commands.Cog):
                     print(len(liz_t))
                     self.bot.translator[ctx.author.id] = f"0/{len(liz)}"
                     translate = Translator(self.bot, ctx.author.id, language)
-                    await ctx.reply(content=f"> Translating {str(cnt)} chunks out of {str(len(chunks))}... use .tp to "
+                    try:
+                        pr_msg = await ctx.reply(content=f"> Translating {str(cnt)} chunks out of {str(len(chunks))}... use .tp to "
                                             f"check progress")
+                    except:
+                        pass
                     story += await translate.start(liz_t, len(asyncio.all_tasks()))
                     del translate
+                    try:
+                        await pr_msg.delete()
+                    except:
+                        pass
                 await ctx.reply(content=f"Translated {str(len(chunks))} chunks")
             async with aiofiles.open(f"{ctx.author.id}.txt", "w", encoding="utf-8") as f:
                 await f.write(story)

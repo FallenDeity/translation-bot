@@ -185,6 +185,13 @@ class Admin(commands.Cog):
                 color=discord.Color.random(),
             ),
         )
+        try:
+            for x in os.listdir():
+                if x.endswith("txt") and "requirements" not in x:
+                    os.remove(x)
+        except Exception as e:
+            print("exception occurred  in deleting")
+            await ctx.send(f"error occurred in deleting {x} {e}")
         channel = self.bot.get_channel(
             991911644831678484
         ) or await self.bot.fetch_channel(991911644831678484)
