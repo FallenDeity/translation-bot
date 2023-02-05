@@ -263,9 +263,12 @@ class Translate(commands.Cog):
                 ids.append(n._id)
                 org_name = ''.join(e for e in n.title if e.isalnum())
                 n_name = ''.join(e for e in name if e.isalnum())
+                org_name2 = ''.join(e for e in n.title.split('__')[0] if e.isalnum())
+                n_name2 = ''.join(e for e in name.split('__')[0] if e.isalnum())
                 if (name.split('__')[0].lower() == n.title.split('__')[0].lower()
                     or n.title.split('  ')[0].lower() == name.split('  ')[0].lower()
                     or org_name.strip().lower() == name.strip().lower()
+                    or org_name2.lower() == n_name2.lower()
                     or n_name.split('__')[0].strip().lower() == org_name.split('__')[0].strip().lower()
                     or n_name.split('  ')[0].strip().lower() == org_name.split('  ')[0].strip().lower())\
                         and language == n.language \
