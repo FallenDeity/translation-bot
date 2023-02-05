@@ -237,6 +237,7 @@ class Translate(commands.Cog):
         for tag in ['/', '\\', '<', '>', "'", '"', ':', ";", '?', '|', '*', ';', '!']:
             name = name.replace(tag, '').strip()
         name = name.replace('_', ' ')
+        library: int = None
         if novel is None:
             data = await resp.read()
             async with aiofiles.open(f"{ctx.author.id}.{file_type}", "wb") as f:
@@ -256,8 +257,12 @@ class Translate(commands.Cog):
             eng_check = False
             size_check = False
             name_lib_check = False
+            size_found = round(os.path.getsize(f"{ctx.author.id}.txt") / (1024 ** 2), 2) - 0.10
+            size_found = size_found - 0.1 * size_found
             for n in novel_data:
                 ids.append(n._id)
+                if (name.strip('__')[0] == n.title or name == n.title or n.title.strip('__')[0] == name) and language == n.language and size_found >= n.size:
+                    library = n._id
                 if "english" == str(n.language).lower():
                     eng_check = True
                 if language == str(n.language).lower():
@@ -267,13 +272,14 @@ class Translate(commands.Cog):
                     if org_str.lower() in lib_str.lower() or org_str.lower() == lib_str.lower():
                         name_lib_check = True
                         try:
-                            size_found = round(os.path.getsize(f"{ctx.author.id}.txt") / (1024 ** 2), 2) - 0.10
-                            size_found = size_found - 0.1 * size_found
                             lib_size = round(n.size / (1024 ** 2), 2)
                             if size_found <= lib_size <= 2 * size_found:
                                 size_check = True
+                                if library is None:
+                                    library = n._id
                         except:
                             pass
+
             if lang_check:
                 ids = ids[:20]
                 rep_msg = await rep_msg.edit(content="Novel is already in our library")
@@ -286,7 +292,7 @@ class Translate(commands.Cog):
                     await asyncio.sleep(15)
                 if name_lib_check and size_check:
                     await ctx.send("**Please check from above library**")
-                    return None
+                    await asyncio.sleep(10)
                 chk_msg = await ctx.send(embed=discord.Embed(
                     description=f"This novel **{name}** is already in our library with ids **{str(ids)}**...use arrow marks  in above  to navigate...\nIf you want to continue translation react with 🇳 within 10 sec\n\n**Note : Some files are in docx format, so file size maybe half the size of txt. and try to minimize translating if its already in library**"))
                 await chk_msg.add_reaction('🇾')

@@ -197,8 +197,8 @@ class FileHandler:
     @staticmethod
     async def find_next_chps(soup: BeautifulSoup, link: str = None):
         selectors = (
-        "下一页", "next page", "下一章", "next chapter", "next", "Вперёд »»", "Вперёд", "»»", "»", "下一节",
-        "chương sau")  # 下一页  "下一章"- next chp 下一页
+            "下一页", "next page", "下一章", "next chapter", "next", "Вперёд »»", "Вперёд", "»»", "»", "下一节",
+            "chương sau")  # 下一页  "下一章"- next chp 下一页
         for a in soup.find_all("a"):
             # print(a.get_text())
             if any(selector == a.get_text().lower().strip() for selector in selectors):
@@ -361,7 +361,7 @@ class FileHandler:
 
     async def distribute(
             self, bot: Raizel, ctx: commands.Context, name: str, language: str, original_language: str, raw_name: str,
-            description: str = "", thumbnail: str = ""
+            description: str = "", thumbnail: str = "", library: int = None
     ) -> None:
         download_url = None
         next_no = await bot.mongo.library.next_number
@@ -444,37 +444,42 @@ class FileHandler:
         bot.translation_count = bot.translation_count + (round(size / (1024 ** 2), 2) / 3.1)
         if raw_name is not None:
             name = name + "__" + raw_name
-        if download_url and size > 0.3 * 10 ** 6:
-            novel_data = [
-                await bot.mongo.library.next_number,
-                name,
-                description,
-                0,
-                language,
-                self.get_tags(name),
-                download_url,
-                size,
-                ctx.author.id,
-                datetime.datetime.utcnow().timestamp(),
-                thumbnail,
-                original_language,
-                category
-            ]
-            data = Novel(*novel_data)
-            try:
-                await bot.mongo.library.add_novel(data)
-            except:
-                loop = True
-                no_of_tries = 0
-                while loop and no_of_tries < 6:
-                    print(f"couldn't add to library... trying for {no_of_tries + 2} times")
-                    try:
-                        await asyncio.sleep(3)
-                        data[0] = await bot.mongo.library.next_number
-                        await bot.mongo.library.add_novel(data)
-                        loop = False
-                    except:
-                        no_of_tries += 1
+        if library is None:
+            if download_url and size > 0.3 * 10 ** 6:
+                novel_data = [
+                    await bot.mongo.library.next_number,
+                    name,
+                    description,
+                    0,
+                    language,
+                    self.get_tags(name),
+                    download_url,
+                    size,
+                    ctx.author.id,
+                    datetime.datetime.utcnow().timestamp(),
+                    thumbnail,
+                    original_language,
+                    category
+                ]
+                data = Novel(*novel_data)
+                try:
+                    await bot.mongo.library.add_novel(data)
+                except:
+                    loop = True
+                    no_of_tries = 0
+                    while loop and no_of_tries < 6:
+                        print(f"couldn't add to library... trying for {no_of_tries + 2} times")
+                        try:
+                            await asyncio.sleep(3)
+                            data[0] = await bot.mongo.library.next_number
+                            await bot.mongo.library.add_novel(data)
+                            loop = False
+                        except:
+                            no_of_tries += 1
+        else:
+            await bot.mongo.library.update_download(_id=library, download=download_url)
+            await bot.mongo.library.update_date(_id=library, date=datetime.datetime.utcnow().timestamp())
+            await bot.mongo.library.update_thumbnail(_id=library, thumbnail=thumbnail)
 
     async def crawlnsend(
             self, ctx: commands.Context, bot: Raizel, title: str, title_name: str, originallanguage: str,
