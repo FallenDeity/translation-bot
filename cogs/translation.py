@@ -257,11 +257,11 @@ class Translate(commands.Cog):
             eng_check = False
             size_check = False
             name_lib_check = False
-            size_found = round(os.path.getsize(f"{ctx.author.id}.txt") / (1024 ** 2), 2) - 0.10
-            size_found = size_found - 0.1 * size_found
+            size_found = round(os.path.getsize(f"{ctx.author.id}.txt") / (1024 ** 2), 2) + 0.10
+            size_found = 1.2 * size_found
             for n in novel_data:
                 ids.append(n._id)
-                if (name.strip('__')[0] == n.title or name == n.title or n.title.strip('__')[0] == name) and language == n.language and size_found >= n.size:
+                if (name.strip('__')[0] == n.title or name == n.title or n.title.strip('__')[0] == name) and language == n.language and size_found >= round(n.size / (1024 ** 2), 2):
                     library = n._id
                 if "english" == str(n.language).lower():
                     eng_check = True
@@ -404,6 +404,7 @@ class Translate(commands.Cog):
         except:
             thumbnail = ""
         # print(f"thumbnail {thumbnail}")
+        input(f"if {library}")
         try:
             try:
                 original_Language = FileHandler.find_language(novel)
