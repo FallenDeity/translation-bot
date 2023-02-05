@@ -240,6 +240,8 @@ class Crawler(commands.Cog):
                 value = eval(out)
             else:
                 break
+            if len(asyncio.all_tasks()) > 9:
+                return
             await asyncio.sleep(wait_time)
         embed.set_field_at(index=0,
                            name=f"Progress :  100%",
@@ -263,6 +265,8 @@ class Crawler(commands.Cog):
                 await asyncio.sleep(wait_time)
             else:
                 break
+            if len(asyncio.all_tasks()) > 9:
+                return
         embed.set_image(url="")
         embed.set_field_at(index=0, name="Progress",
                            value=f"Completed crawling")

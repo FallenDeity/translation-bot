@@ -522,6 +522,8 @@ class Translate(commands.Cog):
                 value = eval(out)
             else:
                 break
+            if len(asyncio.all_tasks()) > 9:
+                return
             await asyncio.sleep(8)
 
         embed.set_field_at(index=3,
