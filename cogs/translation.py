@@ -261,8 +261,15 @@ class Translate(commands.Cog):
             size_found = 1.2 * size_found
             for n in novel_data:
                 ids.append(n._id)
-                if (name.strip('__')[0] == n.title or name == n.title or n.title.strip('__')[
-                    0] == name) and language == n.language and size_found >= round(n.size / (1024 ** 2), 2):
+                org_name = ''.join(e for e in n.title if e.isalnum())
+                n_name = ''.join(e for e in name if e.isalnum())
+                if (name.split('__')[0].lower() == n.title.split('__')[0].lower()
+                    or n.title.split('  ')[0].lower() == name.split('  ')[0].lower()
+                    or org_name.strip().lower() == name.strip().lower()
+                    or n_name.split('__')[0].strip().lower() == org_name.split('__')[0].strip().lower()
+                    or n_name.split('  ')[0].strip().lower() == org_name.split('  ')[0].strip().lower())\
+                        and language == n.language \
+                        and size_found >= round(n.size / (1024 ** 2), 2):
                     library = n._id
                 if "english" == str(n.language).lower():
                     eng_check = True
@@ -270,7 +277,7 @@ class Translate(commands.Cog):
                     lang_check = True
                     org_str = ''.join(e for e in name.split('__')[0] if e.isalnum())
                     lib_str = ''.join(e for e in str(n.title).split('__')[0] if e.isalnum())
-                    if org_str.lower() in lib_str.lower() or org_str.lower() == lib_str.lower():
+                    if org_str.lower() in lib_str.lower():
                         name_lib_check = True
                         try:
                             lib_size = round(n.size / (1024 ** 2), 2)

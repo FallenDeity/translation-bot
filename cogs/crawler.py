@@ -599,10 +599,16 @@ class Crawler(commands.Cog):
             for n in novel_data:
                 ids.append(n._id)
                 org_str = ''.join(e for e in title.split('__')[0] if e.isalnum())
+                org_str2 = ''.join(e for e in title if e.isalnum())
                 lib_str = ''.join(e for e in n.title if e.isalnum())
                 if title.strip('__')[0] in n.title or org_str in lib_str:
                     name_lib_check = True
-                if (title_name.strip('__')[0] == n.title or title_name == n.title or title == n.title) and original_Language == n.org_language:
+                if (title_name.split('__')[0].lower() == n.title.split('__')[0].lower()
+                    or title.lower().strip() == n.title.lower().strip()
+                    or org_str.lower().strip() == lib_str.lower().strip()
+                    or org_str2.lower().strip() == lib_str.lower().strip()
+                    or title_name.split('  ')[0].lower() == n.title.split('  ')[0].lower()) \
+                        and original_Language == n.org_language and original_Language == n.language:
                     library_update = True
                     library = n._id
                     print(library)
@@ -939,7 +945,15 @@ class Crawler(commands.Cog):
                 ids.append(n._id)
                 if title_name.strip('__')[0] in n.title:
                     name_lib_check = True
-                if (title_name.strip('__')[0] == n.title or title_name == n.title or title == n.title) and original_Language == n.org_language:
+                org_str = ''.join(e for e in title.split('__')[0] if e.isalnum())
+                org_str2 = ''.join(e for e in title if e.isalnum())
+                lib_str = ''.join(e for e in n.title if e.isalnum())
+                if (title_name.split('__')[0].lower() == n.title.split('__')[0].lower()
+                    or title.lower().strip() == n.title.lower().strip()
+                    or org_str.lower().strip() == lib_str.lower().strip()
+                    or org_str2.lower().strip() == lib_str.lower().strip()
+                    or title_name.split('  ')[0].lower() == n.title.split('  ')[0].lower()) \
+                        and original_Language == n.org_language and original_Language == n.language:
                     library_update = True
                     library = n._id
                     print(library)
