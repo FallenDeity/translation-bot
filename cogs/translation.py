@@ -236,7 +236,7 @@ class Translate(commands.Cog):
             )
         for tag in ['/', '\\', '<', '>', "'", '"', ':', ";", '?', '|', '*', ';', '!']:
             name = name.replace(tag, '').strip()
-        name = name.replace('_', ' ')
+        name = name.replace("__", "--").replace('_', ' ').replace("--", "__")
         library: int = None
         if novel is None:
             data = await resp.read()
