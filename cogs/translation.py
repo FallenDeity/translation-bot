@@ -275,8 +275,8 @@ class Translate(commands.Cog):
                             lib_size = round(n.size / (1024 ** 2), 2)
                             if size_found <= lib_size <= 2 * size_found:
                                 size_check = True
-                                if library is None:
-                                    library = n._id
+                                # if library is None:
+                                #     library = n._id
                         except:
                             pass
 
@@ -287,9 +287,9 @@ class Translate(commands.Cog):
                                                                                     language, None, None, None, None,
                                                                                     None,
                                                                                     None, None, False, "size", 20)
-                if len(ids) < 5 or name_lib_check:
+                if len(ids) < 4 and name_lib_check:
                     await ctx.send("**Please check from above library**", delete_after=20)
-                    await asyncio.sleep(15)
+                    await asyncio.sleep(5)
                 if name_lib_check and size_check:
                     await ctx.send("**Please check from above library**")
                     await asyncio.sleep(10)
