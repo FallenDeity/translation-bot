@@ -700,7 +700,7 @@ class Crawler(commands.Cog):
                     await ctx.reply(
                         content=f"> Found a large novel with {len(urls)} chapters..  so novel will be crawled  in chunks and  merged automatically "
                                 f"please be patient. Progess wouldn't work properly ..please  use .tcp to  check  progress of chunks")
-                    await ctx.reply(content=f"> Translating {str(cnt)} chunks out of {str(len(chunks))}... use .tcp to "
+                    await ctx.reply(content=f"> Crawling {str(cnt)} chunks out of {str(len(chunks))}... use .tcp to "
                                             f"check progress")
                     book = await self.bot.loop.run_in_executor(
                         None, self.direct, chunk, novel, ctx.author.id, cloudscrape,
