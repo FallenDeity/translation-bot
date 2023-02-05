@@ -188,6 +188,7 @@ class Admin(commands.Cog):
         try:
             for x in os.listdir():
                 if x.endswith("txt") and "requirements" not in x:
+                    print(f"deleting {x}")
                     os.remove(x)
         except Exception as e:
             print("exception occurred  in deleting")

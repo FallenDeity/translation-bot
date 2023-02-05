@@ -329,7 +329,7 @@ class Crawler(commands.Cog):
         if "m.bixiang.me" in link:
             link = link.replace("m.bixiang.me", "m.bixiange.me")
         if "https://ffxs8.com/"  in link:
-            link = link.replace("https://ffxs8.com/", "https://ffxs8.com/")
+            link = link.replace("https://ffxs8.com/", "https://www.ffxs8.com/")
         # if link[-1] == "/" and "69shu" not in link and "uukanshu.cc" not in link and not num == len(allowed):
         #     link = link[:-1]
         # if "m.uuks" in link:
