@@ -343,7 +343,7 @@ class Translate(commands.Cog):
                 pass
         if ctx.author.id in self.bot.translator and not ctx.author.id == 925597069748621353:
             return await ctx.send("> **❌You cannot translate two novels at a time.**", ephemeral=True)
-        if (size := os.path.getsize(f"{ctx.author.id}.txt")) > 30 * 10 ** 6:
+        if (size := os.path.getsize(f"{ctx.author.id}.txt")) > 31 * 10 ** 6:
             os.remove(f"{ctx.author.id}.txt")
             return await ctx.reply("The provided file is bigger than 30mb. Please split the file and translate")
         urls = FileHandler.find_urls_from_text(novel[:3000])
@@ -434,7 +434,7 @@ class Translate(commands.Cog):
             if len(liz) < 2300:
                 story = await translate.start(liz, len(asyncio.all_tasks()))
             else:
-                chunks = [liz[x:x + 1500] for x in range(0, len(liz), 1500)]
+                chunks = [liz[x:x + 1000] for x in range(0, len(liz), 1000)]
                 story = ""
                 await ctx.reply(content=f"> Found large file... bot  will split it into  chunks  and translate  the  "
                                         f"file  and merge it automatically... so  progress wouldn't work correctly. "

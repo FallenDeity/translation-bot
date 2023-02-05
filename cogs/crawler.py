@@ -676,15 +676,36 @@ class Crawler(commands.Cog):
             msg = await msg.edit(content="",
                                  embed=embed)
             asyncio.create_task(self.cc_prog(msg, embed, ctx.author.id))
-            book = await self.bot.loop.run_in_executor(
-                None, self.direct, urls, novel, ctx.author.id, cloudscrape,
-            )
-            if book is None:
-                return await ctx.reply("Crawling stopped")
-            parsed = {k: v for k, v in sorted(book.items(), key=lambda item: item[0])}
-            whole = [i for i in list(parsed.values())]
-            whole.insert(0, "\nsource : " + str(link) + "\n\n" + str(title_name.split('__')[0]) + "\n\n")
-            text = "\n".join(whole)
+            if len(urls) < 1800:
+                book = await self.bot.loop.run_in_executor(
+                    None, self.direct, urls, novel, ctx.author.id, cloudscrape,
+                )
+                if book is None:
+                    return await ctx.reply("Crawling stopped")
+                parsed = {k: v for k, v in sorted(book.items(), key=lambda item: item[0])}
+                whole = [i for i in list(parsed.values())]
+                whole.insert(0, "\nsource : " + str(link) + "\n\n" + str(title_name.split('__')[0]) + "\n\n")
+                text = "\n".join(whole)
+            else:
+                text = "\nsource : " + str(link) + "\n\n" + str(title_name.split('__')[0]) + "\n\n"
+                chunks: list[list[str]] = [urls[x:x + 1000] for x in range(0, len(urls), 1000)]
+                cnt = 0
+                for chunk in chunks:
+                    cnt += 1
+                    novel = {}
+                    await ctx.reply(
+                        content=f"> Found a large novel with {len(urls)} chapters..  so novel will be crawled  in chunks and  merged automatically "
+                                f"please be patient. Progess wouldn't work properly ..please  use .tcp to  check  progress of chunks")
+                    await ctx.reply(content=f"> Translating {str(cnt)} chunks out of {str(len(chunks))}... use .tcp to "
+                                            f"check progress")
+                    book = await self.bot.loop.run_in_executor(
+                        None, self.direct, chunk, novel, ctx.author.id, cloudscrape,
+                    )
+                    if book is None:
+                        return await ctx.reply("Crawling stopped")
+                    parsed = {k: v for k, v in sorted(book.items(), key=lambda item: item[0])}
+                    whole = [i for i in list(parsed.values())]
+                    text = text + ("\n".join(whole))
             title = title[:100]
             async with aiofiles.open(f"{ctx.author.id}_cr.txt", "w", encoding="utf-8") as f:
                 await f.write(text)
