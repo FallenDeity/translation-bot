@@ -912,6 +912,8 @@ class Crawler(commands.Cog):
         if title is None or str(title).strip() == "":
             print(f"title empty {title}")
             title = sel.css(f'title ::text').extract_first()
+        if title is None or str(title).strip() == "":
+            title = firstchplink
         chp_count = 1
         # print(title)
         current_link = firstchplink
