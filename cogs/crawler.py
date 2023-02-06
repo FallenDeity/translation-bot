@@ -693,7 +693,10 @@ class Crawler(commands.Cog):
                 thumbnail = ""
             embed = discord.Embed(title=str(f"{title[:240]}"), description=description[:350],
                                   colour=discord.Colour.blurple())
-            embed.set_thumbnail(url=thumbnail)
+            if thumbnail is None or thumbnail == "":
+                embed.set_thumbnail(url=ctx.author.display_avatar)
+            else:
+                embed.set_thumbnail(url=thumbnail)
             msg = await msg.edit(content="",
                                  embed=embed)
             asyncio.create_task(self.cc_prog(msg, embed, ctx.author.id))
