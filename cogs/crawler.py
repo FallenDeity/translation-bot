@@ -5,6 +5,7 @@ import gc
 import itertools
 import os
 import random
+import re
 import time
 import traceback
 import typing
@@ -598,20 +599,20 @@ class Crawler(commands.Cog):
             ids = []
             for n in novel_data:
                 ids.append(n._id)
-                org_str = ''.join(e for e in title.split('__')[0] if e.isalnum())
-                org_str2 = ''.join(e for e in title if e.isalnum())
-                lib_str = ''.join(e for e in n.title if e.isalnum())
-                if title.strip('__')[0] in n.title or org_str in lib_str:
-                    name_lib_check = True
-                if (title_name.split('__')[0].lower() == n.title.split('__')[0].lower()
-                    or title.lower().strip() == n.title.lower().strip()
-                    or org_str.lower().strip() == lib_str.lower().strip()
-                    or org_str2.lower().strip() == lib_str.lower().strip()
+                org_str = re.sub("[^A-Za-z0-9]", "", title.split('__')[0]).lower()
+                org_str2 = re.sub("[^A-Za-z0-9]", "", title.split('  ')[0]).lower()
+                lib_str = re.sub("[^A-Za-z0-9]", "", n.title.split('__')[0]).lower()
+                lib_str2 = re.sub("[^A-Za-z0-9]", "", n.title.split('  ')[0]).lower()
+                if (title.split('__')[0].strip() == n.title.split('__')[0].strip()
+                    or org_str == lib_str or org_str2 == lib_str
+                    or lib_str2 == org_str2
                     or title_name.split('  ')[0].lower() == n.title.split('  ')[0].lower()) \
                         and original_Language == n.org_language and original_Language == n.language:
                     library_update = True
                     library = n._id
                     print(library)
+                if title.strip('__')[0] in n.title or org_str in lib_str:
+                    name_lib_check = True
             if True:
                 ids = ids[:20]
                 ctx.command = await self.bot.get_command("library search").callback(Library(self.bot), ctx,
@@ -688,6 +689,8 @@ class Crawler(commands.Cog):
             msg = await msg.edit(content="",
                                  embed=embed)
             asyncio.create_task(self.cc_prog(msg, embed, ctx.author.id))
+            if library is not None:
+                await ctx.reply(content=f"> Updating {str(library)} with name : {title_name}")
             if len(urls) < 1800:
                 book = await self.bot.loop.run_in_executor(
                     None, self.direct, urls, novel, ctx.author.id, cloudscrape,
@@ -945,13 +948,13 @@ class Crawler(commands.Cog):
                 ids.append(n._id)
                 if title_name.strip('__')[0] in n.title:
                     name_lib_check = True
-                org_str = ''.join(e for e in title.split('__')[0] if e.isalnum())
-                org_str2 = ''.join(e for e in title if e.isalnum())
-                lib_str = ''.join(e for e in n.title if e.isalnum())
-                if (title_name.split('__')[0].lower() == n.title.split('__')[0].lower()
-                    or title.lower().strip() == n.title.lower().strip()
-                    or org_str.lower().strip() == lib_str.lower().strip()
-                    or org_str2.lower().strip() == lib_str.lower().strip()
+                org_str = re.sub("[^A-Za-z0-9]", "", title.split('__')[0]).lower()
+                org_str2 = re.sub("[^A-Za-z0-9]", "", title.split('  ')[0]).lower()
+                lib_str = re.sub("[^A-Za-z0-9]", "", n.title.split('__')[0]).lower()
+                lib_str2 = re.sub("[^A-Za-z0-9]", "", n.title.split('  ')[0]).lower()
+                if (title.split('__')[0].strip() == n.title.split('__')[0].strip()
+                    or org_str == lib_str or org_str2 == lib_str
+                    or lib_str2 == org_str2
                     or title_name.split('  ')[0].lower() == n.title.split('  ')[0].lower()) \
                         and original_Language == n.org_language and original_Language == n.language:
                     library_update = True
@@ -1031,6 +1034,8 @@ class Crawler(commands.Cog):
         msg = await msg.edit(content="",
                              embed=embed)
         embed.add_field(name="Progress", value=chp_count)
+        if library is not None:
+            await ctx.reply(content=f"> Updating {str(library)} with name : {title_name}")
         try:
             self.bot.crawler[ctx.author.id] = f"0/{noofchapters}"
             asyncio.create_task(self.cc_prog_cr_next(msg, embed, ctx.author.id, 20))

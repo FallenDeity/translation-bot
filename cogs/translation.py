@@ -3,6 +3,7 @@ import datetime
 import gc
 import os
 import random
+import re
 import traceback
 import typing
 from urllib.parse import urljoin
@@ -261,19 +262,23 @@ class Translate(commands.Cog):
             size_found = 1.2 * size_found
             for n in novel_data:
                 ids.append(n._id)
-                org_name = ''.join(e for e in n.title if e.isalnum())
-                n_name = ''.join(e for e in name if e.isalnum())
-                org_name2 = ''.join(e for e in n.title.split('__')[0] if e.isalnum())
-                n_name2 = ''.join(e for e in name.split('__')[0] if e.isalnum())
+                org_name = re.sub("[^A-Za-z0-9]", "", n.title.split('  ')[0]).lower()
+                n_name = re.sub("[^A-Za-z0-9]", "", name.split('  ')[0]).lower()
+                org_name2 = re.sub("[^A-Za-z0-9]", "", n.title.split('__')[0]).lower()
+                n_name2 = re.sub("[^A-Za-z0-9]", "", name.split('__')[0]).lower()
+                # print(f"{org_name}-{org_name2}-{n_name2}-{n_name}")
+                # print(f"{language}-{n.language}")
+                # print(f"{size_found}-{round(n.size / (1024 ** 2), 2)}")
                 if (name.split('__')[0].lower() == n.title.split('__')[0].lower()
                     or n.title.split('  ')[0].lower() == name.split('  ')[0].lower()
-                    or org_name.strip().lower() == name.strip().lower()
-                    or org_name2.lower() == n_name2.lower()
-                    or n_name.split('__')[0].strip().lower() == org_name.split('__')[0].strip().lower()
-                    or n_name.split('  ')[0].strip().lower() == org_name.split('  ')[0].strip().lower())\
-                        and language == n.language \
+                    or org_name == name.strip().lower()
+                    or org_name2 == n_name2
+                    or n_name == org_name
+                    or org_name2 == n_name) \
+                        and language.lower() == n.language.lower() \
                         and size_found >= round(n.size / (1024 ** 2), 2):
                     library = n._id
+                    print(library)
                 if "english" == str(n.language).lower():
                     eng_check = True
                 if language == str(n.language).lower():
@@ -440,6 +445,8 @@ class Translate(commands.Cog):
             embed.add_field(name="From", value=original_Language, inline=True)
             embed.add_field(name="Size", value=f"{round(size / (1024 ** 2), 2)} MB", inline=True)
             rep_msg = await rep_msg.edit(content="", embed=embed)
+            if library is not None:
+                await ctx.reply(content=f"> Updating {str(library)} with name : {name}")
             poke_words = ["elves ", "pokemon", "pokémon", " elf "]
             if any(word in name.lower() for word in poke_words):
                 term_dict = terms("pokemon")
