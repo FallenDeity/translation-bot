@@ -295,7 +295,8 @@ class Translate(commands.Cog):
                                 #     library = n._id
                         except:
                             pass
-
+            if len(ids) >= 20:
+                library = None
             if lang_check:
                 ids = ids[:20]
                 rep_msg = await rep_msg.edit(content="Novel is already in our library")

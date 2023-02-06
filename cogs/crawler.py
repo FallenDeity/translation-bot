@@ -518,6 +518,8 @@ class Crawler(commands.Cog):
                 title_name = str(soup.select(maintitleCSS)[0].text)
             except:
                 title_name = "None"
+        if title_name.strip() == "":
+            title_name = str(soup.select("title")[0].text)
         if (next_link := await FileHandler.find_toc_next(soup, link)) is not None:
             await ctx.send("> Multiple TOC's found.. getting the urls from TOC's", delete_after=8)
             print("Multi TOC found")
@@ -613,6 +615,8 @@ class Crawler(commands.Cog):
                     print(library)
                 if title.strip('__')[0] in n.title or org_str in lib_str:
                     name_lib_check = True
+            if len(ids) >= 20:
+                library = None
             if True:
                 ids = ids[:20]
                 ctx.command = await self.bot.get_command("library search").callback(Library(self.bot), ctx,
@@ -939,6 +943,8 @@ class Crawler(commands.Cog):
         novel_data = await self.bot.mongo.library.get_novel_by_name(title_name.split('__')[0])
         # print(title_name)
         library_update: bool = False
+        if title_name.strip().lower() == "001 - Read Novel Chapter 001 Online".lower():
+            title_name = firstchplink.split("/")[-1].replace(".html", "")
         library: int = None
         if novel_data is not None:
             novel_data = list(novel_data)
@@ -960,7 +966,8 @@ class Crawler(commands.Cog):
                     library_update = True
                     library = n._id
                     print(library)
-
+            if len(ids) >= 20:
+                library = None
             if True:
                 ids = ids[:20]
                 ctx.command = await self.bot.get_command("library search").callback(Library(self.bot), ctx,
