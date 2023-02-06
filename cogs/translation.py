@@ -259,7 +259,7 @@ class Translate(commands.Cog):
             size_check = False
             name_lib_check = False
             size_found = round(os.path.getsize(f"{ctx.author.id}.txt") / (1024 ** 2), 2) + 0.10
-            size_found = 1.2 * size_found
+            size_found = 1.375 * size_found
             for n in novel_data:
                 ids.append(n._id)
                 org_name = re.sub("[^A-Za-z0-9]", "", n.title.split('  ')[0]).lower()
