@@ -222,6 +222,16 @@ class FileHandler:
     #         await ctx.send("error occured in converting docx to txt")
 
     @staticmethod
+    def get_title(soup: BeautifulSoup) -> str:
+        for tag in ("h1", "h2", "h3", "h4", "h5", "h6"):
+            try:
+                if title := soup.select_one(tag):
+                    return title.get_text().strip()
+            except Exception:
+                pass
+        return ""
+
+    @staticmethod
     async def epub_to_txt(ctx: commands.Context):
         msg = await ctx.reply("> **Epub file detected please wait till we finish converting to .txt")
         book = epub.read_epub(f"{ctx.author.id}.epub")

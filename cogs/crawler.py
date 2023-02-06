@@ -520,6 +520,10 @@ class Crawler(commands.Cog):
                 title_name = "None"
         if title_name.strip() == "":
             title_name = str(soup.select("title")[0].text)
+        if title_name is None or str(title_name).strip() == "":
+            title_name = FileHandler.get_title(soup)
+        if title_name is None or str(title_name).strip() == "":
+            title_name = link
         if (next_link := await FileHandler.find_toc_next(soup, link)) is not None:
             await ctx.send("> Multiple TOC's found.. getting the urls from TOC's", delete_after=8)
             print("Multi TOC found")
@@ -912,6 +916,8 @@ class Crawler(commands.Cog):
         if title is None or str(title).strip() == "":
             print(f"title empty {title}")
             title = sel.css(f'title ::text').extract_first()
+        if title is None or str(title).strip() == "":
+            title = FileHandler.get_title(soup)
         if title is None or str(title).strip() == "":
             title = firstchplink
         chp_count = 1
