@@ -83,7 +83,7 @@ class Translate(commands.Cog):
         #     return await ctx.reply(
         #         f"> Bot is scheduled to restart within 60 sec or after all current tasks are completed.. Please try after bot is restarted")
         if ctx.author.id == 925597069748621353:
-            while len(asyncio.all_tasks()) >= 10 or (
+            while len(asyncio.all_tasks()) >= 9 or (
                     ctx.author.id in self.bot.translator and not self.bot.translator[ctx.author.id] == "waiting"):
                 if ctx.author.id not in self.bot.translator:
                     self.bot.translator[ctx.author.id] = f"waiting"
@@ -121,7 +121,7 @@ class Translate(commands.Cog):
             except:
                 pass
             if no_tries >= 7:
-                await ctx.reply(content="> Currently bot is busy.. please try after some time")
+                return await ctx.reply(content="> Currently bot is busy.. please try after some time")
             if no_tries >= 5:
                 self.bot.translator = {}
                 if len(self.bot.translator) < 2:

@@ -672,19 +672,24 @@ class Crawler(commands.Cog):
                 "> **❌You cannot crawl two novels at the same time.**"
             )
         no_tries = 0
-        while len(asyncio.all_tasks()) >= 10:
+        while len(asyncio.all_tasks()) >= 9:
             no_tries = no_tries + 1
             try:
-                msg = await msg.edit(content="> **Currently bot is busy.Please wait some time**")
+                msg = await msg.edit(content=f"> **Currently bot is busy.Please wait some time. bot will retry in "
+                                             f"some time **"
+                                             f"\n No. of retries : {no_tries}")
             except:
                 pass
             await asyncio.sleep(10)
+            if no_tries >= 7:
+                return await ctx.reply(content="> Currently bot is busy.. please restart the task after some time "
+                                               "when bot is free")
             if no_tries >= 5:
                 self.bot.translator = {}
                 self.bot.crawler = {}
                 if len(self.bot.crawler) < 3:
                     break
-                await asyncio.sleep(10)
+                await asyncio.sleep(15)
         try:
             self.bot.crawler[ctx.author.id] = f"0/{len(urls)}"
             try:
@@ -1026,6 +1031,23 @@ class Crawler(commands.Cog):
                         return None
         crawled_urls = []
         repeats = 0
+        while len(asyncio.all_tasks()) >= 9:
+            no_tries = no_tries + 1
+            try:
+                msg = await msg.edit(content=f"> **Currently bot is busy.Please wait some time** bot will retry in "
+                                             f"some time"
+                                             f" \nNo. of retry : {no_tries}")
+            except:
+                pass
+            await asyncio.sleep(10)
+            if no_tries >= 7:
+                return await ctx.reply(content="> Currently bot is busy.. please restart the tasks after some time when bot is free")
+            if no_tries >= 5:
+                self.bot.translator = {}
+                self.bot.crawler = {}
+                if len(self.bot.crawler) < 3:
+                    break
+                await asyncio.sleep(15)
         try:
             description = GoogleTranslator().translate(await FileHandler.get_description(
                 soup=soup, link=firstchplink, next="true", title=org_title)).strip()
