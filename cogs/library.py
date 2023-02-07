@@ -67,25 +67,25 @@ class Library(commands.Cog):
 
     async def make_base_embed(self, data: Novel) -> discord.Embed:
         embed = discord.Embed(
-            title=f"**#{data._id} \t•\t {data.title[:240].strip()}**",
-            url=data.download,
-            description=f"*{data.description}*"
-            if data.description
+            title=f"**#{data['_id']} \t•\t {data['title'][:240].strip()}**",
+            url=data['download'],
+            description=f"*{data['description']}*"
+            if data['description']
             else "No description.",
             color=discord.Color.blue(),
         )
-        embed.add_field(name="Category", value=data.category)
-        embed.add_field(name="Tags", value=f'```yaml\n{", ".join(data.tags)}```')
-        if not str(data.org_language).lower() == 'na':
-            embed.add_field(name="Raw Language", value=data.org_language)
-        embed.add_field(name="Language", value=data.language)
-        embed.add_field(name="Size", value=f"{round(data.size / (1024 ** 2), 2)} MB")
-        uploader = self.bot.get_user(data.uploader) or await self.bot.fetch_user(
-            data.uploader
+        embed.add_field(name="Category", value=data['category'])
+        embed.add_field(name="Tags", value=f'```yaml\n{", ".join(data["tags"])}```')
+        if not str(data["org_language"]).lower() == 'na':
+            embed.add_field(name="Raw Language", value=data["org_language"])
+        embed.add_field(name="Language", value=data["language"])
+        embed.add_field(name="Size", value=f"{round(data['size'] / (1024 ** 2), 2)} MB")
+        uploader = self.bot.get_user(data['uploader']) or await self.bot.fetch_user(
+            data['uploader']
         )
-        embed.set_thumbnail(url=data.thumbnail)
+        embed.set_thumbnail(url=data['thumbnail'])
         embed.set_footer(
-            text=f"ON {datetime.datetime.fromtimestamp(data.date).strftime('%m/%d/%Y, %H:%M:%S')} • {uploader} • {'⭐' * int(data.rating)}",
+            text=f"ON {datetime.datetime.fromtimestamp(data['date']).strftime('%m/%d/%Y, %H:%M:%S')} • {uploader} • {'⭐' * int(data['rating'])}",
             icon_url=uploader.display_avatar,
         )
         return embed
@@ -98,7 +98,7 @@ class Library(commands.Cog):
 
     async def make_base_list_embed(self, data: list[Novel], page: int) -> discord.Embed:
         output = [
-            f"**#{novel._id}\t💠\t[{novel.title.split('__')[0].strip()[:200]}]({novel.download})**\n💠\tSize: **{round(novel.size / (1024 ** 2), 2)} MB**\t💠\tLanguage:** {novel.language}** "
+            f"**#{novel['_id']}\t💠\t[{novel['title'].split('__')[0].strip()[:200]}]({novel['download']})**\n💠\tSize: **{round(novel['size'] / (1024 ** 2), 2)} MB**\t💠\tLanguage:** {novel['language']}** "
             for novel in data]
         out_str = ""
         for out in output:
@@ -129,7 +129,7 @@ class Library(commands.Cog):
             ctx: commands.Context,
             title: str = None,
             language: str = None,
-            rating: int = None,
+            rating: int = 0,
             show_list: bool = False,
             category: str = None,
             tags: str = None,
@@ -187,54 +187,12 @@ class Library(commands.Cog):
                     pass
                 await self.buttons(embeds, ctx)
             return
-        valid = []
-        if title:
-            title = await self.bot.mongo.library.get_novel_by_name(title)
-            if title:
-                valid.append(title)
-        if category:
-            category = await self.bot.mongo.library.get_novel_by_category(category)
-            if category:
-                valid.append(category)
-        if tags:
-            tags = await self.bot.mongo.library.get_novel_by_tags(tags)
-            if tags:
-                valid.append(tags)
-        if language:
-            language = await self.bot.mongo.library.get_novel_by_language(language)
-            if language:
-                valid.append(language)
-        if rating:
-            rating = await self.bot.mongo.library.get_novel_by_rating(int(rating))
-            if rating:
-                valid.append(rating)
-        if raw_language:
-            raw_language_list = await self.bot.mongo.library.get_novel_by_rawlanguage(raw_language)
-            try:
-                if "chinese (simplified)" == raw_language:
-                    temp = await self.bot.mongo.library.get_novel_by_rawlanguage(raw_language)
-                    for t in temp:
-                        raw_language_list.append(t)
-            except:
-                pass
-            if raw_language:
-                valid.append(raw_language_list)
-
-        if size:
-            # print(size)
-            size = await self.bot.mongo.library.get_novel_by_size(size)
-            if size:
-                valid.append(size)
-        if uploader:
-            uploader = await self.bot.mongo.library.get_novel_by_uploader(uploader.id)
-            if uploader:
-                valid.append(uploader)
-
-        if not valid:
+        allnovels = await self.bot.mongo.library.find_common(title=title, rating=rating, category=category, language=language, size=size, original_language=raw_language, )
+        if not allnovels or allnovels == []:
             await ctx.send("> **No results found.**")
             await msg.delete()
             return
-        allnovels = self.common_elements_finder(*valid)
+
         if shuffle and sort_by is None:
             random.shuffle(allnovels)
         if sort_by is not None:

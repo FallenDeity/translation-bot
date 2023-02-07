@@ -1,5 +1,6 @@
 import os
 import re
+from typing import Any
 
 from motor import motor_asyncio
 
@@ -32,6 +33,56 @@ class Library(Database):
 
     async def add_novel(self, data: Novel) -> None:
         await self.library.insert_one(data.__dict__)
+
+    @staticmethod
+    def _make_match(
+            title: str,
+            rating: float,
+            language: str,
+            original_language: str,
+            uploader: int,
+            category: str,
+            tag: str,
+            size: float,
+    ) -> dict[str, Any]:
+        match: dict[str, Any] = {}
+        if title:
+            title = get_regex_from_name(title)
+            match["title"] = {"$regex": title, "$options": "i"}
+        if rating:
+            match["rating"] = {"$gte": rating}
+        if language:
+            match["language"] = language
+        if original_language:
+            match["original_language"] = original_language
+        if uploader:
+            match["uploader"] = uploader
+        if category:
+            match["category"] = {"$regex": category, "$options": "i"}
+        if tag:
+            match["tags"] = {"$in": [tag]}
+        if size:
+            size = int(size * 1024 ** 2)
+            match["size"] = {"$gte": size}
+        return match
+
+    async def find_common(
+            self,
+            title: str = "",
+            rating: float = 0.0,
+            language: str = "",
+            original_language: str = "",
+            uploader: int = None,
+            category: str = "",
+            tag: str = "",
+            size: float = 0.0,
+    ) ->list[Novel]:
+        commons = await self.library.aggregate(
+            [
+                {"$match": self._make_match(title, rating, language, original_language, uploader, category, tag, size)},
+            ]
+        ).to_list(None)
+        return commons
 
     async def get_novel_by_id(self, _id: int) -> Novel:
         novel = await self.library.find_one({"_id": _id})
