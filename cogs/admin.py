@@ -190,6 +190,8 @@ class Admin(commands.Cog):
                 if x.endswith("txt") and "requirements" not in x:
                     print(f"deleting {x}")
                     os.remove(x)
+                if "titles.sav" in x:
+                    os.remove(x)
         except Exception as e:
             print("exception occurred  in deleting")
             await ctx.send(f"error occurred in deleting {x} {e}")

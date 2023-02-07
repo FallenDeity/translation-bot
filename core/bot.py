@@ -4,6 +4,7 @@ import gc
 import os
 import random
 import traceback
+import joblib
 import typing as t
 
 import aiohttp
@@ -77,16 +78,11 @@ class Raizel(commands.Bot):
         self.mongo = Mongo()
         print("Connected to mongo db")
         self.blocked: list[int] = await self.mongo.blocker.get_all_banned_users()
-        self.titles = list(dict.fromkeys(list(await self.mongo.library.get_all_titles)))
-        temp = self.titles
-        self.titles: list[str] = []
-        for it in temp:
-            it = it[:150]
-            self.titles.append(it)
-        del temp
-        self.titles = list(dict.fromkeys(self.titles))
+        titles = list(dict.fromkeys(list(await self.mongo.library.get_all_titles)))
+        titles = random.sample(titles, len(titles))
+        joblib.dump(titles, 'titles.sav')
         print("Loaded titles")
-        self.titles = random.sample(self.titles, len(self.titles))
+        del titles
         channel = await self.fetch_channel(991911644831678484)
         try:
             self.mega = Mega().login(os.getenv("USER"), os.getenv("MEGA"))
@@ -165,6 +161,8 @@ class Raizel(commands.Bot):
                         for x in os.listdir():
                             if x.endswith("txt") and "requirements" not in x:
                                 print(f"deleting {x}")
+                                os.remove(x)
+                            if "titles.sav" in x:
                                 os.remove(x)
                     except Exception as e:
                         print("exception occurred  in deleting")
