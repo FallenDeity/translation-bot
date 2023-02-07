@@ -423,6 +423,10 @@ class Translate(commands.Cog):
         # print(f"thumbnail {thumbnail}")
         # input(f"if {library}")
         try:
+            if urls is None or urls == []:
+                desc_link = ""
+            else:
+                desc_link = urls[0]
             try:
                 original_Language = FileHandler.find_language(novel)
             except:
@@ -434,7 +438,7 @@ class Translate(commands.Cog):
                 else:
                     avatar = ctx.author.display_avatar
                 des = GoogleTranslator().translate(
-                    await FileHandler.get_desc_from_text(novel[:5000], title=name)).strip()
+                    await FileHandler.get_desc_from_text(novel[:5000], title=name, link=desc_link)).strip()
                 description = des
             except:
                 description = ""

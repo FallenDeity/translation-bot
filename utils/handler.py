@@ -51,10 +51,13 @@ class FileHandler:
         return [x[0] for x in url]
 
     @staticmethod
-    async def get_desc_from_text(text: str, title: str = None):
+    async def get_desc_from_text(text: str, title: str = None, link: str = ""):
         desc = ["introduction", "description", "简介", "描述", "描写", "summary", "prologue", "概括", "摘要", "总结",
                 "序幕", "开场白"]
         text = '\n'.join(OrderedDict.fromkeys(text.split('\n')))  # remove  duplicate lines from description
+        if "69shu" in link:
+            desc.append("loadAdv(2,0);")
+            desc.append("chapter")
         if title:
             text = re.sub(re.compile(get_regex_from_name(title), flags=re.IGNORECASE), "",
                           text)  # remove title from description

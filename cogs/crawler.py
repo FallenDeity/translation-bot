@@ -804,8 +804,8 @@ class Crawler(commands.Cog):
                 translate_to = "english"
             if translate_to not in self.bot.all_langs and original_Language not in ["english", "en"]:
                 translate_to = "english"
-            if True:
-                ctx.command = await self.bot.get_command("translate").callback(Translate(self.bot), ctx, download_url,
+            await asyncio.sleep(1)
+            ctx.command = await self.bot.get_command("translate").callback(Translate(self.bot), ctx, download_url,
                                                                                None,
                                                                                None,
                                                                                translate_to, title_name[:100], None,  None,
@@ -1152,7 +1152,7 @@ class Crawler(commands.Cog):
             try:
                 if description is None or description.strip() == "":
                     description = GoogleTranslator(source="auto", target="english").translate(
-                        await FileHandler.get_desc_from_text(full_text[:5000], title=org_title)[:500]).strip()
+                        await FileHandler.get_desc_from_text(full_text[:5000], title=org_title, link=firstchplink)[:500]).strip()
             except:
                 pass
             await ctx.send(f"Crawled {chp_count} pages.")
