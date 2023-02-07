@@ -880,6 +880,8 @@ class Crawler(commands.Cog):
                 "> Couldn't connect to the provided link.... Please check the link")
         if response.status_code == 404:
             return await ctx.reply("> Provided link gives 404 error... Please check the link")
+        if 'b.faloo' in firstchplink or 'wap.faloo' in firstchplink:
+            noofchapters = 150
         response.encoding = response.apparent_encoding
         soup = BeautifulSoup(response.content, 'html5lib', from_encoding=response.encoding)
         htm = response.text
