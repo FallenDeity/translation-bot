@@ -158,7 +158,7 @@ class Library(commands.Cog):
         ):
             novels = await self.bot.mongo.library.get_all_novels
             if show_list is True and no_of_novels == 300:
-                no_of_novels = 1000
+                no_of_novels = 600
             if len(novels) >= no_of_novels:
                 full_size = len(novels)
                 novels = novels[:no_of_novels]
