@@ -782,7 +782,6 @@ class Crawler(commands.Cog):
                 print("error in garbage collection")
             try:
                 del self.bot.crawler[ctx.author.id]
-                self.bot.titles.append(name)
             except:
                 pass
             if translate_to is None and add_terms is None:

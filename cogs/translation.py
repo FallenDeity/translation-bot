@@ -527,7 +527,6 @@ class Translate(commands.Cog):
                 pass
             try:
                 del self.bot.translator[ctx.author.id]
-                self.bot.titles.append(name)
             except:
                 pass
             try:

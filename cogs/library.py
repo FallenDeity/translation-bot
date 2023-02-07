@@ -2,6 +2,7 @@ import datetime
 import random
 
 import discord
+import joblib
 from discord import app_commands
 from discord.ext import commands
 from reactionmenu import ViewButton, ViewMenu
@@ -345,9 +346,10 @@ class Library(commands.Cog):
     async def translate_complete(
             self, inter: discord.Interaction, title: str
     ) -> list[app_commands.Choice]:
+        titles = joblib.load('titles.sav')
         lst = [
                   str(i[:90]).strip()
-                  for i in self.bot.titles
+                  for i in titles
                   if title.lower() in i.lower()
               ][:25]
         # print(lst)
