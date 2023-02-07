@@ -458,7 +458,7 @@ class Translate(commands.Cog):
             if ctx.author.id != 925597069748621353:
                 asyncio.create_task(self.cc_prog(rep_msg, embed=embed, author_id=ctx.author.id))
             translate = Translator(self.bot, ctx.author.id, language)
-            if len(liz) < 2300:
+            if len(liz) < 1700:
                 story = await translate.start(liz, len(asyncio.all_tasks()))
             else:
                 chunks = [liz[x:x + 1000] for x in range(0, len(liz), 1000)]
@@ -571,7 +571,9 @@ class Translate(commands.Cog):
             else:
                 break
             if len(asyncio.all_tasks()) > 9:
-                return
+                embed.set_field_at(index=3,
+                                   name=f"Progress : ", value=f"progress bar is closed .please use .tp to check progress")
+                return await msg.edit(embed=embed)
             await asyncio.sleep(8)
 
         embed.set_field_at(index=3,

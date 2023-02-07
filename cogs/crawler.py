@@ -242,7 +242,10 @@ class Crawler(commands.Cog):
             else:
                 break
             if len(asyncio.all_tasks()) > 9:
-                return
+                embed.set_field_at(index=0,
+                                   name=f"Progress : ",
+                                   value=f"progress bar is closed .please use .tcp to check progress")
+                return await msg.edit(embed=embed)
             await asyncio.sleep(wait_time)
         embed.set_field_at(index=0,
                            name=f"Progress :  100%",
@@ -267,7 +270,10 @@ class Crawler(commands.Cog):
             else:
                 break
             if len(asyncio.all_tasks()) > 9:
-                return
+                embed.set_field_at(index=0,
+                                   name=f"Progress : ",
+                                   value=f"progress bar is closed .please use .tcp to check progress")
+                return await msg.edit(embed=embed)
         embed.set_image(url="")
         embed.set_field_at(index=0, name="Progress",
                            value=f"Completed crawling")
@@ -707,7 +713,7 @@ class Crawler(commands.Cog):
             asyncio.create_task(self.cc_prog(msg, embed, ctx.author.id))
             if library is not None:
                 await ctx.reply(content=f"> Updating {str(library)} with name : {title_name}")
-            if len(urls) < 1800:
+            if len(urls) < 1700:
                 book = await self.bot.loop.run_in_executor(
                     None, self.direct, urls, novel, ctx.author.id, cloudscrape,
                 )
