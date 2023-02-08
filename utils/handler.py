@@ -408,10 +408,6 @@ class FileHandler:
                                                       f"{name[:100]}.txt")
                 filelnk = await bot.loop.run_in_executor(None, bot.mega.get_upload_link, file)
                 view = LinkView({"Novel": [filelnk, "📔"]})
-                await ctx.reply(
-                    content=f"> **✔{ctx.author.mention} your novel #{next_no} {name} is ready.**",
-                    view=view,
-                )
                 if original_language.lower() == "korean":
                     channel = bot.get_channel(
                         1032638028868501554
@@ -434,8 +430,6 @@ class FileHandler:
             except:
                 pass
         else:
-            file = discord.File(f"{ctx.author.id}.txt", f"{name}.txt")
-            await ctx.reply(content=f"**🎉Here is your translated novel #{next_no}**", file=file)
             if original_language.lower() == "korean":
                 channel = bot.get_channel(
                     1032638028868501554
@@ -449,7 +443,6 @@ class FileHandler:
                 allowed_mentions=discord.AllowedMentions(users=False)
             )
             try:
-                file.close()
                 os.remove(f"{ctx.author.id}.txt")
             except:
                 pass
@@ -485,6 +478,7 @@ class FileHandler:
                         try:
                             await asyncio.sleep(3)
                             data[0] = await bot.mongo.library.next_number
+                            next_no = data[0]
                             await bot.mongo.library.add_novel(data)
                             loop = False
                         except:
@@ -493,6 +487,9 @@ class FileHandler:
             await bot.mongo.library.update_download(_id=library, download=download_url)
             await bot.mongo.library.update_date(_id=library, date=datetime.datetime.utcnow().timestamp())
             await bot.mongo.library.update_thumbnail(_id=library, thumbnail=thumbnail)
+        view = LinkView({"Novel": [download_url, "📔"]})
+        await ctx.reply(content=f"**🎉Here is your translated novel #{next_no} {name}**", view=view)
+        return
 
     async def crawlnsend(
             self, ctx: commands.Context, bot: Raizel, title: str, title_name: str, originallanguage: str,
@@ -547,10 +544,6 @@ class FileHandler:
                 )
                 filelnk = await bot.loop.run_in_executor(None, bot.mega.get_upload_link, file)
                 view = LinkView({"Novel": [filelnk, "📔"]})
-                await ctx.reply(
-                    content=f"> **✔{ctx.author.mention} your novel #{next_no} {title_name} is ready.**",
-                    view=view,
-                )
                 channel = bot.get_channel(
                     channel_id
                 ) or await bot.fetch_channel(channel_id)
@@ -567,8 +560,6 @@ class FileHandler:
             except:
                 pass
         else:
-            file = discord.File(f"{ctx.author.id}_cr.txt", f"{title_name[:100]}.txt")
-            await ctx.reply(content=f"**🎉Here is your crawled novel #{next_no}**", file=file)
             channel = bot.get_channel(
                 channel_id
             ) or await bot.fetch_channel(channel_id)
@@ -580,7 +571,6 @@ class FileHandler:
             )
             download_url = msg.attachments[0].url
             try:
-                file.close()
                 os.remove(f"{ctx.author.id}_cr.txt")
             except:
                 pass
@@ -612,6 +602,7 @@ class FileHandler:
                         try:
                             await asyncio.sleep(3)
                             data[0] = await bot.mongo.library.next_number
+                            next_no = int(data[0])
                             await bot.mongo.library.add_novel(data)
                             loop = False
                         except:
@@ -620,4 +611,6 @@ class FileHandler:
             await bot.mongo.library.update_download(_id=library, download=download_url)
             await bot.mongo.library.update_date(_id=library, date=datetime.datetime.utcnow().timestamp())
             await bot.mongo.library.update_thumbnail(_id=library, thumbnail=thumbnail)
+        view = LinkView({"Novel": [download_url, "📔"]})
+        await ctx.reply(content=f"**🎉Here is your crawled novel #{next_no} {title}**", view=view)
         return download_url
