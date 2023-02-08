@@ -54,7 +54,7 @@ class CssSelector:
             #         elif "read.qidian" in link or "book.qidian" in link or "www.qidian" in link:
             #             return "p ::text"
         elif "www.youyoukanshu.com" in link:
-            return "#content > article ::text"
+            return "#content > div.content ::text"
         elif "fanqienovel.com" in link:
             return "div.muye-reader-content.noselect ::text"
         elif "m.shubaow.net" in link or "m.longteng788.com/" in link or "m.xklxsw.com" in link or "m.630shu.net" in link:
@@ -159,8 +159,8 @@ class CssSelector:
             return ["#manga-reading-nav-foot > div > div.select-pagination > div > div.nav-next > a", "#manga-reading-nav-head > div > div.entry-header_wrap > div > div.c-breadcrumb > ol > li:nth-child(2) > a"]
         elif "readlightnovel" in link:
             return ["#ch-page-container > div > div.col-lg-8.content2 > div > div:nth-child(6) > ul > li:nth-child(3) > a", "#ch-page-container > div > div.col-lg-8.content2 > div > div:nth-child(1) > div > div > h1"]
-        elif "www.youyoukanshu.com" in link:
-            return ["#content > div.page.hidden-xs.hidden-sm > a:nth-child(3)", "#content > div.readtop > div.pull-left.hidden-lg > a > font > font"]
+        # elif "www.youyoukanshu.com" in link:
+        #     return [None, "#content > div.readtop > div.pull-left.hidden-lg > a > font > font"]
         elif "m.shubaow.net" in link:
             return ["#novelcontent > div.page_chapter > ul > li:nth-child(4) > a", "#novelbody > div.head > div.nav_name > h1 > font > font"]
         elif "m.xindingdianxsw.com" in link:
