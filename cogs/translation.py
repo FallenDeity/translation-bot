@@ -465,6 +465,8 @@ class Translate(commands.Cog):
             if len(liz) < 1700:
                 story = await translate.start(liz, len(asyncio.all_tasks()))
             else:
+                if ctx.author.id == 925597069748621353:
+                    await asyncio.sleep(250)
                 chunks = [liz[x:x + 1000] for x in range(0, len(liz), 1000)]
                 del liz
                 filename = f"{str(random.randint(1000, 10000))}.txt"
