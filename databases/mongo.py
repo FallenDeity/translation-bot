@@ -186,13 +186,14 @@ class Library(Database):
 
     @property
     async def get_all_tags(self) -> list[str]:
-        tags = set([j for i in await self.get_all_novels for j in i.tags])
-        return list(tags)
+        tags = await self.library.distinct("tags")
+        return tags
+
 
     @property
-    async def get_all_titles(self) -> list[str]:
-        titles = set([i.title for i in await self.get_all_novels])
-        return list(titles)
+    async def get_all_distinct_titles(self) -> list[str]:
+        titles = await self.library.distinct("title")
+        return titles
 
     @property
     async def get_total_novels(self) -> int:

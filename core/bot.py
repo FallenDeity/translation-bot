@@ -28,14 +28,13 @@ class Raizel(commands.Bot):
     mongo: Mongo
 
     def __init__(self) -> None:
-        self.titles: list = None
         self.blocked = None
         self.mega: Mega = None
         intents = discord.Intents.all()
         self.translator: t.Dict[int, str] = {}
         self.crawler: t.Dict[int, str] = {}
         self.languages = choices
-        self.dictionary: str = get_dictionary()
+        self.dictionary: list[str] = get_dictionary()
         self.boot = datetime.datetime.utcnow()
         self.app_status: str = "up"
         self.translation_count: float = 0
@@ -78,11 +77,6 @@ class Raizel(commands.Bot):
         self.mongo = Mongo()
         print("Connected to mongo db")
         self.blocked: list[int] = await self.mongo.blocker.get_all_banned_users()
-        titles = list(dict.fromkeys(list(await self.mongo.library.get_all_titles)))
-        titles = random.sample(titles, len(titles))
-        joblib.dump(titles, 'titles.sav')
-        print("Loaded titles")
-        del titles
         channel = await self.fetch_channel(991911644831678484)
         try:
             self.mega = Mega().login(os.getenv("USER"), os.getenv("MEGA"))
@@ -103,6 +97,19 @@ class Raizel(commands.Bot):
         # await self.tree.sync()
         await channel.send(embed=discord.Embed(description=f"Bot is up now"))
         return await super().setup_hook()
+
+    async def load_title(self):
+        print("started loading titles")
+        try:
+            titles = list(dict.fromkeys(list(await self.mongo.library.get_all_distinct_titles)))
+            titles = random.sample(titles, len(titles))
+            joblib.dump(titles, 'titles.sav')
+            print("Loaded titles")
+            del titles
+            return
+        except Exception as e:
+            print("error loading titles")
+            print(e)
 
     async def start(self) -> None:
         try:
@@ -140,6 +147,7 @@ class Raizel(commands.Bot):
 
     @tasks.loop(hours=2)
     async def auto_restart(self):
+        asyncio.create_task(self.load_title())
         i = 0
         if self.auto_restart.current_loop != 0:
             await self.change_presence(

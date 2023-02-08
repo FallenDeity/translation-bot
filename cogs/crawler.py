@@ -129,12 +129,21 @@ class Crawler(commands.Cog):
         response = scraper.get(links, headers=headers, timeout=20)
         return response
 
-    def direct(self, urls: t.List[str], novel: t.Dict[int, str], name: int, cloudscrape: bool) -> dict:
+    def get_workers(self, tasks: int):
+        if tasks < 8:
+            return 10
+        elif tasks <= 9:
+            return 9
+        else:
+            return 8
+
+    def direct(self, urls: t.List[str], novel: t.Dict[int, str], name: int, cloudscrape: bool, tasks: int = 8) -> dict:
         if cloudscrape:
             scraper = cloudscraper.CloudScraper()
         else:
             scraper = None
-        with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
+        workers = self.get_workers(tasks)
+        with concurrent.futures.ThreadPoolExecutor(max_workers=workers) as executor:
             futures = [
                 executor.submit(self.easy, i, j, self.urlcss, self.chptitlecss, scraper)
                 for i, j in enumerate(urls)
@@ -715,7 +724,7 @@ class Crawler(commands.Cog):
                 await ctx.reply(content=f"> Updating {str(library)} with name : {title_name}")
             if len(urls) < 1700:
                 book = await self.bot.loop.run_in_executor(
-                    None, self.direct, urls, novel, ctx.author.id, cloudscrape,
+                    None, self.direct, urls, novel, ctx.author.id, cloudscrape, len(asyncio.all_tasks())
                 )
                 if book is None:
                     return await ctx.reply("Crawling stopped")
@@ -737,7 +746,7 @@ class Crawler(commands.Cog):
                     await ctx.reply(content=f"> Crawling {str(cnt)} chunks out of {str(len(chunks))}... use .tcp to "
                                             f"check progress")
                     book = await self.bot.loop.run_in_executor(
-                        None, self.direct, chunk, novel, ctx.author.id, cloudscrape,
+                        None, self.direct, chunk, novel, ctx.author.id, cloudscrape, len(asyncio.all_tasks()+1)
                     )
                     if book is None:
                         return await ctx.reply("Crawling stopped")
@@ -1038,6 +1047,7 @@ class Crawler(commands.Cog):
                         return None
         crawled_urls = []
         repeats = 0
+        no_tries = 0
         while len(asyncio.all_tasks()) >= 9:
             no_tries = no_tries + 1
             try:

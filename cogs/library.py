@@ -200,19 +200,19 @@ class Library(commands.Cog):
                 await ctx.send(f"> **Given sort by is not present in bot. available filters \n {self.sorted_data}**")
             else:
                 if sort_by == "_id":
-                    allnovels.sort(key=lambda x: x._id)
+                    allnovels.sort(key=lambda x: x["_id"])
                 elif sort_by == "title":
-                    allnovels.sort(key=lambda x: x.title)
+                    allnovels.sort(key=lambda x: x["title"])
                 elif sort_by == "rating":
-                    allnovels.sort(key=lambda x: x.rating)
+                    allnovels.sort(key=lambda x: x["rating"])
                     allnovels.reverse()
                 elif sort_by == "size":
                     allnovels.sort(key=lambda x: x["size"])
                     allnovels.reverse()
                 elif sort_by == "uploader":
-                    allnovels.sort(key=lambda x: x.uploader)
+                    allnovels.sort(key=lambda x: x["uploader"])
                 elif sort_by == "date":
-                    allnovels.sort(key=lambda x: x.date)
+                    allnovels.sort(key=lambda x: x["date"])
                     allnovels.reverse()
         # print("got all novels")
         full_size = 0
