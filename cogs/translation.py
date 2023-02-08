@@ -483,7 +483,7 @@ class Translate(commands.Cog):
                                     f"check progress")
                     except:
                         pass
-                    story = await translate.start(liz_t, len(asyncio.all_tasks()))
+                    story = await translate.start(liz_t, len(asyncio.all_tasks())+2)
                     async with aiofiles.open(filename, "a+", encoding="utf-8") as f:
                         await f.write("\n")
                         await f.write(story)
