@@ -3,7 +3,6 @@ import datetime
 import os
 import random
 import re
-import string
 import typing
 from urllib.parse import urljoin
 from collections import OrderedDict
@@ -13,7 +12,6 @@ import aiofiles
 import chardet
 import cloudscraper
 import discord
-# import docx
 import ebooklib
 import parsel
 from PyDictionary import PyDictionary
@@ -488,7 +486,7 @@ class FileHandler:
             await bot.mongo.library.update_date(_id=library, date=datetime.datetime.utcnow().timestamp())
             await bot.mongo.library.update_thumbnail(_id=library, thumbnail=thumbnail)
         view = LinkView({"Novel": [download_url, "📔"]})
-        await ctx.reply(content=f"**🎉Here is your translated novel #{next_no} {name}**", view=view)
+        await ctx.reply(content=f"> **{ctx.author.mention} 🎉Here is your translated novel #{next_no} {name}**", view=view)
         return
 
     async def crawlnsend(
@@ -612,5 +610,5 @@ class FileHandler:
             await bot.mongo.library.update_date(_id=library, date=datetime.datetime.utcnow().timestamp())
             await bot.mongo.library.update_thumbnail(_id=library, thumbnail=thumbnail)
         view = LinkView({"Novel": [download_url, "📔"]})
-        await ctx.reply(content=f"**🎉Here is your crawled novel #{next_no} {title}**", view=view)
+        await ctx.reply(content=f"> **{ctx.author.mention} 🎉Here is your crawled novel #{next_no} {title.split('__')[0]}**", view=view)
         return download_url
