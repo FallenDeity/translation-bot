@@ -207,7 +207,7 @@ class Library(commands.Cog):
                     allnovels.sort(key=lambda x: x.rating)
                     allnovels.reverse()
                 elif sort_by == "size":
-                    allnovels.sort(key=lambda x: x.size)
+                    allnovels.sort(key=lambda x: x["size"])
                     allnovels.reverse()
                 elif sort_by == "uploader":
                     allnovels.sort(key=lambda x: x.uploader)
