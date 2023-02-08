@@ -147,7 +147,8 @@ class Raizel(commands.Bot):
 
     @tasks.loop(hours=2)
     async def auto_restart(self):
-        asyncio.create_task(self.load_title())
+        if self.auto_restart.current_loop == 0:
+            asyncio.create_task(self.load_title())
         i = 0
         if self.auto_restart.current_loop != 0:
             await self.change_presence(
