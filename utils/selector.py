@@ -198,6 +198,6 @@ class CssSelector:
         elif "booktoki216.com" in link:
             return ["#goNextBtn", "title"]
         elif "m.bqg789.net" in link:
-            return ["None", "#novelbody > div.head > div.nav_name > h1"]
+            return ["#nextpage", "#novelbody > div.head > div.nav_name > h1"]
         else:
             return [None, "title"]
