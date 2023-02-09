@@ -92,6 +92,10 @@ class Library(Database):
         novel = await self.library.find_one({"_id": _id})
         return novel['title']
 
+    async def get_random_novel(self, no: int = 10) -> Novel:
+        novel = await self.library.aggregate([{"$sample": {"size": no}}]).to_list(None)
+        return novel
+
     async def update_novel(self, novel: Novel) -> None:
         await self.library.update_one({"_id": novel._id}, {"$set": novel.__dict__})
 
