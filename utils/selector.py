@@ -101,6 +101,8 @@ class CssSelector:
             return "#content > div.content ::text"
         elif "ranobes.com" in link:
             return "div.block.story.shortstory ::text"
+        elif "m.bqg789.net" in link:
+            return "#novelcontent ::text"
         else:
             return "* ::text"
 
@@ -159,8 +161,8 @@ class CssSelector:
             return ["#manga-reading-nav-foot > div > div.select-pagination > div > div.nav-next > a", "#manga-reading-nav-head > div > div.entry-header_wrap > div > div.c-breadcrumb > ol > li:nth-child(2) > a"]
         elif "readlightnovel" in link:
             return ["#ch-page-container > div > div.col-lg-8.content2 > div > div:nth-child(6) > ul > li:nth-child(3) > a", "#ch-page-container > div > div.col-lg-8.content2 > div > div:nth-child(1) > div > div > h1"]
-        # elif "www.youyoukanshu.com" in link:
-        #     return [None, "#content > div.readtop > div.pull-left.hidden-lg > a > font > font"]
+        elif "www.youyoukanshu.com" in link:
+            return ["None", "#content > div.readtop > div.pull-left.hidden-lg > a > font > font"]
         elif "m.shubaow.net" in link:
             return ["#novelcontent > div.page_chapter > ul > li:nth-child(4) > a", "#novelbody > div.head > div.nav_name > h1 > font > font"]
         elif "m.xindingdianxsw.com" in link:
@@ -195,5 +197,7 @@ class CssSelector:
             return ["#next", "#dle-speedbar > span > font:nth-child(2) > span:nth-child(4) > a > span"]
         elif "booktoki216.com" in link:
             return ["#goNextBtn", "title"]
+        elif "m.bqg789.net" in link:
+            return ["None", "#novelbody > div.head > div.nav_name > h1"]
         else:
             return [None, "title"]

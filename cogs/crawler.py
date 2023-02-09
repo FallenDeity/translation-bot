@@ -857,6 +857,8 @@ class Crawler(commands.Cog):
             cloudscrape = True
         if nextselector is None:
             nextsel = CssSelector.find_next_selector(firstchplink)
+            if nextsel[0] == "None":
+                nextsel[0] = None
             if nextsel[0] is not None:
                 nextselector = nextsel[0]
                 title_css = nextsel[1]
