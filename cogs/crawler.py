@@ -746,7 +746,7 @@ class Crawler(commands.Cog):
                     await ctx.reply(content=f"> Crawling {str(cnt)} chunks out of {str(len(chunks))}... use .tcp to "
                                             f"check progress")
                     book = await self.bot.loop.run_in_executor(
-                        None, self.direct, chunk, novel, ctx.author.id, cloudscrape, len(asyncio.all_tasks()+1)
+                        None, self.direct, chunk, novel, ctx.author.id, cloudscrape, len(asyncio.all_tasks())+1
                     )
                     if book is None:
                         return await ctx.reply("Crawling stopped")

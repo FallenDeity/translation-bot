@@ -525,6 +525,8 @@ class Translate(commands.Cog):
                 del story
                 del novel
                 del liz
+                if len(asyncio.all_tasks()) < 8:
+                    asyncio.create_task(self.bot.load_title())
             except:
                 pass
             try:
