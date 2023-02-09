@@ -329,9 +329,9 @@ class Library(commands.Cog):
         if not novel:
             await ctx.send("No novel found.")
             return
-        description = novel["description"][:500] + "\n"
+        description = novel["description"][:500]
         await self.bot.mongo.library.update_description(
-            novel["_id"], description+summary + f" • Reviewed by {ctx.author}"
+            novel["_id"], f"{description}\n\n**{summary} +  • Reviewed by {ctx.author}**"
         )
         if novel["rating"] != 0:
             rating = int((rating + novel["rating"])/2)
