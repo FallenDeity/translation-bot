@@ -69,7 +69,7 @@ class Library(commands.Cog):
         embed = discord.Embed(
             title=f"**#{data['_id']} \t•\t {data['title'][:240].strip()}**",
             url=data['download'],
-            description=f"*{data['description']}*"
+            description=f"*{data['description'][:2000]}*"
             if data['description']
             else "No description.",
             color=discord.Color.blue(),
