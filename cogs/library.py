@@ -329,10 +329,13 @@ class Library(commands.Cog):
         if not novel:
             await ctx.send("No novel found.")
             return
+        description = novel["description"][:500] + "\n"
         await self.bot.mongo.library.update_description(
-            novel._id, summary + f" • Reviewed by {ctx.author}"
+            novel["_id"], description+summary + f" • Reviewed by {ctx.author}"
         )
-        await self.bot.mongo.library.update_rating(novel._id, rating)
+        if novel["rating"] != 0:
+            rating = int((rating + novel["rating"])/2)
+        await self.bot.mongo.library.update_rating(novel["_id"], rating)
         return await ctx.send("Novel reviewed.")
 
     @commands.hybrid_command(name="leaderboard", description="Get the bot's leaderboard.")
