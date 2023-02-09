@@ -86,7 +86,7 @@ class Library(Database):
 
     async def get_novel_by_id(self, _id: int) -> Novel:
         novel = await self.library.find_one({"_id": _id})
-        return Novel(**novel) if novel else None
+        return novel if novel else None
 
     async def get_title_by_id(self, _id: int) -> Novel:
         novel = await self.library.find_one({"_id": _id})
