@@ -231,10 +231,10 @@ class ErrorHandler(commands.Cog):
             ) or await self.bot.fetch_channel(991911644831678484)
             try:
                 await channel.send(
-                    f"```yaml\n{ctx.message.jump_url} \n{''.join(traceback.format_exception(error, error, error.__traceback__))}\n```"
+                    f"```yaml\n[Error occurred here]({ctx.message.jump_url}) \n{''.join(traceback.format_exception(error, error, error.__traceback__))[:2000]}\n```"
                 )
             except:
-                await channel.send(f"{ctx.message.jump_url} \n{str(error)}")
+                await channel.send(f"[Error occurred here]({ctx.message.jump_url}) \n{str(error)}")
                 await channel.send(error.__traceback__[:4000])
             raise error
 

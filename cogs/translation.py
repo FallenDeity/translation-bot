@@ -193,7 +193,10 @@ class Translate(commands.Cog):
                 ".pdf", "")
             file_type = resp.headers["content-type"].split("/")[-1]
         elif novel is None:
-            resp = await self.bot.con.get(link)
+            try:
+                resp = await self.bot.con.get(link)
+            except:
+                await ctx.reply("> Check the link provided. We couldn't connect to the link you provided")
             try:
                 file_type = FileHandler.get_headers(resp)
             except KeyError:
