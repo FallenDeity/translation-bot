@@ -187,7 +187,11 @@ class Library(commands.Cog):
                     pass
                 await self.buttons(embeds, ctx)
             return
-        allnovels = await self.bot.mongo.library.find_common(title=title, rating=rating, category=category, language=language, size=size, original_language=raw_language, )
+        if uploader:
+            uploader_id = uploader.id
+        else:
+            uploader_id = None
+        allnovels = await self.bot.mongo.library.find_common(title=title, rating=rating, category=category, language=language, size=size, original_language=raw_language, uploader=uploader_id)
         if not allnovels or allnovels == []:
             await ctx.send("> **No results found.**")
             await msg.delete()
@@ -310,7 +314,10 @@ class Library(commands.Cog):
 
     @library.command(name="info", help="shows info about a novel.")
     async def info(self, ctx: commands.Context, _id: int) -> None:
-        await ctx.defer()
+        try:
+            await ctx.defer()
+        except:
+            pass
         novel = await self.bot.mongo.library.get_novel_by_id(_id)
         if not novel:
             return await ctx.send("No novel found.")
@@ -336,7 +343,8 @@ class Library(commands.Cog):
         if novel["rating"] != 0:
             rating = int((rating + novel["rating"])/2)
         await self.bot.mongo.library.update_rating(novel["_id"], rating)
-        return await ctx.send("Novel reviewed.")
+        await ctx.send("Novel reviewed.")
+        await self.bot.get_command("library info").callback(Library(self.bot), ctx, _id)
 
     @commands.hybrid_command(name="leaderboard", description="Get the bot's leaderboard.")
     async def leaderboard(self, ctx: commands.Context, user: discord.User = None) -> None:

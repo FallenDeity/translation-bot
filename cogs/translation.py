@@ -113,7 +113,7 @@ class Translate(commands.Cog):
         name = None
         rep_msg = await ctx.reply("Please wait.. Translation will began soon")
         no_tries = 0
-        while len(asyncio.all_tasks()) >= 9 or len(self.bot.translator) >= 3:
+        while len(asyncio.all_tasks()) >= 9 or len(self.bot.translator) >= 2:
             no_tries = no_tries + 1
             try:
                 rep_msg = await rep_msg.edit(
