@@ -280,7 +280,7 @@ class Translate(commands.Cog):
                     or org_name2 == n_name
                     or (len(name) > 22 and n_name in org_name)
                     or (len(name) > 22 and n_name2 in org_name2)) \
-                        and language.lower() == n.language.lower() \
+                        and language.lower() in str(n.language).lower() \
                         and size_found >= round(n.size / (1024 ** 2), 2):
                     library = n._id
                     print(library)

@@ -637,7 +637,7 @@ class Crawler(commands.Cog):
                     or title_name.split('  ')[0].lower() == n.title.split('  ')[0].lower()
                     or (len(title) > 20 and org_str in lib_str)
                     or (len(title) > 20 and org_str2 in lib_str2)
-                ) and original_Language == n.language:
+                )and original_Language in str(n.language).lower():
                     library_update = True
                     library = n._id
                     print(library)
@@ -1007,7 +1007,7 @@ class Crawler(commands.Cog):
                     or title_name.split('  ')[0].lower() == n.title.split('  ')[0].lower()
                     or (len(title) > 20 and org_str in lib_str)
                     or (len(title) > 20 and org_str2 in lib_str2)
-                ) and original_Language == n.language:
+                ) and original_Language in str(n.language).lower():
                     library_update = True
                     library = n._id
                     print(library)
