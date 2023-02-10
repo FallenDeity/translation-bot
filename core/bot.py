@@ -81,6 +81,8 @@ class Raizel(commands.Bot):
         try:
             self.mega = Mega().login(os.getenv("USER"), os.getenv("MEGA"))
             print("Connected to Mega")
+            txt_channel = await self.fetch_channel(984664133570031666)
+            await txt_channel.send(embed=discord.Embed(description=f"Bot is up now"))
         except Exception as e:
             try:
                 self.mega = Mega().login()
