@@ -634,8 +634,10 @@ class Crawler(commands.Cog):
                 if (title.split('__')[0].strip() == n.title.split('__')[0].strip()
                     or org_str == lib_str or org_str2 == lib_str
                     or lib_str2 == org_str2
-                    or title_name.split('  ')[0].lower() == n.title.split('  ')[0].lower()) \
-                        and original_Language == n.org_language and original_Language == n.language:
+                    or title_name.split('  ')[0].lower() == n.title.split('  ')[0].lower()
+                    or (len(title) > 20 and org_str in lib_str)
+                    or (len(title) > 20 and org_str2 in lib_str2)
+                ) and original_Language == n.language:
                     library_update = True
                     library = n._id
                     print(library)
@@ -1002,8 +1004,10 @@ class Crawler(commands.Cog):
                 if (title.split('__')[0].strip() == n.title.split('__')[0].strip()
                     or org_str == lib_str or org_str2 == lib_str
                     or lib_str2 == org_str2
-                    or title_name.split('  ')[0].lower() == n.title.split('  ')[0].lower()) \
-                        and original_Language == n.org_language and original_Language == n.language:
+                    or title_name.split('  ')[0].lower() == n.title.split('  ')[0].lower()
+                    or (len(title) > 20 and org_str in lib_str)
+                    or (len(title) > 20 and org_str2 in lib_str2)
+                ) and original_Language == n.language:
                     library_update = True
                     library = n._id
                     print(library)
