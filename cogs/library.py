@@ -30,7 +30,7 @@ class Library(commands.Cog):
     async def buttons(lst: list[discord.Embed], ctx: commands.Context) -> None:
         if len(lst) == 1:
             return await ctx.send(embed=lst[0])
-        menu = ViewMenu(ctx, menu_type=ViewMenu.TypeEmbed)
+        menu = ViewMenu(ctx, menu_type=ViewMenu.TypeEmbed, remove_buttons_on_timeout=True)
         for i in lst:
             menu.add_page(i)
         back = ViewButton(
@@ -156,7 +156,7 @@ class Library(commands.Cog):
                 and size is None
                 and uploader is None
         ):
-            novels = await self.bot.mongo.library.get_all_novels
+            novels = await self.bot.mongo.library.find_common(no=no_of_novels)
             if show_list is True and no_of_novels == 300:
                 no_of_novels = 600
             if len(novels) >= no_of_novels:
@@ -167,7 +167,7 @@ class Library(commands.Cog):
             if show_list:
                 embeds = await self.make_list_embed_list(novels)
                 if full_size != 0:
-                    msg = await msg.edit(content=f"> Showing first **{str(no_of_novels)} out of {str(full_size)}**")
+                    msg = await msg.edit(content=f"> Showing first **{str(no_of_novels)} **")
                 else:
                     msg = await msg.edit(content=f"> Found {len(novels)} novels")
                 try:
@@ -178,7 +178,7 @@ class Library(commands.Cog):
             else:
                 embeds = await self.make_list_embed(novels)
                 if full_size != 0:
-                    msg = await msg.edit(content=f"> Showing first **{str(no_of_novels)} out of {str(full_size)}**")
+                    msg = await msg.edit(content=f"> Showing first **{str(no_of_novels)}**")
                 else:
                     msg = await msg.edit(content=f"> Found {len(embeds)} novels")
                 try:
@@ -191,7 +191,7 @@ class Library(commands.Cog):
             uploader_id = uploader.id
         else:
             uploader_id = None
-        allnovels = await self.bot.mongo.library.find_common(title=title, rating=rating, category=category, language=language, size=size, original_language=raw_language, uploader=uploader_id)
+        allnovels = await self.bot.mongo.library.find_common(title=title, rating=rating, category=category, language=language, size=size, original_language=raw_language, uploader=uploader_id, no=no_of_novels)
         if not allnovels or allnovels == []:
             await ctx.send("> **No results found.**")
             await msg.delete()
@@ -230,7 +230,7 @@ class Library(commands.Cog):
         if show_list:
             embeds = await self.make_list_embed_list(allnovels)
             if full_size != 0:
-                msg = await msg.edit(content=f"> Showing first **{str(no_of_novels)} out of {str(full_size)}**")
+                msg = await msg.edit(content=f"> Showing first **{str(no_of_novels)} **")
             else:
                 msg = await msg.edit(content=f"> Found **{len(allnovels)}** novels")
             try:

@@ -76,10 +76,12 @@ class Library(Database):
             category: str = "",
             tag: str = "",
             size: float = 0.0,
+            no: int = 300,
     ) ->list[Novel]:
         commons = await self.library.aggregate(
             [
                 {"$match": self._make_match(title, rating, language, original_language, uploader, category, tag, size)},
+                {"$sample": {"size": no}}
             ]
         ).to_list(None)
         return commons
