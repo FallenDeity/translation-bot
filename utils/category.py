@@ -79,7 +79,7 @@ class Categories(enum.Enum):
     )
     Marvel = Category(
         name="Marvel",
-        tags=["marvel", "meimen", "infinite gem", "loki", "shield agent", "coulson", "agent shield"],
+        tags=["marvel", "meimen", "infinite gem", "loki", "shield agent", "coulson", "agent shield", "american comics"],
         thumbnails=[
             "https://cdn.discordapp.com/attachments/1055445441958916167/1055497322953441360/image0.jpg",
             "https://cdn.discordapp.com/attachments/1055445441958916167/1055497401269502032/image0.jpg",
