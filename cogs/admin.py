@@ -188,6 +188,7 @@ class Admin(commands.Cog):
         try:
             for x in os.listdir():
                 if x.endswith("txt") and "requirements" not in x:
+                    await ctx.send(f"deleting {x}")
                     print(f"deleting {x}")
                     os.remove(x)
                 if "titles.sav" in x:

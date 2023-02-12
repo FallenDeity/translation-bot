@@ -78,6 +78,11 @@ class Raizel(commands.Bot):
         print("Connected to mongo db")
         self.blocked: list[int] = await self.mongo.blocker.get_all_banned_users()
         channel = await self.fetch_channel(991911644831678484)
+        for x in os.listdir():
+            if x.endswith("txt") and "requirements" not in x:
+                await channel.send(f"deleting {x}")
+                print(f"deleting {x}")
+                os.remove(x)
         try:
             self.mega = Mega().login(os.getenv("USER"), os.getenv("MEGA"))
             print("Connected to Mega")
