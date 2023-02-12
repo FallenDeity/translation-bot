@@ -34,7 +34,7 @@ class Raizel(commands.Bot):
         self.translator: t.Dict[int, str] = {}
         self.crawler: t.Dict[int, str] = {}
         self.languages = choices
-        self.dictionary: list[str] = get_dictionary()
+        self.dictionary: list[str] = None
         self.boot = datetime.datetime.utcnow()
         self.app_status: str = "up"
         self.translation_count: float = 0
@@ -62,9 +62,6 @@ class Raizel(commands.Bot):
                     await self.reload_extension(f"cogs.{extension[:-3]}")
 
     async def setup_hook(self) -> None:
-        nltk.download("brown")
-        nltk.download("punkt")
-        nltk.download("popular")
         try:
             await self._load_cogs()
             await self.load_extension("jishaku")
@@ -73,11 +70,22 @@ class Raizel(commands.Bot):
             print("cogs already loaded")
         self.allowed = sites
         self.con = aiohttp.ClientSession()
-        # self.drive = Client(os.getenv("FILE"))
         self.mongo = Mongo()
         print("Connected to mongo db")
-        self.blocked: list[int] = await self.mongo.blocker.get_all_banned_users()
         channel = await self.fetch_channel(991911644831678484)
+        # await self.tree.sync()
+        await channel.send(embed=discord.Embed(description=f"Bot is up now"))
+        txt_channel = await self.fetch_channel(984664133570031666)
+        await txt_channel.send(embed=discord.Embed(description=f"Bot is up now"))
+        asyncio.create_task(self.startup(channel=channel))
+        return await super().setup_hook()
+
+    async def startup(self, channel):
+        nltk.download("brown")
+        nltk.download("punkt")
+        nltk.download("popular")
+        self.blocked: list[int] = await self.mongo.blocker.get_all_banned_users()
+        self.dictionary = get_dictionary()
         for x in os.listdir():
             if x.endswith("txt") and "requirements" not in x:
                 await channel.send(f"deleting {x}")
@@ -86,8 +94,6 @@ class Raizel(commands.Bot):
         try:
             self.mega = Mega().login(os.getenv("USER"), os.getenv("MEGA"))
             print("Connected to Mega")
-            txt_channel = await self.fetch_channel(984664133570031666)
-            await txt_channel.send(embed=discord.Embed(description=f"Bot is up now"))
         except Exception as e:
             try:
                 self.mega = Mega().login()
@@ -101,9 +107,7 @@ class Raizel(commands.Bot):
                     allowed_mentions=discord.AllowedMentions(roles=False))
                 print("mega login anonymously failed ..something wrong with mega", )
             print(e)
-        # await self.tree.sync()
-        await channel.send(embed=discord.Embed(description=f"Bot is up now"))
-        return await super().setup_hook()
+        await self.load_title()
 
     async def load_title(self):
         print("started loading titles")
