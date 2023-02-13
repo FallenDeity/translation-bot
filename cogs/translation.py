@@ -393,9 +393,7 @@ class Translate(commands.Cog):
             temp = []
             for url in urls:
                 try:
-                    response = scraper.get(url, headers={
-                        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.142 Safari/537.36"
-                    })
+                    response = await self.bot.loop.run_in_executor(None, scraper.get, url)
                     soup = BeautifulSoup(response.text, "lxml")
                     # print(f"url  {url}")
                     thumbnail: str = await FileHandler().get_thumbnail(soup=soup, link=url)
