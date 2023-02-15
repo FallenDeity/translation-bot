@@ -207,7 +207,11 @@ class Admin(commands.Cog):
             gc.collect()
         except:
             pass
-
+        for task in asyncio.all_tasks():
+            try:
+                task.cancel()
+            except:
+                pass
         return await self.bot.start()
         # raise Exception("TooManyRequests")
         # h = heroku3.from_key(os.getenv("APIKEY"))
@@ -256,8 +260,16 @@ class Admin(commands.Cog):
                 embed1.add_field(name="Current Tasks", value=f"{len(self.bot.crawler)} Crawl,"
                                                              f" {len(self.bot.translator)} translate", inline=True)
                 embed1.add_field(name="Tasks Count", value=str(len(asyncio.all_tasks())), inline=True)
+                tasks = asyncio.all_tasks()
+                print(tasks)
+                tasks_str = ""
+                for task in tasks:
+                    tasks_str += f"\n {task.get_name()} : {str(task.get_coro())}"
+                embed2 = discord.Embed(title="Status", description=f"**Tasks runnning in bot**\n\n {tasks_str}", color=discord.Color.dark_gold())
+                embed2.set_thumbnail(url=self.bot.user.avatar)
+                embed2.set_footer(text="Thanks for  using the bot!", icon_url=ctx.author.avatar)
         if admin:
-            return await Library.buttons([embed, embed1], ctx)
+            return await Library.buttons([embed, embed1, embed2], ctx)
         else:
             return await ctx.send(embed=embed)
 
