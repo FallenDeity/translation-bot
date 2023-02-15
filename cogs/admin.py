@@ -263,8 +263,10 @@ class Admin(commands.Cog):
                 tasks = asyncio.all_tasks()
                 print(tasks)
                 tasks_str = ""
+                count = 0
                 for task in tasks:
-                    tasks_str += f"\n {task.get_name()} : {str(task.get_coro())}"
+                    count += 1
+                    tasks_str += f"\n{count} -- {task.get_name()} : {str(task.get_coro())}"
                 embed2 = discord.Embed(title="Status", description=f"**Tasks runnning in bot**\n\n {tasks_str}", color=discord.Color.dark_gold())
                 embed2.set_thumbnail(url=self.bot.user.avatar)
                 embed2.set_footer(text="Thanks for  using the bot!", icon_url=ctx.author.avatar)
