@@ -177,14 +177,16 @@ class Admin(commands.Cog):
                 self.bot.translator = {}
                 self.bot.crawler = {}
                 await asyncio.sleep(60)
-
-        await msg.edit(
-            content="",
-            embed=discord.Embed(
-                description=f"Bot is restarting...",
-                color=discord.Color.random(),
-            ),
-        )
+        try:
+            await msg.edit(
+                content="",
+                embed=discord.Embed(
+                    description=f"Bot is restarting...",
+                    color=discord.Color.random(),
+                ),
+            )
+        except:
+            pass
         try:
             for x in os.listdir():
                 if x.endswith("txt") and "requirements" not in x:
@@ -201,7 +203,7 @@ class Admin(commands.Cog):
         ) or await self.bot.fetch_channel(991911644831678484)
         try:
             await channel.send(
-                f"Bot has been restarted by user : {ctx.author.name} \nBot has translated {str(int(self.bot.translation_count*3.1))} MB novels and crawled {str(self.bot.crawler_count)} novels"
+                f"Bot has been restarted by user : {ctx.author.name} \nBot has translated {str(int(self.bot.translation_count * 3.1))} MB novels and crawled {str(self.bot.crawler_count)} novels"
             )
             del self.bot.titles
             gc.collect()
@@ -233,7 +235,7 @@ class Admin(commands.Cog):
         try:
             embed.add_field(name="CPU usage", value=str(round(float(os.popen(
                 '''grep 'cpu ' /proc/stat | awk '{usage=($2+$4)*100/($2+$4+$5)} END {print usage }' ''').readline()),
-                                                         2)) + " %", inline=True)
+                                                              2)) + " %", inline=True)
             mem = str(os.popen('free -t -m').readlines())
             mem_G = mem[mem.index('T') + 14:-4]
             S1_ind = mem_G.index(' ')
@@ -255,8 +257,9 @@ class Admin(commands.Cog):
                 embed1.add_field(name="UpTime",
                                  value=f"{str(td[0]) + ' days ' if td[0] > 0 else ''}{str(td[1]) + 'hours ' if td[1] > 0 else ''}{str(td[2]) + ' minutes' if td[2] > 0 else ''}",
                                  inline=False)
-                embed1.add_field(name="Tasks Completed", value=f"{str(int(self.bot.translation_count*3.1))} MB translated, "
-                                                               f"{str(self.bot.crawler_count)} crawled", inline=False)
+                embed1.add_field(name="Tasks Completed",
+                                 value=f"{str(int(self.bot.translation_count * 3.1))} MB translated, "
+                                       f"{str(self.bot.crawler_count)} crawled", inline=False)
                 embed1.add_field(name="Current Tasks", value=f"{len(self.bot.crawler)} Crawl,"
                                                              f" {len(self.bot.translator)} translate", inline=True)
                 embed1.add_field(name="Tasks Count", value=str(len(asyncio.all_tasks())), inline=True)
@@ -267,7 +270,8 @@ class Admin(commands.Cog):
                 for task in tasks:
                     count += 1
                     tasks_str += f"\n{count} -- {task.get_name()} : {str(task.get_coro())}"
-                embed2 = discord.Embed(title="Status", description=f"**Tasks runnning in bot**\n\n {tasks_str[:2400]}", color=discord.Color.dark_gold())
+                embed2 = discord.Embed(title="Status", description=f"**Tasks runnning in bot**\n\n {tasks_str[:2400]}",
+                                       color=discord.Color.dark_gold())
                 embed2.set_thumbnail(url=self.bot.user.avatar)
                 embed2.set_footer(text="Thanks for  using the bot!", icon_url=ctx.author.avatar)
         if admin:
