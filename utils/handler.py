@@ -375,7 +375,10 @@ class FileHandler:
             description: str = "", thumbnail: str = "", library: int = None
     ) -> None:
         download_url = None
-        next_no = await bot.mongo.library.next_number
+        if library is None:
+            next_no = await bot.mongo.library.next_number
+        else:
+            next_no = library
         category = "Uncategorised"
         try:
             category = Categories.from_string(name)
