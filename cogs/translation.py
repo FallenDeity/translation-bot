@@ -463,7 +463,7 @@ class Translate(commands.Cog):
             liz = [novel[i: i + 1800] for i in range(0, len(novel), 1800)]
             self.bot.translator[ctx.author.id] = f"0/{len(liz)}"
             if ctx.author.id != 925597069748621353:
-                asyncio.create_task(self.cc_prog(rep_msg, embed=embed, author_id=ctx.author.id))
+                task = asyncio.create_task(self.cc_prog(rep_msg, embed=embed, author_id=ctx.author.id))
             translate = Translator(self.bot, ctx.author.id, language)
             if len(liz) < 1700:
                 story = await translate.start(liz, len(asyncio.all_tasks()))
@@ -506,6 +506,10 @@ class Translate(commands.Cog):
                     os.remove(filename)
                 except:
                     pass
+            try:
+                task.cancel()
+            except:
+                pass
             async with aiofiles.open(f"{ctx.author.id}.txt", "w", encoding="utf-8") as f:
                 await f.write(story)
             if description.strip() == "":
@@ -566,18 +570,16 @@ class Translate(commands.Cog):
         discord.Message]:
         bardata = progressBar.filledBar(100, 0, size=10, line="🟥", slider="🟩")
         embed.add_field(name="Progress", value=f"{bardata[0]}", inline=False)
-        value = 0
         while author_id in self.bot.translator:
             out = self.bot.translator[author_id]
             split = out.split("/")
-            if split[0].isnumeric() and value <= eval(out):
+            if split[0].isnumeric():
                 embed.set_field_at(index=3,
                                    name=f"Progress :  {str(round(eval(out) * 100, 2))}%",
                                    value=progressBar.filledBar(int(split[1]), int(split[0]),
                                                                size=10, line="🟥", slider="🟩")[
                                              0] + f"  {discord.utils.format_dt(datetime.datetime.now(), style='R')}")
                 await msg.edit(embed=embed)
-                value = eval(out)
             else:
                 break
             if len(asyncio.all_tasks()) > 9:

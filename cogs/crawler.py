@@ -233,21 +233,19 @@ class Crawler(commands.Cog):
     async def cc_prog(self, msg: discord.Message, embed: discord.Embed, author_id: int, wait_time: float = 8) -> \
     typing.Optional[
         discord.Message]:
-        value = 0
         bardata = progressBar.filledBar(100, 0, size=10, line="🟥", slider="🟩")
         embed.add_field(name="Progress", value=f"{bardata[0]}")
         await asyncio.sleep(2)
         while author_id in self.bot.crawler:
             out = self.bot.crawler[author_id]
             split = out.split("/")
-            if split[0].isnumeric() and value <= eval(out):
+            if split[0].isnumeric():
                 embed.set_field_at(index=0,
                                    name=f"Progress :  {str(round(eval(out) * 100, 2))}%",
                                    value=progressBar.filledBar(int(split[1]), int(split[0]),
                                                                size=10, line="🟥", slider="🟩")[
                                              0] + f"  {discord.utils.format_dt(datetime.datetime.now(), style='R')}")
                 await msg.edit(embed=embed)
-                value = eval(out)
             else:
                 break
             if len(asyncio.all_tasks()) > 9:
@@ -728,7 +726,7 @@ class Crawler(commands.Cog):
                 embed.set_thumbnail(url=thumbnail)
             msg = await msg.edit(content="",
                                  embed=embed)
-            asyncio.create_task(self.cc_prog(msg, embed, ctx.author.id))
+            task = asyncio.create_task(self.cc_prog(msg, embed, ctx.author.id))
             if library is not None:
                 await ctx.reply(content=f"> Updating {str(library)} with name : {title_name}")
             if len(urls) < 1700:
@@ -775,6 +773,10 @@ class Crawler(commands.Cog):
                 except:
                     pass
             title = title[:100]
+            try:
+                task.cancel()
+            except:
+                pass
             async with aiofiles.open(f"{ctx.author.id}_cr.txt", "w", encoding="utf-8") as f:
                 await f.write(text)
             if description is None or description.strip() == "":
@@ -1108,7 +1110,7 @@ class Crawler(commands.Cog):
             await ctx.reply(content=f"> Updating {str(library)} with name : {title_name}")
         try:
             self.bot.crawler[ctx.author.id] = f"0/{noofchapters}"
-            asyncio.create_task(self.cc_prog_cr_next(msg, embed, ctx.author.id, 20))
+            task = asyncio.create_task(self.cc_prog_cr_next(msg, embed, ctx.author.id, 20))
             for i in range(1, noofchapters):
                 try:
                     if self.bot.crawler[ctx.author.id] == "break":
@@ -1180,6 +1182,10 @@ class Crawler(commands.Cog):
             except:
                 pass
             await ctx.send(f"Crawled {chp_count} pages.")
+            try:
+                task.cancel()
+            except:
+                pass
             return await FileHandler().crawlnsend(ctx, self.bot, title, title_name, original_Language,
                                                   description=description, thumbnail=thumbnail, link=firstchplink, library=library)
         except Exception as e:
