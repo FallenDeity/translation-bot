@@ -304,6 +304,11 @@ class Library(commands.Cog):
         await self.bot.mongo.library.update_rating(novel["_id"], rating)
         await ctx.send("Novel reviewed.")
         await self.bot.get_command("library info").callback(Library(self.bot), ctx, _id)
+        channel = await self.bot.fetch_channel(974673230826721290)
+        if channel:
+            msg = await channel.send(content=f"> {ctx.author} reviewd novel with id  #{_id}")
+            context = await self.bot.get_context(msg)
+            await self.bot.get_command("library info").callback(Library(self.bot), context, _id)
 
     @commands.hybrid_command(name="leaderboard", description="Get the bot's leaderboard.")
     async def leaderboard(self, ctx: commands.Context, user: discord.User = None) -> None:
