@@ -9,7 +9,9 @@ from discord.ext import commands
 
 from cogs.library import Library
 from core import Raizel
+from core.views.linkview import LinkView
 from databases.blocked import User
+from utils.hints import Hints
 
 
 def days_hours_minutes(td):
@@ -232,6 +234,7 @@ class Admin(commands.Cog):
         embed.add_field(name="Users", value=f"{len(self.bot.users)}", inline=True)
         embed.add_field(name="Latency", value=f"{round(self.bot.latency * 1000)}ms", inline=False)
         embed.add_field(name="OS", value=platform.system(), inline=True)
+        embed.set_footer(text=f"Hint : {await Hints.get_single_hint()}", icon_url=self.bot.user.display_avatar)
         try:
             embed.add_field(name="CPU usage", value=str(round(float(os.popen(
                 '''grep 'cpu ' /proc/stat | awk '{usage=($2+$4)*100/($2+$4+$5)} END {print usage }' ''').readline()),
@@ -251,7 +254,7 @@ class Admin(commands.Cog):
                 admin = True
                 embed1 = discord.Embed(title="Status", description="Status of the bot", color=discord.Color.dark_gold())
                 embed1.set_thumbnail(url=self.bot.user.avatar)
-                embed1.set_footer(text="Thanks for  using the bot!", icon_url=ctx.author.avatar)
+                embed1.set_footer(text=f"Hint : {await Hints.get_single_hint()}", icon_url=self.bot.user.display_avatar)
                 td = datetime.datetime.utcnow() - self.bot.boot
                 td = days_hours_minutes(td)
                 embed1.add_field(name="UpTime",
@@ -273,11 +276,19 @@ class Admin(commands.Cog):
                 embed2 = discord.Embed(title="Status", description=f"**Tasks runnning in bot**\n\n {tasks_str[:2400]}",
                                        color=discord.Color.dark_gold())
                 embed2.set_thumbnail(url=self.bot.user.avatar)
-                embed2.set_footer(text="Thanks for  using the bot!", icon_url=ctx.author.avatar)
+                embed2.set_footer(text=f"Hint : {await Hints.get_single_hint()}", icon_url=self.bot.user.display_avatar)
         if admin:
             return await Library.buttons([embed, embed1, embed2], ctx)
         else:
-            return await ctx.send(embed=embed)
+            buttons = {
+                "Invite": [self.bot.invite_url, "💖"],
+                "Support Server": [
+                    "https://discord.gg/EN3ECMHEZP",
+                    self.bot.get_emoji(952146686338285588),
+                ],
+            }
+            view = LinkView(buttons)
+            return await ctx.send(embed=embed, view=view)
 
     @commands.has_role(1020638168237740042)
     @commands.hybrid_command(help="Give the progress of all current tasks of the bot(only for bot-admins)... ")

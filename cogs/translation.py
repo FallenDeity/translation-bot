@@ -23,6 +23,7 @@ from core.bot import Raizel
 from core.views.linkview import LinkView
 from languages.terms import terms
 from utils.handler import FileHandler
+from utils.hints import Hints
 from utils.translate import Translator
 
 
@@ -452,6 +453,7 @@ class Translate(commands.Cog):
             embed.add_field(name="Translating to", value=language, inline=True)
             embed.add_field(name="From", value=original_Language, inline=True)
             embed.add_field(name="Size", value=f"{round(size / (1024 ** 2), 2)} MB", inline=True)
+            embed.set_footer(text=f"Hint : {await Hints.get_single_hint()}", icon_url=self.bot.user.display_avatar)
             rep_msg = await rep_msg.edit(content="", embed=embed)
             if library is not None:
                 await ctx.reply(content=f"> Updating {str(library)} with name : {name}")

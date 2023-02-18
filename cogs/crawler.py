@@ -30,6 +30,7 @@ from cogs.library import Library
 from cogs.translation import Translate
 from core.bot import Raizel
 from utils.handler import FileHandler
+from utils.hints import Hints
 from utils.selector import CssSelector
 
 headers = {
@@ -724,6 +725,7 @@ class Crawler(commands.Cog):
                 embed.set_thumbnail(url=ctx.author.display_avatar)
             else:
                 embed.set_thumbnail(url=thumbnail)
+            embed.set_footer(text=f"Hint : {await Hints.get_single_hint()}", icon_url=self.bot.user.display_avatar)
             msg = await msg.edit(content="",
                                  embed=embed)
             task = asyncio.create_task(self.cc_prog(msg, embed, ctx.author.id))
@@ -1111,6 +1113,7 @@ class Crawler(commands.Cog):
                             "/loading_pi.gif")
         msg = await msg.edit(content="",
                              embed=embed)
+        embed.set_footer(text=f"Hint : {await Hints.get_single_hint()}", icon_url=self.bot.user.display_avatar)
         embed.add_field(name="Progress", value=chp_count)
         if library is not None:
             await ctx.reply(content=f"> Updating {str(library)} with name : {title_name}")

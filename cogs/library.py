@@ -10,6 +10,7 @@ from reactionmenu import ViewButton, ViewMenu
 from core.bot import Raizel
 from databases.data import Novel
 from utils.category import Categories
+from utils.hints import Hints
 
 
 class Library(commands.Cog):
@@ -105,6 +106,7 @@ class Library(commands.Cog):
             out_str += out + "\n\n"
         embed = discord.Embed(title=f"**Page {page}**",
                               description=out_str)
+        embed.set_footer(text=f"Hint : {await Hints.get_single_hint()}", icon_url=self.bot.user.display_avatar)
         return embed
 
     async def make_list_embed_list(self, data: list[Novel]) -> list[discord.Embed]:
