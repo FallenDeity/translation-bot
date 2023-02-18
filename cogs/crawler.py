@@ -308,14 +308,31 @@ class Crawler(commands.Cog):
             add_terms: str = None,
             max_chapters: int = None,
     ) -> typing.Optional[discord.Message]:
+        """Crawl sites for novel
+               Parameters
+               ----------
+               ctx : commands.Context
+                   The interaction
+               link :
+                   The link of the novel want to be crawled
+               translate_to :
+                    if you want the novel to be translated automatically after it is crawled , give the language here en for english
+               reverse :
+                    give true if the chapter are reversed in toc page or chapters are backwards
+               selector :
+                    css selector for  chapter content
+               add_terms :
+                    if you want terms to be added when translating
+               max_chapters :
+                    number of chapters to be crawled.
+               """
         await ctx.defer()
         if ctx.author.id in self.bot.crawler:
             return await ctx.reply(
                 "> **❌You cannot crawl two novels at the same time.**"
             )
-        # if self.bot.app_status == "restart":
-        #     return await ctx.reply(
-        #         f"> Bot is scheduled to restart within 60 sec or after all current tasks are completed.. Please try after bot is restarted")
+        # if self.bot.app_status == "restart": return await ctx.reply( f"> Bot is scheduled to restart within 60 sec
+        # or after all current tasks are completed.. Please try after bot is restarted")
         cloudscrape: bool = False
         if link is None:
             return await ctx.reply(f"> **❌Enter a link for crawling.**")
@@ -857,6 +874,26 @@ class Crawler(commands.Cog):
             nextselector: str = None, noofchapters: int = None,
             cssselector: str = None, waittime: float = None,
     ) -> typing.Optional[discord.Message]:
+        """crawl using first chapter link
+                Parameters
+                ----------
+                ctx :
+                    The interaction
+                firstchplink :
+                    First chapter link (not the main novel url)
+                secondchplink :
+                    Second chapter link , use this if auto detecting 2nd chp fails
+                lastchplink :
+                    last chapter link, bot will auto stop most of time..
+                nextselector :
+                    css selector for the next button in chapter
+                noofchapters :
+                    number of chapters to be crawled. by default it is 3000
+                cssselector :
+                     css selector for chapter content
+                waittime :
+                    add wait time between each chapter crawling, use this if the crawled chapter stop in middle
+                """
         await ctx.defer()
         if ctx.author.id in self.bot.crawler:
             return await ctx.reply(

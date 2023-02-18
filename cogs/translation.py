@@ -49,7 +49,7 @@ class Translate(commands.Cog):
         await ctx.send(f"> **🚄`{self.bot.translator[ctx.author.id]}`**")
 
     @commands.hybrid_command(
-        help="Send file to be translated with the command. For large files use temp.sh. or mega.nz",
+        help="Send file to be translated with the command. use correct novelname, otherwise you  will be banned",
         aliases=["t"],
     )
     async def translate(
@@ -64,6 +64,28 @@ class Translate(commands.Cog):
             library_id: int = None,
             term: str = None,
     ):
+        """Check the leaderboard of a user
+               Parameters
+               ----------
+               ctx : commands.Context
+                   The interaction
+               link :
+                   link of file, discord message link, attachment link, temp.sh, mega , etc...
+               file :
+                    attach a file
+               messageid :
+                    discord message id.. bot has to have access to that msg link else use discord attachment url
+               language :
+                    language to which novel to be translated, default english
+               novelname :
+                    change the novel name to this. if you got not valid name add ongoing with correct novelname here
+               rawname :
+                    add the raw name of the novel. it will be automatically translated to eng and added in novelname
+               library_id :
+                    translate the novel from library with this id
+               term :
+                    add the terms available in bot
+               """
         try:
             await ctx.defer()
         except:
@@ -607,7 +629,17 @@ class Translate(commands.Cog):
     @commands.hybrid_command(
         help="translate multiple files together one at a time"
     )
-    async def multi(self, ctx: commands.Context, language: str = "english", messageid: int = None, ):
+    async def multi(self, ctx: commands.Context, language: str = "english", messageid: str = None, ):
+        """Translate multiple text files
+               Parameters
+               ----------
+               ctx : commands.Context
+                   The interaction
+               language :
+                   language to translate to, by default english
+               messageid :
+                    message id of the attachments, bot has to have access to this message
+               """
         try:
             await ctx.defer()
         except:
@@ -616,7 +648,19 @@ class Translate(commands.Cog):
             messageid = language
             language = "english"
         if messageid:
-            channel = self.bot.get_channel(ctx.channel.id)
+            if 'discord' in messageid:
+                spl_link = messageid.split('/')
+                server_id = int(spl_link[4])
+                channel_id = int(spl_link[5])
+                messageid = int(spl_link[6])
+                server = self.bot.get_guild(server_id)
+                channel = server.get_channel(channel_id)
+            else:
+                if messageid.isnumeric():
+                    messageid = int(messageid)
+                else:
+                    return ctx.reply(content=">Invalid message id")
+                channel = self.bot.get_channel(ctx.channel.id)
             message = await channel.fetch_message(messageid)
         else:
             message = ctx.message

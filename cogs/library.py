@@ -142,6 +142,36 @@ class Library(commands.Cog):
             sort_by: str = None,
             no_of_novels: int = 300,
     ) -> None:
+        """Searches a novel in library
+               Parameters
+               ----------
+               ctx : commands.Context
+                   The interaction
+               title : str, optional
+                   Title of the novel, bot will auto-suggest novels in library
+               language :
+                    Language of the novel
+               rating :
+                    rating of the novel must be between 0 to 5
+               show_list :
+                    give true if you need it in list view by default it  is false
+               category :
+                    category of novel
+               tags :
+                    tags of novel , bot will auto suggest
+               raw_language :
+                    raw_language of novel
+               size :
+                    size of novel in mb, bot will give novel with more than this size
+               uploader :
+                    uploader of novel
+               shuffle :
+                    will shuffle the novel, by default true, if you don't need to shuffle give false
+               sort_by :
+                    sort the novels according to the value given
+               no_of_novels :
+                    number of novels you want to get from library
+               """
         try:
             await ctx.defer()
         except:
@@ -216,6 +246,14 @@ class Library(commands.Cog):
             self,
             ctx: commands.Context, no_of_novels: int = 10
     ) -> None:
+        """get random novels from library
+               Parameters
+               ----------
+               ctx : commands.Context
+                   The interaction
+               no_of_novels : int, optional
+                   number of novels , by default it is 10
+               """
         await ctx.defer()
         novels = await self.bot.mongo.library.get_random_novel(no=no_of_novels)
         embeds = await self.make_list_embed(novels)
@@ -275,6 +313,14 @@ class Library(commands.Cog):
 
     @library.command(name="info", help="shows info about a novel.")
     async def info(self, ctx: commands.Context, _id: int) -> None:
+        """shows info of the novel.
+                       Parameters
+                       ----------
+                       ctx : commands.Context
+                           The interaction
+                       _id : int
+                           library id which you want to view
+                       """
         try:
             await ctx.defer()
         except:
@@ -289,6 +335,18 @@ class Library(commands.Cog):
     async def review(
             self, ctx: commands.Context, _id: int, rating: int, summary: str
     ) -> None:
+        """Review a novel.
+               Parameters
+               ----------
+               ctx : commands.Context
+                   The interaction
+               _id : int
+                   library id which you want to review
+               rating : int
+                    give your rating from 0 to 5
+               summary : str
+                    your review comments.
+               """
         await ctx.defer()
         if not 0 <= rating <= 5:
             await ctx.send("Rating must be between 0 and 5.")
@@ -314,7 +372,14 @@ class Library(commands.Cog):
 
     @commands.hybrid_command(name="leaderboard", description="Get the bot's leaderboard.")
     async def leaderboard(self, ctx: commands.Context, user: discord.User = None) -> None:
-        """Get the bot's leaderboard."""
+        """Check the leaderboard of a user
+        Parameters
+        ----------
+        ctx : commands.Context
+            The interaction
+        user : discord.User, optional
+            The user to check the leaderboard of, by default None
+        """
         await ctx.defer()
         if user is None:
             ld_user_id = ctx.author.id
