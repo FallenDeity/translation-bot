@@ -74,32 +74,37 @@ class Categories(enum.Enum):
             "EyXkFqcGdeQXVyNTAyODkwOQ@@._V1_.jpg",
             "https://cdn.discordapp.com/attachments/1055445441958916167/1055496831985008671/image0.jpg",
             "https://cdn.discordapp.com/attachments/1055445441958916167/1055496965691027496/image0.jpg",
+            "https://cdn.discordapp.com/attachments/1055445441958916167/1066220296236957706/2Q.png",
         ],
     )
     Marvel = Category(
         name="Marvel",
-        tags=["marvel", "meimen", "infinite gem", "loki", "shield agent", "coulson", "agent shield"],
+        tags=["marvel", "meimen", "infinite gem", "loki", "shield agent", "coulson", "agent shield", "american comics"],
         thumbnails=[
             "https://cdn.discordapp.com/attachments/1055445441958916167/1055497322953441360/image0.jpg",
             "https://cdn.discordapp.com/attachments/1055445441958916167/1055497401269502032/image0.jpg",
             "https://cdn.discordapp.com/attachments/1055445441958916167/1055497401269502032/image0.jpg",
+            "https://cdn.discordapp.com/attachments/1055445441958916167/1066220537082294343/Z.png",
         ],
     )
     DC = Category(
         name="DC",
-        tags=["superman", "bat-man", "super-man", "clark", "speedster", "aquaman"],
+        tags=["superman", "bat-man", "super-man", "speedster", "aquaman"],
         thumbnails=[
             "https://cdn.discordapp.com/attachments/1055445441958916167/1055497580416610385/image0.jpg",
             "https://cdn.discordapp.com/attachments/1055445441958916167/1055497831110152223/image0.jpg",
             "https://cdn.discordapp.com/attachments/1055445441958916167/1055497963570479156/image0.jpg",
+            "https://cdn.discordapp.com/attachments/1055445441958916167/1066220860131774515/images.png",
         ],
     )
     HarryPotter = Category(
         name="Harry-Potter",
-        tags=["harry potter", "hogwarts", "harry", "potter", "hermione", "ron", "draco", "dumbledore", "voldemort"],
+        tags=["harry potter", "hogwarts", "harry", "potter", "hermione", "dumbledore", "voldemort"],
         thumbnails=[
             "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS26O29WU8eOxVEVaH7lmNQK28oAi7rqeBN7g&usqp=CAU",
             "https://cdn.discordapp.com/attachments/1055445441958916167/1056116267259535392/2Q.png",
+            "https://cdn.discordapp.com/attachments/1055445441958916167/1066221045717139456/Z.png",
+            "https://cdn.discordapp.com/attachments/1055445441958916167/1066221377637597214/2Q.png",
         ],
     )
     Pokemon = Category(
@@ -124,6 +129,9 @@ class Categories(enum.Enum):
         thumbnails=[
             "https://cdn.discordapp.com/attachments/1055445441958916167/1055686344292179968/images.png",
             "https://cdn.discordapp.com/attachments/1055445441958916167/1055686587318538260/images.png",
+            "https://cdn.discordapp.com/attachments/1055445441958916167/1066221675844227132/images.png",
+            "https://cdn.discordapp.com/attachments/1055445441958916167/1066221720463233085/images.png",
+            "https://cdn.discordapp.com/attachments/1055445441958916167/1066222258038767667/Z.png",
         ],
     )
     ChatRoom = Category(
@@ -167,7 +175,6 @@ class Categories(enum.Enum):
             "xuanhuan",
             "wuxia",
             "wu xia",
-            "tame",
             "evolve",
             "evolution",
             "empress",
@@ -180,10 +187,12 @@ class Categories(enum.Enum):
     )
     FairyTail = Category(
         name="Fairy-Tail",
-        tags=["fairy tail", "妖尾", "erza", "meera", "gray", "natsu", "lucy", "fairytail", "fairy-tail", "dragon slayer"],
+        tags=["fairy tail", "妖尾", "erza", "meera", "gray", "natsu", "fairytail", "fairy-tail", "dragon slayer"],
         thumbnails=[
             "https://cdn.discordapp.com/attachments/1055445441958916167/1055671200258473994/MV5BMzZjNmRhNWQ"
             "tNTAyYy00Yjk2LWE0NzUtMmYyNTU0YTE5NjJiXkEyXkFqcGdeQXVyNjI4OTE5OTM._V1_FMjpg_UX1000_.jpg",
+            "https://cdn.discordapp.com/attachments/1055445441958916167/1066222852195500062/images.png",
+
         ],
     )
     GenshinImpact = Category(
@@ -196,6 +205,10 @@ class Categories(enum.Enum):
         tags=["douluo", "斗罗", "spirit ring", "spiritring", "tan san"],
         thumbnails=[
             "https://cdn.discordapp.com/attachments/1055445441958916167/1055685388116692992/9k.png",
+            "https://cdn.discordapp.com/attachments/1055445441958916167/1066223084979367997/images.png",
+            "https://cdn.discordapp.com/attachments/1055445441958916167/1066223147893919825/images.png",
+            "https://cdn.discordapp.com/attachments/1055445441958916167/1066223197437034536/images.png",
+            "https://cdn.discordapp.com/attachments/1055445441958916167/1066223358460579890/images.png",
         ],
     )
     PreHistoric = Category(
@@ -210,6 +223,8 @@ class Categories(enum.Enum):
         tags=["player", "online game", "网游", "npc", "game", "online", "onlinegame"],
         thumbnails=[
             "https://cdn.discordapp.com/attachments/1055445441958916167/1055684931474432101/9k.png",
+            "https://cdn.discordapp.com/attachments/1055445441958916167/1066223773331759104/images.png",
+            "https://cdn.discordapp.com/attachments/1055445441958916167/1066223999773839491/saolr_game-thumbnail_2.png",
         ],
     )
     Conan = Category(
@@ -249,6 +264,9 @@ class Categories(enum.Enum):
         tags=["hunter", "猎人", "hunterXhunter", "hxh"],
         thumbnails=[
             "https://cdn.discordapp.com/attachments/1055445441958916167/1055684394603520000/Z.png",
+            "https://cdn.discordapp.com/attachments/1055445441958916167/1066224143906918480/2Q.png",
+            "https://cdn.discordapp.com/attachments/1055445441958916167/1066224179910819840/9k.png",
+            "https://cdn.discordapp.com/attachments/1055445441958916167/1066224225184124968/images.png",
         ],
     )
     Reincarnation = Category(
@@ -353,7 +371,7 @@ class Categories(enum.Enum):
     )
     TombRaider = Category(
         name="Tomb-Raider",
-        tags=["tomb raider", "tombraider", "tombraiders", "tomb"],
+        tags=["tomb raider", "tombraider", "tombraiders",],
         thumbnails=[
             "https://cdn.discordapp.com/attachments/1055445441958916167/1055682789372076082/2Q.png",
             "https://cdn.discordapp.com/attachments/1055445441958916167/1055683983918239744/FB_IMG_1671763662541.jpg",
@@ -378,7 +396,6 @@ class Categories(enum.Enum):
         name="Dragon-Ball",
         tags=[
             "dragonball",
-            "db",
             "dbz",
             "dragonballz",
             "dragonballsuper",
@@ -401,7 +418,7 @@ class Categories(enum.Enum):
     )
     Comprehensive = Category(
         name="Comprehensive",
-        tags=["dimensional", "综漫", "comprehensive", "anime"],
+        tags=["dimensional", "综漫", "comprehensive", "anime", "animation"],
         thumbnails=[
             "https://cdn.discordapp.com/attachments/1055445441958916167/1055681961944961144/2Q.png",
         ],
@@ -422,7 +439,7 @@ class Categories(enum.Enum):
     )
     Horror = Category(
         name="Horror",
-        tags=["thriller", "horror", "terror", "horror", "terrorist"],
+        tags=["thriller", "horror", "terror", "terrorist"],
         thumbnails=[
             "https://cdn.discordapp.com/attachments/1055445441958916167/1055680954791907348/Z.png",
         ],
@@ -443,7 +460,7 @@ class Categories(enum.Enum):
     )
     Ultraman = Category(
         name="Ultraman",
-        tags=["ultraman", "ott", "dagu"],
+        tags=["ultraman"],
         thumbnails=[
             "https://cdn.discordapp.com/attachments/1055445441958916167/1055680491405189302/images.png",
         ],
@@ -478,7 +495,7 @@ class Categories(enum.Enum):
     )
     YugiOh = Category(
         name="Yugi-Oh",
-        tags=["card", "yu-gi-oh", "yugio"],
+        tags=[ "yu-gi-oh", "yugio"],
         thumbnails=[
             "https://cdn.discordapp.com/attachments/1055445441958916167/1055495465333948496/image0.jpg",
         ],
@@ -552,14 +569,14 @@ class Categories(enum.Enum):
     )
     InvincibleFlow = Category(
         name="Invincible-Flow",
-        tags=["invincible", "无敌流", "invincible", "最强", "strong", "god level", "god-level"],
+        tags=["invincible", "无敌流", "invincible", "最强", "strong", "god level", "god-level", "sss-level"],
         thumbnails=[
             "https://cdn.discordapp.com/attachments/1055445441958916167/1055677779791855626/Z.png",
         ],
     )
     JackieChan = Category(
         name="Jackie-Chan",
-        tags=["jackie chan", "成龙", "jackie", "chan"],
+        tags=["jackie chan", "成龙", "jackie"],
         thumbnails=[
             "https://cdn.discordapp.com/attachments/1055445441958916167/1055672684211622002/9k.png",
             "https://cdn.discordapp.com/attachments/1055445441958916167/1055672780772880494/2Q.png",
@@ -567,7 +584,7 @@ class Categories(enum.Enum):
     )
     ChinaDynasty = Category(
         name="China-Dynasty",
-        tags=["tang", "dynasty", "song dy"],
+        tags=["tang dynasty", "dynasty", "song dynast", "china"],
         thumbnails=[
             "https://cdn.discordapp.com/attachments/1055445441958916167/1055494594495791104/image0.jpg",
         ],
@@ -610,7 +627,7 @@ class Categories(enum.Enum):
     )
     R18 = Category(
         name="R18",
-        tags=["sex", "horny", "incest", "busty", "r18", "fuck", "hynosis", "rape"],
+        tags=["sex", "horny", "incest", "busty", "r18", "fuck", "hynosis", "rape", "bitch"],
         thumbnails=[
             "https://cdn.discordapp.com/attachments/1055445441958916167/1055493803848519771/FB_IMG_1671010145233.jpg",
             "https://cdn.discordapp.com/attachments/1055445441958916167/1055669249311518812/small29"

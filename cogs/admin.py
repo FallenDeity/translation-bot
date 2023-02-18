@@ -1,10 +1,13 @@
 import asyncio
 import datetime
 import gc
+import os
+import platform
 
 import discord
 from discord.ext import commands
 
+from cogs.library import Library
 from core import Raizel
 from databases.blocked import User
 
@@ -21,6 +24,7 @@ class Admin(commands.Cog):
     @commands.hybrid_command(help="ban user.. Admin only command")
     async def ban(self, ctx: commands.Context, id: str,
                   reason: str = "continuous use of improper names in novel name translation"):
+        await ctx.defer()
         if '#' in id:
             name_spl = id.split('#')
             name = name_spl[0]
@@ -78,6 +82,7 @@ class Admin(commands.Cog):
     @commands.has_role(1020638168237740042)
     @commands.hybrid_command(help="Unban user.. Admin only command")
     async def unban(self, ctx: commands.Context, id: str):
+        await ctx.defer()
         if '#' in id:
             name_spl = id.split('#')
             name = name_spl[0]
@@ -114,6 +119,7 @@ class Admin(commands.Cog):
     @commands.hybrid_command(help="send warning to user..Admin only command")
     async def warn(self, ctx: commands.Context, id: str,
                    reason: str = "continuous use of improper names in novel name translation"):
+        await ctx.defer()
         if '#' in id:
             name_spl = id.split('#')
             name = name_spl[0]
@@ -132,6 +138,7 @@ class Admin(commands.Cog):
     @commands.has_role(1020638168237740042)
     @commands.hybrid_command(help="get id of the user if name and discriminator provided. Admin only command")
     async def get_id(self, ctx: commands.Context, name: str, discriminator: str = None):
+        await ctx.defer()
         if '#' in name:
             name_spl = name.split('#')
             name = name_spl[0]
@@ -141,10 +148,19 @@ class Admin(commands.Cog):
 
     @commands.has_role(1020638168237740042)
     @commands.hybrid_command(help="Restart the bot incase of bot crash. Ping any BOT-admins to restart bot")
-    async def restart(self, ctx: commands.Context):
+    async def restart(self, ctx: commands.Context, instant: bool = False):
+        try:
+            await ctx.defer()
+        except:
+            pass
+        msg = await ctx.send("Please wait")
         self.bot.app_status = "restart"
         while True:
             print("Started restart")
+            if not instant:
+                await asyncio.sleep(10)
+            else:
+                break
             if not self.bot.crawler.items() and not self.bot.translator.items():
                 print("restart " + str(datetime.datetime.now()))
                 channel = self.bot.get_channel(
@@ -160,53 +176,113 @@ class Admin(commands.Cog):
                 self.bot.app_status = "restart"
                 self.bot.translator = {}
                 self.bot.crawler = {}
-                await asyncio.sleep(40)
-
-        await ctx.send(
-            embed=discord.Embed(
-                description=f"Bot is restarting...",
-                color=discord.Color.random(),
-            ),
-        )
+                await asyncio.sleep(60)
+        try:
+            await msg.edit(
+                content="",
+                embed=discord.Embed(
+                    description=f"Bot is restarting...",
+                    color=discord.Color.random(),
+                ),
+            )
+        except:
+            pass
+        try:
+            for x in os.listdir():
+                if x.endswith("txt") and "requirements" not in x:
+                    await ctx.send(f"deleting {x}")
+                    print(f"deleting {x}")
+                    os.remove(x)
+                if "titles.sav" in x:
+                    os.remove(x)
+        except Exception as e:
+            print("exception occurred  in deleting")
+            await ctx.send(f"error occurred in deleting {x} {e}")
         channel = self.bot.get_channel(
             991911644831678484
         ) or await self.bot.fetch_channel(991911644831678484)
         try:
             await channel.send(
-                f"Bot has been restarted by user : {ctx.author.name} \nBot has translated {str(self.bot.translation_count)} novels and crawled {str(self.bot.crawler_count)} novels"
+                f"Bot has been restarted by user : {ctx.author.name} \nBot has translated {str(int(self.bot.translation_count * 3.1))} MB novels and crawled {str(self.bot.crawler_count)} novels"
             )
             del self.bot.titles
             gc.collect()
         except:
             pass
-
+        for task in asyncio.all_tasks():
+            try:
+                task.cancel()
+            except:
+                pass
         return await self.bot.start()
         # raise Exception("TooManyRequests")
         # h = heroku3.from_key(os.getenv("APIKEY"))
         # app = h.app(os.getenv("APPNAME"))
         # app.restart()
 
+    @commands.guild_only()
     @commands.hybrid_command(help="Give the latency and uptime of the bot... ")
     async def status(self, ctx: commands.Context):
         # await ctx.send(str(datetime.datetime.utcnow())+".-"+str(ctx.message.created_at))
-        await ctx.send(f"Latency is {int(self.bot.ws.latency*1000)} ms")
+        await ctx.defer()
+        embed = discord.Embed(title="Status", description="Status of the bot", color=discord.Color.dark_gold())
+        embed.set_thumbnail(url=self.bot.user.avatar)
+        embed.set_footer(text="Thanks for  using the bot!", icon_url=ctx.author.avatar)
+        embed.add_field(name="Guilds", value=f"{len(self.bot.guilds)}", inline=True)
+        embed.add_field(name="Users", value=f"{len(self.bot.users)}", inline=True)
+        embed.add_field(name="Latency", value=f"{round(self.bot.latency * 1000)}ms", inline=False)
+        embed.add_field(name="OS", value=platform.system(), inline=True)
+        try:
+            embed.add_field(name="CPU usage", value=str(round(float(os.popen(
+                '''grep 'cpu ' /proc/stat | awk '{usage=($2+$4)*100/($2+$4+$5)} END {print usage }' ''').readline()),
+                                                              2)) + " %", inline=True)
+            mem = str(os.popen('free -t -m').readlines())
+            mem_G = mem[mem.index('T') + 14:-4]
+            S1_ind = mem_G.index(' ')
+            mem_G1 = mem_G[S1_ind + 8:]
+            S2_ind = mem_G1.index(' ')
+            mem_F = mem_G1[S2_ind + 8:]
+            embed.add_field(name="RAM available", value=f"{mem_F} MB", inline=True)
+        except Exception as e:
+            print(e)
+        admin = False
         for roles in ctx.author.roles:
             if roles.id == 1020638168237740042:
+                admin = True
+                embed1 = discord.Embed(title="Status", description="Status of the bot", color=discord.Color.dark_gold())
+                embed1.set_thumbnail(url=self.bot.user.avatar)
+                embed1.set_footer(text="Thanks for  using the bot!", icon_url=ctx.author.avatar)
                 td = datetime.datetime.utcnow() - self.bot.boot
                 td = days_hours_minutes(td)
-                await ctx.send(
-                    f"Bot is up for {str(td[0]) + ' days ' if td[0] > 0 else ''}{str(td[1]) + ' hours ' if td[1] > 0 else ''}{str(td[2]) + ' minutes' if td[2] > 0 else ''}",
-                    ephemeral=True)
-                try:
-                    await ctx.send(f"** Bot has done {str(self.bot.translation_count)} translation and crawled {str(self.bot.crawler_count)} novels**")
-                    await ctx.send(embed=discord.Embed(title=f"**Bot has {str(len(asyncio.all_tasks()))} tasks running at the moment**", description=f"\n{str(asyncio.all_tasks())[:2000]}", colour=discord.Colour.dark_blue()))
-                except Exception as e:
-                    print(e)
-        return None
+                embed1.add_field(name="UpTime",
+                                 value=f"{str(td[0]) + ' days ' if td[0] > 0 else ''}{str(td[1]) + 'hours ' if td[1] > 0 else ''}{str(td[2]) + ' minutes' if td[2] > 0 else ''}",
+                                 inline=False)
+                embed1.add_field(name="Tasks Completed",
+                                 value=f"{str(int(self.bot.translation_count * 3.1))} MB translated, "
+                                       f"{str(self.bot.crawler_count)} crawled", inline=False)
+                embed1.add_field(name="Current Tasks", value=f"{len(self.bot.crawler)} Crawl,"
+                                                             f" {len(self.bot.translator)} translate", inline=True)
+                embed1.add_field(name="Tasks Count", value=str(len(asyncio.all_tasks())), inline=True)
+                tasks = asyncio.all_tasks()
+                print(tasks)
+                tasks_str = ""
+                count = 0
+                for task in tasks:
+                    count += 1
+                    tasks_str += f"\n{count} -- {task.get_name()} : {str(task.get_coro())}"
+                embed2 = discord.Embed(title="Status", description=f"**Tasks runnning in bot**\n\n {tasks_str[:2400]}",
+                                       color=discord.Color.dark_gold())
+                embed2.set_thumbnail(url=self.bot.user.avatar)
+                embed2.set_footer(text="Thanks for  using the bot!", icon_url=ctx.author.avatar)
+        if admin:
+            return await Library.buttons([embed, embed1, embed2], ctx)
+        else:
+            return await ctx.send(embed=embed)
 
     @commands.has_role(1020638168237740042)
     @commands.hybrid_command(help="Give the progress of all current tasks of the bot(only for bot-admins)... ")
     async def tasks(self, ctx: commands.Context):
+        await ctx.defer()
         out = "**Crawler Tasks**\n"
         if not self.bot.crawler.items():
             out = out + "No tasks currently\n"

@@ -3,6 +3,8 @@ import datetime
 import gc
 import os
 import random
+import re
+import traceback
 import typing
 from urllib.parse import urljoin
 
@@ -59,25 +61,29 @@ class Translate(commands.Cog):
             novelname: str = None,
             rawname: str = None,
             library_id: int = None,
+            term: str = None,
     ):
+        try:
+            await ctx.defer()
+        except:
+            pass
         if link is not None and link.startswith("#"):
             try:
                 novel_id = int(link.replace("#", ""))
-                novel_data = await self.bot.mongo.library.get_novel_by_id(novel_id)
-                link = novel_data.download
+                library_id = novel_id
             except:
                 return await ctx.reply("send a valid id")
         if library_id is not None:
             try:
                 novel_data = await self.bot.mongo.library.get_novel_by_id(library_id)
-                link = novel_data.download
+                link = novel_data["download"]
             except:
                 return await ctx.reply("send a valid id")
-        if self.bot.app_status == "restart":
-            return await ctx.reply(
-                f"> Bot is scheduled to restart within 60 sec or after all current tasks are completed.. Please try after bot is restarted")
+        # if self.bot.app_status == "restart":
+        #     return await ctx.reply(
+        #         f"> Bot is scheduled to restart within 60 sec or after all current tasks are completed.. Please try after bot is restarted")
         if ctx.author.id == 925597069748621353:
-            while len(asyncio.all_tasks()) >= 10 or (
+            while len(asyncio.all_tasks()) >= 9 or (
                     ctx.author.id in self.bot.translator and not self.bot.translator[ctx.author.id] == "waiting"):
                 if ctx.author.id not in self.bot.translator:
                     self.bot.translator[ctx.author.id] = f"waiting"
@@ -107,18 +113,20 @@ class Translate(commands.Cog):
         name = None
         rep_msg = await ctx.reply("Please wait.. Translation will began soon")
         no_tries = 0
-        while len(asyncio.all_tasks()) >= 9 or len(self.bot.translator) >= 3:
+        while len(asyncio.all_tasks()) >= 9 or len(self.bot.translator) >= 2:
             no_tries = no_tries + 1
             try:
                 rep_msg = await rep_msg.edit(
                     content=f"> **Currently bot is busy.Please wait some time. Please wait till bot become free. will retry automatically in 20sec  ** {str(no_tries)} try")
             except:
                 pass
+            if no_tries >= 7:
+                return await ctx.reply(content="> Currently bot is busy.. please try after some time")
             if no_tries >= 5:
                 self.bot.translator = {}
                 if len(self.bot.translator) < 2:
                     break
-                await asyncio.sleep(10)
+                await asyncio.sleep(20)
             await asyncio.sleep(10)
         if link is not None and ("discord.com/channels" in link or link.isnumeric()):
             messageid = link
@@ -127,19 +135,18 @@ class Translate(commands.Cog):
             link = ctx.message.attachments[0].url
         elif messageid is None and ("mega.nz" in link or "mega.co.nz" in link):
             await ctx.send("Mega link found.... downloading from mega", delete_after=10, ephemeral=True)
-            info = self.bot.mega.get_public_url_info(link)
+            info = await self.bot.loop.run_in_executor(None, self.bot.mega.get_public_url_info, link)
             size = int(info.get("size")) / 1000
-            if size >= 21 * 1000:
-                await rep_msg.delete()
-                return await ctx.reply(
-                    "> **❌ File size is too big... Please split the file and translate**"
-                )
+            # if size >= 30 * 1000:
+            #     await rep_msg.delete()
+            #     return await ctx.reply(
+            #         "> **❌ File size is too big... Please split the file and translate**"
+            #     )
             name = info.get("name")
             name = bytes(name, encoding="raw_unicode_escape", errors="ignore").decode()
             file_type = name.split(".")[-1]
-            path = self.bot.mega.download_url(
-                link, dest_filename=f"{ctx.author.id}.{file_type}"
-            )
+            path = await self.bot.loop.run_in_executor(None, self.bot.mega.download_url,
+                                                       link, None, f"{ctx.author.id}.{file_type}")
             if "txt" not in file_type and "epub" not in file_type and "pdf" not in file_type:
                 os.remove(path)
                 await rep_msg.delete()
@@ -186,7 +193,10 @@ class Translate(commands.Cog):
                 ".pdf", "")
             file_type = resp.headers["content-type"].split("/")[-1]
         elif novel is None:
-            resp = await self.bot.con.get(link)
+            try:
+                resp = await self.bot.con.get(link)
+            except:
+                await ctx.reply("> Check the link provided. We couldn't connect to the link you provided")
             try:
                 file_type = FileHandler.get_headers(resp)
             except KeyError:
@@ -220,6 +230,9 @@ class Translate(commands.Cog):
                     name_check = FileHandler.checkname(name, self.bot)
                 except:
                     pass
+        if (not name_check) and library_id is not None:
+            name = await self.bot.mongo.library.get_title_by_id(library_id)
+            name_check = FileHandler.checkname(name, self.bot)
         if not name_check:
             await rep_msg.delete()
             return await ctx.reply(
@@ -227,7 +240,8 @@ class Translate(commands.Cog):
             )
         for tag in ['/', '\\', '<', '>', "'", '"', ':', ";", '?', '|', '*', ';', '!']:
             name = name.replace(tag, '').strip()
-        name = name.replace('_', ' ')
+        name = name.replace("__", "--").replace('_', ' ').replace("--", "__")
+        library: int = None
         if novel is None:
             data = await resp.read()
             async with aiofiles.open(f"{ctx.author.id}.{file_type}", "wb") as f:
@@ -247,24 +261,47 @@ class Translate(commands.Cog):
             eng_check = False
             size_check = False
             name_lib_check = False
+            size_found = round(os.path.getsize(f"{ctx.author.id}.txt") / (1024 ** 2), 2) + 0.10
+            size_found = 1.375 * size_found
             for n in novel_data:
                 ids.append(n._id)
+                org_name = re.sub("[^A-Za-z0-9]", "", n.title.split('  ')[0]).lower()
+                n_name = re.sub("[^A-Za-z0-9]", "", name.split('  ')[0]).lower()
+                org_name2 = re.sub("[^A-Za-z0-9]", "", n.title.split('__')[0]).lower()
+                n_name2 = re.sub("[^A-Za-z0-9]", "", name.split('__')[0]).lower()
+                # print(f"{org_name}-{org_name2}-{n_name2}-{n_name}")
+                # print(f"{language}-{n.language}")
+                # print(f"{size_found}-{round(n.size / (1024 ** 2), 2)}")
+                if (name.split('__')[0].lower() == n.title.split('__')[0].lower()
+                    or n.title.split('  ')[0].lower() == name.split('  ')[0].lower()
+                    or org_name == name.strip().lower()
+                    or org_name2 == n_name2
+                    or n_name == org_name
+                    or org_name2 == n_name
+                    or (len(name) > 22 and n_name in org_name)
+                    or (len(name) > 22 and n_name2 in org_name2)) \
+                        and language.lower() in str(n.language).lower() \
+                        and size_found >= round(n.size / (1024 ** 2), 2):
+                    library = n._id
+                    print(library)
                 if "english" == str(n.language).lower():
                     eng_check = True
                 if language == str(n.language).lower():
                     lang_check = True
                     org_str = ''.join(e for e in name.split('__')[0] if e.isalnum())
                     lib_str = ''.join(e for e in str(n.title).split('__')[0] if e.isalnum())
-                    if org_str.lower() in lib_str.lower() or org_str.lower() == lib_str.lower():
+                    if org_str.lower() in lib_str.lower():
                         name_lib_check = True
                         try:
-                            size_found = round(os.path.getsize(f"{ctx.author.id}.txt") / (1024 ** 2), 2) - 0.10
-                            size_found = size_found - 0.1 * size_found
                             lib_size = round(n.size / (1024 ** 2), 2)
                             if size_found <= lib_size <= 2 * size_found:
                                 size_check = True
+                                # if library is None:
+                                #     library = n._id
                         except:
                             pass
+            if len(ids) >= 20:
+                library = None
             if lang_check:
                 ids = ids[:20]
                 rep_msg = await rep_msg.edit(content="Novel is already in our library")
@@ -272,12 +309,12 @@ class Translate(commands.Cog):
                                                                                     language, None, None, None, None,
                                                                                     None,
                                                                                     None, None, False, "size", 20)
-                if len(ids) < 5 or name_lib_check:
+                if len(ids) < 4 and name_lib_check:
                     await ctx.send("**Please check from above library**", delete_after=20)
-                    await asyncio.sleep(15)
+                    await asyncio.sleep(5)
                 if name_lib_check and size_check:
                     await ctx.send("**Please check from above library**")
-                    return None
+                    await asyncio.sleep(10)
                 chk_msg = await ctx.send(embed=discord.Embed(
                     description=f"This novel **{name}** is already in our library with ids **{str(ids)}**...use arrow marks  in above  to navigate...\nIf you want to continue translation react with 🇳 within 10 sec\n\n**Note : Some files are in docx format, so file size maybe half the size of txt. and try to minimize translating if its already in library**"))
                 await chk_msg.add_reaction('🇾')
@@ -319,7 +356,10 @@ class Translate(commands.Cog):
                 1054014022019715092
             ) or await self.bot.fetch_channel(1054014022019715092)
             msg_new_id = new_ch.last_message_id
-            msg_new = await new_ch.fetch_message(msg_new_id)
+            try:
+                msg_new = await new_ch.fetch_message(msg_new_id)
+            except:
+                msg_new = await new_ch.fetch_message(1069535943738019840)
             context_new = await self.bot.get_context(msg_new)
             try:
                 asyncio.create_task(self.bot.get_command("translate").callback(Translate(self.bot), context_new, link,
@@ -331,20 +371,29 @@ class Translate(commands.Cog):
                 pass
         if ctx.author.id in self.bot.translator and not ctx.author.id == 925597069748621353:
             return await ctx.send("> **❌You cannot translate two novels at a time.**", ephemeral=True)
-        if (size := os.path.getsize(f"{ctx.author.id}.txt")) > 18 * 10 ** 6:
+        if (size := os.path.getsize(f"{ctx.author.id}.txt")) > 25 * 10 ** 6:
             os.remove(f"{ctx.author.id}.txt")
-            return await ctx.reply("The provided file is bigger than 20mb. Please split the file and translate")
+            return await ctx.reply("The provided file is bigger than 25mb. Please split the file and translate")
         urls = FileHandler.find_urls_from_text(novel[:3000])
         # print(f"urls : {urls}")
+        size = os.path.getsize(f"{ctx.author.id}.txt")
         scraper = cloudscraper.create_scraper()
+        if term:
+            term_dict = terms(term)
+            if term_dict == {}:
+                return await ctx.reply(
+                    f"**Please try again with the validterms to be applied :\n\t"
+                    f"1 : Naruto \n\t2 : One-Piece \n\t3 : Pokemon\n\t4 : Mixed anime terms\n\t"
+                    f"5 : Prince of Tennis\n\t6 : Anime + Marvel + DC\n\t7 : Cultivation terms\n\t"
+                )
+            novel = term_raw(novel, term_dict)
+            await ctx.reply(content=f"> Added terms {term}")
         try:
             thumbnail = ""
             temp = []
             for url in urls:
                 try:
-                    response = scraper.get(url, headers={
-                        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.142 Safari/537.36"
-                    })
+                    response = await self.bot.loop.run_in_executor(None, scraper.get, url)
                     soup = BeautifulSoup(response.text, "lxml")
                     # print(f"url  {url}")
                     thumbnail: str = await FileHandler().get_thumbnail(soup=soup, link=url)
@@ -375,7 +424,12 @@ class Translate(commands.Cog):
         except:
             thumbnail = ""
         # print(f"thumbnail {thumbnail}")
+        # input(f"if {library}")
         try:
+            if urls is None or urls == []:
+                desc_link = ""
+            else:
+                desc_link = urls[0]
             try:
                 original_Language = FileHandler.find_language(novel)
             except:
@@ -386,15 +440,21 @@ class Translate(commands.Cog):
                     avatar = thumbnail
                 else:
                     avatar = ctx.author.display_avatar
-                des = await FileHandler.get_desc_from_text(GoogleTranslator().translate(novel[:400]), title=name)
+                des = GoogleTranslator().translate(
+                    await FileHandler.get_desc_from_text(novel[:5000], title=name, link=desc_link)).strip()
+                description = des
             except:
+                description = ""
                 des = novel[:400]
-            embed = discord.Embed(title=str(f"{name[:240]}"), description=des,
+            embed = discord.Embed(title=str(f"{name[:240]}"), description=des[:350],
                                   colour=discord.Colour.blurple())
             embed.set_thumbnail(url=avatar)
-            embed.add_field(name="Translating to", value=language, inline=False)
-            embed.add_field(name="From", value=original_Language, inline=False)
+            embed.add_field(name="Translating to", value=language, inline=True)
+            embed.add_field(name="From", value=original_Language, inline=True)
+            embed.add_field(name="Size", value=f"{round(size / (1024 ** 2), 2)} MB", inline=True)
             rep_msg = await rep_msg.edit(content="", embed=embed)
+            if library is not None:
+                await ctx.reply(content=f"> Updating {str(library)} with name : {name}")
             poke_words = ["elves ", "pokemon", "pokémon", " elf "]
             if any(word in name.lower() for word in poke_words):
                 term_dict = terms("pokemon")
@@ -402,39 +462,92 @@ class Translate(commands.Cog):
                 await ctx.send("Added pokemon terms", delete_after=5)
             liz = [novel[i: i + 1800] for i in range(0, len(novel), 1800)]
             self.bot.translator[ctx.author.id] = f"0/{len(liz)}"
-            asyncio.create_task(self.cc_prog(rep_msg, embed=embed, author_id=ctx.author.id))
+            if ctx.author.id != 925597069748621353:
+                task = asyncio.create_task(self.cc_prog(rep_msg, embed=embed, author_id=ctx.author.id))
             translate = Translator(self.bot, ctx.author.id, language)
-            story = await translate.start(liz)
+            if len(liz) < 1700:
+                story = await translate.start(liz, len(asyncio.all_tasks()))
+            else:
+                if ctx.author.id == 925597069748621353:
+                    await asyncio.sleep(250)
+                chunks = [liz[x:x + 1000] for x in range(0, len(liz), 1000)]
+                del liz
+                filename = f"{str(random.randint(1000, 10000))}.txt"
+                await ctx.reply(content=f"> Found large file... bot  will split it into  chunks  and translate  the  "
+                                        f"file  and merge it automatically... so  progress wouldn't work correctly. "
+                                        f"Please be patient")
+                cnt = 0
+                for liz_t in chunks:
+                    cnt += 1
+                    print(len(liz_t))
+                    self.bot.translator[ctx.author.id] = f"0/{len(liz_t)}"
+                    translate = Translator(self.bot, ctx.author.id, language)
+                    try:
+                        pr_msg = await ctx.reply(
+                            content=f"> Translating {str(cnt)} chunks out of {str(len(chunks))}... use .tp to "
+                                    f"check progress")
+                    except:
+                        pass
+                    story = await translate.start(liz_t, len(asyncio.all_tasks())+2)
+                    async with aiofiles.open(filename, "a+", encoding="utf-8") as f:
+                        await f.write("\n")
+                        await f.write(story)
+                    del translate
+                    del story
+                    gc.collect()
+                    try:
+                        await pr_msg.delete()
+                    except:
+                        pass
+                await ctx.reply(content=f"Translated {str(len(chunks))} chunks")
+                try:
+                    async with aiofiles.open(filename, "r", encoding="utf-8") as f:
+                        story = await f.read()
+                    os.remove(filename)
+                except:
+                    pass
+            try:
+                task.cancel()
+                embed.set_field_at(index=3,
+                                   name=f"Progress :  100%",
+                                   value=progressBar.filledBar(100, 100,
+                                                               size=10, line="🟥", slider="🟩")[
+                                       0])
+                await msg.edit(embed=embed)
+            except:
+                pass
             async with aiofiles.open(f"{ctx.author.id}.txt", "w", encoding="utf-8") as f:
                 await f.write(story)
-            try:
-                description = GoogleTranslator(source="auto", target="english").translate(
-                    await FileHandler.get_desc_from_text(story[:10000], title=name)).strip()
-            except:
-                description = await FileHandler.get_desc_from_text(story[:10000], title=name)
+            if description.strip() == "":
+                try:
+                    description = GoogleTranslator(source="auto", target="english").translate(
+                        await FileHandler.get_desc_from_text(story[:10000], title=name)).strip()
+                except:
+                    description = await FileHandler.get_desc_from_text(story[:10000], title=name)
             await FileHandler().distribute(self.bot, ctx, name, language, original_Language, rawname, description,
-                                           thumbnail=thumbnail)
+                                           thumbnail=thumbnail, library=library)
         except Exception as e:
             if "Translation stopped" in str(e):
                 return await ctx.send("Translation stopped")
             else:
+                print(e)
+                traceback.print_exc()
                 raise e
         finally:
             try:
                 del story
                 del novel
                 del liz
+                if len(asyncio.all_tasks()) < 8:
+                    asyncio.create_task(self.bot.load_title())
             except:
                 pass
             try:
                 del self.bot.translator[ctx.author.id]
-                self.bot.titles.append(name)
-                # print(self.bot.titles[-1])
-                self.bot.titles = random.sample(self.bot.titles, len(self.bot.titles))
             except:
                 pass
             try:
-                if self.bot.translation_count >= 16 or self.bot.crawler_count >= 20:
+                if ((self.bot.translation_count >= 17 or self.bot.crawler_count >= 20) or (self.bot.uptime.seconds//3600) > 2) and self.bot.app_status == "up":
                     await ctx.reply(
                         "> **Bot will be Restarted when the bot is free due to max limit is reached.. Please be patient")
                     chan = self.bot.get_channel(
@@ -459,26 +572,29 @@ class Translate(commands.Cog):
         lst = [i for i in self.bot.all_langs if language.lower() in i.lower()][:25]
         return [app_commands.Choice(name=i, value=i) for i in lst]
 
-    async def cc_prog(self, msg: discord.Message, embed: discord.Embed, author_id: int) -> typing.Optional[discord.Message]:
+    async def cc_prog(self, msg: discord.Message, embed: discord.Embed, author_id: int) -> typing.Optional[
+        discord.Message]:
         bardata = progressBar.filledBar(100, 0, size=10, line="🟥", slider="🟩")
         embed.add_field(name="Progress", value=f"{bardata[0]}", inline=False)
-        value = 0
         while author_id in self.bot.translator:
             out = self.bot.translator[author_id]
             split = out.split("/")
-            if split[0].isnumeric() and value <= eval(out):
-                embed.set_field_at(index=2,
+            if split[0].isnumeric():
+                embed.set_field_at(index=3,
                                    name=f"Progress :  {str(round(eval(out) * 100, 2))}%",
                                    value=progressBar.filledBar(int(split[1]), int(split[0]),
                                                                size=10, line="🟥", slider="🟩")[
-                                       0] + f"  {discord.utils.format_dt(datetime.datetime.now(), style='R')}")
+                                             0] + f"  {discord.utils.format_dt(datetime.datetime.now(), style='R')}")
                 await msg.edit(embed=embed)
-                value = eval(out)
             else:
                 break
+            if len(asyncio.all_tasks()) > 9:
+                embed.set_field_at(index=3,
+                                   name=f"Progress : ", value=f"progress bar is closed .please use .tp to check progress")
+                return await msg.edit(embed=embed)
             await asyncio.sleep(8)
 
-        embed.set_field_at(index=2,
+        embed.set_field_at(index=3,
                            name=f"Progress :  100%",
                            value=progressBar.filledBar(100, 100,
                                                        size=10, line="🟥", slider="🟩")[
@@ -490,6 +606,13 @@ class Translate(commands.Cog):
         help="translate multiple files together one at a time"
     )
     async def multi(self, ctx: commands.Context, language: str = "english", messageid: int = None, ):
+        try:
+            await ctx.defer()
+        except:
+            pass
+        if language is not None and ("discord.com/channels" in language or language.isnumeric()):
+            messageid = language
+            language = "english"
         if messageid:
             channel = self.bot.get_channel(ctx.channel.id)
             message = await channel.fetch_message(messageid)
@@ -539,6 +662,22 @@ class Translate(commands.Cog):
             self, inter: discord.Interaction, language: str
     ) -> list[app_commands.Choice]:
         lst = [i for i in self.bot.all_langs if language.lower() in i.lower()][:25]
+        return [app_commands.Choice(name=i, value=i) for i in lst]
+
+    @translate.autocomplete("term")
+    async def translate_complete(
+            self, inter: discord.Interaction, term: str
+    ) -> list[app_commands.Choice]:
+        lst = [
+                  "naruto",
+                  "one-piece",
+                  "pokemon",
+                  "mixed",
+                  "prince-of-tennis",
+                  "marvel",
+                  "dc",
+                  "xianxia",
+              ] + list(map(str, range(1, 8)))
         return [app_commands.Choice(name=i, value=i) for i in lst]
 
     @commands.hybrid_command(

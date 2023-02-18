@@ -1,5 +1,6 @@
 import os
 import re
+from typing import Any
 
 from motor import motor_asyncio
 
@@ -33,13 +34,69 @@ class Library(Database):
     async def add_novel(self, data: Novel) -> None:
         await self.library.insert_one(data.__dict__)
 
+    @staticmethod
+    def _make_match(
+            title: str,
+            rating: float,
+            language: str,
+            original_language: str,
+            uploader: int,
+            category: str,
+            tag: str,
+            size: float,
+    ) -> dict[str, Any]:
+        match: dict[str, Any] = {}
+        if title:
+            title = get_regex_from_name(title)
+            match["title"] = {"$regex": title, "$options": "i"}
+        if rating:
+            match["rating"] = {"$gte": rating}
+        if language:
+            match["language"] = language
+        if original_language:
+            match["original_language"] = original_language
+        if uploader:
+            match["uploader"] = uploader
+        if category:
+            match["category"] = {"$regex": category, "$options": "i"}
+        if tag:
+            match["tags"] = {"$in": [tag]}
+        if size:
+            size = int(size * 1024 ** 2)
+            match["size"] = {"$gte": size}
+        return match
+
+    async def find_common(
+            self,
+            title: str = "",
+            rating: float = 0.0,
+            language: str = "",
+            original_language: str = "",
+            uploader: int = None,
+            category: str = "",
+            tag: str = "",
+            size: float = 0.0,
+            no: int = 300,
+    ) ->list[Novel]:
+        commons = await self.library.aggregate(
+            [
+                {"$match": self._make_match(title, rating, language, original_language, uploader, category, tag, size)},
+                {"$sample": {"size": no}}
+            ]
+        ).to_list(None)
+        return commons
+
     async def get_novel_by_id(self, _id: int) -> Novel:
         novel = await self.library.find_one({"_id": _id})
-        return Novel(**novel) if novel else None
+        return novel if novel else None
 
     async def get_title_by_id(self, _id: int) -> Novel:
         novel = await self.library.find_one({"_id": _id})
         return novel['title']
+
+    async def get_random_novel(self, no: int = 10) -> Novel:
+        novel = await self.library.aggregate([{"$sample": {"size": no}}]).to_list(None)
+        return novel
 
     async def update_novel(self, novel: Novel) -> None:
         await self.library.update_one({"_id": novel._id}, {"$set": novel.__dict__})
@@ -89,6 +146,21 @@ class Library(Database):
             {"_id": _id}, {"$set": {"description": description}}
         )
 
+    async def update_download(self, _id: int, download: str) -> None:
+        await self.library.update_one(
+            {"_id": _id}, {"$set": {"download": download}}
+        )
+
+    async def update_thumbnail(self, _id: int, thumbnail: str) -> None:
+        await self.library.update_one(
+            {"_id": _id}, {"$set": {"thumbnail": thumbnail}}
+        )
+
+    async def update_date(self, _id: int, date: float) -> None:
+        await self.library.update_one(
+            {"_id": _id}, {"$set": {"date": date}}
+        )
+
     async def get_user_novel_count(self, user_id: int = None, _top_200: bool = False) -> dict[int, int]:
         if user_id is None:
             top_200_uploaders = await self.library.aggregate(
@@ -120,13 +192,14 @@ class Library(Database):
 
     @property
     async def get_all_tags(self) -> list[str]:
-        tags = set([j for i in await self.get_all_novels for j in i.tags])
-        return list(tags)
+        tags = await self.library.distinct("tags")
+        return tags
+
 
     @property
-    async def get_all_titles(self) -> list[str]:
-        titles = set([i.title for i in await self.get_all_novels])
-        return list(titles)
+    async def get_all_distinct_titles(self) -> list[str]:
+        titles = await self.library.distinct("title")
+        return titles
 
     @property
     async def get_total_novels(self) -> int:
