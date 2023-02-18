@@ -775,6 +775,12 @@ class Crawler(commands.Cog):
             title = title[:100]
             try:
                 task.cancel()
+                embed.set_field_at(index=0,
+                                   name=f"Progress :  100%",
+                                   value=progressBar.filledBar(100, 100,
+                                                               size=10, line="🟥", slider="🟩")[
+                                       0])
+                await msg.edit(embed=embed)
             except:
                 pass
             async with aiofiles.open(f"{ctx.author.id}_cr.txt", "w", encoding="utf-8") as f:
@@ -1184,6 +1190,10 @@ class Crawler(commands.Cog):
             await ctx.send(f"Crawled {chp_count} pages.")
             try:
                 task.cancel()
+                embed.set_image(url="")
+                embed.set_field_at(index=0, name="Progress",
+                                   value=f"Completed crawling")
+                await msg.edit(embed=embed)
             except:
                 pass
             return await FileHandler().crawlnsend(ctx, self.bot, title, title_name, original_Language,
