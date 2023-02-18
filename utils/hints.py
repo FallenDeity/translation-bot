@@ -16,7 +16,27 @@ class Hints:
         "if you found any bugs report in our server https://discord.gg/SZxTKASsHq",
         "bot uses google translate to translate novels",
         "we can ban you if you use wrong name for the novel",
-        "use leaderboard to check your rank"
+        "use leaderboard to check your and friend's rank",
+        "check library to find novels you need",
+        "ping admins in support server to manually restart bot server https://discord.gg/SZxTKASsHq",
+        "you can provide us terms in our server we can add it to bot for better translation",
+        "join our support server https://discord.gg/SZxTKASsHq",
+        "you can translate novel with .tt #library_id (eg .tt #32101)",
+        "translate automatically after crawling with adding en(or other lang code)after url in crawl, (eg. .tcrawl "
+        "<link> en where en is eng)",
+        "novel less than 300kb won't be added in library",
+        "you can use .thelp <command> to  get help for the given command. (eg. .thelp translate)",
+        "our categorizer depends on keywords shared by volunteers. sometimes it maybe wrong. you can help us by "
+        "providing keywords.",
+        "you can share images for different categories with us to add in bot",
+        "you can translate multiple novels using .tmulti  and attach all text files ",
+        "bot can access all discord attachment links but can't access messages from different servers if bot is not "
+        "there",
+        "you can invite the bot to your server using .tinvite",
+        "due to limited resources bot can only do 2-3 tasks at same time.. wait some time if you got bot is "
+        "busy message",
+        "if you have any suggestion use suggestion command to send your suggestion",
+        "if you found any bugs you can report to us using suggestion command",
     ]
 
     @classmethod

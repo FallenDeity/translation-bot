@@ -30,6 +30,23 @@ class General(commands.Cog):
         view = LinkView(self.buttons)
         await ctx.send(embed=embed, view=view)
 
+    @commands.hybrid_command(help="Give us a suggestion")
+    async def suggestions(self, ctx: commands.Context, suggestion: str):
+        """Give us a suggestion
+                       Parameters
+                       ----------
+                       ctx : commands.Context
+                           The interaction
+                       suggestion :
+                            Suggest a feature with explanation or report any bug
+                       """
+        channel = await self.bot.fetch_channel(1055445441958916167)
+        embed = discord.Embed(title=f"{ctx.author.name}'s suggestion",
+                              description=f"{suggestion}\n\nsuggested by {ctx.author.mention}",
+                              url=ctx.author.default_avatar)
+        await channel.send(embed=embed, allowed_mentions=discord.AllowedMentions(users=False))
+        await ctx.send(content="Suggestion is sent to developer")
+
 
 async def setup(bot: Raizel) -> None:
     await bot.add_cog(General(bot))
