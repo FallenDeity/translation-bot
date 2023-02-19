@@ -145,7 +145,7 @@ class MyHelp(commands.MinimalHelpCommand):
             embed.add_field(name="Aliases", value=", ".join(command.aliases))
         embed.set_thumbnail(url=self.context.bot.user.display_avatar)
         embed.set_footer(text=f"Hint : {await Hints.get_single_hint()}",
-                         icon_url=self.context.author.display_avatar)
+                         icon_url=await Hints.get_avatar())
         buttons = {
             "Support Server": [
                 "https://discord.gg/EN3ECMHEZP",

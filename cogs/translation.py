@@ -480,7 +480,7 @@ class Translate(commands.Cog):
             embed.add_field(name="Translating to", value=language, inline=True)
             embed.add_field(name="From", value=original_Language, inline=True)
             embed.add_field(name="Size", value=f"{round(size / (1024 ** 2), 2)} MB", inline=True)
-            embed.set_footer(text=f"Hint : {await Hints.get_single_hint()}", icon_url=self.bot.user.display_avatar)
+            embed.set_footer(text=f"Hint : {await Hints.get_single_hint()}", icon_url=await Hints.get_avatar())
             rep_msg = await rep_msg.edit(content="", embed=embed)
             if library is not None:
                 await ctx.reply(content=f"> Updating {str(library)} with name : {name}")

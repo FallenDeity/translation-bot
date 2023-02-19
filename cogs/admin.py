@@ -234,7 +234,7 @@ class Admin(commands.Cog):
         embed.add_field(name="Users", value=f"{len(self.bot.users)}", inline=True)
         embed.add_field(name="Latency", value=f"{round(self.bot.latency * 1000)}ms", inline=False)
         embed.add_field(name="OS", value=platform.system(), inline=True)
-        embed.set_footer(text=f"Hint : {await Hints.get_single_hint()}", icon_url=self.bot.user.display_avatar)
+        embed.set_footer(text=f"Hint : {await Hints.get_single_hint()}", icon_url=await Hints.get_avatar())
         try:
             embed.add_field(name="CPU usage", value=str(round(float(os.popen(
                 '''grep 'cpu ' /proc/stat | awk '{usage=($2+$4)*100/($2+$4+$5)} END {print usage }' ''').readline()),
@@ -254,7 +254,7 @@ class Admin(commands.Cog):
                 admin = True
                 embed1 = discord.Embed(title="Status", description="Status of the bot", color=discord.Color.dark_gold())
                 embed1.set_thumbnail(url=self.bot.user.avatar)
-                embed1.set_footer(text=f"Hint : {await Hints.get_single_hint()}", icon_url=self.bot.user.display_avatar)
+                embed1.set_footer(text=f"Hint : {await Hints.get_single_hint()}", icon_url=await Hints.get_avatar())
                 td = datetime.datetime.utcnow() - self.bot.boot
                 td = days_hours_minutes(td)
                 embed1.add_field(name="UpTime",
@@ -276,7 +276,7 @@ class Admin(commands.Cog):
                 embed2 = discord.Embed(title="Status", description=f"**Tasks runnning in bot**\n\n {tasks_str[:2400]}",
                                        color=discord.Color.dark_gold())
                 embed2.set_thumbnail(url=self.bot.user.avatar)
-                embed2.set_footer(text=f"Hint : {await Hints.get_single_hint()}", icon_url=self.bot.user.display_avatar)
+                embed2.set_footer(text=f"Hint : {await Hints.get_single_hint()}", icon_url=await Hints.get_avatar())
         if admin:
             return await Library.buttons([embed, embed1, embed2], ctx)
         else:

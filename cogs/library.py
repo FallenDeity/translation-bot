@@ -106,7 +106,7 @@ class Library(commands.Cog):
             out_str += out + "\n\n"
         embed = discord.Embed(title=f"**Page {page}**",
                               description=out_str)
-        embed.set_footer(text=f"Hint : {await Hints.get_single_hint()}", icon_url=self.bot.user.display_avatar)
+        embed.set_footer(text=f"Hint : {await Hints.get_single_hint()}", icon_url=await Hints.get_avatar())
         return embed
 
     async def make_list_embed_list(self, data: list[Novel]) -> list[discord.Embed]:

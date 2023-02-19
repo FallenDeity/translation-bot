@@ -45,7 +45,28 @@ class Hints:
         "we(bot-admins) can ban you from using bot, if you don't use proper novelname when translating"
     ]
 
+    urls: list[str] = [
+        "https://cdn.discordapp.com/attachments/1055445441958916167/1066410851340398774/anime-power-up.gif",
+        "https://cdn.discordapp.com/attachments/1055445441958916167/1066410872886530158/animesher.com_asuna--cute-1406639.gif",
+        "https://cdn.discordapp.com/attachments/1055445441958916167/1066410928096149604/84f116649b7edefeb6e32754cc8e4ef5.gif",
+        "https://cdn.discordapp.com/attachments/1055445441958916167/1066411009625030707/aniyuki-anime-girl-in-fight-28.gif",
+        "https://cdn.discordapp.com/attachments/1055445441958916167/1066411067741319280/8c4a56e630fb17708bb6a692f3934671.gif",
+        "https://cdn.discordapp.com/attachments/1055445441958916167/1066411146564874250/72d4e0e2700ca1538354fd95bbb5efd1.gif",
+        "https://cdn.discordapp.com/attachments/1055445441958916167/1066411595636424784/image0.gif",
+        "https://cdn.discordapp.com/attachments/1055445441958916167/1076828894147117177/de67224d07c99e9357d6bc4f17465761.gif",
+        "https://cdn.discordapp.com/attachments/1055445441958916167/1076828894507831356/anime-anime-girl.gif",
+        "https://cdn.discordapp.com/attachments/1055445441958916167/1076828895296360499/1484029932-f54f0d70e20e33b06f56e35f3aa3926a.gif",
+        "https://cdn.discordapp.com/attachments/1055445441958916167/1076828895774515261/fad167493fc0cb0169c3b4c2607fc4cc.gif",
+        "https://cdn.discordapp.com/attachments/1055445441958916167/1076828896105857094/78fcdf41fbc27797e92a4429c276e2f6.gif",
+        "https://cdn.discordapp.com/attachments/1055445441958916167/1076828896546267146/anime-girl-anime.gif",
+        ""
+    ]
+
     @classmethod
     async def get_single_hint(cls):
         return random.choice(cls.hints)
+
+    @classmethod
+    async def get_avatar(cls):
+        return random.choice(cls.urls)
 
