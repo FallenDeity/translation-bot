@@ -467,7 +467,7 @@ class Translate(commands.Cog):
                 if thumbnail is not None and thumbnail.strip() != "":
                     avatar = thumbnail
                 else:
-                    avatar = ctx.author.display_avatar
+                    avatar = await Hints.get_avatar()
                 des = GoogleTranslator().translate(
                     await FileHandler.get_desc_from_text(novel[:5000], title=name, link=desc_link)).strip()
                 description = des

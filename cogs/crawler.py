@@ -739,7 +739,7 @@ class Crawler(commands.Cog):
             embed = discord.Embed(title=str(f"{title[:240]}"), description=description[:350],
                                   colour=discord.Colour.blurple())
             if thumbnail is None or thumbnail == "":
-                embed.set_thumbnail(url=ctx.author.display_avatar)
+                embed.set_thumbnail(url=await Hints.get_avatar())
             else:
                 embed.set_thumbnail(url=thumbnail)
             embed.set_footer(text=f"Hint : {await Hints.get_single_hint()}", icon_url=await Hints.get_avatar())
@@ -1138,11 +1138,11 @@ class Crawler(commands.Cog):
             thumbnail = await FileHandler().get_og_image(soup=soup, link=firstchplink)
             if thumbnail is None or thumbnail.strip() == "":
                 thumbnail = ""
-                display_avatar = ctx.author.display_avatar
+                display_avatar = await Hints.get_avatar()
             else:
                 display_avatar = thumbnail
         except:
-            display_avatar = ctx.author.display_avatar
+            display_avatar = await Hints.get_avatar()
         embed = discord.Embed(title=str(f"{title_name[:240]}"), description=description[:350],
                               colour=discord.Colour.blurple())
         embed.set_thumbnail(url=display_avatar)
