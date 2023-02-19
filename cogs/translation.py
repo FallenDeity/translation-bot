@@ -259,7 +259,11 @@ class Translate(commands.Cog):
         if not name_check:
             await rep_msg.delete()
             return await ctx.reply(
-                f"> **❌{name} is not a valid novel name. please provide a valid name to filename before translating. **"
+                f"> **❌{name} is not a valid novel name. please provide a valid name to filename before translating. "
+                f"**\n If you think name is correct, please add **ongoing** or **complete**(depending on novel status)"
+                f" at the end of filename.. you can also use novelname or rawname tag in slash command.."
+                f" make sure novel name is correct , if its found you are using"
+                f" wrong name we(bot-admins) may ban you from using bot"
             )
         for tag in ['/', '\\', '<', '>', "'", '"', ':', ";", '?', '|', '*', ';', '!']:
             name = name.replace(tag, '').strip()
