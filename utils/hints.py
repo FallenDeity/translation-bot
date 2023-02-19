@@ -45,7 +45,7 @@ class Hints:
         "we(bot-admins) can ban you from using bot, if you don't use proper novelname when translating"
     ]
 
-    urls: list[str] = [
+    avatars: list[str] = [
         "https://cdn.discordapp.com/attachments/1055445441958916167/1066410851340398774/anime-power-up.gif",
         "https://cdn.discordapp.com/attachments/1055445441958916167/1066410872886530158/animesher.com_asuna--cute-1406639.gif",
         "https://cdn.discordapp.com/attachments/1055445441958916167/1066410928096149604/84f116649b7edefeb6e32754cc8e4ef5.gif",
@@ -59,7 +59,6 @@ class Hints:
         "https://cdn.discordapp.com/attachments/1055445441958916167/1076828895774515261/fad167493fc0cb0169c3b4c2607fc4cc.gif",
         "https://cdn.discordapp.com/attachments/1055445441958916167/1076828896105857094/78fcdf41fbc27797e92a4429c276e2f6.gif",
         "https://cdn.discordapp.com/attachments/1055445441958916167/1076828896546267146/anime-girl-anime.gif",
-        ""
     ]
 
     @classmethod
@@ -68,5 +67,5 @@ class Hints:
 
     @classmethod
     async def get_avatar(cls):
-        return random.choice(cls.urls)
+        return random.choice(cls.avatars)
 
