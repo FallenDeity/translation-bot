@@ -261,7 +261,7 @@ class Translate(commands.Cog):
             return await ctx.reply(
                 f"> **❌{name} is not a valid novel name. please provide a valid name to filename before translating. "
                 f"**\n If you think name is correct, please add **ongoing** or **complete**(depending on novel status)"
-                f" at the end of filename(eg: {name}_ongoing).."
+                f" at the end of filename(**eg: {name.split('__')[0]}_ongoing**).."
                 f"\nyou can also use novelname or rawname tag in slash command.."
                 f" make sure novel name is correct , if its found you are using"
                 f" wrong name we(bot-admins) may ban you from using bot"
