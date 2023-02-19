@@ -249,7 +249,7 @@ class Crawler(commands.Cog):
                 await msg.edit(embed=embed)
             else:
                 break
-            if len(asyncio.all_tasks()) > 9:
+            if len(asyncio.all_tasks()) >= 9:
                 embed.set_field_at(index=0,
                                    name=f"Progress : ",
                                    value=f"progress bar is closed .please use .tcp to check progress")

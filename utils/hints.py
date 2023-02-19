@@ -37,6 +37,11 @@ class Hints:
         "busy message",
         "if you have any suggestion use suggestion command to send your suggestion",
         "if you found any bugs you can report to us using suggestion command",
+        "add ongoing or complete at end of filename if u got invalid novelname error.."
+        "remember filename should be correct unless u wanna get banned from bot",
+        "remember always use correct novelname, otherwise u will be banned from bot after 1 warning",
+        "feel free to drop your suggestion to us using suggestions command",
+        "we can't crawl sites which have high level cloudflare protection"
     ]
 
     @classmethod

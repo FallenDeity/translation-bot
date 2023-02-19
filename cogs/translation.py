@@ -612,7 +612,7 @@ class Translate(commands.Cog):
                 await msg.edit(embed=embed)
             else:
                 break
-            if len(asyncio.all_tasks()) > 9:
+            if len(asyncio.all_tasks()) >= 9:
                 embed.set_field_at(index=3,
                                    name=f"Progress : ", value=f"progress bar is closed .please use .tp to check progress")
                 return await msg.edit(embed=embed)
