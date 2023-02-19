@@ -474,7 +474,7 @@ class Translate(commands.Cog):
             except:
                 description = ""
                 des = novel[:400]
-            embed = discord.Embed(title=str(f"{name[:240]}"), description=des[:350],
+            embed = discord.Embed(title=str(f"{name[:240]}"), description=f"```yaml\n{des[:350]}```",
                                   colour=discord.Colour.blurple())
             embed.set_thumbnail(url=avatar)
             embed.add_field(name="Translating to", value=language, inline=True)

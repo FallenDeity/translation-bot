@@ -70,13 +70,13 @@ class Library(commands.Cog):
         embed = discord.Embed(
             title=f"**#{data['_id']} \t•\t {data['title'][:240].strip()}**",
             url=data['download'],
-            description=f"*{data['description'][:2000]}*"
+            description=f"```yaml\n{data['description'][:2000]}```"
             if data['description']
             else "No description.",
             color=discord.Color.blue(),
         )
         embed.add_field(name="Category", value=data['category'])
-        embed.add_field(name="Tags", value=f'```yaml\n{", ".join(data["tags"])}```')
+        embed.add_field(name="Tags", value=f'```\n{", ".join(data["tags"])}```')
         if not str(data["org_language"]).lower() == 'na':
             embed.add_field(name="Raw Language", value=data["org_language"])
         embed.add_field(name="Language", value=data["language"])
@@ -84,9 +84,10 @@ class Library(commands.Cog):
         uploader = self.bot.get_user(data['uploader']) or await self.bot.fetch_user(
             data['uploader']
         )
+        embed.add_field(name="Uploader", value=f"Uploaded by {uploader} \n{discord.utils.format_dt(datetime.datetime.fromtimestamp(data['date']), style='R')}")
         embed.set_thumbnail(url=data['thumbnail'])
         embed.set_footer(
-            text=f"ON {datetime.datetime.fromtimestamp(data['date']).strftime('%m/%d/%Y, %H:%M:%S')} • {uploader} • {'⭐' * int(data['rating'])}",
+            text=f"{'⭐' * int(data['rating'])} Hint : {await Hints.get_single_hint()}",
             icon_url=uploader.display_avatar,
         )
         return embed

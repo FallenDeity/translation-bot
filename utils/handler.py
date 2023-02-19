@@ -391,7 +391,7 @@ class FileHandler:
             print(e)
             if thumbnail.strip() == "":
                 thumbnail = Categories.thumbnail_from_category(category)
-        embed = discord.Embed(title=str(f"#{next_no} : " + name[:240]), description=description[:350],
+        embed = discord.Embed(title=str(f"#{next_no} : " + name[:240]), description=f"```yaml\n{description[:350]}```",
                               colour=discord.Colour.dark_gold())
         embed.add_field(name="Category", value=category)
         embed.add_field(name="Language", value=language)
@@ -516,7 +516,7 @@ class FileHandler:
             print(e)
             if thumbnail.strip() == "":
                 thumbnail = Categories.thumbnail_from_category(category)
-        embed = discord.Embed(title=str(f"#{next_no} : " + title[:240]), description=description[:350],
+        embed = discord.Embed(title=str(f"#{next_no} : " + title[:240]), description=f"```yaml\n{description[:350]}```",
                               colour=discord.Colour.dark_gold())
         embed.add_field(name="Category", value=category)
         embed.add_field(name="Language", value=originallanguage)

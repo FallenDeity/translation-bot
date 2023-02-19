@@ -736,7 +736,7 @@ class Crawler(commands.Cog):
                 thumbnail = await FileHandler().get_thumbnail(soup, link)
             except:
                 thumbnail = ""
-            embed = discord.Embed(title=str(f"{title[:240]}"), description=description[:350],
+            embed = discord.Embed(title=str(f"{title[:240]}"), description=f"```yaml\n{description[:350]}```",
                                   colour=discord.Colour.blurple())
             if thumbnail is None or thumbnail == "":
                 embed.set_thumbnail(url=await Hints.get_avatar())
@@ -1143,7 +1143,7 @@ class Crawler(commands.Cog):
                 display_avatar = thumbnail
         except:
             display_avatar = await Hints.get_avatar()
-        embed = discord.Embed(title=str(f"{title_name[:240]}"), description=description[:350],
+        embed = discord.Embed(title=str(f"{title_name[:240]}"), description=f"```yaml\n{description[:350]}```",
                               colour=discord.Colour.blurple())
         embed.set_thumbnail(url=display_avatar)
         embed.set_image(url="https://cdn.discordapp.com/attachments/1004050326606852237/1064751851481870396"
