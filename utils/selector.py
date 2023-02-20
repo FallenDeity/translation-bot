@@ -199,8 +199,8 @@ class CssSelector:
             return ["#next", "#dle-speedbar > span > font:nth-child(2) > span:nth-child(4) > a > span"]
         elif "booktoki216.com" in link:
             return ["#goNextBtn", "title"]
-        elif "boxnovel.com" in link or "bonnovel.com" in link:
-            return ["#manga-reading-nav-foot > div > div.select-pagination > div > div > a", "#manga-reading-nav-head > div > div.entry-header_wrap > div > div.c-breadcrumb > ol > li:nth-child(2) > a"]
+        # elif "boxnovel.com" in link or "bonnovel.com" in link:
+        #     return ["#manga-reading-nav-foot > div > div.select-pagination > div > div > a", "#manga-reading-nav-head > div > div.entry-header_wrap > div > div.c-breadcrumb > ol > li:nth-child(2) > a"]
         # elif "m.bqg789.net" in link:
         #     return ["#nextpage", "#novelbody > div.head > div.nav_name > h1"]
         else:
