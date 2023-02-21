@@ -42,7 +42,11 @@ class Hints:
         "remember always use correct novelname, otherwise u will be banned from bot after 1 warning",
         "feel free to drop your suggestion to us using suggestions command",
         "we can't crawl sites which have high level cloudflare protection",
-        "we(bot-admins) can ban you from using bot, if you don't use proper novelname when translating"
+        "we(bot-admins) can ban you from using bot, if you don't use proper novelname when translating",
+        "message id's from dm's won't work due to discord  policy.. copy the library id or attachment url to translate",
+        "add a review to your faviorite novel using library review command. so many others can enjoy it too",
+        "add a review to your faviorite novel using library review command. so many others can enjoy it too",
+        "add a review to your faviorite novel using library review command. so many others can enjoy it too",
     ]
 
     avatars: list[str] = [
