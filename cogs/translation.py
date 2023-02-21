@@ -401,7 +401,7 @@ class Translate(commands.Cog):
                 pass
         if ctx.author.id in self.bot.translator and not ctx.author.id == 925597069748621353:
             return await ctx.send("> **❌You cannot translate two novels at a time.**", ephemeral=True)
-        if (size := os.path.getsize(f"{ctx.author.id}.txt")) > 25 * 10 ** 6:
+        if (size := os.path.getsize(f"{ctx.author.id}.txt")) > 35 * 10 ** 6:
             os.remove(f"{ctx.author.id}.txt")
             return await ctx.reply("The provided file is bigger than 25mb. Please split the file and translate")
         urls = FileHandler.find_urls_from_text(novel[:3000])
