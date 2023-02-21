@@ -508,6 +508,8 @@ class Translate(commands.Cog):
                                         f"file  and merge it automatically... so  progress wouldn't work correctly. "
                                         f"Please be patient")
                 cnt = 0
+                attachment_links: list[str] = []
+                tr_channel = await self.bot.fetch_channel(1054014022019715092)
                 for liz_t in chunks:
                     cnt += 1
                     print(len(liz_t))
@@ -520,9 +522,11 @@ class Translate(commands.Cog):
                     except:
                         pass
                     story = await translate.start(liz_t, len(asyncio.all_tasks())+2)
-                    async with aiofiles.open(filename, "a+", encoding="utf-8") as f:
-                        await f.write("\n")
+                    async with aiofiles.open(filename, "w", encoding="utf-8") as f:
                         await f.write(story)
+                    atm_msg = await tr_channel.send(file=discord.File(f"{filename}", f"{name}_part{cnt}.txt"))
+                    os.remove(filename)
+                    attachment_links.append(atm_msg.attachments[0].url)
                     del translate
                     del story
                     gc.collect()
@@ -531,6 +535,11 @@ class Translate(commands.Cog):
                     except:
                         pass
                 await ctx.reply(content=f"Translated {str(len(chunks))} chunks")
+                for at_link in attachment_links:
+                    resp = await self.bot.con.get(at_link)
+                    data = await resp.read()
+                    async with aiofiles.open(filename, "a+", encoding="utf-8") as f:
+                        await f.write(data.decode(encoding="utf-8", errors="ignore"))
                 try:
                     async with aiofiles.open(filename, "r", encoding="utf-8") as f:
                         story = await f.read()
