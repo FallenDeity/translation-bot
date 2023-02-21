@@ -188,6 +188,8 @@ class Translate(commands.Cog):
         else:
             if messageid is not None:
                 if 'discord' in messageid:
+                    if "@me/" in messageid:
+                        return await ctx.send("> Bot can't get attachment urls from dm's.. Please use library id or attachment link")
                     spl_link = messageid.split('/')
                     server_id = int(spl_link[4])
                     channel_id = int(spl_link[5])
