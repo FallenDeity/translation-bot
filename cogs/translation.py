@@ -532,6 +532,8 @@ class Translate(commands.Cog):
                     gc.collect()
                     try:
                         await pr_msg.delete()
+                        del liz_t
+                        chunks[cnt-1] = []
                     except:
                         pass
                 await ctx.reply(content=f"Translated {str(len(chunks))} chunks")
@@ -544,6 +546,7 @@ class Translate(commands.Cog):
                     async with aiofiles.open(filename, "r", encoding="utf-8") as f:
                         story = await f.read()
                     os.remove(filename)
+                    del chunks
                 except:
                     pass
             try:
