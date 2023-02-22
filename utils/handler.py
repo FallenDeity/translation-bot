@@ -65,7 +65,7 @@ class FileHandler:
         text = str(re.sub(r'^https?:\/\/.*[\r\n]*', '', text.replace("source :", "").replace("Source :", "").strip(), flags=re.MULTILINE))
         for d in desc:
             if d in text.lower():
-                description = re.split(d, text, flags=re.IGNORECASE)[1][:500]
+                description = re.split(d, text, flags=re.IGNORECASE, maxsplit=1)[1][:500]
                 description = ((re.sub(r'(\n\s*)+\n', '\n', description).strip()).lstrip(":")).strip()
                 return description
         return re.sub(r'(\n\s*)+\n', '\n', text[:500].strip())
