@@ -47,6 +47,10 @@ class Hints:
         "add a review to your faviorite novel using library review command. so many others can enjoy it too",
         "add a review to your faviorite novel using library review command. so many others can enjoy it too",
         "add a review to your faviorite novel using library review command. so many others can enjoy it too",
+        "for more novels join: https://discord.gg/SZxTKASsHq",
+        "for more novels join: https://discord.gg/SZxTKASsHq",
+        "for more novels join: https://discord.gg/SZxTKASsHq",
+        "for more novels join: https://discord.gg/SZxTKASsHq",
     ]
 
     avatars: list[str] = [
