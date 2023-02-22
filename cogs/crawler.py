@@ -797,14 +797,14 @@ class Crawler(commands.Cog):
                     if cnt == 1:
                         whole.insert(0, "\nsource : " + str(link) + "\n\n" + str(title_name.split('__')[0]) + "\n\n")
                     text = "\n".join(whole)
-                    async with aiofiles.open(filename, "a+", encoding="utf-8") as f:
+                    async with aiofiles.open(filename, "a+", encoding="utf-8", errors="ignore") as f:
                         await f.write(text)
                     del parsed
                     del whole
                     del text
                     gc.collect()
                 try:
-                    async with aiofiles.open(filename, "r", encoding="utf-8") as f:
+                    async with aiofiles.open(filename, "r", encoding="utf-8", errors="ignore") as f:
                         text = await f.read()
                     os.remove(filename)
                 except:
@@ -820,7 +820,7 @@ class Crawler(commands.Cog):
                 await msg.edit(embed=embed)
             except:
                 pass
-            async with aiofiles.open(f"{ctx.author.id}_cr.txt", "w", encoding="utf-8") as f:
+            async with aiofiles.open(f"{ctx.author.id}_cr.txt", "w", encoding="utf-8", errors="ignore") as f:
                 await f.write(text)
             if description is None or description.strip() == "":
                 description = GoogleTranslator(source="auto", target="english").translate(
@@ -1239,7 +1239,7 @@ class Crawler(commands.Cog):
                     await asyncio.sleep(1)
                     full_text = full_text + "\n\n for more novels join: https://discord.gg/SZxTKASsHq\n"
 
-            async with aiofiles.open(f"{ctx.author.id}_cr.txt", 'w', encoding='utf-8') as f:
+            async with aiofiles.open(f"{ctx.author.id}_cr.txt", 'w', encoding='utf-8', errors="ignore") as f:
                 await f.write(full_text)
             try:
                 if description is None or description.strip() == "":

@@ -530,7 +530,7 @@ class Translate(commands.Cog):
                     except:
                         pass
                     story = await translate.start(liz_t, len(asyncio.all_tasks())+2)
-                    async with aiofiles.open(filename, "w", encoding="utf-8") as f:
+                    async with aiofiles.open(filename, "w", encoding="utf-8", errors="ignore") as f:
                         await f.write(story)
                     atm_msg = await tr_channel.send(file=discord.File(f"{filename}", f"{name}_part{cnt}.txt"))
                     os.remove(filename)
@@ -548,10 +548,10 @@ class Translate(commands.Cog):
                 for at_link in attachment_links:
                     resp = await self.bot.con.get(at_link)
                     data = await resp.read()
-                    async with aiofiles.open(filename, "a+", encoding="utf-8") as f:
+                    async with aiofiles.open(filename, "a+", encoding="utf-8", errors="ignore") as f:
                         await f.write(data.decode(encoding="utf-8", errors="ignore"))
                 try:
-                    async with aiofiles.open(filename, "r", encoding="utf-8") as f:
+                    async with aiofiles.open(filename, "r", encoding="utf-8", errors="ignore") as f:
                         story = await f.read()
                     os.remove(filename)
                     del chunks
@@ -567,7 +567,7 @@ class Translate(commands.Cog):
                 await msg.edit(embed=embed)
             except:
                 pass
-            async with aiofiles.open(f"{ctx.author.id}.txt", "w", encoding="utf-8") as f:
+            async with aiofiles.open(f"{ctx.author.id}.txt", "w", encoding="utf-8", errors="ignore") as f:
                 await f.write(story)
             if description.strip() == "":
                 try:
