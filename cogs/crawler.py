@@ -763,7 +763,7 @@ class Crawler(commands.Cog):
                         whole.insert(insert, "\n\n for more novels join: https://discord.gg/SZxTKASsHq\n\n")
                     else:
                         break
-                    insert += random.randint(20, 40)
+                    insert += random.randint(20, 100)
                 whole.append("\n\n for more novels join: https://discord.gg/SZxTKASsHq\n")
                 text = "\n".join(whole)
             else:
@@ -792,7 +792,7 @@ class Crawler(commands.Cog):
                             whole.insert(insert, "\n\n for more novels join: https://discord.gg/SZxTKASsHq\n\n")
                         else:
                             break
-                        insert += random.randint(20, 40)
+                        insert += random.randint(20, 100)
                     whole.append("\n\n for more novels join: https://discord.gg/SZxTKASsHq\n")
                     if cnt == 1:
                         whole.insert(0, "\nsource : " + str(link) + "\n\n" + str(title_name.split('__')[0]) + "\n\n")
