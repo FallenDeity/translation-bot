@@ -62,6 +62,7 @@ class FileHandler:
         if "69shu.com" in text or "jiu mu" in text.lower() or "jiumu" in text.lower():
             desc.append("chapter")
         text = text.replace("for more novels join: https://discord.gg/SZxTKASsHq", "")
+        text = str(re.sub(r'^https?:\/\/.*[\r\n]*', '', text.replace("source :", "").replace("Source :", "").strip(), flags=re.MULTILINE))
         for d in desc:
             if d in text.lower():
                 description = re.split(d, text, flags=re.IGNORECASE)[1][:500]
