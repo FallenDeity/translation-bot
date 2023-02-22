@@ -19,6 +19,7 @@ import discord
 import parsel
 import requests
 from StringProgressBar import progressBar
+from _socket import timeout
 from bs4 import BeautifulSoup
 from deep_translator import GoogleTranslator
 from discord import app_commands
@@ -1022,6 +1023,8 @@ class Crawler(commands.Cog):
             title = firstchplink
         chp_count = 1
         # print(title)
+        if "69shu" in firstchplink:
+            title = title.split("-")[0]
         current_link = firstchplink
         full_text = "Source : " + firstchplink + '\n\n'
         no_of_tries = 0
