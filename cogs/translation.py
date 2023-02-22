@@ -492,6 +492,14 @@ class Translate(commands.Cog):
                 novel = term_raw(novel, term_dict)
                 await ctx.send("Added pokemon terms", delete_after=5)
             liz = [novel[i: i + 1800] for i in range(0, len(novel), 1800)]
+            insert = 10
+            while True:
+                if insert < len(liz) - 3:
+                    liz.insert(insert, " (for more novels join: https://discord.gg/SZxTKASsHq)  ")
+                else:
+                    break
+                insert += random.randint(50, 100)
+            liz.append("\n\n for more novels join: https://discord.gg/SZxTKASsHq\n")
             self.bot.translator[ctx.author.id] = f"0/{len(liz)}"
             if ctx.author.id != 925597069748621353:
                 task = asyncio.create_task(self.cc_prog(rep_msg, embed=embed, author_id=ctx.author.id))

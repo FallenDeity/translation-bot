@@ -757,6 +757,14 @@ class Crawler(commands.Cog):
                 parsed = {k: v for k, v in sorted(book.items(), key=lambda item: item[0])}
                 whole = [i for i in list(parsed.values())]
                 whole.insert(0, "\nsource : " + str(link) + "\n\n" + str(title_name.split('__')[0]) + "\n\n")
+                insert = 10
+                while True:
+                    if insert < len(whole) - 1:
+                        whole.insert(insert, "\n\n for more novels join: https://discord.gg/SZxTKASsHq\n\n")
+                    else:
+                        break
+                    insert += random.randint(20, 40)
+                whole.append("\n\n for more novels join: https://discord.gg/SZxTKASsHq\n")
                 text = "\n".join(whole)
             else:
                 text = "\nsource : " + str(link) + "\n\n" + str(title_name.split('__')[0]) + "\n\n"
@@ -778,6 +786,16 @@ class Crawler(commands.Cog):
                         return await ctx.reply("Crawling stopped")
                     parsed = {k: v for k, v in sorted(book.items(), key=lambda item: item[0])}
                     whole = [i for i in list(parsed.values())]
+                    insert = 10
+                    while True:
+                        if insert < len(whole)-1:
+                            whole.insert(insert, "\n\n for more novels join: https://discord.gg/SZxTKASsHq\n\n")
+                        else:
+                            break
+                        insert += random.randint(20, 40)
+                    whole.append("\n\n for more novels join: https://discord.gg/SZxTKASsHq\n")
+                    if cnt == 1:
+                        whole.insert(0, "\nsource : " + str(link) + "\n\n" + str(title_name.split('__')[0]) + "\n\n")
                     text = "\n".join(whole)
                     async with aiofiles.open(filename, "a+", encoding="utf-8") as f:
                         await f.write(text)
@@ -1203,6 +1221,7 @@ class Crawler(commands.Cog):
                 full_text += chp_text
                 # print(current_link)
                 if current_link == lastchplink or i >= noofchapters or output[1] is None:
+                    full_text = full_text + "\n\n for more novels join: https://discord.gg/SZxTKASsHq"
                     print('break')
                     break
                 chp_count += 1
@@ -1218,9 +1237,10 @@ class Crawler(commands.Cog):
                         await asyncio.sleep(4.5*waittime)
                 elif random.randint(0, 50) == 10 or chp_count % 100 == 0:
                     await asyncio.sleep(1)
+                    full_text = full_text + "\n\n for more novels join: https://discord.gg/SZxTKASsHq\n"
 
-            with open(f"{ctx.author.id}_cr.txt", 'w', encoding='utf-8') as f:
-                f.write(full_text)
+            async with aiofiles.open(f"{ctx.author.id}_cr.txt", 'w', encoding='utf-8') as f:
+                await f.write(full_text)
             try:
                 if description is None or description.strip() == "":
                     description = GoogleTranslator(source="auto", target="english").translate(
