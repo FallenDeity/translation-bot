@@ -671,7 +671,7 @@ class Crawler(commands.Cog):
                                                                                     False, "size", 20)
                 if len(ids) < 5 or name_lib_check:
                     await ctx.send("**Please check from above library**", delete_after=20)
-                    await asyncio.sleep(15)
+                    await asyncio.sleep(5)
                 await asyncio.sleep(0.1)
                 chk_msg = await ctx.send(embed=discord.Embed(
                     description=f"This novel **{title}** is already in our library with ids **{ids.__str__()}**...use arrow marks  in above  to navigate...  \n\nIf you want to continue crawling react with 🇳 \n\n**Note : Some files are in docx format, so file size maybe half the size of txt. and try to minimize translating if its already in library**"))
@@ -686,7 +686,7 @@ class Crawler(commands.Cog):
                     res = await self.bot.wait_for(
                         "reaction_add",
                         check=check,
-                        timeout=16.0,
+                        timeout=20.0,
                     )
                 except asyncio.TimeoutError:
                     try:
@@ -1090,7 +1090,7 @@ class Crawler(commands.Cog):
                                                                                     False, "size", 20)
                 if len(ids) < 5 or name_lib_check:
                     await ctx.send("**Please check from above library**", delete_after=20)
-                    await asyncio.sleep(15)
+                    await asyncio.sleep(5)
                 chk_msg = await ctx.send(embed=discord.Embed(
                     description=f"This novel **{title}** is already in our library with ids **{ids.__str__()}**...use arrow marks in above to navigate...\nIf you want to continue crawling react with 🇳 \n\n**Note : Some files are in docx format, so file size maybe half the size of txt. and try to minimize translating if its already in library**"))
                 await chk_msg.add_reaction('🇾')

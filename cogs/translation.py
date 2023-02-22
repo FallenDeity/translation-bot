@@ -342,9 +342,9 @@ class Translate(commands.Cog):
                 if len(ids) < 4 and name_lib_check:
                     await ctx.send("**Please check from above library**", delete_after=20)
                     await asyncio.sleep(5)
-                if name_lib_check and size_check:
-                    await ctx.send("**Please check from above library**")
-                    await asyncio.sleep(10)
+                # if name_lib_check and size_check:
+                #     await ctx.send("**Please check from above library**")
+                #     await asyncio.sleep(10)
                 chk_msg = await ctx.send(embed=discord.Embed(
                     description=f"This novel **{name}** is already in our library with ids **{str(ids)}**...use arrow marks  in above  to navigate...\nIf you want to continue translation react with 🇳 within 10 sec\n\n**Note : Some files are in docx format, so file size maybe half the size of txt. and try to minimize translating if its already in library**"))
                 await chk_msg.add_reaction('🇾')
@@ -358,7 +358,7 @@ class Translate(commands.Cog):
                     res = await self.bot.wait_for(
                         "reaction_add",
                         check=check,
-                        timeout=16.0,
+                        timeout=20.0,
                     )
                 except asyncio.TimeoutError:
                     print('error')
