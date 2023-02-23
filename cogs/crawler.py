@@ -929,7 +929,10 @@ class Crawler(commands.Cog):
                 translate_to :
                     translate automatically after crawling
                 """
-        await ctx.defer()
+        try:
+            await ctx.defer()
+        except:
+            pass
         if ctx.author.id in self.bot.crawler:
             return await ctx.reply(
                 "> **❌You cannot crawl two novels at the same time.**"
