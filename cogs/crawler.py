@@ -804,7 +804,7 @@ class Crawler(commands.Cog):
                             whole.insert(insert, "\n\n for more novels join: https://discord.gg/SZxTKASsHq\n\n")
                         else:
                             break
-                        insert += random.randint(20, 100)
+                        insert += random.randint(10, 40)
                     whole.append("\n\n for more novels join: https://discord.gg/SZxTKASsHq\n")
                     if cnt == 1:
                         whole.insert(0, "\nsource : " + str(link) + "\n\n" + str(title_name.split('__')[0]) + "\n\n")
@@ -1268,6 +1268,7 @@ class Crawler(commands.Cog):
                     if random.randint(0, 200) == 10:
                         await asyncio.sleep(5*waittime)
                     if i % 25 == 0:
+                        full_text = full_text + "\n\n for more novels join: https://discord.gg/SZxTKASsHq\n"
                         await asyncio.sleep(2.5*waittime)
                     if i % 50 == 0:
                         await asyncio.sleep(4.5*waittime)
