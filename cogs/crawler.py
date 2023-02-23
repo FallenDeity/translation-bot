@@ -944,6 +944,9 @@ class Crawler(commands.Cog):
         except Exception as e:
             print(e)
             return await ctx.send("We couldn't connect to the provided link. Please check the link")
+        if secondchplink in self.bot.all_langs:
+            translate_to = secondchplink
+            secondchplink = None
         if int(str(res.status)[0]) == 4:
             cloudscrape = True
         if nextselector is None:
