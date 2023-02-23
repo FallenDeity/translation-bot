@@ -99,6 +99,7 @@ class Translate(commands.Cog):
         if library_id is not None:
             try:
                 novel_data = await self.bot.mongo.library.get_novel_by_id(library_id)
+                novelname = novel_data["title"]
                 link = novel_data["download"]
             except:
                 return await ctx.reply("send a valid id")
