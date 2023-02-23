@@ -103,7 +103,11 @@ class Crawler(commands.Cog):
 
         if full == "":
             html = response.text
-            sel = parsel.Selector(html)
+            if "69shu" in links:
+                soup = BeautifulSoup(response.text, "html.parser", from_encoding=response.encoding)
+                sel = parsel.Selector(str(soup))
+            else:
+                sel = parsel.Selector(html)
             text = sel.css(css).extract()
 
             if not chptitleCSS == "":
@@ -979,6 +983,13 @@ class Crawler(commands.Cog):
             next_chp_find = True
             path = ""
             secondchplink = await FileHandler.find_next_chps(soup, firstchplink)
+        if (secondchplink is None or secondchplink.strip() == "") and "69shu" in firstchplink:
+            firstchplink = parsel.Selector(response.text).css("#catalog > ul > li:nth-child(1) > a ::attr(href)").extract_first()
+            response = requests.get(firstchplink, headers=headers, timeout=20)
+            response.encoding = response.apparent_encoding
+            sel = parsel.Selector(response.text)
+            soup = BeautifulSoup(response.content, 'html5lib', from_encoding=response.encoding)
+            secondchplink = await FileHandler.find_next_chps(soup, firstchplink)
         if "readwn" in firstchplink or "wuxiax.co" in firstchplink or "novelmt.com" in firstchplink or "fannovels.com" in firstchplink or "novelmtl.com" in firstchplink or "booktoki216.com" in firstchplink:
             waittime = 1.0
         if nextselector is not None:
@@ -1241,7 +1252,8 @@ class Crawler(commands.Cog):
                     if i % 50 == 0:
                         await asyncio.sleep(4.5*waittime)
                 elif random.randint(0, 50) == 10 or chp_count % 100 == 0:
-                    await asyncio.sleep(1)
+                    if "69shu" not in firstchplink:
+                        await asyncio.sleep(1)
                     full_text = full_text + "\n\n for more novels join: https://discord.gg/SZxTKASsHq\n"
 
             async with aiofiles.open(f"{ctx.author.id}_cr.txt", 'w', encoding='utf-8', errors="ignore") as f:
