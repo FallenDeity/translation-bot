@@ -984,6 +984,10 @@ class Crawler(commands.Cog):
             path = ""
             secondchplink = await FileHandler.find_next_chps(soup, firstchplink)
         if (secondchplink is None or secondchplink.strip() == "") and "69shu" in firstchplink:
+            if "69shu" in firstchplink and "txt" in firstchplink:
+                firstchplink = firstchplink.replace("/txt", "")
+                firstchplink = firstchplink.replace(".htm", "/")
+                response = requests.get(firstchplink, headers=headers, timeout=20)
             firstchplink = parsel.Selector(response.text).css("#catalog > ul > li:nth-child(1) > a ::attr(href)").extract_first()
             response = requests.get(firstchplink, headers=headers, timeout=20)
             response.encoding = response.apparent_encoding
