@@ -103,11 +103,11 @@ class Crawler(commands.Cog):
 
         if full == "":
             html = response.text
-            if "69shu" in links:
-                soup = BeautifulSoup(response.text, "html.parser", from_encoding=response.encoding)
-                sel = parsel.Selector(str(soup))
-            else:
-                sel = parsel.Selector(html)
+            # if "69shu" in links:
+            #     soup = BeautifulSoup(response.text, "html.parser", from_encoding=response.encoding)
+            #     sel = parsel.Selector(str(soup))
+            # else:
+            sel = parsel.Selector(html)
             text = sel.css(css).extract()
 
             if not chptitleCSS == "":
