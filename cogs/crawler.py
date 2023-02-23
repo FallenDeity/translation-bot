@@ -351,6 +351,8 @@ class Crawler(commands.Cog):
         #     return await ctx.reply(
         #         f"> **❌We currently crawl only from {', '.join(allowed)}**"
         #     )
+        if "69shu" in link:
+            cloudscrape = True
         if "69shu" in link and "txt" in link:
             link = link.replace("/txt", "")
             link = link.replace(".htm", "/")
