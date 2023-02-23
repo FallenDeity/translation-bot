@@ -345,7 +345,9 @@ class Crawler(commands.Cog):
         next_sel = CssSelector.find_next_selector(link)
         if next_sel[0] is not None:
             if "69shu" in link:
-                ctx.command = await self.bot.get_command("crawlnext").callback(Crawler(self.bot), ctx, link)
+                ctx.command = await self.bot.get_command("crawlnext").callback(Crawler(self.bot), ctx, link, None,
+                                                                               None, None, None, None, None,
+                                                                               translate_to, add_terms)
                 return
             return await ctx.reply(
                 "> **Provided site is found in crawl_next available sites. This site doesn't have TOC page........ so proceed with /crawlnext or .tcrawlnext <first_chapter_link>**")
@@ -870,8 +872,7 @@ class Crawler(commands.Cog):
                         asyncio.create_task(self.bot.get_command("restart").callback(Admin(self.bot), context_new2))
                 except:
                     pass
-        if (
-                translate_to is not None or add_terms is not None) and download_url is not None and not download_url.strip() == "":
+        if (translate_to is not None or add_terms is not None) and download_url is not None and not download_url.strip() == "":
             if translate_to is None:
                 translate_to = "english"
             if translate_to not in self.bot.all_langs and original_Language not in ["english", "en"]:
@@ -882,6 +883,8 @@ class Crawler(commands.Cog):
                                                                                None,
                                                                                translate_to, title_name[:100], None,  None,
                                                                                add_terms)
+        else:
+            return
 
     @commands.hybrid_command(
         help="Clears any stagnant novels which were deposited for crawling."
@@ -900,7 +903,7 @@ class Crawler(commands.Cog):
     async def crawlnext(
             self, ctx: commands.Context, firstchplink: str, secondchplink: str = None, lastchplink: str = None,
             nextselector: str = None, noofchapters: int = None,
-            cssselector: str = None, waittime: float = None,
+            cssselector: str = None, waittime: float = None, translate_to: str = None, add_terms: str =None
     ) -> typing.Optional[discord.Message]:
         """crawl using first chapter link
                 Parameters
@@ -921,6 +924,10 @@ class Crawler(commands.Cog):
                      css selector for chapter content
                 waittime :
                     add wait time between each chapter crawling, use this if the crawled chapter stop in middle
+                add_terms :
+                    add terms to  finished novel
+                translate_to :
+                    translate automatically after crawling
                 """
         await ctx.defer()
         if ctx.author.id in self.bot.crawler:
@@ -1280,8 +1287,23 @@ class Crawler(commands.Cog):
                 await msg.edit(embed=embed)
             except:
                 pass
-            return await FileHandler().crawlnsend(ctx, self.bot, title, title_name, original_Language,
-                                                  description=description, thumbnail=thumbnail, link=firstchplink, library=library)
+            download_url = await FileHandler().crawlnsend(ctx, self.bot, title, title_name, original_Language,
+                                                  description=description, thumbnail=thumbnail,
+                                                          link=firstchplink, library=library)
+            if (translate_to is not None or add_terms is not None) and download_url is not None and not download_url.strip() == "":
+                if translate_to is None:
+                    translate_to = "english"
+                if translate_to not in self.bot.all_langs and original_Language not in ["english", "en"]:
+                    translate_to = "english"
+                await asyncio.sleep(1)
+                ctx.command = await self.bot.get_command("translate").callback(Translate(self.bot), ctx, download_url,
+                                                                               None,
+                                                                               None,
+                                                                               translate_to, title_name[:100], None,
+                                                                               None,
+                                                                               add_terms)
+            else:
+                return
         except Exception as e:
             print(traceback.format_exc())
             await ctx.send("> Error occurred .Please report to admin +\n" + str(e))
