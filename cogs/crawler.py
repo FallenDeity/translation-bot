@@ -126,7 +126,7 @@ class Crawler(commands.Cog):
                     text.pop(0)
                 text.pop(0)
             full = full + "\n".join(text)
-        full = full + "\n---------------------xxx---------------------\n\n"
+        full = full + "\n--------------------xxxx--------------------\n\n"
         if "uukanshu" in links:
             time.sleep(5)
         return nums, full
@@ -212,7 +212,7 @@ class Crawler(commands.Cog):
         except:
             next_href = None
 
-        full_chp = full_chp + "\n---------------------xxx---------------------\n\n"
+        full_chp = full_chp + "\n--------------------xxxx--------------------\n\n"
 
         return [full_chp, next_href]
 
