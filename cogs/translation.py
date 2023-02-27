@@ -633,7 +633,7 @@ class Translate(commands.Cog):
             split = out.split("/")
             if split[0].isnumeric():
                 embed.set_field_at(index=3,
-                                   name=f"Progress :  {str(round(eval(out) * 100, 2))}%",
+                                   name=f"Progress :  {str(round(eval(out) * 100, 2))}%  ({out})",
                                    value=progressBar.filledBar(int(split[1]), int(split[0]),
                                                                size=10, line="🟥", slider="🟩")[
                                              0] + f"  {discord.utils.format_dt(datetime.datetime.now(), style='R')}")
