@@ -772,11 +772,11 @@ class Crawler(commands.Cog):
                 insert = 10
                 while True:
                     if insert < len(whole) - 1:
-                        whole.insert(insert, "\n\n for more novels join: https://discord.gg/SZxTKASsHq\n\n")
+                        whole.insert(insert, f"\n\n for more novels ({random.randint(1000,200000)})join: https://discord.gg/SZxTKASsHq\n\n")
                     else:
                         break
                     insert += random.randint(20, 100)
-                whole.append("\n\n for more novels join: https://discord.gg/SZxTKASsHq\n")
+                whole.append(f"\n\n for more novels ({random.randint(1000,200000)}) join: https://discord.gg/SZxTKASsHq\n")
                 text = "\n".join(whole)
             else:
                 text = "\nsource : " + str(link) + "\n\n" + str(title_name.split('__')[0]) + "\n\n"
@@ -801,11 +801,11 @@ class Crawler(commands.Cog):
                     insert = 10
                     while True:
                         if insert < len(whole)-1:
-                            whole.insert(insert, "\n\n for more novels join: https://discord.gg/SZxTKASsHq\n\n")
+                            whole.insert(insert, f"\n\n for more novels ({random.randint(1000,200000)}) join: https://discord.gg/SZxTKASsHq\n\n")
                         else:
                             break
                         insert += random.randint(10, 40)
-                    whole.append("\n\n for more novels join: https://discord.gg/SZxTKASsHq\n")
+                    whole.append(f"\n\n for more novels({random.randint(1000,200000)}) join: https://discord.gg/SZxTKASsHq\n")
                     if cnt == 1:
                         whole.insert(0, "\nsource : " + str(link) + "\n\n" + str(title_name.split('__')[0]) + "\n\n")
                     text = "\n".join(whole)
@@ -1257,7 +1257,7 @@ class Crawler(commands.Cog):
                 full_text += chp_text
                 # print(current_link)
                 if current_link == lastchplink or i >= noofchapters or output[1] is None:
-                    full_text = full_text + "\n\n for more novels join: https://discord.gg/SZxTKASsHq"
+                    full_text = full_text + f"\n\n for more novels ({random.randint(1000,200000)}) join: https://discord.gg/SZxTKASsHq"
                     print('break')
                     break
                 chp_count += 1
@@ -1268,14 +1268,14 @@ class Crawler(commands.Cog):
                     if random.randint(0, 200) == 10:
                         await asyncio.sleep(5*waittime)
                     if i % 25 == 0:
-                        full_text = full_text + "\n\n for more novels join: https://discord.gg/SZxTKASsHq\n"
+                        full_text = full_text + f"\n\n for more novels ({random.randint(1000,200000)}) join: https://discord.gg/SZxTKASsHq\n"
                         await asyncio.sleep(2.5*waittime)
                     if i % 50 == 0:
                         await asyncio.sleep(4.5*waittime)
                 elif random.randint(0, 50) == 10 or chp_count % 100 == 0:
                     if "69shu" not in firstchplink:
                         await asyncio.sleep(1)
-                    full_text = full_text + "\n\n for more novels join: https://discord.gg/SZxTKASsHq\n"
+                    full_text = full_text + f"\n\n for more novels ({random.randint(1000,200000)}) join: https://discord.gg/SZxTKASsHq\n"
 
             async with aiofiles.open(f"{ctx.author.id}_cr.txt", 'w', encoding='utf-8', errors="ignore") as f:
                 await f.write(full_text)

@@ -496,11 +496,11 @@ class Translate(commands.Cog):
             insert = random.randint(1, 20)
             while True:
                 if insert < len(liz) - 3:
-                    liz.insert(insert, " (for more novels join: https://discord.gg/SZxTKASsHq)  ")
+                    liz.insert(insert, f" (for more novels ({random.randint(1000,200000)})join: https://discord.gg/SZxTKASsHq)  ")
                 else:
                     break
                 insert += random.randint(100, 250)
-            liz.append("\n\n for more novels join: https://discord.gg/SZxTKASsHq\n")
+            liz.append(f"\n\n for more novels ({random.randint(1000,200000)})join: https://discord.gg/SZxTKASsHq\n")
             self.bot.translator[ctx.author.id] = f"0/{len(liz)}"
             if ctx.author.id != 925597069748621353:
                 task = asyncio.create_task(self.cc_prog(rep_msg, embed=embed, author_id=ctx.author.id))
