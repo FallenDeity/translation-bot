@@ -13,7 +13,7 @@ class General(commands.Cog):
         self.buttons = {
             "Invite": [self.bot.invite_url, "💖"],
             "Support Server": [
-                "https://discord.gg/EN3ECMHEZP",
+                "https://discord.gg/SZxTKASsHq",
                 self.bot.get_emoji(952146686338285588),
             ],
         }

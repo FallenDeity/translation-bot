@@ -63,7 +63,7 @@ class CssSelector:
             return "p ::text"
         elif "m.akshu8.com" in link or "soruncg.com" in link or "www.630shu.net" in link\
                 or "www.yifan.net" in link or "www.soxscc.net" in link or "feixs.com" in link \
-                or "www.tsxsw.net" in link or "www.ttshu8.com" in link or "www.szhhlt.com" in link:
+                or "www.tsxsw.net" in link or "www.ttshu8.com" in link or "www.szhhlt.com" in link or "www.bqg789.net" in link:
             return "#content ::text"
         elif "www.wnmtl.org" in link:
             return "#reader > div > div.chapter-container ::text"
@@ -103,6 +103,8 @@ class CssSelector:
             return "#novelcontent ::text"
         elif "boxnovel.com" in link or "bonnovel.com" in link:
             return "div.cha-content ::text"
+        elif "www.asxs.com" in link:
+            return "#contents ::text"
         else:
             return "* ::text"
 
@@ -137,7 +139,7 @@ class CssSelector:
             return ["#header > h1", ""]
         elif "m.soxscc.net" in link or "m.ttshu8.com" in link:
             return ["title", "#chapter > h1 ::text"]
-        elif "www.soxscc.net" in link:
+        elif "www.soxscc.net" in link or "www.bqg789.net" in link:
             return ["#info > h1", "body > div.content_read > div > div.bookname > h1 ::text"]
         elif "www.ops8.com" in link:
             return ["div.book-title", "#BookCon > h1"]
@@ -149,6 +151,8 @@ class CssSelector:
             return ["div.articleinfo > div.r > div.l2 > div > h1", "title ::text"]
         elif "tw.ixdzs.com" in link:
             return ["h1", "title ::text"]
+        elif "www.asxs.com" in link:
+            return ["#a_main > div.bdsub > dl > dd.info > div.book > div.btitle > h1", "#amain > dl > dd:nth-child(2) > h1"]
         else:
             return ["title", "title ::text"]
 
