@@ -3,6 +3,7 @@ import datetime
 import gc
 import os
 import platform
+import socket
 
 import discord
 from discord.ext import commands
@@ -266,6 +267,9 @@ class Admin(commands.Cog):
                 embed1.add_field(name="Current Tasks", value=f"{len(self.bot.crawler)} Crawl,"
                                                              f" {len(self.bot.translator)} translate", inline=True)
                 embed1.add_field(name="Tasks Count", value=str(len(asyncio.all_tasks())), inline=True)
+                host = socket.gethostname()
+                embed1.add_field(name="Host", value=host, inline=True)
+                embed1.add_field(name="IP address", value=socket.gethostbyname(host), inline=True)
                 tasks = asyncio.all_tasks()
                 print(tasks)
                 tasks_str = ""
