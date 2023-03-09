@@ -266,7 +266,7 @@ class Admin(commands.Cog):
                                        f"{str(self.bot.crawler_count)} crawled", inline=False)
                 embed1.add_field(name="Current Tasks", value=f"{len(self.bot.crawler)} Crawl,"
                                                              f" {len(self.bot.translator)} translate", inline=True)
-                embed1.add_field(name="Tasks Count", value=str(len(asyncio.all_tasks())), inline=True)
+                embed1.add_field(name="Tasks Count", value=str(len(asyncio.all_tasks())), inline=False)
                 host = socket.gethostname()
                 embed1.add_field(name="Host", value=host, inline=True)
                 embed1.add_field(name="IP address", value=socket.gethostbyname(host), inline=True)
@@ -277,7 +277,7 @@ class Admin(commands.Cog):
                 for task in tasks:
                     count += 1
                     tasks_str += f"\n{count} -- {task.get_name()} : {str(task.get_coro())}"
-                embed2 = discord.Embed(title="Status", description=f"**Tasks runnning in bot**\n\n {tasks_str[:2400]}",
+                embed2 = discord.Embed(title="Status", description=f"**Tasks running in bot**\n\n {tasks_str[:2400]}",
                                        color=discord.Color.dark_gold())
                 embed2.set_thumbnail(url=self.bot.user.avatar)
                 embed2.set_footer(text=f"Hint : {await Hints.get_single_hint()}", icon_url=await Hints.get_avatar())
