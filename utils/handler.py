@@ -435,12 +435,12 @@ class FileHandler:
         else:
             if original_language.lower() == "korean":
                 channel = bot.get_channel(
-                    1032638028868501554
-                ) or await bot.fetch_channel(1032638028868501554)
+                    1086592170301083668
+                ) or await bot.fetch_channel(1086592170301083668)
             else:
                 channel = bot.get_channel(
-                    1005668482475643050
-                ) or await bot.fetch_channel(1005668482475643050)
+                    1086593341740818523
+                ) or await bot.fetch_channel(1086593341740818523)
             msg = await channel.send(
                 embed=embed, file=discord.File(f"{ctx.author.id}.txt", f"{name}.txt"),
                 allowed_mentions=discord.AllowedMentions(users=False)
@@ -527,9 +527,9 @@ class FileHandler:
         embed.set_thumbnail(url=thumbnail)
         embed.set_footer(text=f"Uploaded by {ctx.author}", icon_url=ctx.author.display_avatar)
         if originallanguage == "english":
-            channel_id = 1005668482475643050
+            channel_id = 1086593341740818523
         else:
-            channel_id = 1020980703229382706
+            channel_id = 1086592655238103061
         if (size := os.path.getsize(f"{ctx.author.id}_cr.txt")) > 8 * 10 ** 6:
             bot.crawler_count = bot.crawler_count + 1
             # if size > 35 * 10 ** 6:
