@@ -48,30 +48,11 @@ class General(commands.Cog):
         await ctx.send(content="Suggestion is sent to developer")
 
     @commands.is_owner()
-    @commands.hybrid_command(help="Give us a suggestion")
+    @commands.hybrid_command(help="command to add role for storage access. only owner")
     async def addrole(self, ctx: commands.Context):
-        guild = self.bot.get_guild(940866934214373376)
-        role = guild.get_role(1076124121592770590)
         await ctx.send("started adding roles")
-        top = await self.bot.mongo.library.get_user_novel_count(_top_200=True)
-        top_200 = [(user_id, count) for user_id, count in top.items()]
-        chunks = [top_200[i: i + 10] for i in range(0, len(top_200), 10)]
-        user_ids = []
-        no = 0
-        for chunk in chunks:
-            for user_id, count in chunk:
-                if count >= 10:
-                    user_ids.append(user_id)
-        members = guild.members
-        for member in members:
-            if member.id in user_ids:
-                no = no + 1
-                print(f"added role to {member.name}")
-                await member.add_roles(role)
-            else:
-                print(f"not adding access to  {member.name}")
-
-        await ctx.send(f"added  roles to {no}")
+        n = await self.bot.add_roles()
+        await ctx.send(f"added storage-access role to {n} users")
 
 
 async def setup(bot: Raizel) -> None:
