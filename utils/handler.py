@@ -413,12 +413,12 @@ class FileHandler:
                 view = LinkView({"Novel": [filelnk, "📔"]})
                 if original_language.lower() == "korean":
                     channel = bot.get_channel(
-                        1032638028868501554
-                    ) or await bot.fetch_channel(1032638028868501554)
+                        1086592167767711794
+                    ) or await bot.fetch_channel(1086592167767711794)
                 else:
                     channel = bot.get_channel(
-                        1005668482475643050
-                    ) or await bot.fetch_channel(1005668482475643050)
+                        1086593341740818523
+                    ) or await bot.fetch_channel(1086593341740818523)
                 await channel.send(
                     embed=embed, view=view, allowed_mentions=discord.AllowedMentions(users=False)
                 )
@@ -435,8 +435,8 @@ class FileHandler:
         else:
             if original_language.lower() == "korean":
                 channel = bot.get_channel(
-                    1086592170301083668
-                ) or await bot.fetch_channel(1086592170301083668)
+                    1086592167767711794
+                ) or await bot.fetch_channel(1086592167767711794)
             else:
                 channel = bot.get_channel(
                     1086593341740818523
