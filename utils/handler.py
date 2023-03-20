@@ -61,9 +61,11 @@ class FileHandler:
                           text)  # remove title from description
         if "69shu.com" in text or "jiu mu" in text.lower() or "jiumu" in text.lower():
             desc.append("chapter")
+        text = text.replace("for more novels join: https://discord.gg/SZxTKASsHq", "")
+        text = str(re.sub(r'^https?:\/\/.*[\r\n]*', '', text.replace("source :", "").replace("Source :", "").strip(), flags=re.MULTILINE))
         for d in desc:
             if d in text.lower():
-                description = re.split(d, text, flags=re.IGNORECASE)[1][:500]
+                description = re.split(d, text, flags=re.IGNORECASE, maxsplit=1)[1][:500]
                 description = ((re.sub(r'(\n\s*)+\n', '\n', description).strip()).lstrip(":")).strip()
                 return description
         return re.sub(r'(\n\s*)+\n', '\n', text[:500].strip())
@@ -391,7 +393,7 @@ class FileHandler:
             print(e)
             if thumbnail.strip() == "":
                 thumbnail = Categories.thumbnail_from_category(category)
-        embed = discord.Embed(title=str(f"#{next_no} : " + name[:240]), description=description[:350],
+        embed = discord.Embed(title=str(f"#{next_no} : " + name[:240]), description=f"```yaml\n{description[:350]}```",
                               colour=discord.Colour.dark_gold())
         embed.add_field(name="Category", value=category)
         embed.add_field(name="Language", value=language)
@@ -411,12 +413,12 @@ class FileHandler:
                 view = LinkView({"Novel": [filelnk, "📔"]})
                 if original_language.lower() == "korean":
                     channel = bot.get_channel(
-                        1032638028868501554
-                    ) or await bot.fetch_channel(1032638028868501554)
+                        1086592167767711794
+                    ) or await bot.fetch_channel(1086592167767711794)
                 else:
                     channel = bot.get_channel(
-                        1005668482475643050
-                    ) or await bot.fetch_channel(1005668482475643050)
+                        1086593341740818523
+                    ) or await bot.fetch_channel(1086593341740818523)
                 await channel.send(
                     embed=embed, view=view, allowed_mentions=discord.AllowedMentions(users=False)
                 )
@@ -433,12 +435,12 @@ class FileHandler:
         else:
             if original_language.lower() == "korean":
                 channel = bot.get_channel(
-                    1032638028868501554
-                ) or await bot.fetch_channel(1032638028868501554)
+                    1086592167767711794
+                ) or await bot.fetch_channel(1086592167767711794)
             else:
                 channel = bot.get_channel(
-                    1005668482475643050
-                ) or await bot.fetch_channel(1005668482475643050)
+                    1086593341740818523
+                ) or await bot.fetch_channel(1086593341740818523)
             msg = await channel.send(
                 embed=embed, file=discord.File(f"{ctx.author.id}.txt", f"{name}.txt"),
                 allowed_mentions=discord.AllowedMentions(users=False)
@@ -516,7 +518,7 @@ class FileHandler:
             print(e)
             if thumbnail.strip() == "":
                 thumbnail = Categories.thumbnail_from_category(category)
-        embed = discord.Embed(title=str(f"#{next_no} : " + title[:240]), description=description[:350],
+        embed = discord.Embed(title=str(f"#{next_no} : " + title[:240]), description=f"```yaml\n{description[:350]}```",
                               colour=discord.Colour.dark_gold())
         embed.add_field(name="Category", value=category)
         embed.add_field(name="Language", value=originallanguage)
@@ -525,9 +527,9 @@ class FileHandler:
         embed.set_thumbnail(url=thumbnail)
         embed.set_footer(text=f"Uploaded by {ctx.author}", icon_url=ctx.author.display_avatar)
         if originallanguage == "english":
-            channel_id = 1005668482475643050
+            channel_id = 1086593341740818523
         else:
-            channel_id = 1020980703229382706
+            channel_id = 1086592655238103061
         if (size := os.path.getsize(f"{ctx.author.id}_cr.txt")) > 8 * 10 ** 6:
             bot.crawler_count = bot.crawler_count + 1
             # if size > 35 * 10 ** 6:
