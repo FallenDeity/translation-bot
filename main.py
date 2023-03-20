@@ -6,7 +6,7 @@ from discord.ext import tasks
 from core.bot import Raizel
 
 bot = Raizel()
-
+ 
 
 @tasks.loop(seconds=120)
 async def census():
