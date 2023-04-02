@@ -81,7 +81,7 @@ class CssSelector:
             return "#BookText ::text"
         elif "m.77z5.com" in link or "m.lw52.com" in link:
             return "#chaptercontent ::text"
-        elif "mtl-novel.net" in link or "novelnext.com" in link:
+        elif "mtl-novel.net" in link or "novelnext.com" in link or "novelbin.net" in link:
             return "#chr-content ::text"
         elif "ncode.syosetu.com" in link:
             return "#novel_honbun ::text"
@@ -207,6 +207,8 @@ class CssSelector:
             return ["None", "body > div.container > header > h1 > label > a"]
         elif "69shu" in link:
             return ["None", "title"]
+        elif "novelbin.net" in link:
+            return ["None", "#chapter > div > div > a"]
         # elif "m.bqg789.net" in link:
         #     return ["#nextpage", "#novelbody > div.head > div.nav_name > h1"]
         else:
