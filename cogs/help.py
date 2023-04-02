@@ -5,6 +5,8 @@ from discord import ui
 from discord.ext import commands, menus
 
 from core.bot import Raizel
+from core.views.linkview import LinkView
+from utils.hints import Hints
 
 
 class MyMenuPages(ui.View, menus.MenuPages):
@@ -103,7 +105,7 @@ class HelpPageSource(menus.ListPageSource):
         author = menu.ctx.author
         embed.set_thumbnail(url=menu.ctx.bot.user.display_avatar)
         embed.set_footer(
-            text=f"{page + 1}/{max_page} | Requested by {author.name}",
+            text=f"{page + 1}/{max_page} For more help join https://discord.gg/EN3ECMHEZP",
             icon_url=author.display_avatar,
         )
         return embed
@@ -142,8 +144,16 @@ class MyHelp(commands.MinimalHelpCommand):
         if command.aliases:
             embed.add_field(name="Aliases", value=", ".join(command.aliases))
         embed.set_thumbnail(url=self.context.bot.user.display_avatar)
-        embed.set_footer(text=f"Requested by {self.context.author.name}")
-        await self.context.send(embed=embed)
+        embed.set_footer(text=f"Hint : {await Hints.get_single_hint()}",
+                         icon_url=await Hints.get_avatar())
+        buttons = {
+            "Support Server": [
+                "https://discord.gg/EN3ECMHEZP",
+                "🫶",
+            ],
+        }
+        view = LinkView(buttons)
+        await self.context.send(embed=embed, view=view)
 
 
 class Help(commands.Cog):

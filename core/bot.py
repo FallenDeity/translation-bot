@@ -108,6 +108,34 @@ class Raizel(commands.Bot):
                 print("mega login anonymously failed ..something wrong with mega", )
             print(e)
         await self.load_title()
+        n = await self.add_roles()
+        if n > 0:
+            await channel.send(f"Added Storage access to {n} users")
+
+    async def add_roles(self) -> int:
+        guild = self.get_guild(940866934214373376)
+        role = guild.get_role(1076124121592770590)
+        top = await self.mongo.library.get_user_novel_count(_top_200=True)
+        top_200 = [(user_id, count) for user_id, count in top.items()]
+        chunks = [top_200[i: i + 10] for i in range(0, len(top_200), 10)]
+        user_ids = []
+        no = 0
+        for chunk in chunks:
+            for user_id, count in chunk:
+                if count >= 20:
+                    user_ids.append(user_id)
+        members = guild.members
+        for member in members:
+            if member.id in user_ids:
+                if role in member.roles:
+                    break
+                no = no + 1
+                print(f"added role to {member.name}")
+                await member.add_roles(role)
+            # else:
+            #     print(f"not adding access to  {member.name}")
+
+        return no
 
     async def load_title(self):
         print("started loading titles")

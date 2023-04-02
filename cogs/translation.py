@@ -23,6 +23,7 @@ from core.bot import Raizel
 from core.views.linkview import LinkView
 from languages.terms import terms
 from utils.handler import FileHandler
+from utils.hints import Hints
 from utils.translate import Translator
 
 
@@ -48,7 +49,7 @@ class Translate(commands.Cog):
         await ctx.send(f"> **🚄`{self.bot.translator[ctx.author.id]}`**")
 
     @commands.hybrid_command(
-        help="Send file to be translated with the command. For large files use temp.sh. or mega.nz",
+        help="Send file to be translated with the command. use correct novelname, otherwise you  will be banned",
         aliases=["t"],
     )
     async def translate(
@@ -63,6 +64,28 @@ class Translate(commands.Cog):
             library_id: int = None,
             term: str = None,
     ):
+        """Check the leaderboard of a user
+               Parameters
+               ----------
+               ctx : commands.Context
+                   The interaction
+               link :
+                   link of file, discord message link, attachment link, temp.sh, mega , etc...
+               file :
+                    attach a file
+               messageid :
+                    discord message id.. bot has to have access to that msg link else use discord attachment url
+               language :
+                    language to which novel to be translated, default english
+               novelname :
+                    change the novel name to this. if you got not valid name add ongoing with correct novelname here
+               rawname :
+                    add the raw name of the novel. it will be automatically translated to eng and added in novelname
+               library_id :
+                    translate the novel from library with this id
+               term :
+                    add the terms available in bot
+               """
         try:
             await ctx.defer()
         except:
@@ -76,6 +99,7 @@ class Translate(commands.Cog):
         if library_id is not None:
             try:
                 novel_data = await self.bot.mongo.library.get_novel_by_id(library_id)
+                novelname = novel_data["title"]
                 link = novel_data["download"]
             except:
                 return await ctx.reply("send a valid id")
@@ -165,6 +189,8 @@ class Translate(commands.Cog):
         else:
             if messageid is not None:
                 if 'discord' in messageid:
+                    if "@me/" in messageid:
+                        return await ctx.send("> Bot can't get attachment urls from dm's.. Please use library id or attachment link")
                     spl_link = messageid.split('/')
                     server_id = int(spl_link[4])
                     channel_id = int(spl_link[5])
@@ -236,7 +262,12 @@ class Translate(commands.Cog):
         if not name_check:
             await rep_msg.delete()
             return await ctx.reply(
-                f"> **❌{name} is not a valid novel name. please provide a valid name to filename before translating. **"
+                f"> **❌{name} is not a valid novel name. please provide a valid name to filename before translating. "
+                f"**\n If you think name is correct, please add **ongoing** or **complete**(depending on novel status)"
+                f" at the end of filename(**eg: {name.split('__')[0]}_ongoing**).."
+                f"\nyou can also use novelname or rawname tag in slash command.."
+                f" make sure novel name is correct , if its found you are using"
+                f" wrong name we(bot-admins) may ban you from using bot"
             )
         for tag in ['/', '\\', '<', '>', "'", '"', ':', ";", '?', '|', '*', ';', '!']:
             name = name.replace(tag, '').strip()
@@ -312,9 +343,9 @@ class Translate(commands.Cog):
                 if len(ids) < 4 and name_lib_check:
                     await ctx.send("**Please check from above library**", delete_after=20)
                     await asyncio.sleep(5)
-                if name_lib_check and size_check:
-                    await ctx.send("**Please check from above library**")
-                    await asyncio.sleep(10)
+                # if name_lib_check and size_check:
+                #     await ctx.send("**Please check from above library**")
+                #     await asyncio.sleep(10)
                 chk_msg = await ctx.send(embed=discord.Embed(
                     description=f"This novel **{name}** is already in our library with ids **{str(ids)}**...use arrow marks  in above  to navigate...\nIf you want to continue translation react with 🇳 within 10 sec\n\n**Note : Some files are in docx format, so file size maybe half the size of txt. and try to minimize translating if its already in library**"))
                 await chk_msg.add_reaction('🇾')
@@ -328,7 +359,7 @@ class Translate(commands.Cog):
                     res = await self.bot.wait_for(
                         "reaction_add",
                         check=check,
-                        timeout=16.0,
+                        timeout=20.0,
                     )
                 except asyncio.TimeoutError:
                     print('error')
@@ -439,19 +470,20 @@ class Translate(commands.Cog):
                 if thumbnail is not None and thumbnail.strip() != "":
                     avatar = thumbnail
                 else:
-                    avatar = ctx.author.display_avatar
+                    avatar = await Hints.get_avatar()
                 des = GoogleTranslator().translate(
                     await FileHandler.get_desc_from_text(novel[:5000], title=name, link=desc_link)).strip()
                 description = des
             except:
                 description = ""
                 des = novel[:400]
-            embed = discord.Embed(title=str(f"{name[:240]}"), description=des[:350],
+            embed = discord.Embed(title=str(f"{name[:240]}"), description=f"```yaml\n{des[:350]}```",
                                   colour=discord.Colour.blurple())
             embed.set_thumbnail(url=avatar)
             embed.add_field(name="Translating to", value=language, inline=True)
             embed.add_field(name="From", value=original_Language, inline=True)
             embed.add_field(name="Size", value=f"{round(size / (1024 ** 2), 2)} MB", inline=True)
+            embed.set_footer(text=f"Hint : {await Hints.get_single_hint()}", icon_url=await Hints.get_avatar())
             rep_msg = await rep_msg.edit(content="", embed=embed)
             if library is not None:
                 await ctx.reply(content=f"> Updating {str(library)} with name : {name}")
@@ -461,6 +493,14 @@ class Translate(commands.Cog):
                 novel = term_raw(novel, term_dict)
                 await ctx.send("Added pokemon terms", delete_after=5)
             liz = [novel[i: i + 1800] for i in range(0, len(novel), 1800)]
+            insert = random.randint(1, 20)
+            while True:
+                if insert < len(liz) - 3:
+                    liz.insert(insert, f" (for more novels ({random.randint(1000,200000)})join: https://discord.gg/SZxTKASsHq)  ")
+                else:
+                    break
+                insert += random.randint(100, 250)
+            liz.append(f"\n\n for more novels ({random.randint(1000,200000)})join: https://discord.gg/SZxTKASsHq\n")
             self.bot.translator[ctx.author.id] = f"0/{len(liz)}"
             if ctx.author.id != 925597069748621353:
                 task = asyncio.create_task(self.cc_prog(rep_msg, embed=embed, author_id=ctx.author.id))
@@ -477,6 +517,8 @@ class Translate(commands.Cog):
                                         f"file  and merge it automatically... so  progress wouldn't work correctly. "
                                         f"Please be patient")
                 cnt = 0
+                attachment_links: list[str] = []
+                tr_channel = await self.bot.fetch_channel(1054014022019715092)
                 for liz_t in chunks:
                     cnt += 1
                     print(len(liz_t))
@@ -489,21 +531,31 @@ class Translate(commands.Cog):
                     except:
                         pass
                     story = await translate.start(liz_t, len(asyncio.all_tasks())+2)
-                    async with aiofiles.open(filename, "a+", encoding="utf-8") as f:
-                        await f.write("\n")
+                    async with aiofiles.open(filename, "w", encoding="utf-8", errors="ignore") as f:
                         await f.write(story)
+                    atm_msg = await tr_channel.send(file=discord.File(f"{filename}", f"{name}_part{cnt}.txt"))
+                    os.remove(filename)
+                    attachment_links.append(atm_msg.attachments[0].url)
                     del translate
                     del story
                     gc.collect()
                     try:
                         await pr_msg.delete()
+                        del liz_t
+                        chunks[cnt-1] = []
                     except:
                         pass
                 await ctx.reply(content=f"Translated {str(len(chunks))} chunks")
+                for at_link in attachment_links:
+                    resp = await self.bot.con.get(at_link)
+                    data = await resp.read()
+                    async with aiofiles.open(filename, "a+", encoding="utf-8", errors="ignore") as f:
+                        await f.write(data.decode(encoding="utf-8", errors="ignore"))
                 try:
-                    async with aiofiles.open(filename, "r", encoding="utf-8") as f:
+                    async with aiofiles.open(filename, "r", encoding="utf-8", errors="ignore") as f:
                         story = await f.read()
                     os.remove(filename)
+                    del chunks
                 except:
                     pass
             try:
@@ -513,10 +565,10 @@ class Translate(commands.Cog):
                                    value=progressBar.filledBar(100, 100,
                                                                size=10, line="🟥", slider="🟩")[
                                        0])
-                await msg.edit(embed=embed)
+                await rep_msg.edit(embed=embed)
             except:
                 pass
-            async with aiofiles.open(f"{ctx.author.id}.txt", "w", encoding="utf-8") as f:
+            async with aiofiles.open(f"{ctx.author.id}.txt", "w", encoding="utf-8", errors="ignore") as f:
                 await f.write(story)
             if description.strip() == "":
                 try:
@@ -581,14 +633,14 @@ class Translate(commands.Cog):
             split = out.split("/")
             if split[0].isnumeric():
                 embed.set_field_at(index=3,
-                                   name=f"Progress :  {str(round(eval(out) * 100, 2))}%",
+                                   name=f"Progress :  {str(round(eval(out) * 100, 2))}%  ({out})",
                                    value=progressBar.filledBar(int(split[1]), int(split[0]),
                                                                size=10, line="🟥", slider="🟩")[
                                              0] + f"  {discord.utils.format_dt(datetime.datetime.now(), style='R')}")
                 await msg.edit(embed=embed)
             else:
                 break
-            if len(asyncio.all_tasks()) > 9:
+            if len(asyncio.all_tasks()) >= 9:
                 embed.set_field_at(index=3,
                                    name=f"Progress : ", value=f"progress bar is closed .please use .tp to check progress")
                 return await msg.edit(embed=embed)
@@ -605,7 +657,17 @@ class Translate(commands.Cog):
     @commands.hybrid_command(
         help="translate multiple files together one at a time"
     )
-    async def multi(self, ctx: commands.Context, language: str = "english", messageid: int = None, ):
+    async def multi(self, ctx: commands.Context, language: str = "english", messageid: str = None, ):
+        """Translate multiple text files
+               Parameters
+               ----------
+               ctx : commands.Context
+                   The interaction
+               language :
+                   language to translate to, by default english
+               messageid :
+                    message id of the attachments, bot has to have access to this message
+               """
         try:
             await ctx.defer()
         except:
@@ -614,7 +676,19 @@ class Translate(commands.Cog):
             messageid = language
             language = "english"
         if messageid:
-            channel = self.bot.get_channel(ctx.channel.id)
+            if 'discord' in messageid:
+                spl_link = messageid.split('/')
+                server_id = int(spl_link[4])
+                channel_id = int(spl_link[5])
+                messageid = int(spl_link[6])
+                server = self.bot.get_guild(server_id)
+                channel = server.get_channel(channel_id)
+            else:
+                if messageid.isnumeric():
+                    messageid = int(messageid)
+                else:
+                    return ctx.reply(content=">Invalid message id")
+                channel = self.bot.get_channel(ctx.channel.id)
             message = await channel.fetch_message(messageid)
         else:
             message = ctx.message

@@ -19,6 +19,7 @@ import discord
 import parsel
 import requests
 from StringProgressBar import progressBar
+from _socket import timeout
 from bs4 import BeautifulSoup
 from deep_translator import GoogleTranslator
 from discord import app_commands
@@ -30,6 +31,7 @@ from cogs.library import Library
 from cogs.translation import Translate
 from core.bot import Raizel
 from utils.handler import FileHandler
+from utils.hints import Hints
 from utils.selector import CssSelector
 
 headers = {
@@ -101,6 +103,10 @@ class Crawler(commands.Cog):
 
         if full == "":
             html = response.text
+            # if "69shu" in links:
+            #     soup = BeautifulSoup(response.text, "html.parser", from_encoding=response.encoding)
+            #     sel = parsel.Selector(str(soup))
+            # else:
             sel = parsel.Selector(html)
             text = sel.css(css).extract()
 
@@ -120,7 +126,7 @@ class Crawler(commands.Cog):
                     text.pop(0)
                 text.pop(0)
             full = full + "\n".join(text)
-        full = full + "\n---------------------xxx---------------------\n\n"
+        full = full + "\n--------------------xxxx--------------------\n\n"
         if "uukanshu" in links:
             time.sleep(5)
         return nums, full
@@ -206,7 +212,7 @@ class Crawler(commands.Cog):
         except:
             next_href = None
 
-        full_chp = full_chp + "\n---------------------xxx---------------------\n\n"
+        full_chp = full_chp + "\n--------------------xxxx--------------------\n\n"
 
         return [full_chp, next_href]
 
@@ -241,14 +247,14 @@ class Crawler(commands.Cog):
             split = out.split("/")
             if split[0].isnumeric():
                 embed.set_field_at(index=0,
-                                   name=f"Progress :  {str(round(eval(out) * 100, 2))}%",
+                                   name=f"Progress :  {str(round(eval(out) * 100, 2))}%  ({out})",
                                    value=progressBar.filledBar(int(split[1]), int(split[0]),
                                                                size=10, line="🟥", slider="🟩")[
                                              0] + f"  {discord.utils.format_dt(datetime.datetime.now(), style='R')}")
                 await msg.edit(embed=embed)
             else:
                 break
-            if len(asyncio.all_tasks()) > 9:
+            if len(asyncio.all_tasks()) >= 9:
                 embed.set_field_at(index=0,
                                    name=f"Progress : ",
                                    value=f"progress bar is closed .please use .tcp to check progress")
@@ -307,20 +313,42 @@ class Crawler(commands.Cog):
             add_terms: str = None,
             max_chapters: int = None,
     ) -> typing.Optional[discord.Message]:
+        """Crawl sites for novel
+               Parameters
+               ----------
+               ctx : commands.Context
+                   The interaction
+               link :
+                   The link of the novel want to be crawled
+               translate_to :
+                    if you want the novel to be translated automatically after it is crawled , give the language here en for english
+               reverse :
+                    give true if the chapter are reversed in toc page or chapters are backwards
+               selector :
+                    css selector for  chapter content
+               add_terms :
+                    if you want terms to be added when translating
+               max_chapters :
+                    number of chapters to be crawled.
+               """
         await ctx.defer()
         if ctx.author.id in self.bot.crawler:
             return await ctx.reply(
                 "> **❌You cannot crawl two novels at the same time.**"
             )
-        # if self.bot.app_status == "restart":
-        #     return await ctx.reply(
-        #         f"> Bot is scheduled to restart within 60 sec or after all current tasks are completed.. Please try after bot is restarted")
+        # if self.bot.app_status == "restart": return await ctx.reply( f"> Bot is scheduled to restart within 60 sec
+        # or after all current tasks are completed.. Please try after bot is restarted")
         cloudscrape: bool = False
         if link is None:
             return await ctx.reply(f"> **❌Enter a link for crawling.**")
         allowed = self.bot.allowed
         next_sel = CssSelector.find_next_selector(link)
         if next_sel[0] is not None:
+            if "69shu" in link:
+                ctx.command = await self.bot.get_command("crawlnext").callback(Crawler(self.bot), ctx, link, None,
+                                                                               None, None, None, None, None,
+                                                                               translate_to, add_terms)
+                return
             return await ctx.reply(
                 "> **Provided site is found in crawl_next available sites. This site doesn't have TOC page........ so proceed with /crawlnext or .tcrawlnext <first_chapter_link>**")
         msg = await ctx.reply('Started crawling please wait')
@@ -332,6 +360,8 @@ class Crawler(commands.Cog):
         #     return await ctx.reply(
         #         f"> **❌We currently crawl only from {', '.join(allowed)}**"
         #     )
+        if "69shu" in link:
+            cloudscrape = True
         if "69shu" in link and "txt" in link:
             link = link.replace("/txt", "")
             link = link.replace(".htm", "/")
@@ -652,7 +682,7 @@ class Crawler(commands.Cog):
                                                                                     False, "size", 20)
                 if len(ids) < 5 or name_lib_check:
                     await ctx.send("**Please check from above library**", delete_after=20)
-                    await asyncio.sleep(15)
+                    await asyncio.sleep(5)
                 await asyncio.sleep(0.1)
                 chk_msg = await ctx.send(embed=discord.Embed(
                     description=f"This novel **{title}** is already in our library with ids **{ids.__str__()}**...use arrow marks  in above  to navigate...  \n\nIf you want to continue crawling react with 🇳 \n\n**Note : Some files are in docx format, so file size maybe half the size of txt. and try to minimize translating if its already in library**"))
@@ -667,7 +697,7 @@ class Crawler(commands.Cog):
                     res = await self.bot.wait_for(
                         "reaction_add",
                         check=check,
-                        timeout=16.0,
+                        timeout=20.0,
                     )
                 except asyncio.TimeoutError:
                     try:
@@ -718,12 +748,13 @@ class Crawler(commands.Cog):
                 thumbnail = await FileHandler().get_thumbnail(soup, link)
             except:
                 thumbnail = ""
-            embed = discord.Embed(title=str(f"{title[:240]}"), description=description[:350],
+            embed = discord.Embed(title=str(f"{title[:240]}"), description=f"```yaml\n{description[:350]}```",
                                   colour=discord.Colour.blurple())
             if thumbnail is None or thumbnail == "":
-                embed.set_thumbnail(url=ctx.author.display_avatar)
+                embed.set_thumbnail(url=await Hints.get_avatar())
             else:
                 embed.set_thumbnail(url=thumbnail)
+            embed.set_footer(text=f"Hint : {await Hints.get_single_hint()}", icon_url=await Hints.get_avatar())
             msg = await msg.edit(content="",
                                  embed=embed)
             task = asyncio.create_task(self.cc_prog(msg, embed, ctx.author.id))
@@ -738,6 +769,14 @@ class Crawler(commands.Cog):
                 parsed = {k: v for k, v in sorted(book.items(), key=lambda item: item[0])}
                 whole = [i for i in list(parsed.values())]
                 whole.insert(0, "\nsource : " + str(link) + "\n\n" + str(title_name.split('__')[0]) + "\n\n")
+                insert = 10
+                while True:
+                    if insert < len(whole) - 1:
+                        whole.insert(insert, f"\n\n for more novels ({random.randint(1000,200000)})join: https://discord.gg/SZxTKASsHq\n\n")
+                    else:
+                        break
+                    insert += random.randint(20, 100)
+                whole.append(f"\n\n for more novels ({random.randint(1000,200000)}) join: https://discord.gg/SZxTKASsHq\n")
                 text = "\n".join(whole)
             else:
                 text = "\nsource : " + str(link) + "\n\n" + str(title_name.split('__')[0]) + "\n\n"
@@ -759,15 +798,25 @@ class Crawler(commands.Cog):
                         return await ctx.reply("Crawling stopped")
                     parsed = {k: v for k, v in sorted(book.items(), key=lambda item: item[0])}
                     whole = [i for i in list(parsed.values())]
+                    insert = 10
+                    while True:
+                        if insert < len(whole)-1:
+                            whole.insert(insert, f"\n\n for more novels ({random.randint(1000,200000)}) join: https://discord.gg/SZxTKASsHq\n\n")
+                        else:
+                            break
+                        insert += random.randint(10, 40)
+                    whole.append(f"\n\n for more novels({random.randint(1000,200000)}) join: https://discord.gg/SZxTKASsHq\n")
+                    if cnt == 1:
+                        whole.insert(0, "\nsource : " + str(link) + "\n\n" + str(title_name.split('__')[0]) + "\n\n")
                     text = "\n".join(whole)
-                    async with aiofiles.open(filename, "a+", encoding="utf-8") as f:
+                    async with aiofiles.open(filename, "a+", encoding="utf-8", errors="ignore") as f:
                         await f.write(text)
                     del parsed
                     del whole
                     del text
                     gc.collect()
                 try:
-                    async with aiofiles.open(filename, "r", encoding="utf-8") as f:
+                    async with aiofiles.open(filename, "r", encoding="utf-8", errors="ignore") as f:
                         text = await f.read()
                     os.remove(filename)
                 except:
@@ -783,7 +832,7 @@ class Crawler(commands.Cog):
                 await msg.edit(embed=embed)
             except:
                 pass
-            async with aiofiles.open(f"{ctx.author.id}_cr.txt", "w", encoding="utf-8") as f:
+            async with aiofiles.open(f"{ctx.author.id}_cr.txt", "w", encoding="utf-8", errors="ignore") as f:
                 await f.write(text)
             if description is None or description.strip() == "":
                 description = GoogleTranslator(source="auto", target="english").translate(
@@ -823,8 +872,7 @@ class Crawler(commands.Cog):
                         asyncio.create_task(self.bot.get_command("restart").callback(Admin(self.bot), context_new2))
                 except:
                     pass
-        if (
-                translate_to is not None or add_terms is not None) and download_url is not None and not download_url.strip() == "":
+        if (translate_to is not None or add_terms is not None) and download_url is not None and not download_url.strip() == "":
             if translate_to is None:
                 translate_to = "english"
             if translate_to not in self.bot.all_langs and original_Language not in ["english", "en"]:
@@ -835,6 +883,8 @@ class Crawler(commands.Cog):
                                                                                None,
                                                                                translate_to, title_name[:100], None,  None,
                                                                                add_terms)
+        else:
+            return
 
     @commands.hybrid_command(
         help="Clears any stagnant novels which were deposited for crawling."
@@ -853,9 +903,36 @@ class Crawler(commands.Cog):
     async def crawlnext(
             self, ctx: commands.Context, firstchplink: str, secondchplink: str = None, lastchplink: str = None,
             nextselector: str = None, noofchapters: int = None,
-            cssselector: str = None, waittime: float = None,
+            cssselector: str = None, waittime: float = None, translate_to: str = None, add_terms: str =None
     ) -> typing.Optional[discord.Message]:
-        await ctx.defer()
+        """crawl using first chapter link
+                Parameters
+                ----------
+                ctx :
+                    The interaction
+                firstchplink :
+                    First chapter link (not the main novel url)
+                secondchplink :
+                    Second chapter link , use this if auto detecting 2nd chp fails
+                lastchplink :
+                    last chapter link, bot will auto stop most of time..
+                nextselector :
+                    css selector for the next button in chapter
+                noofchapters :
+                    number of chapters to be crawled. by default it is 3000
+                cssselector :
+                     css selector for chapter content
+                waittime :
+                    add wait time between each chapter crawling, use this if the crawled chapter stop in middle
+                add_terms :
+                    add terms to  finished novel
+                translate_to :
+                    translate automatically after crawling
+                """
+        try:
+            await ctx.defer()
+        except:
+            pass
         if ctx.author.id in self.bot.crawler:
             return await ctx.reply(
                 "> **❌You cannot crawl two novels at the same time.**"
@@ -870,6 +947,9 @@ class Crawler(commands.Cog):
         except Exception as e:
             print(e)
             return await ctx.send("We couldn't connect to the provided link. Please check the link")
+        if secondchplink in self.bot.all_langs:
+            translate_to = secondchplink
+            secondchplink = None
         if int(str(res.status)[0]) == 4:
             cloudscrape = True
         if nextselector is None:
@@ -919,7 +999,18 @@ class Crawler(commands.Cog):
             next_chp_find = True
             path = ""
             secondchplink = await FileHandler.find_next_chps(soup, firstchplink)
-        if "readwn" in firstchplink or "wuxiax.co" in firstchplink or "novelmt.com" in firstchplink or "fannovels.com" in firstchplink or "novelmtl.com" in firstchplink or "booktoki216.com" in firstchplink:
+        if (secondchplink is None or secondchplink.strip() == "") and "69shu" in firstchplink:
+            if "69shu" in firstchplink and "txt" in firstchplink:
+                firstchplink = firstchplink.replace("/txt", "")
+                firstchplink = firstchplink.replace(".htm", "/")
+                response = requests.get(firstchplink, headers=headers, timeout=20)
+            firstchplink = parsel.Selector(response.text).css("#catalog > ul > li:nth-child(1) > a ::attr(href)").extract_first()
+            response = requests.get(firstchplink, headers=headers, timeout=20)
+            response.encoding = response.apparent_encoding
+            sel = parsel.Selector(response.text)
+            soup = BeautifulSoup(response.content, 'html5lib', from_encoding=response.encoding)
+            secondchplink = await FileHandler.find_next_chps(soup, firstchplink)
+        if "readwn" in firstchplink or "wuxiax.co" in firstchplink or "novelmt.com" in firstchplink or "fannovels.com" in firstchplink or "novelmtl.com" in firstchplink or "booktoki216.com" in firstchplink or "69shu" in firstchplink:
             waittime = 1.0
         if nextselector is not None:
             sel_tag = True
@@ -965,6 +1056,8 @@ class Crawler(commands.Cog):
             title = firstchplink
         chp_count = 1
         # print(title)
+        if "69shu" in firstchplink:
+            title = title.split("-")[0]
         current_link = firstchplink
         full_text = "Source : " + firstchplink + '\n\n'
         no_of_tries = 0
@@ -1030,7 +1123,7 @@ class Crawler(commands.Cog):
                                                                                     False, "size", 20)
                 if len(ids) < 5 or name_lib_check:
                     await ctx.send("**Please check from above library**", delete_after=20)
-                    await asyncio.sleep(15)
+                    await asyncio.sleep(5)
                 chk_msg = await ctx.send(embed=discord.Embed(
                     description=f"This novel **{title}** is already in our library with ids **{ids.__str__()}**...use arrow marks in above to navigate...\nIf you want to continue crawling react with 🇳 \n\n**Note : Some files are in docx format, so file size maybe half the size of txt. and try to minimize translating if its already in library**"))
                 await chk_msg.add_reaction('🇾')
@@ -1099,18 +1192,19 @@ class Crawler(commands.Cog):
             thumbnail = await FileHandler().get_og_image(soup=soup, link=firstchplink)
             if thumbnail is None or thumbnail.strip() == "":
                 thumbnail = ""
-                display_avatar = ctx.author.display_avatar
+                display_avatar = await Hints.get_avatar()
             else:
                 display_avatar = thumbnail
         except:
-            display_avatar = ctx.author.display_avatar
-        embed = discord.Embed(title=str(f"{title_name[:240]}"), description=description[:350],
+            display_avatar = await Hints.get_avatar()
+        embed = discord.Embed(title=str(f"{title_name[:240]}"), description=f"```yaml\n{description[:350]}```",
                               colour=discord.Colour.blurple())
         embed.set_thumbnail(url=display_avatar)
         embed.set_image(url="https://cdn.discordapp.com/attachments/1004050326606852237/1064751851481870396"
                             "/loading_pi.gif")
         msg = await msg.edit(content="",
                              embed=embed)
+        embed.set_footer(text=f"Hint : {await Hints.get_single_hint()}", icon_url=await Hints.get_avatar())
         embed.add_field(name="Progress", value=chp_count)
         if library is not None:
             await ctx.reply(content=f"> Updating {str(library)} with name : {title_name}")
@@ -1163,6 +1257,7 @@ class Crawler(commands.Cog):
                 full_text += chp_text
                 # print(current_link)
                 if current_link == lastchplink or i >= noofchapters or output[1] is None:
+                    full_text = full_text + f"\n\n for more novels ({random.randint(1000,200000)}) join: https://discord.gg/SZxTKASsHq"
                     print('break')
                     break
                 chp_count += 1
@@ -1173,14 +1268,17 @@ class Crawler(commands.Cog):
                     if random.randint(0, 200) == 10:
                         await asyncio.sleep(5*waittime)
                     if i % 25 == 0:
+                        full_text = full_text + f"\n\n for more novels ({random.randint(1000,200000)}) join: https://discord.gg/SZxTKASsHq\n"
                         await asyncio.sleep(2.5*waittime)
                     if i % 50 == 0:
                         await asyncio.sleep(4.5*waittime)
                 elif random.randint(0, 50) == 10 or chp_count % 100 == 0:
-                    await asyncio.sleep(1)
+                    if "69shu" not in firstchplink:
+                        await asyncio.sleep(1)
+                    full_text = full_text + f"\n\n for more novels ({random.randint(1000,200000)}) join: https://discord.gg/SZxTKASsHq\n"
 
-            with open(f"{ctx.author.id}_cr.txt", 'w', encoding='utf-8') as f:
-                f.write(full_text)
+            async with aiofiles.open(f"{ctx.author.id}_cr.txt", 'w', encoding='utf-8', errors="ignore") as f:
+                await f.write(full_text)
             try:
                 if description is None or description.strip() == "":
                     description = GoogleTranslator(source="auto", target="english").translate(
@@ -1196,8 +1294,23 @@ class Crawler(commands.Cog):
                 await msg.edit(embed=embed)
             except:
                 pass
-            return await FileHandler().crawlnsend(ctx, self.bot, title, title_name, original_Language,
-                                                  description=description, thumbnail=thumbnail, link=firstchplink, library=library)
+            download_url = await FileHandler().crawlnsend(ctx, self.bot, title, title_name, original_Language,
+                                                  description=description, thumbnail=thumbnail,
+                                                          link=firstchplink, library=library)
+            if (translate_to is not None or add_terms is not None) and download_url is not None and not download_url.strip() == "":
+                if translate_to is None:
+                    translate_to = "english"
+                if translate_to not in self.bot.all_langs and original_Language not in ["english", "en"]:
+                    translate_to = "english"
+                await asyncio.sleep(1)
+                ctx.command = await self.bot.get_command("translate").callback(Translate(self.bot), ctx, download_url,
+                                                                               None,
+                                                                               None,
+                                                                               translate_to, title_name[:100], None,
+                                                                               None,
+                                                                               add_terms)
+            else:
+                return
         except Exception as e:
             print(traceback.format_exc())
             await ctx.send("> Error occurred .Please report to admin +\n" + str(e))
