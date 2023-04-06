@@ -345,10 +345,11 @@ class Crawler(commands.Cog):
         next_sel = CssSelector.find_next_selector(link)
         if next_sel[0] is not None:
             if "69shu" in link:
-                ctx.command = await self.bot.get_command("crawlnext").callback(Crawler(self.bot), ctx, link, None,
-                                                                               None, None, None, None, None,
-                                                                               translate_to, add_terms)
-                return
+                pass
+               # ctx.command = await self.bot.get_command("crawlnext").callback(Crawler(self.bot), ctx, link, None,
+                 #                                                              None, None, None, None, None,
+                #                                                               translate_to, add_terms)
+               # return
             return await ctx.reply(
                 "> **Provided site is found in crawl_next available sites. This site doesn't have TOC page........ so proceed with /crawlnext or .tcrawlnext <first_chapter_link>**")
         msg = await ctx.reply('Started crawling please wait')
