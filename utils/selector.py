@@ -2,6 +2,8 @@
 class CssSelector:
 
     def findURLCSS(link):
+        if "m.bixiange.me" in link:
+            return "#mycontent ::text"
         if "bixiange" in link or "bixiang" in link:
             return "p ::text"
         elif "sj.uukanshu" in link or "t.uukanshu" in link:
