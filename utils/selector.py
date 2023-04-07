@@ -107,6 +107,8 @@ class CssSelector:
             return "div.cha-content ::text"
         elif "www.asxs.com" in link:
             return "#contents ::text"
+        elif "www.72xsw.net" in link:
+            return "div.box_box ::text"
         else:
             return "* ::text"
 
@@ -154,7 +156,9 @@ class CssSelector:
         elif "tw.ixdzs.com" in link:
             return ["h1", "title ::text"]
         elif "www.asxs.com" in link:
-            return ["#a_main > div.bdsub > dl > dd.info > div.book > div.btitle > h1", "#amain > dl > dd:nth-child(2) > h1"]
+            return ["#a_main > div.bdsub > dl > dd.info > div.book > div.btitle > h1", "#amain > dl > dd:nth-child(2) > h1 ::text"]
+        elif "www.72xsw.net" in link:
+            return ["div.title > h1", "div > h1 ::text"]
         else:
             return ["title", "title ::text"]
 
