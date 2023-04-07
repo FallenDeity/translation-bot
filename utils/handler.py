@@ -426,7 +426,7 @@ class FileHandler:
             except Exception as e:
                 print(e)
                 await ctx.reply(
-                    "**Sorry your file was too big please split it and try again.**"
+                    "**Sorry your file was too big and mega seems down now. ping developers in support server to resolve the issue.. please split it and try again.**"
                 )
             try:
                 os.remove(f"{ctx.author.id}.txt")
@@ -557,7 +557,7 @@ class FileHandler:
                 download_url = filelnk
             except Exception as e:
                 print(e)
-                await ctx.reply("> **❌Sorry the file is too big to send.**")
+                await ctx.reply("> **❌Sorry the file is too big to send and mega seems down now. ping developers in support server to resolve the issue..**")
             try:
                 os.remove(f"{ctx.author.id}_cr.txt")
             except:
@@ -615,5 +615,5 @@ class FileHandler:
             await bot.mongo.library.update_date(_id=library, date=datetime.datetime.utcnow().timestamp())
             await bot.mongo.library.update_thumbnail(_id=library, thumbnail=thumbnail)
         view = LinkView({"Novel": [download_url, "📔"]})
-        await ctx.reply(content=f"> **{ctx.author.mention} 🎉Here is your crawled novel #{next_no} {title.split('__')[0]}**", view=view)
+        await ctx.reply(content=f"> **{ctx.author.mention} 🎉Here is your crawled novel #{next_no} {title.split('__')[0]}**  size : {round(size / (1024 ** 2), 2)} MB", view=view)
         return download_url
