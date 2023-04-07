@@ -50,7 +50,7 @@ class FileHandler:
 
     @staticmethod
     async def get_emoji_book() -> str:
-        emojis = ["📚", "🕮", "📖", "📗", "📘", "📙", "📕", "📔", "📔"]
+        emojis = ["📖", "📗", "📘", "📙", "📕", "📔", "📔"]
         return random.choice(emojis)
 
     @staticmethod
