@@ -49,6 +49,11 @@ class FileHandler:
         return [x[0] for x in url]
 
     @staticmethod
+    async def get_emoji_book() -> str:
+        emojis = [":books:", ":book:", ":blue_book:", ":closed_book:", ":green_book:", ":orange_book:", ":notebook_with_decorative_cover:", "📔"]
+        return random.choice(emojis)
+
+    @staticmethod
     async def get_desc_from_text(text: str, title: str = None, link: str = ""):
         desc = ["introduction", "description", "简介", "描述", "描写", "summary", "prologue", "概括", "摘要", "总结",
                 "序幕", "开场白", "loadAdv(2,0)"]
@@ -410,7 +415,7 @@ class FileHandler:
                 file = await bot.loop.run_in_executor(None, bot.mega.upload, f"{ctx.author.id}.txt", None,
                                                       f"{name[:100]}.txt")
                 filelnk = await bot.loop.run_in_executor(None, bot.mega.get_upload_link, file)
-                view = LinkView({"Novel": [filelnk, "📔"]})
+                view = LinkView({"Novel": [filelnk, await self.get_emoji_book()]})
                 if original_language.lower() == "korean":
                     channel = bot.get_channel(
                         1086592167767711794
@@ -490,7 +495,7 @@ class FileHandler:
             await bot.mongo.library.update_download(_id=library, download=download_url)
             await bot.mongo.library.update_date(_id=library, date=datetime.datetime.utcnow().timestamp())
             await bot.mongo.library.update_thumbnail(_id=library, thumbnail=thumbnail)
-        view = LinkView({"Novel": [download_url, "📔"]})
+        view = LinkView({"Novel": [download_url, await self.get_emoji_book()]})
         await ctx.reply(content=f"> **{ctx.author.mention} 🎉Here is your translated novel #{next_no} {name}**", view=view)
         return
 
@@ -546,7 +551,7 @@ class FileHandler:
                     delete_after=5,
                 )
                 filelnk = await bot.loop.run_in_executor(None, bot.mega.get_upload_link, file)
-                view = LinkView({"Novel": [filelnk, "📔"]})
+                view = LinkView({"Novel": [filelnk, await self.get_emoji_book()]})
                 channel = bot.get_channel(
                     channel_id
                 ) or await bot.fetch_channel(channel_id)
@@ -614,6 +619,6 @@ class FileHandler:
             await bot.mongo.library.update_download(_id=library, download=download_url)
             await bot.mongo.library.update_date(_id=library, date=datetime.datetime.utcnow().timestamp())
             await bot.mongo.library.update_thumbnail(_id=library, thumbnail=thumbnail)
-        view = LinkView({"Novel": [download_url, "📔"]})
+        view = LinkView({"Novel": [download_url, await self.get_emoji_book()]})
         await ctx.reply(content=f"> **{ctx.author.mention} 🎉Here is your crawled novel #{next_no} {title.split('__')[0]}**  size : {round(size / (1024 ** 2), 2)} MB", view=view)
         return download_url
