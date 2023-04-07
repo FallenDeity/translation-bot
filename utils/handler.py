@@ -66,7 +66,7 @@ class FileHandler:
                           text)  # remove title from description
         if "69shu.com" in text or "jiu mu" in text.lower() or "jiumu" in text.lower():
             desc.append("chapter")
-        text = text.replace("for more novels join: https://discord.gg/SZxTKASsHq", "")
+        text = re.sub(re.compile("for more novels \([0-9]*\) join: https://discord.gg/[a-zA-Z]*"), "", text)
         text = str(re.sub(r'^https?:\/\/.*[\r\n]*', '', text.replace("source :", "").replace("Source :", "").strip(), flags=re.MULTILINE))
         for d in desc:
             if d in text.lower():
