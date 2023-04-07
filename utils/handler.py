@@ -41,7 +41,7 @@ class FileHandler:
     TOTAL: int = len(ENCODING)
 
     @staticmethod
-    def find_urls_from_text(string):
+    async def find_urls_from_text(string):
         # findall() has been used
         # with valid conditions for urls in string
         regex = r"(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'\".,<>?«»“”‘’]))"
@@ -110,13 +110,13 @@ class FileHandler:
         return description
 
     @staticmethod
-    def get_tags(text: str) -> list[str]:
+    async def get_tags(text: str) -> list[str]:
         text = text.replace("_", " ")
         text = TextBlob(text)
         return list(set(text.noun_phrases))
 
     @staticmethod
-    def get_language(lang_code: str) -> str:
+    async def get_language(lang_code: str) -> str:
         lang = languages.choices
         if lang_code in lang:
             language = {lang_code}
@@ -125,7 +125,7 @@ class FileHandler:
         return language.pop()
 
     @staticmethod
-    def find_language(text: str, link: str = None) -> str:
+    async def find_language(text: str, link: str = None) -> str:
         if link is not None:
             for l in ["bixiange", "trxs", "txt520", "powanjuan", "tongrenquan", "jpxs", "ptwxz", "qidian",
                       "xindingdian", "longteng", "akshu8", "qbtr"]:
@@ -152,7 +152,7 @@ class FileHandler:
             lang = languages.choices
             original_Language = {i for i in lang if lang[i] == lang_code}
         if original_Language == set() or original_Language == [set()]:
-            original_Language = FileHandler.find_language(text[600:700])
+            original_Language = await FileHandler.find_language(text[600:700])
 
         try:
             original_Language = original_Language.pop()
@@ -164,7 +164,7 @@ class FileHandler:
         return original_Language
 
     @staticmethod
-    def checkname(name: str, bot: Raizel):
+    async def checkname(name: str, bot: Raizel):
         name = name.replace("-", "_")
         name = name.replace(" ", "_")
         name = name.replace("%20", "_")
@@ -230,7 +230,7 @@ class FileHandler:
     #         await ctx.send("error occured in converting docx to txt")
 
     @staticmethod
-    def get_title(soup: BeautifulSoup) -> str:
+    async def get_title(soup: BeautifulSoup) -> str:
         for tag in ("h1", "h2", "h3", "h4", "h5", "h6"):
             try:
                 if title := soup.select_one(tag):
@@ -301,7 +301,7 @@ class FileHandler:
         return novel
 
     @staticmethod
-    def get_headers(response) -> str:
+    async def get_headers(response) -> str:
         string = "".join(
             [
                 i
@@ -312,7 +312,7 @@ class FileHandler:
         return string
 
     @staticmethod
-    def tokenize(link: str) -> tuple[str, ...]:
+    async def tokenize(link: str) -> tuple[str, ...]:
         url = link.replace(".html", "").replace(".htm/", "")
         suffix = url.split("/")[-1]
         midfix = url.replace(f"/{suffix}", "").split("/")[-1]
@@ -324,7 +324,7 @@ class FileHandler:
         if "69shu" in link and "txt" not in link:
             link = urljoin(link, parsel.Selector(scraper.get(link).text).css("div.titxt ::attr(href)").extract_first())
             soup = BeautifulSoup(scraper.get(link).text, "html.parser")
-        url, suffix, midfix, prefix = FileHandler.tokenize(link)
+        url, suffix, midfix, prefix = await FileHandler.tokenize(link)
         compound = (
             "readwn",
             "fannovels",
@@ -466,7 +466,7 @@ class FileHandler:
                     description,
                     0,
                     language,
-                    self.get_tags(name),
+                    await self.get_tags(name),
                     download_url,
                     size,
                     ctx.author.id,
@@ -590,7 +590,7 @@ class FileHandler:
                     description,
                     0,
                     originallanguage,
-                    self.get_tags(title_name),
+                    await self.get_tags(title_name),
                     download_url,
                     size,
                     ctx.author.id,

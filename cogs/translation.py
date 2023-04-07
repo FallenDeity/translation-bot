@@ -126,7 +126,7 @@ class Translate(commands.Cog):
             return await ctx.reply(
                 f"**❌We have the following languages in our db.**\n```ini\n{self.bot.display_langs}```"
             )
-        language = FileHandler.get_language(language)
+        language = await FileHandler.get_language(language)
         if ctx.author.id in self.bot.translator and not ctx.author.id == 925597069748621353:
             return await ctx.send("> **❌You cannot translate two novels at a time.**", ephemeral=True)
         if not ctx.message.attachments and not file and messageid is None:
@@ -224,7 +224,7 @@ class Translate(commands.Cog):
             except:
                 await ctx.reply("> Check the link provided. We couldn't connect to the link you provided")
             try:
-                file_type = FileHandler.get_headers(resp)
+                file_type = await FileHandler.get_headers(resp)
             except KeyError:
                 view = LinkView({"Storage": ["https://temp.sh", "📨"]})
                 await rep_msg.delete()
@@ -246,19 +246,19 @@ class Translate(commands.Cog):
                                   ephemeral=True)
         if novelname is not None:
             name = novelname
-        name_check = FileHandler.checkname(name, self.bot)
+        name_check = await FileHandler.checkname(name, self.bot)
         if rawname is not None:
             if not name_check:
                 try:
                     name = GoogleTranslator(
                         source="auto", target="english"
                     ).translate(rawname).strip()
-                    name_check = FileHandler.checkname(name, self.bot)
+                    name_check = await FileHandler.checkname(name, self.bot)
                 except:
                     pass
         if (not name_check) and library_id is not None:
             name = await self.bot.mongo.library.get_title_by_id(library_id)
-            name_check = FileHandler.checkname(name, self.bot)
+            name_check = await FileHandler.checkname(name, self.bot)
         if not name_check:
             await rep_msg.delete()
             return await ctx.reply(
@@ -405,7 +405,7 @@ class Translate(commands.Cog):
         if (size := os.path.getsize(f"{ctx.author.id}.txt")) > 25 * 10 ** 6:
             os.remove(f"{ctx.author.id}.txt")
             return await ctx.reply("The provided file is bigger than 25mb. Please split the file and translate")
-        urls = FileHandler.find_urls_from_text(novel[:3000])
+        urls = await FileHandler.find_urls_from_text(novel[:3000])
         # print(f"urls : {urls}")
         size = os.path.getsize(f"{ctx.author.id}.txt")
         scraper = cloudscraper.create_scraper()
@@ -462,7 +462,7 @@ class Translate(commands.Cog):
             else:
                 desc_link = urls[0]
             try:
-                original_Language = FileHandler.find_language(novel)
+                original_Language = await FileHandler.find_language(novel)
             except:
                 original_Language = 'NA'
             os.remove(f"{ctx.author.id}.txt")
@@ -701,7 +701,7 @@ class Translate(commands.Cog):
             return await ctx.reply(
                 f"**❌We have the following languages in our db.**\n```ini\n{self.bot.display_langs}```"
             )
-        language = FileHandler.get_language(language)
+        language = await FileHandler.get_language(language)
         if not message.attachments:
             return await ctx.reply(content="> Attach a file to translate")
         count = 1

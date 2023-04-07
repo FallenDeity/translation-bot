@@ -565,7 +565,7 @@ class Crawler(commands.Cog):
         if title_name.strip() == "":
             title_name = str(soup.select("title")[0].text)
         if title_name is None or str(title_name).strip() == "":
-            title_name = FileHandler.get_title(soup)
+            title_name = await FileHandler.get_title(soup)
         if title_name is None or str(title_name).strip() == "":
             title_name = link
         if (next_link := await FileHandler.find_toc_next(soup, link)) is not None:
@@ -631,7 +631,7 @@ class Crawler(commands.Cog):
         for tag in ['/', '\\', '!', '<', '>', "'", '"', ':', ";", '?', '|', '*', ';', '\r', '\n', '\t', '\\\\']:
             title_name = title_name.replace(tag, '')
         title_name = title_name.replace('_', ' ')
-        original_Language = FileHandler.find_language(text="title_name " + title_name, link=link)
+        original_Language = await FileHandler.find_language(text="title_name " + title_name, link=link)
         if title_name == "" or title_name == "None" or title_name is None:
             title = f"{ctx.author.id}_crl"
             title_name = link
@@ -1052,7 +1052,7 @@ class Crawler(commands.Cog):
             print(f"title empty {title}")
             title = sel.css(f'title ::text').extract_first()
         if title is None or str(title).strip() == "":
-            title = FileHandler.get_title(soup)
+            title = await FileHandler.get_title(soup)
         if title is None or str(title).strip() == "":
             title = firstchplink
         chp_count = 1
@@ -1062,7 +1062,7 @@ class Crawler(commands.Cog):
         current_link = firstchplink
         full_text = "Source : " + firstchplink + '\n\n'
         no_of_tries = 0
-        original_Language = FileHandler.find_language("title_name " + title)
+        original_Language = await FileHandler.find_language("title_name " + title)
         org_title = title
         if title is None or str(title).strip() == "" or title == "None":
             title = f"{ctx.author.id}_crl"
