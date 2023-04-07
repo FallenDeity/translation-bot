@@ -90,6 +90,7 @@ class Translate(commands.Cog):
             await ctx.defer()
         except:
             pass
+        name = None
         if link is not None and link.startswith("#"):
             try:
                 novel_id = int(link.replace("#", ""))
@@ -99,7 +100,7 @@ class Translate(commands.Cog):
         if library_id is not None:
             try:
                 novel_data = await self.bot.mongo.library.get_novel_by_id(library_id)
-                novelname = novel_data["title"]
+                name = novel_data["title"]
                 link = novel_data["download"]
             except:
                 return await ctx.reply("send a valid id")
@@ -134,7 +135,6 @@ class Translate(commands.Cog):
         msg = None
         novel = None
         file_type = None
-        name = None
         rep_msg = await ctx.reply("Please wait.. Translation will began soon")
         no_tries = 0
         while len(asyncio.all_tasks()) >= 9 or len(self.bot.translator) >= 2:
