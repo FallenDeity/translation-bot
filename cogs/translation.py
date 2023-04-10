@@ -542,6 +542,7 @@ class Translate(commands.Cog):
                     try:
                         await pr_msg.delete()
                         del liz_t
+                        gc.collect()
                         chunks[cnt-1] = []
                     except:
                         pass
@@ -755,6 +756,7 @@ class Translate(commands.Cog):
         return [app_commands.Choice(name=i, value=i) for i in lst]
 
     @commands.hybrid_command(
+
         help="Clears any stagnant novels which were deposited for translation."
     )
     async def tclear(self, ctx: commands.Context):

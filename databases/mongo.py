@@ -156,6 +156,11 @@ class Library(Database):
             {"_id": _id}, {"$set": {"thumbnail": thumbnail}}
         )
 
+    async def update_size(self, _id: int, size: int) -> None:
+        await self.library.update_one(
+            {"_id": _id}, {"$set": {"size": size}}
+        )
+
     async def update_date(self, _id: int, date: float) -> None:
         await self.library.update_one(
             {"_id": _id}, {"$set": {"date": date}}

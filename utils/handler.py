@@ -495,6 +495,7 @@ class FileHandler:
             await bot.mongo.library.update_download(_id=library, download=download_url)
             await bot.mongo.library.update_date(_id=library, date=datetime.datetime.utcnow().timestamp())
             await bot.mongo.library.update_thumbnail(_id=library, thumbnail=thumbnail)
+            await bot.mongo.library.update_size(_id=library, size=size)
         view = LinkView({"Novel": [download_url, await self.get_emoji_book()]})
         await ctx.reply(content=f"> **{ctx.author.mention} 🎉Here is your translated novel #{next_no} {name}**", view=view)
         return
@@ -619,6 +620,7 @@ class FileHandler:
             await bot.mongo.library.update_download(_id=library, download=download_url)
             await bot.mongo.library.update_date(_id=library, date=datetime.datetime.utcnow().timestamp())
             await bot.mongo.library.update_thumbnail(_id=library, thumbnail=thumbnail)
+            await bot.mongo.library.update_size(_id=library, size=size)
         view = LinkView({"Novel": [download_url, await self.get_emoji_book()]})
         await ctx.reply(content=f"> **{ctx.author.mention} 🎉Here is your crawled novel #{next_no} {title.split('__')[0]}**  size : {round(size / (1024 ** 2), 2)} MB", view=view)
         return download_url
