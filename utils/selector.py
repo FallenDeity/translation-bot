@@ -2,6 +2,8 @@
 class CssSelector:
 
     def findURLCSS(link):
+        if "m.bixiange.me" in link:
+            return "#mycontent ::text"
         if "bixiange" in link or "bixiang" in link:
             return "p ::text"
         elif "sj.uukanshu" in link or "t.uukanshu" in link:
@@ -81,7 +83,7 @@ class CssSelector:
             return "#BookText ::text"
         elif "m.77z5.com" in link or "m.lw52.com" in link:
             return "#chaptercontent ::text"
-        elif "mtl-novel.net" in link or "novelnext.com" in link:
+        elif "mtl-novel.net" in link or "novelnext.com" in link or "novelbin.net" in link:
             return "#chr-content ::text"
         elif "ncode.syosetu.com" in link:
             return "#novel_honbun ::text"
@@ -105,6 +107,8 @@ class CssSelector:
             return "div.cha-content ::text"
         elif "www.asxs.com" in link:
             return "#contents ::text"
+        elif "www.72xsw.net" in link:
+            return "div.box_box ::text"
         else:
             return "* ::text"
 
@@ -152,7 +156,9 @@ class CssSelector:
         elif "tw.ixdzs.com" in link:
             return ["h1", "title ::text"]
         elif "www.asxs.com" in link:
-            return ["#a_main > div.bdsub > dl > dd.info > div.book > div.btitle > h1", "#amain > dl > dd:nth-child(2) > h1"]
+            return ["#a_main > div.bdsub > dl > dd.info > div.book > div.btitle > h1", "#amain > dl > dd:nth-child(2) > h1 ::text"]
+        elif "www.72xsw.net" in link:
+            return ["div.title > h1", "div > h1 ::text"]
         else:
             return ["title", "title ::text"]
 
@@ -205,8 +211,10 @@ class CssSelector:
             return ["None", "#manga-reading-nav-head > div > div.entry-header_wrap > div > div.c-breadcrumb > ol > li:nth-child(2) > a"]
         elif "www.szhhlt.com" in link:
             return ["None", "body > div.container > header > h1 > label > a"]
-        elif "69shu" in link:
-            return ["None", "title"]
+        #elif "69shu" in link:
+        #    return ["None", "title"]
+        elif "novelbin.net" in link:
+            return ["None", "#chapter > div > div > a"]
         # elif "m.bqg789.net" in link:
         #     return ["#nextpage", "#novelbody > div.head > div.nav_name > h1"]
         else:

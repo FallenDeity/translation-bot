@@ -41,12 +41,17 @@ class FileHandler:
     TOTAL: int = len(ENCODING)
 
     @staticmethod
-    def find_urls_from_text(string):
+    async def find_urls_from_text(string):
         # findall() has been used
         # with valid conditions for urls in string
         regex = r"(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'\".,<>?«»“”‘’]))"
         url = re.findall(regex, string)
         return [x[0] for x in url]
+
+    @staticmethod
+    async def get_emoji_book() -> str:
+        emojis = ["📖", "📗", "📘", "📙", "📕", "📔", "📔"]
+        return random.choice(emojis)
 
     @staticmethod
     async def get_desc_from_text(text: str, title: str = None, link: str = ""):
@@ -61,7 +66,7 @@ class FileHandler:
                           text)  # remove title from description
         if "69shu.com" in text or "jiu mu" in text.lower() or "jiumu" in text.lower():
             desc.append("chapter")
-        text = text.replace("for more novels join: https://discord.gg/SZxTKASsHq", "")
+        text = re.sub(re.compile("for more novels \([0-9]*\) join: https://discord.gg/[a-zA-Z]*"), "", text)
         text = str(re.sub(r'^https?:\/\/.*[\r\n]*', '', text.replace("source :", "").replace("Source :", "").strip(), flags=re.MULTILINE))
         for d in desc:
             if d in text.lower():
@@ -105,13 +110,13 @@ class FileHandler:
         return description
 
     @staticmethod
-    def get_tags(text: str) -> list[str]:
+    async def get_tags(text: str) -> list[str]:
         text = text.replace("_", " ")
         text = TextBlob(text)
         return list(set(text.noun_phrases))
 
     @staticmethod
-    def get_language(lang_code: str) -> str:
+    async def get_language(lang_code: str) -> str:
         lang = languages.choices
         if lang_code in lang:
             language = {lang_code}
@@ -120,7 +125,7 @@ class FileHandler:
         return language.pop()
 
     @staticmethod
-    def find_language(text: str, link: str = None) -> str:
+    async def find_language(text: str, link: str = None) -> str:
         if link is not None:
             for l in ["bixiange", "trxs", "txt520", "powanjuan", "tongrenquan", "jpxs", "ptwxz", "qidian",
                       "xindingdian", "longteng", "akshu8", "qbtr"]:
@@ -147,7 +152,7 @@ class FileHandler:
             lang = languages.choices
             original_Language = {i for i in lang if lang[i] == lang_code}
         if original_Language == set() or original_Language == [set()]:
-            original_Language = FileHandler.find_language(text[600:700])
+            original_Language = await FileHandler.find_language(text[600:700])
 
         try:
             original_Language = original_Language.pop()
@@ -159,7 +164,7 @@ class FileHandler:
         return original_Language
 
     @staticmethod
-    def checkname(name: str, bot: Raizel):
+    async def checkname(name: str, bot: Raizel):
         name = name.replace("-", "_")
         name = name.replace(" ", "_")
         name = name.replace("%20", "_")
@@ -225,7 +230,7 @@ class FileHandler:
     #         await ctx.send("error occured in converting docx to txt")
 
     @staticmethod
-    def get_title(soup: BeautifulSoup) -> str:
+    async def get_title(soup: BeautifulSoup) -> str:
         for tag in ("h1", "h2", "h3", "h4", "h5", "h6"):
             try:
                 if title := soup.select_one(tag):
@@ -296,7 +301,7 @@ class FileHandler:
         return novel
 
     @staticmethod
-    def get_headers(response) -> str:
+    async def get_headers(response) -> str:
         string = "".join(
             [
                 i
@@ -307,7 +312,7 @@ class FileHandler:
         return string
 
     @staticmethod
-    def tokenize(link: str) -> tuple[str, ...]:
+    async def tokenize(link: str) -> tuple[str, ...]:
         url = link.replace(".html", "").replace(".htm/", "")
         suffix = url.split("/")[-1]
         midfix = url.replace(f"/{suffix}", "").split("/")[-1]
@@ -319,7 +324,7 @@ class FileHandler:
         if "69shu" in link and "txt" not in link:
             link = urljoin(link, parsel.Selector(scraper.get(link).text).css("div.titxt ::attr(href)").extract_first())
             soup = BeautifulSoup(scraper.get(link).text, "html.parser")
-        url, suffix, midfix, prefix = FileHandler.tokenize(link)
+        url, suffix, midfix, prefix = await FileHandler.tokenize(link)
         compound = (
             "readwn",
             "fannovels",
@@ -410,7 +415,7 @@ class FileHandler:
                 file = await bot.loop.run_in_executor(None, bot.mega.upload, f"{ctx.author.id}.txt", None,
                                                       f"{name[:100]}.txt")
                 filelnk = await bot.loop.run_in_executor(None, bot.mega.get_upload_link, file)
-                view = LinkView({"Novel": [filelnk, "📔"]})
+                view = LinkView({"Novel": [filelnk, await self.get_emoji_book()]})
                 if original_language.lower() == "korean":
                     channel = bot.get_channel(
                         1086592167767711794
@@ -426,7 +431,7 @@ class FileHandler:
             except Exception as e:
                 print(e)
                 await ctx.reply(
-                    "**Sorry your file was too big please split it and try again.**"
+                    "**Sorry your file was too big and mega seems down now. ping developers in support server to resolve the issue.. please split it and try again.**"
                 )
             try:
                 os.remove(f"{ctx.author.id}.txt")
@@ -461,7 +466,7 @@ class FileHandler:
                     description,
                     0,
                     language,
-                    self.get_tags(name),
+                    await self.get_tags(name),
                     download_url,
                     size,
                     ctx.author.id,
@@ -490,7 +495,8 @@ class FileHandler:
             await bot.mongo.library.update_download(_id=library, download=download_url)
             await bot.mongo.library.update_date(_id=library, date=datetime.datetime.utcnow().timestamp())
             await bot.mongo.library.update_thumbnail(_id=library, thumbnail=thumbnail)
-        view = LinkView({"Novel": [download_url, "📔"]})
+            await bot.mongo.library.update_size(_id=library, size=size)
+        view = LinkView({"Novel": [download_url, await self.get_emoji_book()]})
         await ctx.reply(content=f"> **{ctx.author.mention} 🎉Here is your translated novel #{next_no} {name}**", view=view)
         return
 
@@ -546,7 +552,7 @@ class FileHandler:
                     delete_after=5,
                 )
                 filelnk = await bot.loop.run_in_executor(None, bot.mega.get_upload_link, file)
-                view = LinkView({"Novel": [filelnk, "📔"]})
+                view = LinkView({"Novel": [filelnk, await self.get_emoji_book()]})
                 channel = bot.get_channel(
                     channel_id
                 ) or await bot.fetch_channel(channel_id)
@@ -557,7 +563,7 @@ class FileHandler:
                 download_url = filelnk
             except Exception as e:
                 print(e)
-                await ctx.reply("> **❌Sorry the file is too big to send.**")
+                await ctx.reply("> **❌Sorry the file is too big to send and mega seems down now. ping developers in support server to resolve the issue..**")
             try:
                 os.remove(f"{ctx.author.id}_cr.txt")
             except:
@@ -585,7 +591,7 @@ class FileHandler:
                     description,
                     0,
                     originallanguage,
-                    self.get_tags(title_name),
+                    await self.get_tags(title_name),
                     download_url,
                     size,
                     ctx.author.id,
@@ -614,6 +620,7 @@ class FileHandler:
             await bot.mongo.library.update_download(_id=library, download=download_url)
             await bot.mongo.library.update_date(_id=library, date=datetime.datetime.utcnow().timestamp())
             await bot.mongo.library.update_thumbnail(_id=library, thumbnail=thumbnail)
-        view = LinkView({"Novel": [download_url, "📔"]})
-        await ctx.reply(content=f"> **{ctx.author.mention} 🎉Here is your crawled novel #{next_no} {title.split('__')[0]}**", view=view)
+            await bot.mongo.library.update_size(_id=library, size=size)
+        view = LinkView({"Novel": [download_url, await self.get_emoji_book()]})
+        await ctx.reply(content=f"> **{ctx.author.mention} 🎉Here is your crawled novel #{next_no} {title.split('__')[0]}**  size : {round(size / (1024 ** 2), 2)} MB", view=view)
         return download_url
