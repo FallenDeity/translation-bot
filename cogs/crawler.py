@@ -237,8 +237,8 @@ class Crawler(commands.Cog):
         await ctx.send(f"> **🚄`{self.bot.crawler[ctx.author.id]}`**")
 
     async def cc_prog(self, msg: discord.Message, embed: discord.Embed, author_id: int, wait_time: float = 8) -> \
-    typing.Optional[
-        discord.Message]:
+            typing.Optional[
+                discord.Message]:
         bardata = progressBar.filledBar(100, 0, size=10, line="🟥", slider="🟩")
         embed.add_field(name="Progress", value=f"{bardata[0]}")
         await asyncio.sleep(2)
@@ -345,11 +345,11 @@ class Crawler(commands.Cog):
         next_sel = CssSelector.find_next_selector(link)
         if next_sel[0] is not None:
             if "69shu" in link:
-                pass
-               # ctx.command = await self.bot.get_command("crawlnext").callback(Crawler(self.bot), ctx, link, None,
-                 #                                                              None, None, None, None, None,
-                #                                                               translate_to, add_terms)
-               # return
+                # pass
+                ctx.command = await self.bot.get_command("crawlnext").callback(Crawler(self.bot), ctx, link, None,
+                                                                               None, None, None, None, None,
+                                                                               translate_to, add_terms)
+                return
             return await ctx.reply(
                 "> **Provided site is found in crawl_next available sites. This site doesn't have TOC page........ so proceed with /crawlnext or .tcrawlnext <first_chapter_link>**")
         msg = await ctx.reply('Started crawling please wait')
@@ -373,7 +373,7 @@ class Crawler(commands.Cog):
             link = link.replace(".html", "/")
         if "m.bixiang.me" in link:
             link = link.replace("m.bixiang.me", "m.bixiange.me")
-        if "https://ffxs8.com/"  in link:
+        if "https://ffxs8.com/" in link:
             link = link.replace("https://ffxs8.com/", "https://www.ffxs8.com/")
         # if link[-1] == "/" and "69shu" not in link and "uukanshu.cc" not in link and not num == len(allowed):
         #     link = link[:-1]
@@ -620,7 +620,7 @@ class Crawler(commands.Cog):
                 description = await FileHandler.get_description(soup, link, title=title_name)
             except:
                 description = ""
-        library_update:bool = False
+        library_update: bool = False
         library: int = None
         if 'b.faloo' in link or 'wap.faloo' in link:
             urls = urls[:200]
@@ -666,7 +666,7 @@ class Crawler(commands.Cog):
                     or title_name.split('  ')[0].lower() == n.title.split('  ')[0].lower()
                     or (len(title) > 20 and org_str in lib_str)
                     or (len(title) > 20 and org_str2 in lib_str2)
-                )and original_Language in str(n.language).lower():
+                ) and original_Language in str(n.language).lower():
                     library_update = True
                     library = n._id
                     print(library)
@@ -773,11 +773,13 @@ class Crawler(commands.Cog):
                 insert = 10
                 while True:
                     if insert < len(whole) - 1:
-                        whole.insert(insert, f"\n\n for more novels ({random.randint(1000,200000)})join: https://discord.gg/SZxTKASsHq\n\n")
+                        whole.insert(insert,
+                                     f"\n\n for more novels ({random.randint(1000, 200000)})join: https://discord.gg/SZxTKASsHq\n\n")
                     else:
                         break
                     insert += random.randint(20, 100)
-                whole.append(f"\n\n for more novels ({random.randint(1000,200000)}) join: https://discord.gg/SZxTKASsHq\n")
+                whole.append(
+                    f"\n\n for more novels ({random.randint(1000, 200000)}) join: https://discord.gg/SZxTKASsHq\n")
                 text = "\n".join(whole)
             else:
                 text = "\nsource : " + str(link) + "\n\n" + str(title_name.split('__')[0]) + "\n\n"
@@ -793,7 +795,7 @@ class Crawler(commands.Cog):
                     await ctx.reply(content=f"> Crawling {str(cnt)} chunks out of {str(len(chunks))}... use .tcp to "
                                             f"check progress")
                     book = await self.bot.loop.run_in_executor(
-                        None, self.direct, chunk, novel, ctx.author.id, cloudscrape, len(asyncio.all_tasks())+1
+                        None, self.direct, chunk, novel, ctx.author.id, cloudscrape, len(asyncio.all_tasks()) + 1
                     )
                     if book is None:
                         return await ctx.reply("Crawling stopped")
@@ -801,12 +803,14 @@ class Crawler(commands.Cog):
                     whole = [i for i in list(parsed.values())]
                     insert = 10
                     while True:
-                        if insert < len(whole)-1:
-                            whole.insert(insert, f"\n\n for more novels ({random.randint(1000,200000)}) join: https://discord.gg/SZxTKASsHq\n\n")
+                        if insert < len(whole) - 1:
+                            whole.insert(insert,
+                                         f"\n\n for more novels ({random.randint(1000, 200000)}) join: https://discord.gg/SZxTKASsHq\n\n")
                         else:
                             break
                         insert += random.randint(10, 40)
-                    whole.append(f"\n\n for more novels({random.randint(1000,200000)}) join: https://discord.gg/SZxTKASsHq\n")
+                    whole.append(
+                        f"\n\n for more novels({random.randint(1000, 200000)}) join: https://discord.gg/SZxTKASsHq\n")
                     if cnt == 1:
                         whole.insert(0, "\nsource : " + str(link) + "\n\n" + str(title_name.split('__')[0]) + "\n\n")
                     text = "\n".join(whole)
@@ -862,7 +866,8 @@ class Crawler(commands.Cog):
                 pass
             if translate_to is None and add_terms is None:
                 try:
-                    if (self.bot.translation_count >= 18 or self.bot.crawler_count >= 20) and self.bot.app_status == "up":
+                    if (
+                            self.bot.translation_count >= 18 or self.bot.crawler_count >= 20) and self.bot.app_status == "up":
                         await ctx.reply(
                             "> **Bot will be Restarted when the bot is free due to max limit is reached.. Please be patient")
                         chan = self.bot.get_channel(
@@ -873,17 +878,18 @@ class Crawler(commands.Cog):
                         asyncio.create_task(self.bot.get_command("restart").callback(Admin(self.bot), context_new2))
                 except:
                     pass
-        if (translate_to is not None or add_terms is not None) and download_url is not None and not download_url.strip() == "":
+        if (
+                translate_to is not None or add_terms is not None) and download_url is not None and not download_url.strip() == "":
             if translate_to is None:
                 translate_to = "english"
             if translate_to not in self.bot.all_langs and original_Language not in ["english", "en"]:
                 translate_to = "english"
             await asyncio.sleep(1)
             ctx.command = await self.bot.get_command("translate").callback(Translate(self.bot), ctx, download_url,
-                                                                               None,
-                                                                               None,
-                                                                               translate_to, title_name[:100], None,  None,
-                                                                               add_terms)
+                                                                           None,
+                                                                           None,
+                                                                           translate_to, title_name[:100], None, None,
+                                                                           add_terms)
         else:
             return
 
@@ -904,7 +910,7 @@ class Crawler(commands.Cog):
     async def crawlnext(
             self, ctx: commands.Context, firstchplink: str, secondchplink: str = None, lastchplink: str = None,
             nextselector: str = None, noofchapters: int = None,
-            cssselector: str = None, waittime: float = None, translate_to: str = None, add_terms: str =None
+            cssselector: str = None, waittime: float = None, translate_to: str = None, add_terms: str = None
     ) -> typing.Optional[discord.Message]:
         """crawl using first chapter link
                 Parameters
@@ -1005,7 +1011,8 @@ class Crawler(commands.Cog):
                 firstchplink = firstchplink.replace("/txt", "")
                 firstchplink = firstchplink.replace(".htm", "/")
                 response = requests.get(firstchplink, headers=headers, timeout=20)
-            firstchplink = parsel.Selector(response.text).css("#catalog > ul > li:nth-child(1) > a ::attr(href)").extract_first()
+            firstchplink = parsel.Selector(response.text).css(
+                "#catalog > ul > li:nth-child(1) > a ::attr(href)").extract_first()
             response = requests.get(firstchplink, headers=headers, timeout=20)
             response.encoding = response.apparent_encoding
             sel = parsel.Selector(response.text)
@@ -1173,7 +1180,8 @@ class Crawler(commands.Cog):
                 pass
             await asyncio.sleep(10)
             if no_tries >= 7:
-                return await ctx.reply(content="> Currently bot is busy.. please restart the tasks after some time when bot is free")
+                return await ctx.reply(
+                    content="> Currently bot is busy.. please restart the tasks after some time when bot is free")
             if no_tries >= 5:
                 self.bot.translator = {}
                 self.bot.crawler = {}
@@ -1258,7 +1266,7 @@ class Crawler(commands.Cog):
                 full_text += chp_text
                 # print(current_link)
                 if current_link == lastchplink or i >= noofchapters or output[1] is None:
-                    full_text = full_text + f"\n\n for more novels ({random.randint(1000,200000)}) join: https://discord.gg/SZxTKASsHq"
+                    full_text = full_text + f"\n\n for more novels ({random.randint(1000, 200000)}) join: https://discord.gg/SZxTKASsHq"
                     print('break')
                     break
                 chp_count += 1
@@ -1267,23 +1275,24 @@ class Crawler(commands.Cog):
                 if waittime:
                     await asyncio.sleep(waittime)
                     if random.randint(0, 200) == 10:
-                        await asyncio.sleep(5*waittime)
+                        await asyncio.sleep(5 * waittime)
                     if i % 25 == 0:
-                        full_text = full_text + f"\n\n for more novels ({random.randint(1000,200000)}) join: https://discord.gg/SZxTKASsHq\n"
-                        await asyncio.sleep(2.5*waittime)
+                        full_text = full_text + f"\n\n for more novels ({random.randint(1000, 200000)}) join: https://discord.gg/SZxTKASsHq\n"
+                        await asyncio.sleep(2.5 * waittime)
                     if i % 50 == 0:
-                        await asyncio.sleep(4.5*waittime)
+                        await asyncio.sleep(4.5 * waittime)
                 elif random.randint(0, 50) == 10 or chp_count % 100 == 0:
                     if "69shu" not in firstchplink:
                         await asyncio.sleep(1)
-                    full_text = full_text + f"\n\n for more novels ({random.randint(1000,200000)}) join: https://discord.gg/SZxTKASsHq\n"
+                    full_text = full_text + f"\n\n for more novels ({random.randint(1000, 200000)}) join: https://discord.gg/SZxTKASsHq\n"
 
             async with aiofiles.open(f"{ctx.author.id}_cr.txt", 'w', encoding='utf-8', errors="ignore") as f:
                 await f.write(full_text)
             try:
                 if description is None or description.strip() == "":
                     description = GoogleTranslator(source="auto", target="english").translate(
-                        await FileHandler.get_desc_from_text(full_text[:5000], title=org_title, link=firstchplink)[:500]).strip()
+                        await FileHandler.get_desc_from_text(full_text[:5000], title=org_title, link=firstchplink)[
+                              :500]).strip()
             except:
                 pass
             await ctx.send(f"Crawled {chp_count} pages.")
@@ -1296,9 +1305,10 @@ class Crawler(commands.Cog):
             except:
                 pass
             download_url = await FileHandler().crawlnsend(ctx, self.bot, title, title_name, original_Language,
-                                                  description=description, thumbnail=thumbnail,
+                                                          description=description, thumbnail=thumbnail,
                                                           link=firstchplink, library=library)
-            if (translate_to is not None or add_terms is not None) and download_url is not None and not download_url.strip() == "":
+            if (
+                    translate_to is not None or add_terms is not None) and download_url is not None and not download_url.strip() == "":
                 if translate_to is None:
                     translate_to = "english"
                 if translate_to not in self.bot.all_langs and original_Language not in ["english", "en"]:

@@ -211,8 +211,8 @@ class CssSelector:
             return ["None", "#manga-reading-nav-head > div > div.entry-header_wrap > div > div.c-breadcrumb > ol > li:nth-child(2) > a"]
         elif "www.szhhlt.com" in link:
             return ["None", "body > div.container > header > h1 > label > a"]
-        #elif "69shu" in link:
-        #    return ["None", "title"]
+        elif "69shu" in link:
+            return ["None", "title"]
         elif "novelbin.net" in link:
             return ["None", "#chapter > div > div > a"]
         # elif "m.bqg789.net" in link:
