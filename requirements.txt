@@ -18,3 +18,4 @@ readabilipy==0.2.0
 EbookLib==0.17.1
 PyPDF2==2.11.0
 cloudscraper>=1.2.64
+
