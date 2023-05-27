@@ -404,7 +404,7 @@ class FileHandler:
         embed.add_field(name="Language", value=language)
         embed.set_thumbnail(url=thumbnail)
         embed.set_footer(text=f"Uploaded by {ctx.author}", icon_url=ctx.author.display_avatar)
-        if (size := os.path.getsize(f"{ctx.author.id}.txt")) > 8 * 10 ** 6:
+        if (size := os.path.getsize(f"{ctx.author.id}.txt")) > 24 * 10 ** 6:
             try:
                 await ctx.send(
                     "Translation Completed... Your novel is too big.We are uploading to Mega.. Please wait",
@@ -536,7 +536,7 @@ class FileHandler:
             channel_id = 1086593341740818523
         else:
             channel_id = 1086592655238103061
-        if (size := os.path.getsize(f"{ctx.author.id}_cr.txt")) > 8 * 10 ** 6:
+        if (size := os.path.getsize(f"{ctx.author.id}_cr.txt")) > 24 * 10 ** 6:
             bot.crawler_count = bot.crawler_count + 1
             # if size > 35 * 10 ** 6:
             #     os.remove(f"{ctx.author.id}_cr.txt")
