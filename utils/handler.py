@@ -411,7 +411,7 @@ class FileHandler:
 
     async def distribute(
             self, bot: Raizel, ctx: commands.Context, name: str, language: str, original_language: str, raw_name: str,
-            description: str = "", thumbnail: str = "", library: int = None
+            description: str = "", thumbnail: str = "", library: int = None, novel_url: str = None
     ) -> None:
         download_url = None
         if library is None:
@@ -434,6 +434,8 @@ class FileHandler:
                               colour=discord.Colour.dark_gold())
         embed.add_field(name="Category", value=category)
         embed.add_field(name="Language", value=language)
+        if novel_url:
+            embed.add_field(name="Crawled from", value=novel_url)
         embed.set_thumbnail(url=thumbnail)
         embed.set_footer(text=f"Uploaded by {ctx.author}", icon_url=ctx.author.display_avatar)
         if (size := os.path.getsize(f"{ctx.author.id}.txt")) > 24 * 10 ** 6:
@@ -510,7 +512,8 @@ class FileHandler:
                     datetime.datetime.utcnow().timestamp(),
                     thumbnail,
                     original_language,
-                    category
+                    category,
+                    novel_url
                 ]
                 data = Novel(*novel_data)
                 try:
@@ -637,7 +640,8 @@ class FileHandler:
                     datetime.datetime.utcnow().timestamp(),
                     thumbnail,
                     originallanguage,
-                    category
+                    category,
+                    link
                 ]
                 data = Novel(*novel_data)
                 try:

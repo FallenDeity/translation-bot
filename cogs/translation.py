@@ -405,7 +405,11 @@ class Translate(commands.Cog):
         if (size := os.path.getsize(f"{ctx.author.id}.txt")) > 25 * 10 ** 6:
             os.remove(f"{ctx.author.id}.txt")
             return await ctx.reply("The provided file is bigger than 25mb. Please split the file and translate")
-        urls = await FileHandler.find_urls_from_text(novel[:3000])
+        urls = await FileHandler.find_urls_from_text(novel[:1000])
+        try:
+            novel_url = urls[0]
+        except:
+            novel_url = None
         # print(f"urls : {urls}")
         size = os.path.getsize(f"{ctx.author.id}.txt")
         scraper = cloudscraper.create_scraper()
@@ -432,6 +436,7 @@ class Translate(commands.Cog):
                     if thumbnail is not None and thumbnail.strip() != "":
                         if scraper.get(thumbnail).status_code == 200:
                             # print("break")
+                            novel_url = url
                             break
                         else:
                             # print("else")
@@ -578,7 +583,7 @@ class Translate(commands.Cog):
                 except:
                     description = await FileHandler.get_desc_from_text(story[:10000], title=name)
             await FileHandler().distribute(self.bot, ctx, name, language, original_Language, rawname, description,
-                                           thumbnail=thumbnail, library=library)
+                                           thumbnail=thumbnail, library=library, novel_url=novel_url)
         except Exception as e:
             if "Translation stopped" in str(e):
                 return await ctx.send("Translation stopped")
