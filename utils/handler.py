@@ -49,6 +49,37 @@ class FileHandler:
         return [x[0] for x in url]
 
     @staticmethod
+    async def distribute_genre(embed: discord.Embed, category: str, download_url: str, bot: Raizel):
+        anime_cat = ["Naruto", "One-Piece", "Harry-Potter", "Pokemon""Fairy-Tail", "Genshin-Impact", "Doulou-Daluo",
+                     "Conan"
+            , "High-School-DXD", "Hunter-X-Hunter", "Doraemon", "Dragon-Ball", "Comprehensive", "Yugi-Oh", "Bleach",
+                     "Shokugeki-No-Soma",
+                     "Jackie-Chan", "One-Punch-Man", "Cartoonist"]
+        marvel_dc = ["DC", "Marvel"]
+        villain = ["Villain"]
+        magic = ["Fantasy", "Spirit-Recovery", "Reincarnation"]
+        r18 = ["R18"]
+        scifi = ["Technology"]
+        if category in anime_cat:
+            channel_id = 1110761695174983680
+        elif category in marvel_dc:
+            channel_id = 1110761272619839538
+        elif category in villain:
+            channel_id = 1110764343869571132
+        elif category in magic:
+            channel_id = 1110761401930240030
+        elif category in r18:
+            channel_id = 1112230192522481754
+        elif category in scifi:
+            channel_id = 1110761533631365220
+        else:
+            return
+        channel = await bot.fetch_channel(channel_id)
+        view = LinkView({"Novel": [download_url, await FileHandler.get_emoji_book()]})
+        await channel.send(embed=embed, view=view)
+        return
+
+    @staticmethod
     async def get_emoji_book() -> str:
         emojis = ["📖", "📗", "📘", "📙", "📕", "📔", "📔"]
         return random.choice(emojis)
@@ -67,7 +98,8 @@ class FileHandler:
         if "69shu.com" in text or "jiu mu" in text.lower() or "jiumu" in text.lower():
             desc.append("chapter")
         text = re.sub(re.compile("for more novels \([0-9]*\) join: https://discord.gg/[a-zA-Z]*"), "", text)
-        text = str(re.sub(r'^https?:\/\/.*[\r\n]*', '', text.replace("source :", "").replace("Source :", "").strip(), flags=re.MULTILINE))
+        text = str(re.sub(r'^https?:\/\/.*[\r\n]*', '', text.replace("source :", "").replace("Source :", "").strip(),
+                          flags=re.MULTILINE))
         for d in desc:
             if d in text.lower():
                 description = re.split(d, text, flags=re.IGNORECASE, maxsplit=1)[1][:500]
@@ -458,6 +490,11 @@ class FileHandler:
         bot.translation_count = bot.translation_count + (round(size / (1024 ** 2), 2) / 3.1)
         if raw_name is not None:
             name = name + "__" + raw_name
+        try:
+            if language == "english":
+                await self.distribute_genre(embed, category, download_url, bot)
+        except:
+            pass
         if library is None:
             if download_url and size > 0.3 * 10 ** 6:
                 novel_data = [
@@ -497,7 +534,8 @@ class FileHandler:
             await bot.mongo.library.update_thumbnail(_id=library, thumbnail=thumbnail)
             await bot.mongo.library.update_size(_id=library, size=size)
         view = LinkView({"Novel": [download_url, await self.get_emoji_book()]})
-        await ctx.reply(content=f"> **{ctx.author.mention} 🎉Here is your translated novel #{next_no} {name}**", view=view)
+        await ctx.reply(content=f"> **{ctx.author.mention} 🎉Here is your translated novel #{next_no} {name}**",
+                        view=view)
         return
 
     async def crawlnsend(
@@ -529,7 +567,7 @@ class FileHandler:
         embed.add_field(name="Category", value=category)
         embed.add_field(name="Language", value=originallanguage)
         if link:
-            embed.add_field(name="Crawled from :", value=f"[{link}]({link})")
+            embed.add_field(name="Crawled from :", value=f"{link}")
         embed.set_thumbnail(url=thumbnail)
         embed.set_footer(text=f"Uploaded by {ctx.author}", icon_url=ctx.author.display_avatar)
         if originallanguage == "english":
@@ -563,7 +601,8 @@ class FileHandler:
                 download_url = filelnk
             except Exception as e:
                 print(e)
-                await ctx.reply("> **❌Sorry the file is too big to send and mega seems down now. ping developers in support server to resolve the issue..**")
+                await ctx.reply(
+                    "> **❌Sorry the file is too big to send and mega seems down now. ping developers in support server to resolve the issue..**")
             try:
                 os.remove(f"{ctx.author.id}_cr.txt")
             except:
@@ -621,6 +660,10 @@ class FileHandler:
             await bot.mongo.library.update_date(_id=library, date=datetime.datetime.utcnow().timestamp())
             await bot.mongo.library.update_thumbnail(_id=library, thumbnail=thumbnail)
             await bot.mongo.library.update_size(_id=library, size=size)
+        if originallanguage == "english":
+            await self.distribute_genre(embed, category, download_url, bot)
         view = LinkView({"Novel": [download_url, await self.get_emoji_book()]})
-        await ctx.reply(content=f"> **{ctx.author.mention} 🎉Here is your crawled novel #{next_no} {title.split('__')[0]}**  size : {round(size / (1024 ** 2), 2)} MB", view=view)
+        await ctx.reply(
+            content=f"> **{ctx.author.mention} 🎉Here is your crawled novel #{next_no} {title.split('__')[0]}**  size : {round(size / (1024 ** 2), 2)} MB",
+            view=view)
         return download_url
