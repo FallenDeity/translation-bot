@@ -428,6 +428,9 @@ class Translate(commands.Cog):
             temp = []
             for url in urls:
                 try:
+                    if "discord.gg" in url:
+                        continue
+                        # urls.remove(url)
                     response = await self.bot.loop.run_in_executor(None, scraper.get, url)
                     soup = BeautifulSoup(response.text, "lxml")
                     # print(f"url  {url}")
