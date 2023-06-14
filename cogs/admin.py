@@ -213,7 +213,10 @@ class Admin(commands.Cog):
             gc.collect()
         except:
             pass
-        os.execv(sys.argv[0], sys.argv)
+        print(sys.argv[0])
+        print(sys.argv)
+        os.execv(sys.executable, ['python'] + sys.argv)
+        # os.execv(sys.argv[0], sys.argv)
         # for task in asyncio.all_tasks():
         #     try:
         #         task.cancel()
