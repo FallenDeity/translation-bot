@@ -159,6 +159,8 @@ class Raizel(commands.Bot):
             except:
                 pass
             print('error occurred on connecting to Discord client... will try after 60 secs')
+            print(os.getenv("TOKEN"))
+            print(e.with_traceback())
             print(e)
             # time.sleep(60)
             # return await self.start()
