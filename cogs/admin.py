@@ -213,16 +213,17 @@ class Admin(commands.Cog):
             gc.collect()
         except:
             pass
-        print(sys.argv[0])
-        print(sys.argv)
-        os.execv(sys.executable, ['python'] + sys.argv)
+        for task in asyncio.all_tasks():
+            try:
+                 task.cancel()
+            except:
+                 pass
+        return await self.bot.start()
+        #print(sys.argv[0])
+        #print(sys.argv)
+        #os.execv(sys.executable, ['python'] + sys.argv)
         # os.execv(sys.argv[0], sys.argv)
-        # for task in asyncio.all_tasks():
-        #     try:
-        #         task.cancel()
-        #     except:
-        #         pass
-        # return await self.bot.start()
+        
         # raise Exception("TooManyRequests")
         # h = heroku3.from_key(os.getenv("APIKEY"))
         # app = h.app(os.getenv("APPNAME"))
