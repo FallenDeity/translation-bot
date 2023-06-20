@@ -867,7 +867,7 @@ class Crawler(commands.Cog):
             if translate_to is None and add_terms is None:
                 try:
                     if (
-                            self.bot.translation_count >= 18 or self.bot.crawler_count >= 20) and self.bot.app_status == "up":
+                            self.bot.translation_count >= 28 or self.bot.crawler_count >= 28) and self.bot.app_status == "up":
                         await ctx.reply(
                             "> **Bot will be Restarted when the bot is free due to max limit is reached.. Please be patient")
                         chan = self.bot.get_channel(

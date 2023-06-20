@@ -610,7 +610,7 @@ class Translate(commands.Cog):
             except:
                 pass
             try:
-                if (self.bot.translation_count >= 17 or self.bot.crawler_count >= 20) and self.bot.app_status == "up":
+                if (self.bot.translation_count >= 20 or self.bot.crawler_count >= 25) and self.bot.app_status == "up":
                     await ctx.reply(
                         "> **Bot will be Restarted when the bot is free due to max limit is reached.. Please be patient")
                     chan = self.bot.get_channel(
