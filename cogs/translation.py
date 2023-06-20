@@ -190,7 +190,8 @@ class Translate(commands.Cog):
             if messageid is not None:
                 if 'discord' in messageid:
                     if "@me/" in messageid:
-                        return await ctx.send("> Bot can't get attachment urls from dm's.. Please use library id or attachment link")
+                        return await ctx.send(
+                            "> Bot can't get attachment urls from dm's.. Please use library id or attachment link")
                     spl_link = messageid.split('/')
                     server_id = int(spl_link[4])
                     channel_id = int(spl_link[5])
@@ -504,11 +505,12 @@ class Translate(commands.Cog):
             insert = random.randint(1, 20)
             while True:
                 if insert < len(liz) - 3:
-                    liz.insert(insert, f" (for more novels ({random.randint(1000,200000)})join: https://discord.gg/SZxTKASsHq)  ")
+                    liz.insert(insert,
+                               f" (for more novels ({random.randint(1000, 200000)})join: https://discord.gg/SZxTKASsHq)  ")
                 else:
                     break
                 insert += random.randint(100, 250)
-            liz.append(f"\n\n for more novels ({random.randint(1000,200000)})join: https://discord.gg/SZxTKASsHq\n")
+            liz.append(f"\n\n for more novels ({random.randint(1000, 200000)})join: https://discord.gg/SZxTKASsHq\n")
             self.bot.translator[ctx.author.id] = f"0/{len(liz)}"
             if ctx.author.id != 925597069748621353:
                 task = asyncio.create_task(self.cc_prog(rep_msg, embed=embed, author_id=ctx.author.id))
@@ -538,7 +540,7 @@ class Translate(commands.Cog):
                                     f"check progress")
                     except:
                         pass
-                    story = await translate.start(liz_t, len(asyncio.all_tasks())+2)
+                    story = await translate.start(liz_t, len(asyncio.all_tasks()) + 2)
                     async with aiofiles.open(filename, "w", encoding="utf-8", errors="ignore") as f:
                         await f.write(story)
                     atm_msg = await tr_channel.send(file=discord.File(f"{filename}", f"{name}_part{cnt}.txt"))
@@ -551,7 +553,7 @@ class Translate(commands.Cog):
                         await pr_msg.delete()
                         del liz_t
                         gc.collect()
-                        chunks[cnt-1] = []
+                        chunks[cnt - 1] = []
                     except:
                         pass
                 await ctx.reply(content=f"Translated {str(len(chunks))} chunks")
@@ -608,7 +610,7 @@ class Translate(commands.Cog):
             except:
                 pass
             try:
-                if ((self.bot.translation_count >= 17 or self.bot.crawler_count >= 20) or (self.bot.uptime.seconds//3600) > 2) and self.bot.app_status == "up":
+                if (self.bot.translation_count >= 17 or self.bot.crawler_count >= 20) and self.bot.app_status == "up":
                     await ctx.reply(
                         "> **Bot will be Restarted when the bot is free due to max limit is reached.. Please be patient")
                     chan = self.bot.get_channel(
@@ -651,7 +653,8 @@ class Translate(commands.Cog):
                 break
             if len(asyncio.all_tasks()) >= 9:
                 embed.set_field_at(index=3,
-                                   name=f"Progress : ", value=f"progress bar is closed .please use .tp to check progress")
+                                   name=f"Progress : ",
+                                   value=f"progress bar is closed .please use .tp to check progress")
                 return await msg.edit(embed=embed)
             await asyncio.sleep(8)
 
