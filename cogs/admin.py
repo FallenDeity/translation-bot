@@ -214,20 +214,21 @@ class Admin(commands.Cog):
             gc.collect()
         except:
             pass
-        if random.randint(0,2)==1:
-            await channel.send(f"Server is restarting")
-            os.system("sudo restart")
+        # if random.randint(0, 2) == 1:
+        await channel.send(f"Server is restarting")
+        os.system("sudo restart")
+        await channel.send(f"Server is restarting")
         for task in asyncio.all_tasks():
             try:
-                 task.cancel()
+                task.cancel()
             except:
-                 pass
+                pass
         return await self.bot.start()
-        #print(sys.argv[0])
-        #print(sys.argv)
-        #os.execv(sys.executable, ['python'] + sys.argv)
+        # print(sys.argv[0])
+        # print(sys.argv)
+        # os.execv(sys.executable, ['python'] + sys.argv)
         # os.execv(sys.argv[0], sys.argv)
-        
+
         # raise Exception("TooManyRequests")
         # h = heroku3.from_key(os.getenv("APIKEY"))
         # app = h.app(os.getenv("APPNAME"))
