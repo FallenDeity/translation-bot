@@ -92,7 +92,7 @@ class Raizel(commands.Bot):
                 print(f"deleting {x}")
                 os.remove(x)
         try:
-            self.mega = Mega().login(os.getenv("USER"), os.getenv("MEGA"))
+            self.mega = Mega().login(os.getenv("USERMAIL"), os.getenv("MEGA"))
             print("Connected to Mega")
         except Exception as e:
             try:
