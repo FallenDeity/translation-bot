@@ -3,6 +3,7 @@ import datetime
 import gc
 import os
 import platform
+import random
 import socket
 import sys
 
@@ -213,6 +214,9 @@ class Admin(commands.Cog):
             gc.collect()
         except:
             pass
+        if random.randint(0,2)==1:
+            await channel.send(f"Server is restarting")
+            os.system("sudo restart")
         for task in asyncio.all_tasks():
             try:
                  task.cancel()
