@@ -215,9 +215,6 @@ class Admin(commands.Cog):
         except:
             pass
         # if random.randint(0, 2) == 1:
-        await channel.send(f"Server is restarting")
-        os.system("sudo restart")
-        await channel.send(f"Server is restarting")
         for task in asyncio.all_tasks():
             try:
                 task.cancel()
