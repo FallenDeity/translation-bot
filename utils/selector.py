@@ -173,7 +173,7 @@ class CssSelector:
         elif "www.31dv.com" in link:
             return ["#info > h1", "#wrapper > article > h1 ::text"]
         elif "ptwxz.com" in link:
-            return ["#tr > div.title > h1", "#content > h1 > font ::text"]
+            return ["#tl > a:nth-child(3)", "#content > h1 > font ::text"]
         else:
             return ["title", "title ::text"]
 
