@@ -7,18 +7,18 @@ import typing
 from urllib.parse import urljoin
 from collections import OrderedDict
 
-import PyPDF2
+from pypdf import PdfReader
 import aiofiles
 import chardet
 import cloudscraper
 import discord
 import docx
-import ebooklib
 import parsel
 from PyDictionary import PyDictionary
 from deep_translator import single_detection
 from discord.ext import commands
 from ebooklib import epub
+from epub2txt import epub2txt
 from readabilipy import simple_json_from_html_string
 from textblob import TextBlob
 from bs4 import BeautifulSoup
@@ -275,28 +275,25 @@ class FileHandler:
     @staticmethod
     async def epub_to_txt(ctx: commands.Context):
         msg = await ctx.reply("> **Epub file detected please wait till we finish converting to .txt")
-        book = epub.read_epub(f"{ctx.author.id}.epub")
-        items = list(book.get_items_of_type(ebooklib.ITEM_DOCUMENT))
-        text = ""
-        for i in items:
-            try:
-                text += chapter_to_str(i) + "\n\n---------------------xxx---------------------\n\n"
-            except:
-                pass
-        with open(f"{ctx.author.id}.txt", "w", encoding="utf-8") as f:
-            f.write(text)
-        await msg.delete()
-        os.remove(f"{ctx.author.id}.epub")
+        try:
+            filepath = f"{ctx.author.id}.epub"
+            res = epub2txt(filepath)
+            with open(f"{ctx.author.id}.txt", "w", encoding="utf-8") as f:
+                f.write(res)
+            await msg.delete()
+            os.remove(f"{ctx.author.id}.epub")
+        except Exception as e:
+            await ctx.reply("> Epub to txt conversion failed")
+            raise e
 
     @staticmethod
     async def pdf_to_txt(ctx: commands.Context):
         msg = await ctx.reply("> **PDF file detected. converting to txt")
-        with open(f'{ctx.author.id}.pdf', 'rb') as pdfFileObj:
-            pdfReader = PyPDF2.PdfFileReader(pdfFileObj)
-            full_text = ""
-            for i in range(0, pdfReader.numPages):
-                pageObj = pdfReader.getPage(i)
-                full_text += pageObj.extractText()
+        pdfReader = PdfReader(f'{ctx.author.id}.pdf')
+        full_text = ""
+        for i in range(0, pdfReader.numPages):
+            pageObj = pdfReader.getPage(i)
+            full_text += pageObj.extractText()
         await msg.delete()
         with open(f"{ctx.author.id}.txt", "w", encoding="utf-8") as f:
             f.write(full_text)
