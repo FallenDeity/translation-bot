@@ -292,8 +292,8 @@ class FileHandler:
         pdfReader = PdfReader(f'{ctx.author.id}.pdf')
         full_text = ""
         for i in range(0, len(pdfReader.pages)):
-            pageObj = pdfReader.getPage(i)
-            full_text += pageObj.extractText()
+            pageObj = pdfReader.pages[i]
+            full_text += pageObj.extract_text()
         await msg.delete()
         with open(f"{ctx.author.id}.txt", "w", encoding="utf-8") as f:
             f.write(full_text)
