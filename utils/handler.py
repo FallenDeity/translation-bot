@@ -291,7 +291,7 @@ class FileHandler:
         msg = await ctx.reply("> **PDF file detected. converting to txt")
         pdfReader = PdfReader(f'{ctx.author.id}.pdf')
         full_text = ""
-        for i in range(0, pdfReader.numPages):
+        for i in range(0, len(pdfReader.pages)):
             pageObj = pdfReader.getPage(i)
             full_text += pageObj.extractText()
         await msg.delete()
