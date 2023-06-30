@@ -179,8 +179,8 @@ class Translate(commands.Cog):
             name = name.replace(".txt", "").replace(".docx", "").replace(".epub", "").replace(".pdf", "")
             name = name[:100]
             # os.rename(path, f"{ctx.author.id}.{file_type}")
-            # if "docx" in file_type:
-            #     await FileHandler.docx_to_txt(ctx, file_type)
+            if "docx" in file_type:
+                await FileHandler.docx_to_txt(ctx, file_type)
             if "epub" in file_type:
                 await FileHandler.epub_to_txt(ctx)
             if "pdf" in file_type:
@@ -403,9 +403,9 @@ class Translate(commands.Cog):
                 pass
         if ctx.author.id in self.bot.translator and not ctx.author.id == 925597069748621353:
             return await ctx.send("> **❌You cannot translate two novels at a time.**", ephemeral=True)
-        if (size := os.path.getsize(f"{ctx.author.id}.txt")) > 25 * 10 ** 6:
-            os.remove(f"{ctx.author.id}.txt")
-            return await ctx.reply("The provided file is bigger than 25mb. Please split the file and translate")
+        # if (size := os.path.getsize(f"{ctx.author.id}.txt")) > 25 * 10 ** 6:
+        #     os.remove(f"{ctx.author.id}.txt")
+        #     return await ctx.reply("The provided file is bigger than 25mb. Please split the file and translate")
         urls = await FileHandler.find_urls_from_text(novel[:1000])
         try:
             novel_url = urls[0]

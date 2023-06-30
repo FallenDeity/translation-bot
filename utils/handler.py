@@ -12,6 +12,7 @@ import aiofiles
 import chardet
 import cloudscraper
 import discord
+import docx
 import ebooklib
 import parsel
 from PyDictionary import PyDictionary
@@ -246,20 +247,20 @@ class FileHandler:
                 return urljoin(link, a.get('href'))
         return None
 
-    # @staticmethod
-    # async def docx_to_txt(ctx: commands.Context, file_type: str):
-    #     msg = await ctx.reply(
-    #         "> **✔Docx file detected please wait while we finish converting.**"
-    #     )
-    #     try:
-    #         doc = docx.Document(f"{ctx.author.id}.{file_type}")
-    #         string = "\n".join([para.text for para in doc.paragraphs])
-    #         async with aiofiles.open(f"{ctx.author.id}.txt", "w", encoding="utf-8") as f:
-    #             await f.write(string)
-    #         await msg.delete()
-    #         os.remove(f"{ctx.author.id}.docx")
-    #     except Exception as e:
-    #         await ctx.send("error occured in converting docx to txt")
+    @staticmethod
+    async def docx_to_txt(ctx: commands.Context, file_type: str):
+        msg = await ctx.reply(
+            "> **✔Docx file detected please wait while we finish converting.**"
+        )
+        try:
+            doc = docx.Document(f"{ctx.author.id}.{file_type}")
+            string = "\n".join([para.text for para in doc.paragraphs])
+            async with aiofiles.open(f"{ctx.author.id}.txt", "w", encoding="utf-8") as f:
+                await f.write(string)
+            await msg.delete()
+            os.remove(f"{ctx.author.id}.docx")
+        except Exception as e:
+            await ctx.send("error occured in converting docx to txt")
 
     @staticmethod
     async def get_title(soup: BeautifulSoup) -> str:
