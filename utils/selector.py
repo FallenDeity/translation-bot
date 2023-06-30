@@ -232,6 +232,8 @@ class CssSelector:
             return ["None", "#chapter-heading"]
         elif "sangtacviet.vip" in link:
             return ["#navnexttop", "#booknameholder"]
+        elif "ptwxz.com" in link:
+            return ["#tr > div.title > h1", "#content > h1 > font"]
         # elif "m.bqg789.net" in link:
         #     return ["#nextpage", "#novelbody > div.head > div.nav_name > h1"]
         else:
