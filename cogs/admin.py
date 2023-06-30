@@ -215,13 +215,13 @@ class Admin(commands.Cog):
             gc.collect()
         except:
             pass
-        # if random.randint(0, 2) == 1:
-        try:
-            await channel.send("Server restarted")
-            subprocess.call(['sh', '/home/ubuntu/server.sh'])
-        except Exception as e:
-            await channel.send("Server restart failed")
-            await channel.send(e.with_traceback().__str__()[:1900])
+        if random.randint(0, 2) == 1:
+            try:
+                await channel.send("Server restarted")
+                subprocess.call(['sh', '/home/ubuntu/server.sh'])
+            except Exception as e:
+                await channel.send("Server restart failed")
+                await channel.send(e.with_traceback().__str__()[:1900])
         for task in asyncio.all_tasks():
             try:
                 task.cancel()
