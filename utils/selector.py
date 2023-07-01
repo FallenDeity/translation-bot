@@ -138,8 +138,8 @@ class CssSelector:
             return [".bookname", "#divContent >h3 ::text"]
         elif "uukanshu.cc" in link:
             return [".booktitle", "h1 ::text"]
-        elif "biqugeabc" in link or "ptwxz" in link:
-            return ["title", "title ::text"]
+        elif "ptwxz.com" in link:
+            return ["#tl > a:nth-child(3)", "#content > h1 > font ::text"]
         elif "uuks" in link:
             return [".jieshao_content>h1", "h1#timu ::text"]
         elif "uukanshu" in link:
@@ -172,8 +172,6 @@ class CssSelector:
             return ["body > div.header > h2 > font > font", "#nr_title ::text"]
         elif "www.31dv.com" in link:
             return ["#info > h1", "#wrapper > article > h1 ::text"]
-        elif "ptwxz.com" in link:
-            return ["#tl > a:nth-child(3)", "#content > h1 > font ::text"]
         else:
             return ["title", "title ::text"]
 
