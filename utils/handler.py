@@ -55,7 +55,7 @@ class FileHandler:
                 else:
                     await bot.change_presence(
                         activity=discord.Activity(
-                            type=discord.ActivityType.custom, state="contains",
+                            type=discord.ActivityType.watching,
                             name=f"{bot.mongo.library.next_number - 1} novels in library",
                         ),
                         status=discord.Status.idle,
@@ -72,7 +72,7 @@ class FileHandler:
                     outstr += f"translating {len(bot.translator)} novels"
                 await bot.change_presence(
                     activity=discord.Activity(
-                        type=discord.ActivityType.custom, state="",
+                        type=discord.ActivityType.watching, state="stat",
                         name=f"{outstr}",
                     ),
                     status=discord.Status.online,
