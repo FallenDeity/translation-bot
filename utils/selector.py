@@ -7,11 +7,11 @@ class CssSelector:
         if "bixiange" in link or "bixiang" in link:
             return "p ::text"
         elif "sj.uukanshu" in link or "t.uukanshu" in link:
-            return "#read-page p ::text"
+            return "#read-page ::text"
         elif "uukanshu.cc" in link:
             return ".bbb.font-normal.readcotent ::text"
         elif "uukanshu" in link:
-            return ".contentbox ::text"
+            return "#contentbox ::text"
         elif (
                 "trxs.me" in link
                 or "trxs.cc" in link
