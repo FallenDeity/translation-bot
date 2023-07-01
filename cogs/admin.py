@@ -215,7 +215,7 @@ class Admin(commands.Cog):
             gc.collect()
         except:
             pass
-        if random.randint(0, 3) == 1:
+        if random.randint(0, 20) > 12:
             try:
                 await channel.send("Server restarted")
                 subprocess.call(['sh', '/home/ubuntu/server.sh'])
