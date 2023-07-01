@@ -104,9 +104,9 @@ class Translate(commands.Cog):
                 link = novel_data["download"]
             except:
                 return await ctx.reply("send a valid id")
-        # if self.bot.app_status == "restart":
-        #     return await ctx.reply(
-        #         f"> Bot is scheduled to restart within 60 sec or after all current tasks are completed.. Please try after bot is restarted")
+        if self.bot.app_status == "restart":
+            return await ctx.reply(
+                f"> Bot is scheduled to restart within 60 sec or after all current tasks are completed.. Please try after bot is restarted")
         if ctx.author.id == 925597069748621353:
             while len(asyncio.all_tasks()) >= 9 or (
                     ctx.author.id in self.bot.translator and not self.bot.translator[ctx.author.id] == "waiting"):
@@ -512,6 +512,7 @@ class Translate(commands.Cog):
                 insert += random.randint(100, 250)
             liz.append(f"\n\n for more novels ({random.randint(1000, 200000)})join: https://discord.gg/SZxTKASsHq\n")
             self.bot.translator[ctx.author.id] = f"0/{len(liz)}"
+            await FileHandler.update_status(self.bot)
             if ctx.author.id != 925597069748621353:
                 task = asyncio.create_task(self.cc_prog(rep_msg, embed=embed, author_id=ctx.author.id))
             translate = Translator(self.bot, ctx.author.id, language)
@@ -597,6 +598,7 @@ class Translate(commands.Cog):
                 traceback.print_exc()
                 raise e
         finally:
+            await FileHandler.update_status(self.bot)
             try:
                 del story
                 del novel
@@ -624,6 +626,7 @@ class Translate(commands.Cog):
             except:
                 pass
             try:
+                await FileHandler.update_status(self.bot)
                 gc.collect()
             except:
                 print("error in garbage collection")

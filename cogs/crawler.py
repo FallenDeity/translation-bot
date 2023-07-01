@@ -336,8 +336,8 @@ class Crawler(commands.Cog):
             return await ctx.reply(
                 "> **❌You cannot crawl two novels at the same time.**"
             )
-        # if self.bot.app_status == "restart": return await ctx.reply( f"> Bot is scheduled to restart within 60 sec
-        # or after all current tasks are completed.. Please try after bot is restarted")
+        if self.bot.app_status == "restart":
+            return await ctx.reply( f"> Bot is scheduled to restart within 60 sec or after all current tasks are completed.. Please try after bot is restarted")
         cloudscrape: bool = False
         if link is None:
             return await ctx.reply(f"> **❌Enter a link for crawling.**")
@@ -745,6 +745,7 @@ class Crawler(commands.Cog):
                 await asyncio.sleep(15)
         try:
             self.bot.crawler[ctx.author.id] = f"0/{len(urls)}"
+            await FileHandler.update_status(self.bot)
             try:
                 thumbnail = await FileHandler().get_thumbnail(soup, link)
             except:
@@ -944,8 +945,8 @@ class Crawler(commands.Cog):
             return await ctx.reply(
                 "> **❌You cannot crawl two novels at the same time.**"
             )
-        # if self.bot.app_status == "restart": return await ctx.reply( f"> Bot is scheduled to restart within 60 sec
-        # or after all current tasks are completed.. Please try after bot is restarted")
+        if self.bot.app_status == "restart":
+            return await ctx.reply(f"> Bot is scheduled to restart within 60 sec  or after all current tasks are completed.. Please try after bot is restarted")
         title_css = "title"
         cloudscrape: bool = False
         try:
@@ -1221,6 +1222,7 @@ class Crawler(commands.Cog):
             await ctx.reply(content=f"> Updating {str(library)} with name : {title_name}")
         try:
             self.bot.crawler[ctx.author.id] = f"0/{noofchapters}"
+            await FileHandler.update_status(self.bot)
             task = asyncio.create_task(self.cc_prog_cr_next(msg, embed, ctx.author.id, 20))
             for i in range(1, noofchapters):
                 try:
@@ -1338,6 +1340,7 @@ class Crawler(commands.Cog):
             except:
                 pass
             try:
+                await FileHandler.update_status(self.bot)
                 gc.collect()
             except:
                 print("error in garbage collection")

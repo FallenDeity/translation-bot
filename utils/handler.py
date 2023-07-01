@@ -17,7 +17,6 @@ import parsel
 from PyDictionary import PyDictionary
 from deep_translator import single_detection
 from discord.ext import commands
-from ebooklib import epub
 from epub2txt import epub2txt
 from readabilipy import simple_json_from_html_string
 from textblob import TextBlob
@@ -40,6 +39,46 @@ def chapter_to_str(chapter):
 class FileHandler:
     ENCODING: list[str] = ["utf-8", "cp936", "utf-16", "cp949"]
     TOTAL: int = len(ENCODING)
+
+    @staticmethod
+    async def update_status(bot: Raizel):
+        try:
+            if len(bot.translator) == 0 and len(bot.crawler) == 0:
+                if random.randint(0, 10) >= 5:
+                    await bot.change_presence(
+                        activity=discord.Activity(
+                            type=discord.ActivityType.listening,
+                            name=f"{len(bot.users)} novel enthusiasts. Prefix: .t",
+                        ),
+                        status=discord.Status.idle,
+                    )
+                else:
+                    await bot.change_presence(
+                        activity=discord.Activity(
+                            type=discord.ActivityType.custom, state="contains",
+                            name=f"{bot.mongo.library.next_number - 1} novels in library",
+                        ),
+                        status=discord.Status.idle,
+                    )
+            else:
+                outstr = ""
+                if len(bot.crawler) != 0:
+                    outstr = f"crawling {len(bot.crawler)}"
+                    if len(bot.translator) != 0:
+                        outstr += " , "
+                    else:
+                        outstr += " novels"
+                if len(bot.translator) != 0:
+                    outstr += f"translating {len(bot.translator)} novels"
+                await bot.change_presence(
+                    activity=discord.Activity(
+                        type=discord.ActivityType.custom, state="",
+                        name=f"{outstr}",
+                    ),
+                    status=discord.Status.online,
+                )
+        except:
+            pass
 
     @staticmethod
     async def find_urls_from_text(string):

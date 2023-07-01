@@ -159,9 +159,16 @@ class Admin(commands.Cog):
             await ctx.defer()
         except:
             pass
+        await self.bot.change_presence(activity=discord.Activity(
+            type=discord.ActivityType.unknown, name="Restarting bot"), status=discord.Status.do_not_disturb)
         msg = await ctx.send("Please wait")
         self.bot.app_status = "restart"
+        no_of_times = 0
+        channel = self.bot.get_channel(
+            991911644831678484
+        ) or await self.bot.fetch_channel(991911644831678484)
         while True:
+            no_of_times += 1
             print("Started restart")
             if not instant:
                 await asyncio.sleep(10)
@@ -169,9 +176,6 @@ class Admin(commands.Cog):
                 break
             if not self.bot.crawler.items() and not self.bot.translator.items():
                 print("restart " + str(datetime.datetime.now()))
-                channel = self.bot.get_channel(
-                    991911644831678484
-                ) or await self.bot.fetch_channel(991911644831678484)
                 try:
                     await channel.send(embed=discord.Embed(description=f"Bot has started restarting"))
                 except:
@@ -183,6 +187,9 @@ class Admin(commands.Cog):
                 self.bot.translator = {}
                 self.bot.crawler = {}
                 await asyncio.sleep(60)
+                if no_of_times > 5:
+                    self.bot.app_status = "up"
+                    await channel.send("Restart failed")
         try:
             await msg.edit(
                 content="",
