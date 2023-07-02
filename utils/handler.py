@@ -69,6 +69,7 @@ class FileHandler:
                         ),
                         status=discord.Status.idle,
                     )
+                return
             else:
                 outstr = ""
                 if len(bot.crawler) != 0:
