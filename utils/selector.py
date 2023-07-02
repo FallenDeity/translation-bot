@@ -138,8 +138,6 @@ class CssSelector:
             return [".bookname", "#divContent >h3 ::text"]
         elif "uukanshu.cc" in link:
             return [".booktitle", "h1 ::text"]
-        elif "ptwxz.com" in link:
-            return ["#tl > a:nth-child(3)", "#content > h1 > font ::text"]
         elif "uuks" in link:
             return [".jieshao_content>h1", "h1#timu ::text"]
         elif "uukanshu" in link:

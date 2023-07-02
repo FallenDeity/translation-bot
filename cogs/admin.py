@@ -154,7 +154,7 @@ class Admin(commands.Cog):
 
     @commands.has_role(1020638168237740042)
     @commands.hybrid_command(help="Restart the bot incase of bot crash. Ping any BOT-admins to restart bot")
-    async def restart(self, ctx: commands.Context, instant: bool = False):
+    async def restart(self, ctx: commands.Context, instant: bool = False, server: bool = False):
         try:
             await ctx.defer()
         except:
@@ -222,7 +222,7 @@ class Admin(commands.Cog):
             gc.collect()
         except:
             pass
-        if random.randint(0, 20) > 12:
+        if random.randint(0, 20) > 12 or server is True:
             try:
                 await channel.send("Server restarted")
                 subprocess.call(['sh', '/home/ubuntu/server.sh'])

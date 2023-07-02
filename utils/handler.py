@@ -44,7 +44,7 @@ class FileHandler:
     async def update_status(bot: Raizel):
         try:
             if len(bot.translator) == 0 and len(bot.crawler) == 0:
-                if random.randint(0, 10) >= 5:
+                if random.randint(0, 10) > 5:
                     await bot.change_presence(
                         activity=discord.Activity(
                             type=discord.ActivityType.listening,

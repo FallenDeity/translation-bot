@@ -863,6 +863,7 @@ class Crawler(commands.Cog):
                 print("error in garbage collection")
             try:
                 del self.bot.crawler[ctx.author.id]
+                await FileHandler.update_status(self.bot)
             except:
                 pass
             if translate_to is None and add_terms is None:
