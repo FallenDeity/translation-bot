@@ -43,6 +43,14 @@ class FileHandler:
     @staticmethod
     async def update_status(bot: Raizel):
         try:
+            if bot.app_status == "restart":
+                await bot.change_presence(
+                    activity=discord.Activity(
+                        type=discord.ActivityType.playing,
+                        name=f"Bot will restart soon. Please wait",
+                    ),
+                    status=discord.Status.do_not_disturb,
+                )
             if len(bot.translator) == 0 and len(bot.crawler) == 0:
                 if random.randint(0, 10) > 5:
                     await bot.change_presence(
