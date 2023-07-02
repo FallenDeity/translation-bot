@@ -9,7 +9,7 @@ from core.bot import Raizel
 bot = Raizel()
  
 
-@tasks.loop(seconds=120)
+@tasks.loop(seconds=60)
 async def census():
     await handler.update_status(bot)
 
