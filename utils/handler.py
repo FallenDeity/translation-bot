@@ -51,6 +51,7 @@ class FileHandler:
                     ),
                     status=discord.Status.do_not_disturb,
                 )
+                return
             if len(bot.translator) == 0 and len(bot.crawler) == 0:
                 if random.randint(0, 10) > 5:
                     await bot.change_presence(
@@ -63,7 +64,7 @@ class FileHandler:
                 else:
                     await bot.change_presence(
                         activity=discord.Activity(
-                            type=discord.ActivityType.watching,
+                            type=discord.ActivityType.listening,
                             name=f"{bot.mongo.library.next_number - 1} novels in library",
                         ),
                         status=discord.Status.idle,
