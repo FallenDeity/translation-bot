@@ -880,8 +880,7 @@ class Crawler(commands.Cog):
                         asyncio.create_task(self.bot.get_command("restart").callback(Admin(self.bot), context_new2))
                 except:
                     pass
-        if (
-                translate_to is not None or add_terms is not None) and download_url is not None and not download_url.strip() == "":
+        if (translate_to is not None or add_terms is not None) and download_url is not None and not download_url.strip() == "":
             if translate_to is None:
                 translate_to = "english"
             if translate_to not in self.bot.all_langs and original_Language not in ["english", "en"]:
