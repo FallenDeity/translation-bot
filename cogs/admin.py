@@ -225,7 +225,7 @@ class Admin(commands.Cog):
         if random.randint(0, 20) > 12 or server is True:
             try:
                 await channel.send("Server restarted")
-                subprocess.call(['sh', '/home/ubuntu/server.sh'])
+                subprocess.call(['sh', '/home/ubuntu/translation-bot/scripts/server-restart.sh'])
             except Exception as e:
                 await channel.send("Server restart failed")
                 await channel.send(e.with_traceback().__str__()[:1900])
