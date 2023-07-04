@@ -104,9 +104,9 @@ class Translate(commands.Cog):
                 link = novel_data["download"]
             except:
                 return await ctx.reply("send a valid id")
-        # if self.bot.app_status == "restart":
-        #     return await ctx.reply(
-        #         f"> Bot is scheduled to restart within 60 sec or after all current tasks are completed.. Please try after bot is restarted")
+        if self.bot.app_status == "restart":
+            return await ctx.reply(
+                f"> Bot is scheduled to restart within 60 sec or after all current tasks are completed.. Please try after bot is restarted")
         if ctx.author.id == 925597069748621353:
             while len(asyncio.all_tasks()) >= 9 or (
                     ctx.author.id in self.bot.translator and not self.bot.translator[ctx.author.id] == "waiting"):
@@ -179,8 +179,8 @@ class Translate(commands.Cog):
             name = name.replace(".txt", "").replace(".docx", "").replace(".epub", "").replace(".pdf", "")
             name = name[:100]
             # os.rename(path, f"{ctx.author.id}.{file_type}")
-            # if "docx" in file_type:
-            #     await FileHandler.docx_to_txt(ctx, file_type)
+            if "docx" in file_type:
+                await FileHandler.docx_to_txt(ctx, file_type)
             if "epub" in file_type:
                 await FileHandler.epub_to_txt(ctx)
             if "pdf" in file_type:
@@ -190,7 +190,8 @@ class Translate(commands.Cog):
             if messageid is not None:
                 if 'discord' in messageid:
                     if "@me/" in messageid:
-                        return await ctx.send("> Bot can't get attachment urls from dm's.. Please use library id or attachment link")
+                        return await ctx.send(
+                            "> Bot can't get attachment urls from dm's.. Please use library id or attachment link")
                     spl_link = messageid.split('/')
                     server_id = int(spl_link[4])
                     channel_id = int(spl_link[5])
@@ -402,10 +403,14 @@ class Translate(commands.Cog):
                 pass
         if ctx.author.id in self.bot.translator and not ctx.author.id == 925597069748621353:
             return await ctx.send("> **❌You cannot translate two novels at a time.**", ephemeral=True)
-        if (size := os.path.getsize(f"{ctx.author.id}.txt")) > 25 * 10 ** 6:
-            os.remove(f"{ctx.author.id}.txt")
-            return await ctx.reply("The provided file is bigger than 25mb. Please split the file and translate")
-        urls = await FileHandler.find_urls_from_text(novel[:3000])
+        # if (size := os.path.getsize(f"{ctx.author.id}.txt")) > 25 * 10 ** 6:
+        #     os.remove(f"{ctx.author.id}.txt")
+        #     return await ctx.reply("The provided file is bigger than 25mb. Please split the file and translate")
+        urls = await FileHandler.find_urls_from_text(novel[:1000])
+        try:
+            novel_url = urls[0]
+        except:
+            novel_url = None
         # print(f"urls : {urls}")
         size = os.path.getsize(f"{ctx.author.id}.txt")
         scraper = cloudscraper.create_scraper()
@@ -424,6 +429,9 @@ class Translate(commands.Cog):
             temp = []
             for url in urls:
                 try:
+                    if "discord.gg" in url:
+                        continue
+                        # urls.remove(url)
                     response = await self.bot.loop.run_in_executor(None, scraper.get, url)
                     soup = BeautifulSoup(response.text, "lxml")
                     # print(f"url  {url}")
@@ -432,6 +440,7 @@ class Translate(commands.Cog):
                     if thumbnail is not None and thumbnail.strip() != "":
                         if scraper.get(thumbnail).status_code == 200:
                             # print("break")
+                            novel_url = url
                             break
                         else:
                             # print("else")
@@ -496,12 +505,14 @@ class Translate(commands.Cog):
             insert = random.randint(1, 20)
             while True:
                 if insert < len(liz) - 3:
-                    liz.insert(insert, f" (for more novels ({random.randint(1000,200000)})join: https://discord.gg/SZxTKASsHq)  ")
+                    liz.insert(insert,
+                               f" (for more novels ({random.randint(1000, 200000)})join: https://discord.gg/SZxTKASsHq)  ")
                 else:
                     break
                 insert += random.randint(100, 250)
-            liz.append(f"\n\n for more novels ({random.randint(1000,200000)})join: https://discord.gg/SZxTKASsHq\n")
+            liz.append(f"\n\n for more novels ({random.randint(1000, 200000)})join: https://discord.gg/SZxTKASsHq\n")
             self.bot.translator[ctx.author.id] = f"0/{len(liz)}"
+            await FileHandler.update_status(self.bot)
             if ctx.author.id != 925597069748621353:
                 task = asyncio.create_task(self.cc_prog(rep_msg, embed=embed, author_id=ctx.author.id))
             translate = Translator(self.bot, ctx.author.id, language)
@@ -530,7 +541,7 @@ class Translate(commands.Cog):
                                     f"check progress")
                     except:
                         pass
-                    story = await translate.start(liz_t, len(asyncio.all_tasks())+2)
+                    story = await translate.start(liz_t, len(asyncio.all_tasks()) + 2)
                     async with aiofiles.open(filename, "w", encoding="utf-8", errors="ignore") as f:
                         await f.write(story)
                     atm_msg = await tr_channel.send(file=discord.File(f"{filename}", f"{name}_part{cnt}.txt"))
@@ -543,7 +554,7 @@ class Translate(commands.Cog):
                         await pr_msg.delete()
                         del liz_t
                         gc.collect()
-                        chunks[cnt-1] = []
+                        chunks[cnt - 1] = []
                     except:
                         pass
                 await ctx.reply(content=f"Translated {str(len(chunks))} chunks")
@@ -578,7 +589,7 @@ class Translate(commands.Cog):
                 except:
                     description = await FileHandler.get_desc_from_text(story[:10000], title=name)
             await FileHandler().distribute(self.bot, ctx, name, language, original_Language, rawname, description,
-                                           thumbnail=thumbnail, library=library)
+                                           thumbnail=thumbnail, library=library, novel_url=novel_url)
         except Exception as e:
             if "Translation stopped" in str(e):
                 return await ctx.send("Translation stopped")
@@ -587,6 +598,7 @@ class Translate(commands.Cog):
                 traceback.print_exc()
                 raise e
         finally:
+            await FileHandler.update_status(self.bot)
             try:
                 del story
                 del novel
@@ -600,7 +612,7 @@ class Translate(commands.Cog):
             except:
                 pass
             try:
-                if ((self.bot.translation_count >= 17 or self.bot.crawler_count >= 20) or (self.bot.uptime.seconds//3600) > 2) and self.bot.app_status == "up":
+                if (self.bot.translation_count >= 20 or self.bot.crawler_count >= 25) and self.bot.app_status == "up":
                     await ctx.reply(
                         "> **Bot will be Restarted when the bot is free due to max limit is reached.. Please be patient")
                     chan = self.bot.get_channel(
@@ -614,6 +626,7 @@ class Translate(commands.Cog):
             except:
                 pass
             try:
+                await FileHandler.update_status(self.bot)
                 gc.collect()
             except:
                 print("error in garbage collection")
@@ -643,7 +656,8 @@ class Translate(commands.Cog):
                 break
             if len(asyncio.all_tasks()) >= 9:
                 embed.set_field_at(index=3,
-                                   name=f"Progress : ", value=f"progress bar is closed .please use .tp to check progress")
+                                   name=f"Progress : ",
+                                   value=f"progress bar is closed .please use .tp to check progress")
                 return await msg.edit(embed=embed)
             await asyncio.sleep(8)
 

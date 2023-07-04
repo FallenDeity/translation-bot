@@ -7,11 +7,11 @@ class CssSelector:
         if "bixiange" in link or "bixiang" in link:
             return "p ::text"
         elif "sj.uukanshu" in link or "t.uukanshu" in link:
-            return "#read-page p ::text"
+            return "#read-page ::text"
         elif "uukanshu.cc" in link:
             return ".bbb.font-normal.readcotent ::text"
         elif "uukanshu" in link:
-            return ".contentbox ::text"
+            return "#contentbox ::text"
         elif (
                 "trxs.me" in link
                 or "trxs.cc" in link
@@ -35,7 +35,7 @@ class CssSelector:
             return "* ::text"
         elif "shu05" in link:
             return "#htmlContent ::text"
-        elif "readwn" in link or "novelmt.com" in link or "wuxiax.com" in link or "fannovels.com" in link or "novelmtl.com" in link:
+        elif "readwn" in link or "novelmt.com" in link or "wuxiax.com" in link or "fannovels.com" in link or "novelmtl.com" in link or "www.wuxiap.com" in link:
             return ".chapter-content ::text"
         elif "novelsemperor" in link or "novelsknight.com" in link:
             return "p ::text"
@@ -114,6 +114,8 @@ class CssSelector:
             return "#booktxt ::text"
         elif "1stkissnovel.org" in link:
             return "div.entry-content > div > div > div > div.text-left ::text"
+        elif "sangtacviet.vip" in link:
+            return ".contentbox ::text"
         else:
             return "* ::text"
 
@@ -136,8 +138,6 @@ class CssSelector:
             return [".bookname", "#divContent >h3 ::text"]
         elif "uukanshu.cc" in link:
             return [".booktitle", "h1 ::text"]
-        elif "biqugeabc" in link or "ptwxz" in link:
-            return ["title", "title ::text"]
         elif "uuks" in link:
             return [".jieshao_content>h1", "h1#timu ::text"]
         elif "uukanshu" in link:
@@ -174,7 +174,7 @@ class CssSelector:
             return ["title", "title ::text"]
 
     def find_next_selector(link):
-        if "readwn" in link or "wuxiax.co" in link or "novelmt.com" in link or "fannovels.com" in link or "novelmtl.com" in link:
+        if "readwn" in link or "wuxiax.co" in link or "novelmt.com" in link or "fannovels.com" in link or "novelmtl.com" in link or "www.wuxiap.com" in link:
             return ["#chapter-article > header > div > aside > nav > div.action-select > a.chnav.next", "#chapter-article > header > div > div > h1 > a"]
         elif "novelfull.com" in link:
             return ["#next_chap", "#chapter > div > div > a"]
@@ -228,6 +228,8 @@ class CssSelector:
             return ["None", "#chapter > div > div > a"]
         elif "1stkissnovel.org" in link:
             return ["None", "#chapter-heading"]
+        elif "sangtacviet.vip" in link:
+            return ["#navnexttop", "#booknameholder"]
         # elif "m.bqg789.net" in link:
         #     return ["#nextpage", "#novelbody > div.head > div.nav_name > h1"]
         else:

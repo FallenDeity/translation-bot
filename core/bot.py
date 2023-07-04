@@ -92,7 +92,7 @@ class Raizel(commands.Bot):
                 print(f"deleting {x}")
                 os.remove(x)
         try:
-            self.mega = Mega().login(os.getenv("USER"), os.getenv("MEGA"))
+            self.mega = Mega().login(os.getenv("USERMAIL"), os.getenv("MEGA"))
             print("Connected to Mega")
         except Exception as e:
             try:
@@ -159,6 +159,8 @@ class Raizel(commands.Bot):
             except:
                 pass
             print('error occurred on connecting to Discord client... will try after 60 secs')
+            print(os.getenv("TOKEN"))
+            print(e.with_traceback())
             print(e)
             # time.sleep(60)
             # return await self.start()

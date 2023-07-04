@@ -7,17 +7,17 @@ import typing
 from urllib.parse import urljoin
 from collections import OrderedDict
 
-import PyPDF2
+from pypdf import PdfReader
 import aiofiles
 import chardet
 import cloudscraper
 import discord
-import ebooklib
+import docx
 import parsel
 from PyDictionary import PyDictionary
 from deep_translator import single_detection
 from discord.ext import commands
-from ebooklib import epub
+from epub2txt import epub2txt
 from readabilipy import simple_json_from_html_string
 from textblob import TextBlob
 from bs4 import BeautifulSoup
@@ -41,12 +41,93 @@ class FileHandler:
     TOTAL: int = len(ENCODING)
 
     @staticmethod
+    async def update_status(bot: Raizel):
+        try:
+            if bot.app_status == "restart":
+                await bot.change_presence(
+                    activity=discord.Activity(
+                        type=discord.ActivityType.playing,
+                        name=f"Bot will restart soon. Please wait",
+                    ),
+                    status=discord.Status.do_not_disturb,
+                )
+                return
+            if len(bot.translator) == 0 and len(bot.crawler) == 0:
+                if random.randint(0, 10) > 5:
+                    await bot.change_presence(
+                        activity=discord.Activity(
+                            type=discord.ActivityType.listening,
+                            name=f"{len(bot.users)} novel enthusiasts. Prefix: .t",
+                        ),
+                        status=discord.Status.idle,
+                    )
+                else:
+                    await bot.change_presence(
+                        activity=discord.Activity(
+                            type=discord.ActivityType.listening,
+                            name=f"{bot.mongo.library.next_number - 1} novels in library",
+                        ),
+                        status=discord.Status.idle,
+                    )
+                return
+            else:
+                outstr = ""
+                if len(bot.crawler) != 0:
+                    outstr = f"crawling {len(bot.crawler)}"
+                    if len(bot.translator) != 0:
+                        outstr += " , "
+                    else:
+                        outstr += " novels"
+                if len(bot.translator) != 0:
+                    outstr += f"translating {len(bot.translator)} novels"
+                await bot.change_presence(
+                    activity=discord.Activity(
+                        type=discord.ActivityType.watching, state="stat",
+                        name=f"{outstr}",
+                    ),
+                    status=discord.Status.online,
+                )
+        except:
+            pass
+
+    @staticmethod
     async def find_urls_from_text(string):
         # findall() has been used
         # with valid conditions for urls in string
         regex = r"(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'\".,<>?«»“”‘’]))"
         url = re.findall(regex, string)
         return [x[0] for x in url]
+
+    @staticmethod
+    async def distribute_genre(embed: discord.Embed, category: str, download_url: str, bot: Raizel):
+        anime_cat = ["Naruto", "One-Piece", "Harry-Potter", "Pokemon""Fairy-Tail", "Genshin-Impact", "Doulou-Daluo",
+                     "Conan"
+            , "High-School-DXD", "Hunter-X-Hunter", "Doraemon", "Dragon-Ball", "Comprehensive", "Yugi-Oh", "Bleach",
+                     "Shokugeki-No-Soma",
+                     "Jackie-Chan", "One-Punch-Man", "Cartoonist"]
+        marvel_dc = ["DC", "Marvel"]
+        villain = ["Villain"]
+        magic = ["Fantasy", "Spirit-Recovery", "Reincarnation"]
+        r18 = ["R18"]
+        scifi = ["Technology"]
+        if category in anime_cat:
+            channel_id = 1110761695174983680
+        elif category in marvel_dc:
+            channel_id = 1110761272619839538
+        elif category in villain:
+            channel_id = 1110764343869571132
+        elif category in magic:
+            channel_id = 1110761401930240030
+        elif category in r18:
+            channel_id = 1112230192522481754
+        elif category in scifi:
+            channel_id = 1110761533631365220
+        else:
+            return
+        channel = await bot.fetch_channel(channel_id)
+        view = LinkView({"Novel": [download_url, await FileHandler.get_emoji_book()]})
+        await channel.send(embed=embed, view=view)
+        return
 
     @staticmethod
     async def get_emoji_book() -> str:
@@ -67,7 +148,8 @@ class FileHandler:
         if "69shu.com" in text or "jiu mu" in text.lower() or "jiumu" in text.lower():
             desc.append("chapter")
         text = re.sub(re.compile("for more novels \([0-9]*\) join: https://discord.gg/[a-zA-Z]*"), "", text)
-        text = str(re.sub(r'^https?:\/\/.*[\r\n]*', '', text.replace("source :", "").replace("Source :", "").strip(), flags=re.MULTILINE))
+        text = str(re.sub(r'^https?:\/\/.*[\r\n]*', '', text.replace("source :", "").replace("Source :", "").strip(),
+                          flags=re.MULTILINE))
         for d in desc:
             if d in text.lower():
                 description = re.split(d, text, flags=re.IGNORECASE, maxsplit=1)[1][:500]
@@ -214,20 +296,20 @@ class FileHandler:
                 return urljoin(link, a.get('href'))
         return None
 
-    # @staticmethod
-    # async def docx_to_txt(ctx: commands.Context, file_type: str):
-    #     msg = await ctx.reply(
-    #         "> **✔Docx file detected please wait while we finish converting.**"
-    #     )
-    #     try:
-    #         doc = docx.Document(f"{ctx.author.id}.{file_type}")
-    #         string = "\n".join([para.text for para in doc.paragraphs])
-    #         async with aiofiles.open(f"{ctx.author.id}.txt", "w", encoding="utf-8") as f:
-    #             await f.write(string)
-    #         await msg.delete()
-    #         os.remove(f"{ctx.author.id}.docx")
-    #     except Exception as e:
-    #         await ctx.send("error occured in converting docx to txt")
+    @staticmethod
+    async def docx_to_txt(ctx: commands.Context, file_type: str):
+        msg = await ctx.reply(
+            "> **✔Docx file detected please wait while we finish converting.**"
+        )
+        try:
+            doc = docx.Document(f"{ctx.author.id}.{file_type}")
+            string = "\n".join([para.text for para in doc.paragraphs])
+            async with aiofiles.open(f"{ctx.author.id}.txt", "w", encoding="utf-8") as f:
+                await f.write(string)
+            await msg.delete()
+            os.remove(f"{ctx.author.id}.docx")
+        except Exception as e:
+            await ctx.send("error occured in converting docx to txt")
 
     @staticmethod
     async def get_title(soup: BeautifulSoup) -> str:
@@ -242,28 +324,25 @@ class FileHandler:
     @staticmethod
     async def epub_to_txt(ctx: commands.Context):
         msg = await ctx.reply("> **Epub file detected please wait till we finish converting to .txt")
-        book = epub.read_epub(f"{ctx.author.id}.epub")
-        items = list(book.get_items_of_type(ebooklib.ITEM_DOCUMENT))
-        text = ""
-        for i in items:
-            try:
-                text += chapter_to_str(i) + "\n\n---------------------xxx---------------------\n\n"
-            except:
-                pass
-        with open(f"{ctx.author.id}.txt", "w", encoding="utf-8") as f:
-            f.write(text)
-        await msg.delete()
-        os.remove(f"{ctx.author.id}.epub")
+        try:
+            filepath = f"{ctx.author.id}.epub"
+            res = epub2txt(filepath)
+            with open(f"{ctx.author.id}.txt", "w", encoding="utf-8") as f:
+                f.write(res)
+            await msg.delete()
+            os.remove(f"{ctx.author.id}.epub")
+        except Exception as e:
+            await ctx.reply("> Epub to txt conversion failed")
+            raise e
 
     @staticmethod
     async def pdf_to_txt(ctx: commands.Context):
         msg = await ctx.reply("> **PDF file detected. converting to txt")
-        with open(f'{ctx.author.id}.pdf', 'rb') as pdfFileObj:
-            pdfReader = PyPDF2.PdfFileReader(pdfFileObj)
-            full_text = ""
-            for i in range(0, pdfReader.numPages):
-                pageObj = pdfReader.getPage(i)
-                full_text += pageObj.extractText()
+        pdfReader = PdfReader(f'{ctx.author.id}.pdf')
+        full_text = ""
+        for i in range(0, len(pdfReader.pages)):
+            pageObj = pdfReader.pages[i]
+            full_text += pageObj.extract_text()
         await msg.delete()
         with open(f"{ctx.author.id}.txt", "w", encoding="utf-8") as f:
             f.write(full_text)
@@ -379,7 +458,7 @@ class FileHandler:
 
     async def distribute(
             self, bot: Raizel, ctx: commands.Context, name: str, language: str, original_language: str, raw_name: str,
-            description: str = "", thumbnail: str = "", library: int = None
+            description: str = "", thumbnail: str = "", library: int = None, novel_url: str = None
     ) -> None:
         download_url = None
         if library is None:
@@ -402,9 +481,11 @@ class FileHandler:
                               colour=discord.Colour.dark_gold())
         embed.add_field(name="Category", value=category)
         embed.add_field(name="Language", value=language)
+        if novel_url:
+            embed.add_field(name="Crawled from", value=novel_url)
         embed.set_thumbnail(url=thumbnail)
         embed.set_footer(text=f"Uploaded by {ctx.author}", icon_url=ctx.author.display_avatar)
-        if (size := os.path.getsize(f"{ctx.author.id}.txt")) > 8 * 10 ** 6:
+        if (size := os.path.getsize(f"{ctx.author.id}.txt")) > 24 * 10 ** 6:
             try:
                 await ctx.send(
                     "Translation Completed... Your novel is too big.We are uploading to Mega.. Please wait",
@@ -458,6 +539,11 @@ class FileHandler:
         bot.translation_count = bot.translation_count + (round(size / (1024 ** 2), 2) / 3.1)
         if raw_name is not None:
             name = name + "__" + raw_name
+        try:
+            if language == "english":
+                await self.distribute_genre(embed, category, download_url, bot)
+        except:
+            pass
         if library is None:
             if download_url and size > 0.3 * 10 ** 6:
                 novel_data = [
@@ -473,7 +559,8 @@ class FileHandler:
                     datetime.datetime.utcnow().timestamp(),
                     thumbnail,
                     original_language,
-                    category
+                    category,
+                    novel_url
                 ]
                 data = Novel(*novel_data)
                 try:
@@ -497,7 +584,8 @@ class FileHandler:
             await bot.mongo.library.update_thumbnail(_id=library, thumbnail=thumbnail)
             await bot.mongo.library.update_size(_id=library, size=size)
         view = LinkView({"Novel": [download_url, await self.get_emoji_book()]})
-        await ctx.reply(content=f"> **{ctx.author.mention} 🎉Here is your translated novel #{next_no} {name}**", view=view)
+        await ctx.reply(content=f"> **{ctx.author.mention} 🎉Here is your translated novel #{next_no} {name}**",
+                        view=view)
         return
 
     async def crawlnsend(
@@ -529,14 +617,14 @@ class FileHandler:
         embed.add_field(name="Category", value=category)
         embed.add_field(name="Language", value=originallanguage)
         if link:
-            embed.add_field(name="Crawled from :", value=f"[{link}]({link})")
+            embed.add_field(name="Crawled from :", value=f"{link}")
         embed.set_thumbnail(url=thumbnail)
         embed.set_footer(text=f"Uploaded by {ctx.author}", icon_url=ctx.author.display_avatar)
         if originallanguage == "english":
             channel_id = 1086593341740818523
         else:
             channel_id = 1086592655238103061
-        if (size := os.path.getsize(f"{ctx.author.id}_cr.txt")) > 8 * 10 ** 6:
+        if (size := os.path.getsize(f"{ctx.author.id}_cr.txt")) > 24 * 10 ** 6:
             bot.crawler_count = bot.crawler_count + 1
             # if size > 35 * 10 ** 6:
             #     os.remove(f"{ctx.author.id}_cr.txt")
@@ -563,7 +651,8 @@ class FileHandler:
                 download_url = filelnk
             except Exception as e:
                 print(e)
-                await ctx.reply("> **❌Sorry the file is too big to send and mega seems down now. ping developers in support server to resolve the issue..**")
+                await ctx.reply(
+                    "> **❌Sorry the file is too big to send and mega seems down now. ping developers in support server to resolve the issue..**")
             try:
                 os.remove(f"{ctx.author.id}_cr.txt")
             except:
@@ -598,7 +687,8 @@ class FileHandler:
                     datetime.datetime.utcnow().timestamp(),
                     thumbnail,
                     originallanguage,
-                    category
+                    category,
+                    link
                 ]
                 data = Novel(*novel_data)
                 try:
@@ -621,6 +711,10 @@ class FileHandler:
             await bot.mongo.library.update_date(_id=library, date=datetime.datetime.utcnow().timestamp())
             await bot.mongo.library.update_thumbnail(_id=library, thumbnail=thumbnail)
             await bot.mongo.library.update_size(_id=library, size=size)
+        if originallanguage == "english":
+            await self.distribute_genre(embed, category, download_url, bot)
         view = LinkView({"Novel": [download_url, await self.get_emoji_book()]})
-        await ctx.reply(content=f"> **{ctx.author.mention} 🎉Here is your crawled novel #{next_no} {title.split('__')[0]}**  size : {round(size / (1024 ** 2), 2)} MB", view=view)
+        await ctx.reply(
+            content=f"> **{ctx.author.mention} 🎉Here is your crawled novel #{next_no} {title.split('__')[0]}**  size : {round(size / (1024 ** 2), 2)} MB",
+            view=view)
         return download_url

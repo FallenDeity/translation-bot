@@ -3,7 +3,10 @@ import datetime
 import gc
 import os
 import platform
+import random
 import socket
+import subprocess
+import sys
 
 import discord
 from discord.ext import commands
@@ -151,14 +154,21 @@ class Admin(commands.Cog):
 
     @commands.has_role(1020638168237740042)
     @commands.hybrid_command(help="Restart the bot incase of bot crash. Ping any BOT-admins to restart bot")
-    async def restart(self, ctx: commands.Context, instant: bool = False):
+    async def restart(self, ctx: commands.Context, instant: bool = False, server: bool = False):
         try:
             await ctx.defer()
         except:
             pass
+        await self.bot.change_presence(activity=discord.Activity(
+            type=discord.ActivityType.unknown, name="Restarting bot"), status=discord.Status.do_not_disturb)
         msg = await ctx.send("Please wait")
         self.bot.app_status = "restart"
+        no_of_times = 0
+        channel = self.bot.get_channel(
+            991911644831678484
+        ) or await self.bot.fetch_channel(991911644831678484)
         while True:
+            no_of_times += 1
             print("Started restart")
             if not instant:
                 await asyncio.sleep(10)
@@ -166,9 +176,6 @@ class Admin(commands.Cog):
                 break
             if not self.bot.crawler.items() and not self.bot.translator.items():
                 print("restart " + str(datetime.datetime.now()))
-                channel = self.bot.get_channel(
-                    991911644831678484
-                ) or await self.bot.fetch_channel(991911644831678484)
                 try:
                     await channel.send(embed=discord.Embed(description=f"Bot has started restarting"))
                 except:
@@ -180,6 +187,9 @@ class Admin(commands.Cog):
                 self.bot.translator = {}
                 self.bot.crawler = {}
                 await asyncio.sleep(60)
+                if no_of_times > 5:
+                    self.bot.app_status = "up"
+                    await channel.send("Restart failed")
         try:
             await msg.edit(
                 content="",
@@ -212,12 +222,24 @@ class Admin(commands.Cog):
             gc.collect()
         except:
             pass
+        if random.randint(0, 20) > 12 or server is True:
+            try:
+                await channel.send("Server restarted")
+                subprocess.call(['sh', '/home/ubuntu/translation-bot/scripts/server-restart.sh'])
+            except Exception as e:
+                await channel.send("Server restart failed")
+                await channel.send(e.with_traceback().__str__()[:1900])
         for task in asyncio.all_tasks():
             try:
                 task.cancel()
             except:
                 pass
         return await self.bot.start()
+        # print(sys.argv[0])
+        # print(sys.argv)
+        # os.execv(sys.executable, ['python'] + sys.argv)
+        # os.execv(sys.argv[0], sys.argv)
+
         # raise Exception("TooManyRequests")
         # h = heroku3.from_key(os.getenv("APIKEY"))
         # app = h.app(os.getenv("APPNAME"))

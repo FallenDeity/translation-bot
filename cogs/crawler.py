@@ -336,8 +336,8 @@ class Crawler(commands.Cog):
             return await ctx.reply(
                 "> **❌You cannot crawl two novels at the same time.**"
             )
-        # if self.bot.app_status == "restart": return await ctx.reply( f"> Bot is scheduled to restart within 60 sec
-        # or after all current tasks are completed.. Please try after bot is restarted")
+        if self.bot.app_status == "restart":
+            return await ctx.reply( f"> Bot is scheduled to restart within 60 sec or after all current tasks are completed.. Please try after bot is restarted")
         cloudscrape: bool = False
         if link is None:
             return await ctx.reply(f"> **❌Enter a link for crawling.**")
@@ -745,6 +745,7 @@ class Crawler(commands.Cog):
                 await asyncio.sleep(15)
         try:
             self.bot.crawler[ctx.author.id] = f"0/{len(urls)}"
+            await FileHandler.update_status(self.bot)
             try:
                 thumbnail = await FileHandler().get_thumbnail(soup, link)
             except:
@@ -862,12 +863,13 @@ class Crawler(commands.Cog):
                 print("error in garbage collection")
             try:
                 del self.bot.crawler[ctx.author.id]
+                await FileHandler.update_status(self.bot)
             except:
                 pass
             if translate_to is None and add_terms is None:
                 try:
                     if (
-                            self.bot.translation_count >= 18 or self.bot.crawler_count >= 20) and self.bot.app_status == "up":
+                            self.bot.translation_count >= 28 or self.bot.crawler_count >= 28) and self.bot.app_status == "up":
                         await ctx.reply(
                             "> **Bot will be Restarted when the bot is free due to max limit is reached.. Please be patient")
                         chan = self.bot.get_channel(
@@ -878,8 +880,7 @@ class Crawler(commands.Cog):
                         asyncio.create_task(self.bot.get_command("restart").callback(Admin(self.bot), context_new2))
                 except:
                     pass
-        if (
-                translate_to is not None or add_terms is not None) and download_url is not None and not download_url.strip() == "":
+        if (translate_to is not None or add_terms is not None) and download_url is not None and not download_url.strip() == "":
             if translate_to is None:
                 translate_to = "english"
             if translate_to not in self.bot.all_langs and original_Language not in ["english", "en"]:
@@ -944,8 +945,8 @@ class Crawler(commands.Cog):
             return await ctx.reply(
                 "> **❌You cannot crawl two novels at the same time.**"
             )
-        # if self.bot.app_status == "restart": return await ctx.reply( f"> Bot is scheduled to restart within 60 sec
-        # or after all current tasks are completed.. Please try after bot is restarted")
+        if self.bot.app_status == "restart":
+            return await ctx.reply(f"> Bot is scheduled to restart within 60 sec  or after all current tasks are completed.. Please try after bot is restarted")
         title_css = "title"
         cloudscrape: bool = False
         try:
@@ -1018,8 +1019,10 @@ class Crawler(commands.Cog):
             sel = parsel.Selector(response.text)
             soup = BeautifulSoup(response.content, 'html5lib', from_encoding=response.encoding)
             secondchplink = await FileHandler.find_next_chps(soup, firstchplink)
-        if "readwn" in firstchplink or "wuxiax.co" in firstchplink or "novelmt.com" in firstchplink or "fannovels.com" in firstchplink or "novelmtl.com" in firstchplink or "booktoki216.com" in firstchplink or "69shu" in firstchplink:
+        if "readwn" in firstchplink or "wuxiax.co" in firstchplink or "novelmt.com" in firstchplink or "fannovels.com" in firstchplink or "novelmtl.com" in firstchplink or "booktoki216.com" in firstchplink or "69shu" in firstchplink or "wuxiap.com" in firstchplink:
             waittime = 1.0
+        if "69shu" in firstchplink:
+            waittime = 1.65
         if nextselector is not None:
             sel_tag = True
             if '::attr(href)' not in nextselector:
@@ -1219,6 +1222,7 @@ class Crawler(commands.Cog):
             await ctx.reply(content=f"> Updating {str(library)} with name : {title_name}")
         try:
             self.bot.crawler[ctx.author.id] = f"0/{noofchapters}"
+            await FileHandler.update_status(self.bot)
             task = asyncio.create_task(self.cc_prog_cr_next(msg, embed, ctx.author.id, 20))
             for i in range(1, noofchapters):
                 try:
@@ -1336,6 +1340,7 @@ class Crawler(commands.Cog):
             except:
                 pass
             try:
+                await FileHandler.update_status(self.bot)
                 gc.collect()
             except:
                 print("error in garbage collection")
