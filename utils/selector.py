@@ -128,9 +128,11 @@ class CssSelector:
                 or "jpxs" in link
         ):
             return [".infos>h1:first-child", ""]
-        elif "txt520" in link or "powanjuan" in link or "ffxs" in link:
+        elif "ffxs8.com" in link:
+            return ["body > div.detail.clearfix > div > div.info-desc > div.desc-detail > h1", ""]
+        elif "txt520" in link or "ffxs" in link:
             return ["title", ""]
-        elif "bixiang" in link:
+        elif "bixiang" in link or "powanjuan" in link:
             return [".desc>h1", ""]
         elif "sjks" in link:
             return [".box-artic>h1", ""]
