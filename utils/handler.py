@@ -581,7 +581,7 @@ class FileHandler:
                             no_of_tries += 1
         else:
             await bot.mongo.library.update_download(_id=library, download=download_url)
-            await bot.mongo.library.update_date(_id=library, date=datetime.datetime.utcnow().timestamp())
+            await bot.mongo.library.update_date(_id=library, date=datetime.datetime.now(datetime.timezone.utc).timestamp())
             await bot.mongo.library.update_thumbnail(_id=library, thumbnail=thumbnail)
             await bot.mongo.library.update_size(_id=library, size=size)
         view = LinkView({"Novel": [download_url, await self.get_emoji_book()]})
@@ -710,7 +710,7 @@ class FileHandler:
                             no_of_tries += 1
         else:
             await bot.mongo.library.update_download(_id=library, download=download_url)
-            await bot.mongo.library.update_date(_id=library, date=datetime.datetime.utcnow().timestamp())
+            await bot.mongo.library.update_date(_id=library, date=datetime.datetime.now(datetime.timezone.utc).timestamp())
             await bot.mongo.library.update_thumbnail(_id=library, thumbnail=thumbnail)
             await bot.mongo.library.update_size(_id=library, size=size)
         if originallanguage == "english":
