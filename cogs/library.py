@@ -30,7 +30,8 @@ class Library(commands.Cog):
     @staticmethod
     async def buttons(lst: list[discord.Embed], ctx: commands.Context) -> None:
         if len(lst) == 1:
-            return await ctx.send(embed=lst[0])
+            await ctx.send(embed=lst[0])
+            return
         menu = ViewMenu(ctx, menu_type=ViewMenu.TypeEmbed, remove_buttons_on_timeout=True)
         for i in lst:
             menu.add_page(i)

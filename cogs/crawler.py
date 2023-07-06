@@ -891,6 +891,7 @@ class Crawler(commands.Cog):
                                                                            None,
                                                                            translate_to, title_name[:100], None, None,
                                                                            add_terms)
+            return
         else:
             return
 
@@ -1324,6 +1325,7 @@ class Crawler(commands.Cog):
                                                                                translate_to, title_name[:100], None,
                                                                                None,
                                                                                add_terms)
+                return
             else:
                 return
         except Exception as e:
@@ -1342,8 +1344,10 @@ class Crawler(commands.Cog):
             try:
                 await FileHandler.update_status(self.bot)
                 gc.collect()
+                return
             except:
                 print("error in garbage collection")
+
 
     @crawl.autocomplete("translate_to")
     async def translate_complete(

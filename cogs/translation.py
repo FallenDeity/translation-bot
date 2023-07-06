@@ -46,7 +46,7 @@ class Translate(commands.Cog):
                 "> **❌You have no novel deposited for translation currently.**",
                 delete_after=5,
             )
-        await ctx.send(f"> **🚄`{self.bot.translator[ctx.author.id]}`**")
+        return await ctx.send(f"> **🚄`{self.bot.translator[ctx.author.id]}`**")
 
     @commands.hybrid_command(
         help="Send file to be translated with the command. use correct novelname, otherwise you  will be banned",
@@ -588,8 +588,9 @@ class Translate(commands.Cog):
                         await FileHandler.get_desc_from_text(story[:10000], title=name)).strip()
                 except:
                     description = await FileHandler.get_desc_from_text(story[:10000], title=name)
-            await FileHandler().distribute(self.bot, ctx, name, language, original_Language, rawname, description,
-                                           thumbnail=thumbnail, library=library, novel_url=novel_url)
+            return await FileHandler().distribute(self.bot, ctx, name, language, original_Language, rawname,
+                                                  description,
+                                                  thumbnail=thumbnail, library=library, novel_url=novel_url)
         except Exception as e:
             if "Translation stopped" in str(e):
                 return await ctx.send("Translation stopped")
@@ -628,6 +629,7 @@ class Translate(commands.Cog):
             try:
                 await FileHandler.update_status(self.bot)
                 gc.collect()
+                return
             except:
                 print("error in garbage collection")
 
@@ -721,6 +723,7 @@ class Translate(commands.Cog):
             return await ctx.reply(content="> Attach a file to translate")
         count = 1
         for attached in message.attachments:
+            self.bot.app_status = "multi"
             try:
                 ctx_new = await self.bot.get_context(message)
             except:
@@ -738,13 +741,18 @@ class Translate(commands.Cog):
                                                                                None,
                                                                                language)
                 await asyncio.sleep(5)
+
             except Exception as e:
                 if "TooManyRequests" in str(e):
                     raise e
                 else:
                     print(e)
                     ctx_new = self.bot.get_context(message)
-                    await ctx_new.send(f"> Error occurred in translating {attached.filename}\ndue to : {str(e)}")
+                    self.bot.app_status = "up"
+                    return await ctx_new.send(f"> Error occurred in translating {attached.filename}\ndue to : {str(e)}")
+            finally:
+                self.bot.app_status = "up"
+        return
 
     @multi.autocomplete("language")
     async def translate_complete(

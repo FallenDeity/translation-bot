@@ -237,6 +237,7 @@ class ErrorHandler(commands.Cog):
                 await channel.send(f"({ctx.message.jump_url}) \n{str(error)}")
                 await channel.send(error.__traceback__[:4000])
             raise error
+        return
 
 
 async def setup(bot: Raizel) -> None:
