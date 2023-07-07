@@ -143,14 +143,32 @@ class Admin(commands.Cog):
 
     @commands.has_role(1020638168237740042)
     @commands.hybrid_command(help="get id of the user if name and discriminator provided. Admin only command")
-    async def get_id(self, ctx: commands.Context, name: str, discriminator: str = None):
+    async def get_id(self, ctx: commands.Context, library_id: int = None, name: str = None, discriminator: str = None):
+        """Get id of a user with library id or username
+                       Parameters
+                       ----------
+                       ctx : commands.Context
+                           The interaction
+                       library_id :
+                           it will return the userid of the user who uploaded the novel with this library id
+                       name :
+                            return the user id of the user with given name
+                       discriminator :
+                            discriminator(need to be updated, use library id for now
+                       """
         await ctx.defer()
-        if '#' in name:
-            name_spl = name.split('#')
-            name = name_spl[0]
-            discriminator = name_spl[1]
-        user = discord.utils.get(self.bot.get_all_members(), name=name, discriminator=discriminator)
-        return await ctx.send(content=f"{user.id}", ephemeral=True)
+        if library_id:
+            userid = await self.bot.mongo.library.get_uploader_by_id(library_id)
+            return await ctx.send(content=f"{userid}")
+        elif name:
+            if '#' in name:
+                name_spl = name.split('#')
+                name = name_spl[0]
+                discriminator = name_spl[1]
+            user = discord.utils.get(self.bot.get_all_members(), name=name, discriminator=discriminator)
+            return await ctx.send(content=f"{user.id}", ephemeral=True)
+        else:
+            return await ctx.reply(content="> please provide library id or user name")
 
     @commands.has_role(1020638168237740042)
     @commands.hybrid_command(help="Restart the bot incase of bot crash. Ping any BOT-admins to restart bot")
