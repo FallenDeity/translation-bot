@@ -159,7 +159,8 @@ class Admin(commands.Cog):
         await ctx.defer()
         if library_id:
             userid = await self.bot.mongo.library.get_uploader_by_id(library_id)
-            return await ctx.send(content=f"{userid}")
+            await ctx.send(content=f"{userid}")
+            return await ctx.send(content=f"> uploader of library id {library_id} is :{self.bot.get_user(userid).mention}")
         elif name:
             if '#' in name:
                 name_spl = name.split('#')
