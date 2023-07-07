@@ -624,6 +624,8 @@ class Crawler(commands.Cog):
         library: int = None
         if 'b.faloo' in link or 'wap.faloo' in link:
             urls = urls[:200]
+        if "www.uukanshu.com" in link:
+            reverse = "true"
         if reverse is not None:
             urls.reverse()
         if max_chapters is not None:
