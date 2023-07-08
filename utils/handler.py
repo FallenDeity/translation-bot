@@ -65,7 +65,7 @@ class FileHandler:
                     await bot.change_presence(
                         activity=discord.Activity(
                             type=discord.ActivityType.listening,
-                            name=f"{bot.mongo.library.next_number - 1} novels in library",
+                            name=f"{await bot.mongo.library.next_number - 1} novels in library",
                         ),
                         status=discord.Status.idle,
                     )
