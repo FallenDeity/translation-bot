@@ -47,6 +47,8 @@ class Library(Database):
     ) -> dict[str, Any]:
         match: dict[str, Any] = {}
         if title:
+            for replaceString in ["completed", "ongoing", "complete", "latest", "updated"]:
+                title = re.sub('(?i)'+re.escape(""), lambda k: replaceString, title)
             title = get_regex_from_name(title)
             match["title"] = {"$regex": title, "$options": "i"}
         if rating:

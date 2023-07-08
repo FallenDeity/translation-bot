@@ -128,9 +128,12 @@ class Raizel(commands.Bot):
                 if count >= 20:
                     user_ids.append(user_id)
         members = guild.members
+        banned_members  =  await self.mongo.blocker.get_all_banned_users()
         for member in members:
             if member.id in user_ids:
                 if role in member.roles:
+                    break
+                if member.id in banned_members:
                     break
                 no = no + 1
                 print(f"added role to {member.name}")
