@@ -202,7 +202,7 @@ class Crawler(commands.Cog):
             full_chp = full_chp + "\n".join(text)
         try:
             if next_chp_finder:
-                next_href = await FileHandler.find_next_chps(soup, links)
+                next_href = await self.bot.loop.run_in_executor(None, FileHandler.find_next_chps, soup, links)
             elif tag:
                 next_href = sel.css(next_xpath).extract_first()
                 next_href = urljoin(links, next_href)
@@ -1009,7 +1009,8 @@ class Crawler(commands.Cog):
         if secondchplink is None and nextselector is None:
             next_chp_find = True
             path = ""
-            secondchplink = await FileHandler.find_next_chps(soup, firstchplink)
+            secondchplink = await self.bot.loop.run_in_executor(None, FileHandler.find_next_chps, soup, firstchplink)
+            # secondchplink = await FileHandler.find_next_chps(soup, firstchplink)
         if (secondchplink is None or secondchplink.strip() == "") and "69shu" in firstchplink:
             if "69shu" in firstchplink and "txt" in firstchplink:
                 firstchplink = firstchplink.replace("/txt", "")
@@ -1021,7 +1022,8 @@ class Crawler(commands.Cog):
             response.encoding = response.apparent_encoding
             sel = parsel.Selector(response.text)
             soup = BeautifulSoup(response.content, 'html5lib', from_encoding=response.encoding)
-            secondchplink = await FileHandler.find_next_chps(soup, firstchplink)
+            secondchplink = await self.bot.loop.run_in_executor(None, FileHandler.find_next_chps, soup, firstchplink)
+            # secondchplink = await FileHandler.find_next_chps(soup, firstchplink)
         if "readwn" in firstchplink or "wuxiax.co" in firstchplink or "novelmt.com" in firstchplink or "fannovels.com" in firstchplink or "novelmtl.com" in firstchplink or "booktoki216.com" in firstchplink or "69shu" in firstchplink or "wuxiap.com" in firstchplink:
             waittime = 1.0
         if "69shu" in firstchplink:
@@ -1045,7 +1047,8 @@ class Crawler(commands.Cog):
                 if full_url == secondchplink:
                     psrt = url
             if psrt == '':
-                secondchplink: str = await FileHandler.find_next_chps(soup, firstchplink)
+                secondchplink = await self.bot.loop.run_in_executor(None, FileHandler.find_next_chps, soup, firstchplink)
+                # secondchplink: str = await FileHandler.find_next_chps(soup, firstchplink)
                 if secondchplink is not None and secondchplink.strip() != "":
                     next_chp_find = True
                     path = ""
