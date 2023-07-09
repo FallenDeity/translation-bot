@@ -116,8 +116,8 @@ class CssSelector:
             return "div.entry-content > div > div > div > div.text-left ::text"
         elif "sangtacviet.vip" in link:
             return ".contentbox ::text"
-        elif "www.novelcool.com" in link:
-            return "body > div.site-content > div.chp-skin.null > div.chapter-reading-section-list > div > div ::text"
+        # elif "www.novelcool.com" in link:
+        #     return "body > div.site-content > div.chp-skin.null > div.chapter-reading-section-list > div > div ::text"
         else:
             return "* ::text"
 
