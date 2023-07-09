@@ -362,7 +362,7 @@ class Translate(commands.Cog):
                             str(reaction.emoji) == '🇾' or str(reaction.emoji) == '🇳') and user == ctx.author
 
                 try:
-                    if ignore_warnings:
+                    if ignore_warnings is True:
                         timeout = 1.0
                     else:
                         timeout = 20.0
@@ -372,6 +372,7 @@ class Translate(commands.Cog):
                         timeout=timeout,
                     )
                 except asyncio.TimeoutError:
+                 if ignore_warnings is False:
                     print('error')
                     try:
                         os.remove(f"{ctx.author.id}.txt")
@@ -379,8 +380,7 @@ class Translate(commands.Cog):
                         pass
                     await ctx.send("No response detected. ", delete_after=5)
                     await chk_msg.delete()
-                    if not ignore_warnings:
-                        return None
+                    return None
                 else:
                     if str(res[0]) == '🇳' or ignore_warnings is True:
                         await rep_msg.delete()
