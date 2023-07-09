@@ -356,6 +356,8 @@ class Translate(commands.Cog):
                 await chk_msg.add_reaction('🇳')
 
                 def check(reaction, user):
+                    if ignore_warnings:
+                        return True
                     return reaction.message.id == chk_msg.id and (
                             str(reaction.emoji) == '🇾' or str(reaction.emoji) == '🇳') and user == ctx.author
 
@@ -377,7 +379,8 @@ class Translate(commands.Cog):
                         pass
                     await ctx.send("No response detected. ", delete_after=5)
                     await chk_msg.delete()
-                    return None
+                    if not ignore_warnings:
+                        return None
                 else:
                     if str(res[0]) == '🇳' or ignore_warnings is True:
                         await rep_msg.delete()
