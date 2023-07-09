@@ -114,8 +114,8 @@ class CssSelector:
             return "#booktxt ::text"
         elif "1stkissnovel.org" in link:
             return "div.entry-content > div > div > div > div.text-left ::text"
-        elif "www.libraryofakasha.com" in link:
-            return "div.chapter-content ::text"
+        #elif "www.libraryofakasha.com" in link:
+        #   return "div.chapter-content ::text"
         #elif "sangtacviet.vip" in link:
         #   return ".contentbox ::text"
         # elif "www.novelcool.com" in link:
