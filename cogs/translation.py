@@ -63,6 +63,7 @@ class Translate(commands.Cog):
             rawname: str = None,
             library_id: int = None,
             term: str = None,
+            ignore_warnings: bool = False
     ):
         """Check the leaderboard of a user
                Parameters
@@ -85,6 +86,8 @@ class Translate(commands.Cog):
                     translate the novel from library with this id
                term :
                     add the terms available in bot
+               ignore_warnings :
+                    give true to ignore the library check
                """
         try:
             await ctx.defer()
@@ -357,10 +360,14 @@ class Translate(commands.Cog):
                             str(reaction.emoji) == '🇾' or str(reaction.emoji) == '🇳') and user == ctx.author
 
                 try:
+                    if ignore_warnings:
+                        timeout = 1.0
+                    else:
+                        timeout = 20.0
                     res = await self.bot.wait_for(
                         "reaction_add",
                         check=check,
-                        timeout=20.0,
+                        timeout=timeout,
                     )
                 except asyncio.TimeoutError:
                     print('error')
@@ -372,7 +379,7 @@ class Translate(commands.Cog):
                     await chk_msg.delete()
                     return None
                 else:
-                    if str(res[0]) == '🇳':
+                    if str(res[0]) == '🇳' or ignore_warnings is True:
                         await rep_msg.delete()
                         rep_msg = await ctx.reply("Reaction received.. please wait")
                     else:

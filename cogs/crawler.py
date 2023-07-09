@@ -337,7 +337,8 @@ class Crawler(commands.Cog):
                 "> **❌You cannot crawl two novels at the same time.**"
             )
         if self.bot.app_status == "restart":
-            return await ctx.reply( f"> Bot is scheduled to restart within 60 sec or after all current tasks are completed.. Please try after bot is restarted")
+            return await ctx.reply(
+                f"> Bot is scheduled to restart within 60 sec or after all current tasks are completed.. Please try after bot is restarted")
         cloudscrape: bool = False
         if link is None:
             return await ctx.reply(f"> **❌Enter a link for crawling.**")
@@ -882,7 +883,8 @@ class Crawler(commands.Cog):
                         asyncio.create_task(self.bot.get_command("restart").callback(Admin(self.bot), context_new2))
                 except:
                     pass
-        if (translate_to is not None or add_terms is not None) and download_url is not None and not download_url.strip() == "":
+        if (
+                translate_to is not None or add_terms is not None) and download_url is not None and not download_url.strip() == "":
             if translate_to is None:
                 translate_to = "english"
             if translate_to not in self.bot.all_langs and original_Language not in ["english", "en"]:
@@ -892,7 +894,7 @@ class Crawler(commands.Cog):
                                                                            None,
                                                                            None,
                                                                            translate_to, title_name[:100], None, None,
-                                                                           add_terms)
+                                                                           add_terms, True)
             return
         else:
             return
@@ -949,7 +951,8 @@ class Crawler(commands.Cog):
                 "> **❌You cannot crawl two novels at the same time.**"
             )
         if self.bot.app_status == "restart":
-            return await ctx.reply(f"> Bot is scheduled to restart within 60 sec  or after all current tasks are completed.. Please try after bot is restarted")
+            return await ctx.reply(
+                f"> Bot is scheduled to restart within 60 sec  or after all current tasks are completed.. Please try after bot is restarted")
         title_css = "title"
         cloudscrape: bool = False
         try:
@@ -1047,7 +1050,8 @@ class Crawler(commands.Cog):
                 if full_url == secondchplink:
                     psrt = url
             if psrt == '':
-                secondchplink = await self.bot.loop.run_in_executor(None, FileHandler.find_next_chps, soup, firstchplink)
+                secondchplink = await self.bot.loop.run_in_executor(None, FileHandler.find_next_chps, soup,
+                                                                    firstchplink)
                 # secondchplink: str = await FileHandler.find_next_chps(soup, firstchplink)
                 if secondchplink is not None and secondchplink.strip() != "":
                     next_chp_find = True
@@ -1329,7 +1333,7 @@ class Crawler(commands.Cog):
                                                                                None,
                                                                                translate_to, title_name[:100], None,
                                                                                None,
-                                                                               add_terms)
+                                                                               add_terms, True)
                 return
             else:
                 return
@@ -1352,7 +1356,6 @@ class Crawler(commands.Cog):
                 return
             except:
                 print("error in garbage collection")
-
 
     @crawl.autocomplete("translate_to")
     async def translate_complete(
