@@ -80,6 +80,22 @@ class FileHandler:
                         outstr += " novels"
                 if len(bot.translator) != 0:
                     outstr += f"translating {len(bot.translator)} novels"
+                outstr += "\n"
+                if len(bot.crawler) != 0:
+                    outstr += "Crawler : "
+                    for keys, values in bot.crawler.items():
+                        user = bot.get_user(keys)
+                        user = user.name
+                        outstr = f"{outstr}{user}:{values}, "
+                    outstr += "\n"
+                if len(bot.translator) != 0:
+                    outstr += "Translator : "
+                    for keys, values in bot.translator.items():
+                        user = bot.get_user(keys)
+                        user = user.name
+                        outstr = f"{outstr}{user}:{values}, "
+                if len(outstr) >= 128:
+                    outstr = outstr[:120] + "..."
                 await bot.change_presence(
                     activity=discord.Activity(
                         type=discord.ActivityType.watching, state="stat",
