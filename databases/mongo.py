@@ -1,5 +1,6 @@
 import os
 import re
+from datetime import datetime
 from typing import Any
 
 from motor import motor_asyncio
@@ -48,7 +49,7 @@ class Library(Database):
         match: dict[str, Any] = {}
         if title:
             for subString in ["completed", "ongoing", "complete", "latest", "updated"]:
-                title = str(re.sub('(?i)'+re.escape(subString), lambda k: "", title))
+                title = str(re.sub('(?i)' + re.escape(subString), lambda k: "", title))
             title = get_regex_from_name(title)
             match["title"] = {"$regex": title, "$options": "i"}
         if rating:
@@ -79,7 +80,7 @@ class Library(Database):
             tag: str = "",
             size: float = 0.0,
             no: int = 300,
-    ) ->list[Novel]:
+    ) -> list[Novel]:
         commons = await self.library.aggregate(
             [
                 {"$match": self._make_match(title, rating, language, original_language, uploader, category, tag, size)},
@@ -172,6 +173,15 @@ class Library(Database):
             {"_id": _id}, {"$set": {"date": date}}
         )
 
+    async def update_novel_(self, _id: int, title: str, description: str, download: str, size: float,
+                            date: datetime.timestamp
+                            , thumbnail: str, category: str, crawled_from: str) -> None:
+        await self.library.update_one(
+            {"_id": _id}, {"$set": {"title": title, "description": description, "download": download, "size": size,
+                                    "date": date, "thumbnail": thumbnail, "category": category,
+                                    "crawled_from": crawled_from}}
+        )
+
     async def get_user_novel_count(self, user_id: int = None, _top_200: bool = False) -> dict[int, int]:
         if user_id is None:
             top_200_uploaders = await self.library.aggregate(
@@ -205,7 +215,6 @@ class Library(Database):
     async def get_all_tags(self) -> list[str]:
         tags = await self.library.distinct("tags")
         return tags
-
 
     @property
     async def get_all_distinct_titles(self) -> list[str]:
@@ -244,4 +253,3 @@ class Blocker(Database):
         users = await self.blocker.find().to_list(length=await self.blocker.count_documents({}))
         users_id = [i['userid'] for i in users]
         return users_id
-

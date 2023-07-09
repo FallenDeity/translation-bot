@@ -580,10 +580,10 @@ class FileHandler:
                         except:
                             no_of_tries += 1
         else:
-            await bot.mongo.library.update_download(_id=library, download=download_url)
-            await bot.mongo.library.update_date(_id=library, date=datetime.datetime.now(datetime.timezone.utc).timestamp())
-            await bot.mongo.library.update_thumbnail(_id=library, thumbnail=thumbnail)
-            await bot.mongo.library.update_size(_id=library, size=size)
+            await bot.mongo.library.update_novel_(_id=library, title=name, description=description,
+                                                  download=download_url, size=size,
+                                                  date=datetime.datetime.now(datetime.timezone.utc).timestamp(),
+                                                  thumbnail=thumbnail, category=category, crawled_from=novel_url)
         view = LinkView({"Novel": [download_url, await self.get_emoji_book()]})
         await ctx.reply(content=f"> **{ctx.author.mention} 🎉Here is your translated novel #{next_no} {name}**",
                         view=view)
@@ -709,10 +709,11 @@ class FileHandler:
                         except:
                             no_of_tries += 1
         else:
-            await bot.mongo.library.update_download(_id=library, download=download_url)
-            await bot.mongo.library.update_date(_id=library, date=datetime.datetime.now(datetime.timezone.utc).timestamp())
-            await bot.mongo.library.update_thumbnail(_id=library, thumbnail=thumbnail)
-            await bot.mongo.library.update_size(_id=library, size=size)
+            await bot.mongo.library.update_novel_(_id=library, title=title_name, description=description,
+                                                  download=download_url, size=size,
+                                                  date=datetime.datetime.now(datetime.timezone.utc).timestamp(),
+                                                  thumbnail=thumbnail, category=category, crawled_from=link)
+
         if originallanguage == "english":
             await self.distribute_genre(embed, category, download_url, bot)
         view = LinkView({"Novel": [download_url, await self.get_emoji_book()]})
