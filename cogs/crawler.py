@@ -185,7 +185,7 @@ class Crawler(commands.Cog):
         # response.encoding = response.apparent_encoding
         # chp_html = response.text
         sel = parsel.Selector(str(soup))
-        article = simple_json_from_html_string(str(soup))
+        article = await self.bot.loop.run_in_executor(None, simple_json_from_html_string, str(soup))
         chpTitle = article['title']
         full_chp = ""
         if '* ::text' == css or css is None or css.strip() == '':
