@@ -94,7 +94,7 @@ class FileHandler:
                         user = user.name
                         outstr = f"{outstr}{user}:{values}, "
                 if len(outstr) >= 128:
-                    outstr = outstr[:125] + "..."
+                    outstr = outstr[:123] + "..."
                 await bot.change_presence(
                     activity=discord.Activity(
                         type=discord.ActivityType.watching, state="stat",
