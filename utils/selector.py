@@ -233,7 +233,7 @@ class CssSelector:
         elif "1stkissnovel.org" in link:
             return ["None", "#chapter-heading"]
         elif "sangtacviet.vip" in link:
-            return ["#navnexttop", "#booknameholder"]
+            return ["#navnexttop", "title"]
         # elif "www.novelcool.com" in link:
         #     return ["None",  "div.chapter-reading-section-list > div > div > h2"]
         # elif "m.bqg789.net" in link:

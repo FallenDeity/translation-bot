@@ -1110,6 +1110,16 @@ class Crawler(commands.Cog):
         library_update: bool = False
         if title_name.strip().lower() == "001 - Read Novel Chapter 001 Online".lower():
             title_name = firstchplink.split("/")[-1].replace(".html", "")
+        if title_name is None:
+            title_name = GoogleTranslator(
+                        source="auto", target="english"
+                    ).translate(title).strip()
+            if title_name is None:
+                title_name = await FileHandler.get_title(soup=soup)
+                title_name = GoogleTranslator(
+                    source="auto", target="english"
+                ).translate(title_name).strip()
+                title = title_name
         library: int = None
         if novel_data is not None:
             novel_data = list(novel_data)
