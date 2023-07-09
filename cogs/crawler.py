@@ -1158,7 +1158,7 @@ class Crawler(commands.Cog):
                     res = await self.bot.wait_for(
                         "reaction_add",
                         check=check,
-                        timeout=16.0,
+                        timeout=20.0,
                     )
                 except asyncio.TimeoutError:
                     try:
