@@ -35,7 +35,7 @@ class CssSelector:
             return "* ::text"
         elif "shu05" in link:
             return "#htmlContent ::text"
-        elif "readwn" in link or "novelmt.com" in link or "wuxiax.com" in link or "fannovels.com" in link or "novelmtl.com" in link or "www.wuxiap.com" in link:
+        elif "readwn" in link or "novelmt.com" in link or "wuxiax.com" in link or "fannovels.com" in link or "novelmtl.com" in link or "www.wuxiap.com" in link or "www.wuxiau.com" in link:
             return ".chapter-content ::text"
         elif "novelsemperor" in link or "novelsknight.com" in link:
             return "p ::text"
@@ -178,7 +178,7 @@ class CssSelector:
             return ["title", "title ::text"]
 
     def find_next_selector(link):
-        if "readwn" in link or "wuxiax.co" in link or "novelmt.com" in link or "fannovels.com" in link or "novelmtl.com" in link or "www.wuxiap.com" in link:
+        if "readwn" in link or "wuxiax.co" in link or "novelmt.com" in link or "fannovels.com" in link or "novelmtl.com" in link or "www.wuxiap.com" in link or "www.wuxiau.com" in link:
             return ["#chapter-article > header > div > aside > nav > div.action-select > a.chnav.next", "#chapter-article > header > div > div > h1 > a"]
         elif "novelfull.com" in link:
             return ["#next_chap", "#chapter > div > div > a"]
