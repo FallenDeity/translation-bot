@@ -304,7 +304,7 @@ class FileHandler:
     async def find_next_chps(soup: BeautifulSoup, link: str = None):
         selectors = (
             "下一页", "next page", "下一章", "next chapter", "next", "Вперёд »»", "Вперёд", "»»", "»", "下一节",
-            "chương sau")  # 下一页  "下一章"- next chp 下一页
+            "chương sau", "next>>")  # 下一页  "下一章"- next chp 下一页
         for a in soup.find_all("a"):
             # print(a.get_text())
             if any(selector == a.get_text().lower().strip() for selector in selectors):
