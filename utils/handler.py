@@ -71,11 +71,10 @@ class FileHandler:
                     )
                 return
             else:
-                outstr = ""
                 if len(bot.crawler) != 0:
                     outstr = f"crawling {len(bot.crawler)}"
                     if len(bot.translator) != 0:
-                        outstr += " , "
+                        outstr += " ,"
                     else:
                         outstr += " novels"
                 if len(bot.translator) != 0:
@@ -95,7 +94,7 @@ class FileHandler:
                         user = user.name
                         outstr = f"{outstr}{user}:{values}, "
                 if len(outstr) >= 128:
-                    outstr = outstr[:120] + "..."
+                    outstr = outstr[:125] + "..."
                 await bot.change_presence(
                     activity=discord.Activity(
                         type=discord.ActivityType.watching, state="stat",
