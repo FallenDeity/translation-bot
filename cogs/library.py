@@ -85,6 +85,8 @@ class Library(commands.Cog):
         uploader = self.bot.get_user(data['uploader']) or await self.bot.fetch_user(
             data['uploader']
         )
+        if data['crawled_from'] is not None:
+            embed.add_field(name="source", value=f"{data['crawled_from']}")
         embed.add_field(name="Uploader", value=f"Uploaded by {uploader} \n{discord.utils.format_dt(datetime.datetime.fromtimestamp(data['date']), style='R')}")
         embed.set_thumbnail(url=data['thumbnail'])
         embed.set_footer(
