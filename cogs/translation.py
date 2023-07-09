@@ -372,15 +372,14 @@ class Translate(commands.Cog):
                         timeout=timeout,
                     )
                 except asyncio.TimeoutError:
-                 if ignore_warnings is False:
-                    print('error')
-                    try:
-                        os.remove(f"{ctx.author.id}.txt")
-                    except:
-                        pass
-                    await ctx.send("No response detected. ", delete_after=5)
                     await chk_msg.delete()
-                    return None
+                    if ignore_warnings is False:
+                        try:
+                            os.remove(f"{ctx.author.id}.txt")
+                        except:
+                            pass
+                        await ctx.send("No response detected. ", delete_after=5)
+                        return None
                 else:
                     if str(res[0]) == '🇳' or ignore_warnings is True:
                         await rep_msg.delete()
