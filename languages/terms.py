@@ -1,3 +1,6 @@
+from utils.category import Categories
+
+
 def terms(value: str):
     term_dict = {}
 
@@ -7677,4 +7680,5 @@ def get_dictionary():
     for i in temp:
         for j in i:
             dictionary.append(j.lower())
+    dictionary.extend(Categories.all_tags())
     return dictionary
