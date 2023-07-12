@@ -302,7 +302,7 @@ class Crawler(commands.Cog):
                 "> **❌You have no tasks currently running.**"
             )
         if ctx.author.id in self.bot.crawler:
-            del self.bot.crawler[ctx.author.id]
+            self.bot.crawler[ctx.author.id] = "break"
             task: Task = self.bot.crawler_tasks[ctx.author.id]
             task.cancel()
         elif ctx.author.id in self.bot.translator:
