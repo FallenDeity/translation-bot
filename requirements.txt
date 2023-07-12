@@ -1,5 +1,6 @@
 
 aiofiles==23.1.0
+futures==2.2.0
 jishaku==2.5.1
 bs4==0.0.1
 chardet==4.0.0
