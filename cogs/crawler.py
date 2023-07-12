@@ -751,7 +751,7 @@ class Crawler(commands.Cog):
                 await asyncio.sleep(15)
         try:
             self.bot.crawler[ctx.author.id] = f"0/{len(urls)}"
-            self.bot.crawler_tasks[ctx.author.id] = await asyncio.current_task()
+            self.bot.crawler_tasks[ctx.author.id] = asyncio.current_task()
             await FileHandler.update_status(self.bot)
             try:
                 thumbnail = await FileHandler().get_thumbnail(soup, link)
