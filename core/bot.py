@@ -4,6 +4,8 @@ import gc
 import os
 import random
 import traceback
+from asyncio import Task
+
 import joblib
 import typing as t
 
@@ -33,6 +35,8 @@ class Raizel(commands.Bot):
         intents = discord.Intents.all()
         self.translator: t.Dict[int, str] = {}
         self.crawler: t.Dict[int, str] = {}
+        self.translator_tasks: t.Dict[int, Task] = {}
+        self.crawler_tasks: t.Dict[int, Task] = {}
         self.languages = choices
         self.dictionary: list[str] = None
         self.boot = datetime.datetime.utcnow()

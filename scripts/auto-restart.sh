@@ -6,6 +6,7 @@ then
 
   pkill -f tmux
   killall python3
+  pgrep procname && killall python3
   tmux new-session -d -s ENTER
   tmux detach -s ENTER
   tmux send-keys -t 0 "cd /home/ubuntu/translation-bot;python3 main.py" ENTER

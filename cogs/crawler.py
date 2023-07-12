@@ -10,6 +10,7 @@ import time
 import traceback
 import typing
 import typing as t
+from asyncio import Task
 from urllib.parse import urljoin
 from urllib.parse import urlparse
 import cloudscraper
@@ -301,7 +302,9 @@ class Crawler(commands.Cog):
                 "> **❌You have no tasks currently running.**"
             )
         if ctx.author.id in self.bot.crawler:
-            self.bot.crawler[ctx.author.id] = "break"
+            del self.bot.crawler[ctx.author.id]
+            task: Task = self.bot.crawler_tasks[ctx.author.id]
+            task.cancel()
         elif ctx.author.id in self.bot.translator:
             self.bot.translator[ctx.author.id] = "break"
         await ctx.send("> Added stop command to all tasks..")
@@ -748,6 +751,7 @@ class Crawler(commands.Cog):
                 await asyncio.sleep(15)
         try:
             self.bot.crawler[ctx.author.id] = f"0/{len(urls)}"
+            self.bot.crawler_tasks[ctx.author.id] = await asyncio.current_task()
             await FileHandler.update_status(self.bot)
             try:
                 thumbnail = await FileHandler().get_thumbnail(soup, link)
@@ -866,6 +870,7 @@ class Crawler(commands.Cog):
                 print("error in garbage collection")
             try:
                 del self.bot.crawler[ctx.author.id]
+                del self.bot.crawler_tasks[ctx.author.id]
                 await FileHandler.update_status(self.bot)
             except:
                 pass
