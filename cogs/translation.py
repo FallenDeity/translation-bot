@@ -85,7 +85,7 @@ class Translate(commands.Cog):
                library_id :
                     translate the novel from library with this id
                term :
-                    add the terms available in bot
+                    add the terms available in bot.. currently we only have chinese terms
                ignore_warnings :
                     give true to ignore the library check
                """
@@ -683,7 +683,7 @@ class Translate(commands.Cog):
     @commands.hybrid_command(
         help="translate multiple files together one at a time"
     )
-    async def multi(self, ctx: commands.Context, language: str = "english", messageid: str = None, ):
+    async def multi(self, ctx: commands.Context, language: str = "english", add_terms: str = None, messageid: str = None, ):
         """Translate multiple text files
                Parameters
                ----------
@@ -693,6 +693,8 @@ class Translate(commands.Cog):
                    language to translate to, by default english
                messageid :
                     message id of the attachments, bot has to have access to this message
+               add_terms:
+                    add terms to novel added before translating. currently we only have chinese terms
                """
         try:
             await ctx.defer()
@@ -748,7 +750,9 @@ class Translate(commands.Cog):
                                                                                attached.url,
                                                                                None,
                                                                                None,
-                                                                               language)
+                                                                               language, None, None,
+                                                                               None,
+                                                                               add_terms, True)
                 await asyncio.sleep(5)
 
             except Exception as e:
@@ -768,6 +772,22 @@ class Translate(commands.Cog):
             self, inter: discord.Interaction, language: str
     ) -> list[app_commands.Choice]:
         lst = [i for i in self.bot.all_langs if language.lower() in i.lower()][:25]
+        return [app_commands.Choice(name=i, value=i) for i in lst]
+
+    @multi.autocomplete("add_terms")
+    async def translate_complete(
+            self, inter: discord.Interaction, term: str
+    ) -> list[app_commands.Choice]:
+        lst = [
+                  "naruto",
+                  "one-piece",
+                  "pokemon",
+                  "mixed",
+                  "prince-of-tennis",
+                  "marvel",
+                  "dc",
+                  "xianxia",
+              ] + list(map(str, range(1, 8)))
         return [app_commands.Choice(name=i, value=i) for i in lst]
 
     @translate.autocomplete("term")
