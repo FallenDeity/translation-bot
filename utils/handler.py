@@ -279,7 +279,7 @@ class FileHandler:
                 t = t[:-1]
             if t.lower() in bot.dictionary or (len(t) > 3
                                                and bool(dictionary.meaning(str(t), disable_errors=True))):
-                if len(t) > 5 or segment == 2:
+                if len(t) > 5 or segment >= 2:
                     return True
                 else:
                     segment += 1
