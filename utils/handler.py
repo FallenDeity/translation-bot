@@ -556,7 +556,7 @@ class FileHandler:
             name = name + "__" + raw_name
         try:
             if language == "english":
-                embed.add_field(name="size", value=size)
+                embed.add_field(name="size", value=f"{round(size / (1024 ** 2), 2)} MB")
                 await self.distribute_genre(embed, category, download_url, bot)
         except:
             pass
@@ -731,7 +731,7 @@ class FileHandler:
                                                   thumbnail=thumbnail, category=category, crawled_from=link)
 
         if originallanguage == "english":
-            embed.add_field(name="size", value=size)
+            embed.add_field(name="size", value=f"{round(size / (1024 ** 2), 2)} MB")
             await self.distribute_genre(embed, category, download_url, bot)
         view = LinkView({"Novel": [download_url, await self.get_emoji_book()]})
         await ctx.reply(
