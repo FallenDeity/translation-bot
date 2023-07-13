@@ -277,11 +277,8 @@ class FileHandler:
                 continue
             if not t[-1].isalpha():
                 t = t[:-1]
-            if (
-                    t[:-1].isalpha()
-                    and len(t) > 3
-                    and (bool(dictionary.meaning(str(t), disable_errors=True)) or t.lower() in bot.dictionary)
-            ):
+            if t.lower() in bot.dictionary or (len(t) > 3
+                                               and bool(dictionary.meaning(str(t), disable_errors=True))):
                 if len(t) > 5 or segment == 2:
                     return True
                 else:
