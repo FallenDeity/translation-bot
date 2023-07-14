@@ -36,7 +36,7 @@ from utils.hints import Hints
 from utils.selector import CssSelector
 
 headers = {
-    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.142 Safari/537.36"
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36"
 }
 
 
@@ -74,14 +74,14 @@ class Crawler(commands.Cog):
             if scraper is not None:
                 response = scraper.get(links, headers=FileHandler.get_handler(), timeout=20)
             else:
-                response = requests.get(links, headers=FileHandler.get_handler(), timeout=20)
+                response = requests.get(links, headers=headers, timeout=20)
         except Exception as e:
             time.sleep(10)
             try:
                 if scraper is not None:
                     response = scraper.get(links, headers=FileHandler.get_handler(), timeout=20)
                 else:
-                    response = requests.get(links, headers=FileHandler.get_handler(), timeout=20)
+                    response = requests.get(links, headers=headers, timeout=20)
             except:
                 print(e)
                 return nums, f"\ncouldn't get connection to {links}\n"
@@ -528,7 +528,7 @@ class Crawler(commands.Cog):
             if link[-1] == '/':
                 link = link[:-1]
             try:
-                response = requests.get(link, headers=FileHandler.get_handler(), timeout=20)
+                response = requests.get(link, headers=headers, timeout=20)
             except:
                 print('error')
             response.encoding = response.apparent_encoding
@@ -1000,7 +1000,7 @@ class Crawler(commands.Cog):
                 await asyncio.sleep(0.25)
             else:
                 scraper = None
-                response = requests.get(firstchplink, headers=FileHandler.get_handler(), timeout=20)
+                response = requests.get(firstchplink, headers=headers, timeout=20)
         except Exception as e:
             print(e)
             return await ctx.reply(
@@ -1023,10 +1023,10 @@ class Crawler(commands.Cog):
             if "69shu" in firstchplink and "txt" in firstchplink:
                 firstchplink = firstchplink.replace("/txt", "")
                 firstchplink = firstchplink.replace(".htm", "/")
-                response = requests.get(firstchplink, headers=FileHandler.get_handler(), timeout=20)
+                response = requests.get(firstchplink, headers=headers, timeout=20)
             firstchplink = parsel.Selector(response.text).css(
                 "#catalog > ul > li:nth-child(1) > a ::attr(href)").extract_first()
-            response = requests.get(firstchplink, headers=FileHandler.get_handler(), timeout=20)
+            response = requests.get(firstchplink, headers=headers, timeout=20)
             response.encoding = response.apparent_encoding
             sel = parsel.Selector(response.text)
             soup = BeautifulSoup(response.content, 'html5lib', from_encoding=response.encoding)
