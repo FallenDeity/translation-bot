@@ -557,6 +557,10 @@ class FileHandler:
                 await self.distribute_genre(embed, category, download_url, bot)
         except:
             pass
+        if library is not None:
+            org_size = await bot.mongo.library.get_novel_by_id(library)
+            if size < org_size:
+                library = None
         if library is None:
             if download_url and size > 0.3 * 10 ** 6:
                 novel_data = [
@@ -686,6 +690,10 @@ class FileHandler:
                 os.remove(f"{ctx.author.id}_cr.txt")
             except:
                 pass
+        if library is not None:
+            org_size = await bot.mongo.library.get_novel_by_id(library)
+            if size < org_size:
+                library = None
         if library is None:
             if download_url and size > 0.3 * 10 ** 6:
                 novel_data = [
