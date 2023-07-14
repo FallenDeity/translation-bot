@@ -146,7 +146,7 @@ class Crawler(commands.Cog):
 
     def direct(self, urls: t.List[str], novel: t.Dict[int, str], name: int, cloudscrape: bool, tasks: int = 8) -> dict:
         if cloudscrape:
-            scraper = cloudscraper.CloudScraper()
+            scraper = cloudscraper.CloudScraper(delay=10)
         else:
             scraper = None
         workers = self.get_workers(tasks)
@@ -397,7 +397,7 @@ class Crawler(commands.Cog):
         if int(str(res.status)[0]) == 4:
             cloudscrape = True
         if cloudscrape:
-            scraper = cloudscraper.CloudScraper()  # CloudScraper inherits from requests.Session
+            scraper = cloudscraper.CloudScraper(delay=10)  # CloudScraper inherits from requests.Session
             response = scraper.get(link, timeout=10)
             response.encoding = response.apparent_encoding
             soup = BeautifulSoup(response.text, "html.parser", from_encoding=response.encoding)
@@ -422,7 +422,7 @@ class Crawler(commands.Cog):
             print(e)
             try:
                 title_name = ""
-                scraper = cloudscraper.CloudScraper()  # CloudScraper inherits from requests.Session
+                scraper = cloudscraper.CloudScraper(delay=10)  # CloudScraper inherits from requests.Session
                 response = scraper.get(link, timeout=10)
                 response.encoding = response.apparent_encoding
                 html = response.text
@@ -554,7 +554,7 @@ class Crawler(commands.Cog):
             # print(urls)
             title_name = sel.css(maintitleCSS + " ::text").extract_first()
             # print(urls)
-        scraper = cloudscraper.CloudScraper()
+        scraper = cloudscraper.CloudScraper(delay=10)
         if urls == [] or len(urls) < 30:
             response = scraper.get(link)
             soup = BeautifulSoup(response.text, "html.parser", from_encoding=response.encoding)
@@ -994,7 +994,7 @@ class Crawler(commands.Cog):
             noofchapters = 3000
         try:
             if cloudscrape:
-                scraper = cloudscraper.CloudScraper()
+                scraper = cloudscraper.CloudScraper(delay=10)
                 response = scraper.get(firstchplink, headers=headers, timeout=20)
                 await ctx.send("Cloudscrape is turned ON", delete_after=8)
                 await asyncio.sleep(0.25)
