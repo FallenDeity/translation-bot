@@ -411,7 +411,7 @@ class Library(commands.Cog):
                 try:
                     embed.add_field(
                         name=f"{n}. {count} novels",
-                        value=f"**{(self.bot.get_user(user_id)).name} **-> <@{user_id}>",
+                        value=f"**{(self.bot.get_user(user_id)).global_name} **-> <@{user_id}>",
                         inline=False,
                     )
                 except:
