@@ -483,6 +483,7 @@ class FileHandler:
             description: str = "", thumbnail: str = "", library: int = None, novel_url: str = None
     ) -> None:
         download_url = None
+        update: bool = True
         if library is None:
             next_no = await bot.mongo.library.next_number
         else:
@@ -569,8 +570,8 @@ class FileHandler:
             pass
         if library is not None:
             data = await bot.mongo.library.get_novel_by_id(library)
-            if size < data['size']:
-                library = None
+            if size+1000 < data['size']:
+                update = False
         if library is None:
             if download_url and size > 0.3 * 10 ** 6:
                 novel_data = [
@@ -606,7 +607,7 @@ class FileHandler:
                             loop = False
                         except:
                             no_of_tries += 1
-        else:
+        elif update:
             await bot.mongo.library.update_novel_(_id=library, title=name, description=description,
                                                   download=download_url, size=size,
                                                   date=datetime.datetime.now(datetime.timezone.utc).timestamp(),
@@ -621,6 +622,7 @@ class FileHandler:
             description: str = None, thumbnail: str = "", link: str = None, library: int = None
     ) -> str:
         download_url = None
+        update: bool = True
         if library is None:
             next_no = await bot.mongo.library.next_number
         else:
@@ -702,8 +704,8 @@ class FileHandler:
                 pass
         if library is not None:
             data = await bot.mongo.library.get_novel_by_id(library)
-            if size < data['size']:
-                library = None
+            if size+1000 < data['size']:
+                update = False
         if library is None:
             if download_url and size > 0.3 * 10 ** 6:
                 novel_data = [
@@ -739,7 +741,7 @@ class FileHandler:
                             loop = False
                         except:
                             no_of_tries += 1
-        else:
+        elif update:
             await bot.mongo.library.update_novel_(_id=library, title=title_name, description=description,
                                                   download=download_url, size=size,
                                                   date=datetime.datetime.now(datetime.timezone.utc).timestamp(),
