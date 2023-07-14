@@ -177,7 +177,7 @@ class FileHandler:
         aliases = ("description", "Description", "DESCRIPTION", "desc", "Desc", "DESC")
         description = ""
         if next:
-            scraper = cloudscraper.CloudScraper()
+            scraper = cloudscraper.CloudScraper(delay=10)
             response = scraper.get(link)
             response.encoding = response.apparent_encoding
             article = simple_json_from_html_string(response.text)
@@ -191,7 +191,7 @@ class FileHandler:
             if description is not None and description.strip() != "":
                 return description
         if "69shu" in link:
-            scraper = cloudscraper.CloudScraper()  # CloudScraper inherits from requests.Session
+            scraper = cloudscraper.CloudScraper(delay=10)  # CloudScraper inherits from requests.Session
             href = urljoin(link, parsel.Selector(scraper.get(link).text).css("div.titxt ::attr(href)").extract_first())
             response = scraper.get(href)
             response.encoding = response.apparent_encoding
@@ -411,7 +411,7 @@ class FileHandler:
         return url, suffix, midfix, prefix
 
     async def get_thumbnail(self, soup, link) -> str:
-        scraper = cloudscraper.create_scraper()
+        scraper = cloudscraper.create_scraper(delay=10)
         if "69shu" in link and "txt" not in link:
             link = urljoin(link, parsel.Selector(scraper.get(link).text).css("div.titxt ::attr(href)").extract_first())
             soup = BeautifulSoup(scraper.get(link).text, "html.parser")
