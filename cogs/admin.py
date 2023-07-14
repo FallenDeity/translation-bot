@@ -190,7 +190,7 @@ class Admin(commands.Cog):
             no_of_times += 1
             print("Started restart")
             if not instant:
-                await asyncio.sleep(10)
+                await asyncio.sleep(3)
             else:
                 break
             if not self.bot.crawler.items() and not self.bot.translator.items():
@@ -205,7 +205,7 @@ class Admin(commands.Cog):
                 self.bot.app_status = "restart"
                 self.bot.translator = {}
                 self.bot.crawler = {}
-                await asyncio.sleep(60)
+                await asyncio.sleep(no_of_times*10.0)
                 if no_of_times > 5:
                     self.bot.app_status = "up"
                     await channel.send("Restart failed")
