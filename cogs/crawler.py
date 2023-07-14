@@ -72,16 +72,16 @@ class Crawler(commands.Cog):
         response = None
         try:
             if scraper is not None:
-                response = scraper.get(links, headers=headers, timeout=20)
+                response = scraper.get(links, headers=FileHandler.get_handler(), timeout=20)
             else:
-                response = requests.get(links, headers=headers, timeout=20)
+                response = requests.get(links, headers=FileHandler.get_handler(), timeout=20)
         except Exception as e:
             time.sleep(10)
             try:
                 if scraper is not None:
-                    response = scraper.get(links, headers=headers, timeout=20)
+                    response = scraper.get(links, headers=FileHandler.get_handler(), timeout=20)
                 else:
-                    response = requests.get(links, headers=headers, timeout=20)
+                    response = requests.get(links, headers=FileHandler.get_handler(), timeout=20)
             except:
                 print(e)
                 return nums, f"\ncouldn't get connection to {links}\n"
@@ -133,7 +133,7 @@ class Crawler(commands.Cog):
         return nums, full
 
     def scrape(self, scraper, links: str):
-        response = scraper.get(links, headers=headers, timeout=20)
+        response = scraper.get(links, headers=FileHandler.get_handler(), timeout=20)
         return response
 
     def get_workers(self, tasks: int):
@@ -528,7 +528,7 @@ class Crawler(commands.Cog):
             if link[-1] == '/':
                 link = link[:-1]
             try:
-                response = requests.get(link, headers=headers, timeout=20)
+                response = requests.get(link, headers=FileHandler.get_handler(), timeout=20)
             except:
                 print('error')
             response.encoding = response.apparent_encoding
@@ -995,12 +995,12 @@ class Crawler(commands.Cog):
         try:
             if cloudscrape:
                 scraper = cloudscraper.CloudScraper(delay=10)
-                response = scraper.get(firstchplink, headers=headers, timeout=20)
+                response = scraper.get(firstchplink, headers=FileHandler.get_handler(), timeout=20)
                 await ctx.send("Cloudscrape is turned ON", delete_after=8)
                 await asyncio.sleep(0.25)
             else:
                 scraper = None
-                response = requests.get(firstchplink, headers=headers, timeout=20)
+                response = requests.get(firstchplink, headers=FileHandler.get_handler(), timeout=20)
         except Exception as e:
             print(e)
             return await ctx.reply(
@@ -1023,10 +1023,10 @@ class Crawler(commands.Cog):
             if "69shu" in firstchplink and "txt" in firstchplink:
                 firstchplink = firstchplink.replace("/txt", "")
                 firstchplink = firstchplink.replace(".htm", "/")
-                response = requests.get(firstchplink, headers=headers, timeout=20)
+                response = requests.get(firstchplink, headers=FileHandler.get_handler(), timeout=20)
             firstchplink = parsel.Selector(response.text).css(
                 "#catalog > ul > li:nth-child(1) > a ::attr(href)").extract_first()
-            response = requests.get(firstchplink, headers=headers, timeout=20)
+            response = requests.get(firstchplink, headers=FileHandler.get_handler(), timeout=20)
             response.encoding = response.apparent_encoding
             sel = parsel.Selector(response.text)
             soup = BeautifulSoup(response.content, 'html5lib', from_encoding=response.encoding)
