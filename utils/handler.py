@@ -568,8 +568,8 @@ class FileHandler:
         except:
             pass
         if library is not None:
-            org_size = await bot.mongo.library.get_novel_by_id(library)
-            if size < org_size:
+            data = await bot.mongo.library.get_novel_by_id(library)
+            if size < data['size']:
                 library = None
         if library is None:
             if download_url and size > 0.3 * 10 ** 6:
@@ -701,8 +701,8 @@ class FileHandler:
             except:
                 pass
         if library is not None:
-            org_size = await bot.mongo.library.get_novel_by_id(library)
-            if size < org_size:
+            data = await bot.mongo.library.get_novel_by_id(library)
+            if size < data['size']:
                 library = None
         if library is None:
             if download_url and size > 0.3 * 10 ** 6:
