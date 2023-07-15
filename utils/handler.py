@@ -6,6 +6,7 @@ import re
 import typing
 from urllib.parse import urljoin
 from collections import OrderedDict
+from difflib import SequenceMatcher
 
 from pypdf import PdfReader
 import aiofiles
@@ -573,6 +574,9 @@ class FileHandler:
             data = await bot.mongo.library.get_novel_by_id(library)
             if size+1000 < data['size']:
                 update = False
+                s = SequenceMatcher(None, data['description'], description)
+                if s.ratio() <= 0.7:
+                    library = None
         if library is None:
             if download_url and size > 0.3 * 10 ** 6:
                 novel_data = [
@@ -707,6 +711,9 @@ class FileHandler:
             data = await bot.mongo.library.get_novel_by_id(library)
             if size+1000 < data['size']:
                 update = False
+                s = SequenceMatcher(None, data['description'], description)
+                if s.ratio() <= 0.7:
+                    library = None
         if library is None:
             if download_url and size > 0.3 * 10 ** 6:
                 novel_data = [
