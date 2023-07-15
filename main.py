@@ -12,6 +12,7 @@ bot = Raizel()
 @tasks.loop(seconds=50)
 async def census():
     await handler.update_status(bot)
+    return
 
 
 @census.before_loop

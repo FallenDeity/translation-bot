@@ -112,8 +112,9 @@ class FileHandler:
                     ),
                     status=discord.Status.online,
                 )
+                return
         except:
-            pass
+            return
 
     @staticmethod
     async def find_urls_from_text(string):
