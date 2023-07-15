@@ -74,7 +74,7 @@ class Crawler(commands.Cog):
             if scraper is not None:
                 response = scraper.get(links, headers=FileHandler.get_handler(), timeout=20)
             else:
-                response = requests.get(links, headers=headers, timeout=20)
+                response = requests.get(links, headers=FileHandler.get_handler(), timeout=20)
         except Exception as e:
             time.sleep(10)
             try:
