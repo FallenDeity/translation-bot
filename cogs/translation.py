@@ -734,7 +734,8 @@ class Translate(commands.Cog):
             return await ctx.reply(content="> Attach a file to translate")
         count = 1
         for attached in message.attachments:
-            self.bot.app_status = "multi"
+            if count < len(message.attachments):
+                self.bot.app_status = "multi"
             try:
                 ctx_new = await self.bot.get_context(message)
             except:
@@ -754,6 +755,7 @@ class Translate(commands.Cog):
                                                                                None,
                                                                                add_terms, True)
                 await asyncio.sleep(5)
+                self.bot.app_status = "up"
 
             except Exception as e:
                 if "TooManyRequests" in str(e):
