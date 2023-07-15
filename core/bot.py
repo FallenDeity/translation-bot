@@ -41,6 +41,7 @@ class Raizel(commands.Bot):
         self.dictionary: list[str] = None
         self.boot = datetime.datetime.utcnow()
         self.app_status: str = "up"
+        self.update: bool = False
         self.translation_count: float = 0
         self.crawler_count = 0
         super().__init__(

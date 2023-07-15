@@ -208,6 +208,8 @@ class Admin(commands.Cog):
                 await asyncio.sleep(no_of_times*10.0)
                 if no_of_times > 5:
                     self.bot.app_status = "up"
+                    if git_update is True:
+                        self.bot.update = True
                     await channel.send("Restart failed")
         try:
             await msg.edit(
@@ -241,7 +243,7 @@ class Admin(commands.Cog):
             gc.collect()
         except:
             pass
-        if git_update:
+        if git_update or self.bot.update:
             try:
                 subprocess.call(['sh', '/home/ubuntu/translation-bot/scripts/git_update.sh'])
                 await ctx.reply(content="> ** source code updated**")
