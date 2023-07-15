@@ -203,6 +203,7 @@ class Admin(commands.Cog):
             else:
                 print("waiting")
                 self.bot.app_status = "restart"
+                await channel.send(content=f"> {no_of_times} : Restart waiting for {', '.join(self.bot.get_user(k).global_name for k in self.bot.translator.keys())} {', '.join(self.bot.get_user(k).global_name for k in self.bot.crawler.keys())}")
                 self.bot.translator = {}
                 self.bot.crawler = {}
                 await asyncio.sleep(no_of_times*10.0)
@@ -232,9 +233,6 @@ class Admin(commands.Cog):
         except Exception as e:
             print("exception occurred  in deleting")
             await ctx.send(f"error occurred in deleting {x} {e}")
-        channel = self.bot.get_channel(
-            991911644831678484
-        ) or await self.bot.fetch_channel(991911644831678484)
         try:
             await channel.send(
                 f"Bot has been restarted by user : {ctx.author.name} \nBot has translated {str(int(self.bot.translation_count * 3.1))} MB novels and crawled {str(self.bot.crawler_count)} novels"
