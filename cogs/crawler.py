@@ -175,7 +175,7 @@ class Crawler(commands.Cog):
                     return ['error', links]
                 # await asyncio.sleep(0.1)
             else:
-                response = await bot.con.get(links)
+                response = await bot.con.get(links, headers=FileHandler.get_handler())
                 soup = BeautifulSoup(await response.read(), "html.parser", from_encoding=response.get_encoding())
                 if response.status == 404:
                     return ['error', links]
