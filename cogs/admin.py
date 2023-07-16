@@ -27,6 +27,14 @@ class Admin(commands.Cog):
         self.bot = bot
 
     @commands.has_role(1020638168237740042)
+    @commands.hybrid_command(help="update source code in next restart")
+    async def update(self, ctx: commands.Context):
+        await ctx.defer()
+        self.bot.update = True
+        await ctx.send(content=f"> Bots source code will be updated in next restart. ")
+        return
+
+    @commands.has_role(1020638168237740042)
     @commands.hybrid_command(help="ban user.. Admin only command")
     async def ban(self, ctx: commands.Context, id: str,
                   reason: str = "continuous use of improper names in novel name translation"):
