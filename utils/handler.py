@@ -82,6 +82,7 @@ class FileHandler:
                     )
                 return
             else:
+                outstr = ""
                 if len(bot.crawler) != 0:
                     outstr = f"crawling {len(bot.crawler)}"
                     if len(bot.translator) != 0:
