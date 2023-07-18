@@ -53,6 +53,8 @@ class Admin(commands.Cog):
         ]
         user = User(*user_data)
         m_user = self.bot.get_user(id)
+        await self.bot.mongo.blocker.ban(user)
+        self.bot.blocked = await self.bot.mongo.blocker.get_all_banned_users()
         try:
             await m_user.send(embed=discord.Embed(
                 title="Blocked",
@@ -61,8 +63,6 @@ class Admin(commands.Cog):
             ))
         except:
             pass
-        await self.bot.mongo.blocker.ban(user)
-        self.bot.blocked = await self.bot.mongo.blocker.get_all_banned_users()
         await ctx.send(
             f"User {m_user.mention} banned due to {reason}"
         )
@@ -214,12 +214,13 @@ class Admin(commands.Cog):
                 await channel.send(content=f"> {no_of_times} : Restart waiting for {', '.join(self.bot.get_user(k).global_name for k in self.bot.translator.keys())} {', '.join(self.bot.get_user(k).global_name for k in self.bot.crawler.keys())}")
                 self.bot.translator = {}
                 self.bot.crawler = {}
-                await asyncio.sleep(no_of_times*10.0)
+                await asyncio.sleep(no_of_times*6)
                 if no_of_times > 5:
                     self.bot.app_status = "up"
                     if git_update is True:
                         self.bot.update = True
                     await channel.send("Restart failed")
+                    return
         try:
             await msg.edit(
                 content="",
@@ -245,7 +246,7 @@ class Admin(commands.Cog):
             await channel.send(
                 f"Bot has been restarted by user : {ctx.author.name} \nBot has translated {str(int(self.bot.translation_count * 3.1))} MB novels and crawled {str(self.bot.crawler_count)} novels"
             )
-            del self.bot.titles
+            self.bot.app_status = "up"
             gc.collect()
         except:
             pass
