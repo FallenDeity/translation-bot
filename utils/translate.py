@@ -69,9 +69,10 @@ class Translator:
                 self.order[future.result()[0]] = future.result()[1]
                 try:
                     if self.bot.translator[self.user] == "break":
+                        executor.shutdown(wait=False, cancel_futures=True)
                         raise Exception("Translation stopped")
                 except Exception as e:
-                    if "Translation stopped" in str(e):
+                    if self.bot.translator[self.user] == "break":
                         raise e
                     else:
                         pass

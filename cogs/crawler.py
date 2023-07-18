@@ -157,11 +157,10 @@ class Crawler(commands.Cog):
             ]
             for future in concurrent.futures.as_completed(futures):
                 novel[future.result()[0]] = future.result()[1]
-                try:
-                    if self.bot.crawler[name] == "break":
-                        return None
-                except:
-                    pass
+                if self.bot.crawler[name] == "break":
+                    executor.shutdown(wait=False, cancel_futures=True)
+                    return None
+                    # executor.
                 self.bot.crawler[name] = f"{len(novel)}/{len(urls)}"
             return novel
 
@@ -294,20 +293,21 @@ class Crawler(commands.Cog):
         await msg.edit(embed=embed)
         return
 
-    @commands.hybrid_command(help="stops the tasks initiated by user", aliases=["st"])
-    async def stop(self, ctx: commands.Context) -> typing.Optional[discord.Message]:
+    @commands.hybrid_command(help="stops the tasks initiated by user. give true to tran/crawl to stop only translator/crawl tasks", aliases=["st"])
+    async def stop(self, ctx: commands.Context, translator: bool = False, crawler: bool = False) -> typing.Optional[discord.Message]:
         await ctx.defer()
+        if not translator and not crawler:
+            translator = True
+            crawler = True
         if ctx.author.id not in self.bot.crawler and ctx.author.id not in self.bot.translator:
             return await ctx.send(
                 "> **❌You have no tasks currently running.**"
             )
-        if ctx.author.id in self.bot.crawler:
+        if ctx.author.id in self.bot.crawler and crawler:
             self.bot.crawler[ctx.author.id] = "break"
-            task: Task = self.bot.crawler_tasks[ctx.author.id]
-            task.cancel()
-        elif ctx.author.id in self.bot.translator:
+        elif ctx.author.id in self.bot.translator and translator:
             self.bot.translator[ctx.author.id] = "break"
-        await ctx.send("> Added stop command to all tasks..")
+        await ctx.send("> Added stop command tasks.. Please wait for requested tasks to be stopped")
 
     @commands.hybrid_command(
         help="Crawls other sites for novels. \nselector: give the css selector for the content page. It will try to auto select if not given\n Reverse: give any value if Table of Content is reversed in the given link(or if crawled novel needs to be reversed)")
