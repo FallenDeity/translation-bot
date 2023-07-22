@@ -120,6 +120,8 @@ class CssSelector:
         #   return ".contentbox ::text"
         elif "www.novelcool.com" in link:
             return "p ::text"
+        elif"novelcool.org/" in link:
+            return "p ::text"
         else:
             return "* ::text"
 
