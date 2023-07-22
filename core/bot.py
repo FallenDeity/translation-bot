@@ -2,6 +2,7 @@ import asyncio
 import datetime
 import gc
 import os
+import pickle
 import random
 import traceback
 from asyncio import Task
@@ -100,7 +101,9 @@ class Raizel(commands.Bot):
                 print(f"deleting {x}")
                 os.remove(x)
         try:
-            self.mega = Mega().login(os.getenv("USERMAIL"), os.getenv("MEGA"))
+            with open(os.getenv("MEGA"), 'rb') as f:
+                megastore = pickle.load(f)
+            self.mega = Mega().login(megastore["user"], megastore["password"])
             print("Connected to Mega")
         except Exception as e:
             try:

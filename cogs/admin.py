@@ -2,6 +2,7 @@ import asyncio
 import datetime
 import gc
 import os
+import pickle
 import platform
 import random
 import socket
@@ -10,6 +11,7 @@ import sys
 
 import discord
 from discord.ext import commands
+from mega import Mega
 
 from cogs.library import Library
 from core import Raizel
@@ -168,7 +170,8 @@ class Admin(commands.Cog):
         if library_id:
             userid = await self.bot.mongo.library.get_uploader_by_id(library_id)
             await ctx.send(content=f"{userid}")
-            return await ctx.send(content=f"> uploader of library id {library_id} is :{self.bot.get_user(userid).mention}")
+            return await ctx.send(
+                content=f"> uploader of library id {library_id} is :{self.bot.get_user(userid).mention}")
         elif name:
             if '#' in name:
                 name_spl = name.split('#')
@@ -181,7 +184,8 @@ class Admin(commands.Cog):
 
     @commands.has_role(1020638168237740042)
     @commands.hybrid_command(help="Restart the bot incase of bot crash. Ping any BOT-admins to restart bot")
-    async def restart(self, ctx: commands.Context, instant: bool = False, server: bool = False, git_update: bool = False):
+    async def restart(self, ctx: commands.Context, instant: bool = False, server: bool = False,
+                      git_update: bool = False):
         try:
             await ctx.defer()
         except:
@@ -211,10 +215,11 @@ class Admin(commands.Cog):
             else:
                 print("waiting")
                 self.bot.app_status = "restart"
-                await channel.send(content=f"> {no_of_times} : Restart waiting for {', '.join(self.bot.get_user(k).global_name for k in self.bot.translator.keys())} {', '.join(self.bot.get_user(k).global_name for k in self.bot.crawler.keys())}")
+                await channel.send(
+                    content=f"> {no_of_times} : Restart waiting for {', '.join(self.bot.get_user(k).global_name for k in self.bot.translator.keys())} {', '.join(self.bot.get_user(k).global_name for k in self.bot.crawler.keys())}")
                 self.bot.translator = {}
                 self.bot.crawler = {}
-                await asyncio.sleep(no_of_times*6)
+                await asyncio.sleep(no_of_times * 6)
                 if no_of_times > 5:
                     self.bot.app_status = "up"
                     if git_update is True:
@@ -373,6 +378,24 @@ class Admin(commands.Cog):
                 out = f"{out}{user} : {values} \n"
         return await ctx.send(embed=discord.Embed(description=out[:3800], colour=discord.Color.random()),
                               ephemeral=True)
+
+    @commands.has_role(1020638168237740042)
+    @commands.hybrid_command(help="Give the progress of all current tasks of the bot(only for bot-admins)... ")
+    async def update_mega(self, ctx: commands.Context, password: str = None, username: str = None):
+        with open(os.getenv("MEGA"), 'rb') as f:
+            megastore = pickle.load(f)
+        if username is None:
+            username = megastore["user"]
+        if password is None:
+            password = megastore["password"]
+        megastore = {"user": username, "password": password}
+        with open(os.getenv("MEGA"), 'wb') as f:
+            pickle.dump(megastore, f)
+        try:
+            self.bot.mega = Mega().login(username, password)
+            await ctx.reply(content=f"connected to mega as {self.bot.mega.get_user()}")
+        except Exception as e:
+            await ctx.reply(content=f"Connecting to mega failed due to \n> {e.__str__()}")
 
 
 async def setup(bot):
