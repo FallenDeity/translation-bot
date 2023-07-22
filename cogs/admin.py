@@ -198,34 +198,39 @@ class Admin(commands.Cog):
         channel = self.bot.get_channel(
             991911644831678484
         ) or await self.bot.fetch_channel(991911644831678484)
-        while True:
-            no_of_times += 1
-            print("Started restart")
-            if not instant:
-                await asyncio.sleep(3)
-            else:
-                break
-            if not self.bot.crawler.items() and not self.bot.translator.items():
-                print("restart " + str(datetime.datetime.now()))
-                try:
-                    await channel.send(embed=discord.Embed(description=f"Bot has started restarting"))
-                except:
-                    pass
-                break
-            else:
-                print("waiting")
-                self.bot.app_status = "restart"
-                await channel.send(
-                    content=f"> {no_of_times} : Restart waiting for {', '.join(self.bot.get_user(k).global_name for k in self.bot.translator.keys())} {', '.join(self.bot.get_user(k).global_name for k in self.bot.crawler.keys())}")
-                self.bot.translator = {}
-                self.bot.crawler = {}
-                await asyncio.sleep(no_of_times * 6)
-                if no_of_times > 5:
-                    self.bot.app_status = "up"
-                    if git_update is True:
-                        self.bot.update = True
-                    await channel.send("Restart failed")
-                    return
+        try:
+            while True:
+                no_of_times += 1
+                print("Started restart")
+                if not instant:
+                    await asyncio.sleep(3)
+                else:
+                    break
+                if not self.bot.crawler.items() and not self.bot.translator.items():
+                    print("restart " + str(datetime.datetime.now()))
+                    try:
+                        await channel.send(embed=discord.Embed(description=f"Bot has started restarting"))
+                    except:
+                        pass
+                    break
+                else:
+                    print("waiting")
+                    self.bot.app_status = "restart"
+                    await channel.send(
+                        content=f"> {no_of_times} : Restart waiting for {', '.join(self.bot.get_user(k).global_name for k in self.bot.translator.keys())} {', '.join(self.bot.get_user(k).global_name for k in self.bot.crawler.keys())}")
+                    self.bot.translator = {}
+                    self.bot.crawler = {}
+                    await asyncio.sleep(no_of_times * 6)
+                    if no_of_times > 5:
+                        self.bot.app_status = "up"
+                        if git_update is True:
+                            self.bot.update = True
+                        await channel.send("Restart failed")
+                        return None
+        except:
+            self.bot.app_status = "up"
+        finally:
+            self.bot.app_status = "up"
         try:
             await msg.edit(
                 content="",
@@ -251,7 +256,6 @@ class Admin(commands.Cog):
             await channel.send(
                 f"Bot has been restarted by user : {ctx.author.name} \nBot has translated {str(int(self.bot.translation_count * 3.1))} MB novels and crawled {str(self.bot.crawler_count)} novels"
             )
-            self.bot.app_status = "up"
             gc.collect()
         except:
             pass
