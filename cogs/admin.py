@@ -393,9 +393,12 @@ class Admin(commands.Cog):
             pickle.dump(megastore, f)
         try:
             self.bot.mega = Mega().login(username, password)
-            await ctx.reply(content=f"connected to mega as {self.bot.mega.get_user()}")
+            await ctx.reply(content=f"connected to mega as {username}")
         except Exception as e:
-            await ctx.reply(content=f"Connecting to mega failed due to \n> {e.__str__()}")
+            await ctx.reply(content=f"Connecting to mega failed due to \n> {e}")
+            print(e.with_traceback())
+            print(e)
+        return
 
 
 async def setup(bot):
