@@ -122,6 +122,8 @@ class CssSelector:
             return "p ::text"
         elif"novelcool.org/" in link:
             return "p ::text"
+        elif "m.sywx8.com" in link:
+            return "#nr ::text"
         else:
             return "* ::text"
 
@@ -238,6 +240,8 @@ class CssSelector:
             return ["None", "#chapter-heading"]
         elif "sangtacviet.vip" in link:
             return ["None", "title"]
+        elif "m.sywx8.com" in link:
+            return ["None", "#header > div.zhong"]
         # elif "www.novelcool.com" in link:
         #     return ["None",  "div.chapter-reading-section-list > div > div > h2"]
         # elif "m.bqg789.net" in link:
