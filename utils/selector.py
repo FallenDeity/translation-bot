@@ -241,7 +241,7 @@ class CssSelector:
         elif "sangtacviet.vip" in link:
             return ["None", "title"]
         elif "m.sywx8.com" in link:
-            return ["None", "#header > div.zhong"]
+            return ["None", "head > meta:nth-child(9)"]
         # elif "www.novelcool.com" in link:
         #     return ["None",  "div.chapter-reading-section-list > div > div > h2"]
         # elif "m.bqg789.net" in link:
