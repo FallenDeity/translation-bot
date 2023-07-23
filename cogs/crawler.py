@@ -898,7 +898,7 @@ class Crawler(commands.Cog):
             ctx.command = await self.bot.get_command("translate").callback(Translate(self.bot), ctx, download_url,
                                                                            None,
                                                                            None,
-                                                                           translate_to, title_name[:100], None, None,
+                                                                           translate_to, title_name[:240]+"_crawl", None, None,
                                                                            add_terms, True)
             return
         else:
@@ -1346,7 +1346,7 @@ class Crawler(commands.Cog):
                 ctx.command = await self.bot.get_command("translate").callback(Translate(self.bot), ctx, download_url,
                                                                                None,
                                                                                None,
-                                                                               translate_to, title_name[:100], None,
+                                                                               translate_to, title_name[:240]+"_crawl", None,
                                                                                None,
                                                                                add_terms, True)
                 return

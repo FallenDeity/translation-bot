@@ -263,6 +263,10 @@ class Translate(commands.Cog):
         if (not name_check) and library_id is not None:
             name = await self.bot.mongo.library.get_title_by_id(library_id)
             name_check = await FileHandler.checkname(name, self.bot)
+        if "_crawl" in name:
+            name = name.replace("_crawl", "")
+            if len(name) >= 5:
+                name_check = True
         if not name_check:
             await rep_msg.delete()
             return await ctx.reply(
