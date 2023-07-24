@@ -53,6 +53,8 @@ class FileHandler:
 
     @staticmethod
     async def update_status(bot: Raizel):
+        if bot.is_closed():
+            os.system("killall python3")
         try:
             if bot.app_status == "restart":
                 await bot.change_presence(

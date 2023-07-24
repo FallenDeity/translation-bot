@@ -27,7 +27,6 @@ class Raizel(commands.Bot):
     con: aiohttp.ClientSession
     boot: datetime.datetime.utcnow()
     allowed: list[str]
-    # drive: Client
     mongo: Mongo
 
     def __init__(self) -> None:
