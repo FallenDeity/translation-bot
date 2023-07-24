@@ -212,6 +212,7 @@ class Admin(commands.Cog):
                         await channel.send(embed=discord.Embed(description=f"Bot has started restarting"))
                     except:
                         pass
+                    await asyncio.sleep(7)
                     break
                 else:
                     print("waiting")
