@@ -262,7 +262,7 @@ class Admin(commands.Cog):
             pass
         if git_update or self.bot.update:
             try:
-                subprocess.call(['sh', '/home/ubuntu/translation-bot/scripts/git_update.sh'])
+                subprocess.call(['sh', '/home/ec2-user/translation-bot/scripts/git_update.sh'])
                 await ctx.reply(content="> ** source code updated**")
             except Exception as e:
                 await channel.send("git update failed")
@@ -270,7 +270,7 @@ class Admin(commands.Cog):
         if random.randint(0, 20) > 12 or server is True:
             try:
                 await channel.send("Server restarted")
-                subprocess.call(['sh', '/home/ubuntu/translation-bot/scripts/server-restart.sh'])
+                subprocess.call(['sh', '/home/ec2-user/translation-bot/scripts/server-restart.sh'])
             except Exception as e:
                 await channel.send("Server restart failed")
                 await channel.send(e.with_traceback().__str__()[:1900])
