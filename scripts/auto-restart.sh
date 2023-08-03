@@ -8,9 +8,9 @@ then
   pgrep python3 && killall python3
   tmux new-session -d -s ENTER
   tmux detach -s ENTER
-  tmux send-keys -t 0 "cd /home/ec2-user/translation-bot;python3 main.py" ENTER
+  tmux send-keys -t 0 "cd /home/ubuntu/translation-bot;python3 main.py" ENTER
   nowtime=$(date)
-  echo "$USER : started bot at $nowtime">>/home/ec2-user/logs
+  echo "$USER : started bot at $nowtime">>/home/ubuntu/logs
 #else
 # echo "already running"
 fi
