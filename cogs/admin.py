@@ -387,8 +387,11 @@ class Admin(commands.Cog):
     @commands.has_role(1020638168237740042)
     @commands.hybrid_command(help="Give the progress of all current tasks of the bot(only for bot-admins)... ")
     async def update_mega(self, ctx: commands.Context, password: str = None, username: str = None):
-        with open(os.getenv("MEGA"), 'rb') as f:
-            megastore = pickle.load(f)
+        try:
+            with open(os.getenv("MEGA"), 'rb') as f:
+                megastore = pickle.load(f)
+        except:
+            pass
         if username is None:
             username = megastore["user"]
         if password is None:
