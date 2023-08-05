@@ -1,4 +1,5 @@
 import asyncio
+import os
 
 import discord
 from discord.ext import tasks
@@ -9,22 +10,22 @@ from core.bot import Raizel
 bot = Raizel()
  
 
-# @tasks.loop(seconds=60)
-# async def census():
-#     await handler.update_status(bot)
-#     return
+@tasks.loop(minutes=10)
+async def census():
+    await handler.update_status(bot)
+    return
 
 
-# @census.before_loop
-# async def before_census():
-#     await bot.wait_until_ready()
+@census.before_loop
+async def before_census():
+    await bot.wait_until_ready()
 
 
 @bot.event
 async def on_ready():
     print(f"Running as {bot.user}")
     await bot.tree.sync()
-    # census.start()
+    census.start()
     # bot.auto_restart.start()
 
 
