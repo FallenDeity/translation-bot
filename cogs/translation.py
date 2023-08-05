@@ -140,7 +140,7 @@ class Translate(commands.Cog):
         file_type = None
         rep_msg = await ctx.reply("Please wait.. Translation will began soon")
         no_tries = 0
-        while (len(self.bot.crawler)+len(self.bot.translator)) > 2 or len(self.bot.translator) >= 2:
+        while ((len(self.bot.crawler)+len(self.bot.translator)) >= 2 or len(self.bot.translator) >= 2) and len(self.bot.crawler_next) >= 2:
             no_tries = no_tries + 3
             try:
                 rep_msg = await rep_msg.edit(

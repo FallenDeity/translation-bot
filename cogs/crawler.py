@@ -293,8 +293,11 @@ class Crawler(commands.Cog):
         await msg.edit(embed=embed)
         return
 
-    @commands.hybrid_command(help="stops the tasks initiated by user. give true to tran/crawl to stop only translator/crawl tasks", aliases=["st"])
-    async def stop(self, ctx: commands.Context, translator: bool = False, crawler: bool = False) -> typing.Optional[discord.Message]:
+    @commands.hybrid_command(
+        help="stops the tasks initiated by user. give true to tran/crawl to stop only translator/crawl tasks",
+        aliases=["st"])
+    async def stop(self, ctx: commands.Context, translator: bool = False, crawler: bool = False) -> typing.Optional[
+        discord.Message]:
         await ctx.defer()
         if not translator and not crawler:
             translator = True
@@ -731,7 +734,7 @@ class Crawler(commands.Cog):
                 "> **❌You cannot crawl two novels at the same time.**"
             )
         no_tries = 0
-        while (len(self.bot.crawler)+len(self.bot.translator)) > 2:
+        while (len(self.bot.crawler) + len(self.bot.translator)) >= 2 and len(self.bot.crawler_next) >= 2:
             no_tries = no_tries + 3
             try:
                 msg = await msg.edit(content=f"> **Currently bot is busy.Please wait some time. bot will retry in "
@@ -898,7 +901,8 @@ class Crawler(commands.Cog):
             ctx.command = await self.bot.get_command("translate").callback(Translate(self.bot), ctx, download_url,
                                                                            None,
                                                                            None,
-                                                                           translate_to, title_name[:240]+"_crawl", None, None,
+                                                                           translate_to, title_name[:240] + "_crawl",
+                                                                           None, None,
                                                                            add_terms, True)
             return
         else:
@@ -1117,8 +1121,8 @@ class Crawler(commands.Cog):
             title_name = firstchplink.split("/")[-1].replace(".html", "")
         if title_name is None:
             title_name = GoogleTranslator(
-                        source="auto", target="english"
-                    ).translate(title).strip()
+                source="auto", target="english"
+            ).translate(title).strip()
             if title_name is None:
                 title_name = await FileHandler.get_title(soup=soup)
                 title_name = GoogleTranslator(
@@ -1198,7 +1202,7 @@ class Crawler(commands.Cog):
         crawled_urls = []
         repeats = 0
         no_tries = 0
-        while (len(self.bot.crawler)+len(self.bot.translator)) > 2:
+        while (len(self.bot.crawler) + len(self.bot.translator)) >= 2 and len(self.bot.crawler_next) >= 2:
             no_tries = no_tries + 3
             try:
                 msg = await msg.edit(content=f"> **Currently bot is busy.Please wait some time** bot will retry in "
@@ -1346,7 +1350,8 @@ class Crawler(commands.Cog):
                 ctx.command = await self.bot.get_command("translate").callback(Translate(self.bot), ctx, download_url,
                                                                                None,
                                                                                None,
-                                                                               translate_to, title_name[:240]+"_crawl", None,
+                                                                               translate_to,
+                                                                               title_name[:240] + "_crawl", None,
                                                                                None,
                                                                                add_terms, True)
                 return
