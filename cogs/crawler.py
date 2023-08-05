@@ -230,11 +230,18 @@ class Crawler(commands.Cog):
 
     @commands.hybrid_command(help="Gives progress of novel crawling", aliases=["cp"])
     async def crawled(self, ctx: commands.Context) -> typing.Optional[discord.Message]:
-        if ctx.author.id not in self.bot.crawler:
+        if ctx.author.id not in self.bot.crawler and ctx.author.id not in self.bot.crawler_next:
             return await ctx.send(
                 "> **❌You have no novel deposited for crawling currently.**"
             )
-        await ctx.send(f"> **🚄`{self.bot.crawler[ctx.author.id]}`**")
+        try:
+            await ctx.send(f"> crawler :  **🚄`{self.bot.crawler[ctx.author.id]}`**")
+        except:
+            pass
+        try:
+            await ctx.send(f"> crawlnext : **🚄`{self.bot.crawler[ctx.author.id]}`**")
+        except:
+            pass
 
     async def cc_prog(self, msg: discord.Message, embed: discord.Embed, author_id: int, wait_time: float = 8) -> \
             typing.Optional[
@@ -271,8 +278,8 @@ class Crawler(commands.Cog):
     async def cc_prog_cr_next(self, msg: discord.Message, embed: discord.Embed, author_id: int, wait_time: float = 20):
         value = 0
         await asyncio.sleep(5)
-        while author_id in self.bot.crawler:
-            current_progress = self.bot.crawler[author_id].split("/")[0]
+        while author_id in self.bot.crawler_next:
+            current_progress = self.bot.crawler_next[author_id].split("/")[0]
             if current_progress.isnumeric() and value <= int(current_progress):
                 embed.set_field_at(index=0, name="Progress",
                                    value=f"Crawled {current_progress} pages  "
@@ -306,9 +313,11 @@ class Crawler(commands.Cog):
             return await ctx.send(
                 "> **❌You have no tasks currently running.**"
             )
+        if ctx.author.id in self.bot.crawler_next and crawler:
+            self.bot.crawler[ctx.author.id] = "break"
         if ctx.author.id in self.bot.crawler and crawler:
             self.bot.crawler[ctx.author.id] = "break"
-        elif ctx.author.id in self.bot.translator and translator:
+        if ctx.author.id in self.bot.translator and translator:
             self.bot.translator[ctx.author.id] = "break"
         await ctx.send("> Added stop command tasks.. Please wait for requested tasks to be stopped")
 
@@ -749,8 +758,8 @@ class Crawler(commands.Cog):
             if no_tries >= 5:
                 self.bot.translator = {}
                 self.bot.crawler = {}
-                if len(self.bot.crawler) < 3:
-                    break
+                # if len(self.bot.crawler) < 3:
+                #     break
                 await asyncio.sleep(15)
         try:
             self.bot.crawler[ctx.author.id] = f"0/{len(urls)}"
@@ -955,7 +964,7 @@ class Crawler(commands.Cog):
             await ctx.defer()
         except:
             pass
-        if ctx.author.id in self.bot.crawler:
+        if ctx.author.id in self.bot.crawler_next:
             return await ctx.reply(
                 "> **❌You cannot crawl two novels at the same time.**"
             )
@@ -1217,8 +1226,9 @@ class Crawler(commands.Cog):
             if no_tries >= 5:
                 self.bot.translator = {}
                 self.bot.crawler = {}
-                if len(self.bot.crawler) < 3:
-                    break
+                self.bot.crawler_next = {}
+                # if len(self.bot.crawler) < 3:
+                #     break
                 await asyncio.sleep(15)
         try:
             description = GoogleTranslator().translate(await FileHandler.get_description(
@@ -1250,22 +1260,22 @@ class Crawler(commands.Cog):
         if library is not None:
             await ctx.reply(content=f"> Updating {str(library)} with name : {title_name}")
         try:
-            self.bot.crawler[ctx.author.id] = f"0/{noofchapters}"
+            self.bot.crawler_next[ctx.author.id] = f"0/{noofchapters}"
             await FileHandler.update_status(self.bot)
             task = asyncio.create_task(self.cc_prog_cr_next(msg, embed, ctx.author.id, 20))
             for i in range(1, noofchapters):
                 try:
-                    if self.bot.crawler[ctx.author.id] == "break":
+                    if self.bot.crawler_next[ctx.author.id] == "break":
                         return await ctx.send("> **Stopped Crawling...**")
                 except:
                     break
-                self.bot.crawler[ctx.author.id] = f"{i}/{noofchapters}"
+                self.bot.crawler_next[ctx.author.id] = f"{i}/{noofchapters}"
                 if current_link in crawled_urls:
                     repeats += 1
                 if current_link in crawled_urls and repeats > 5:
                     if i >= 30:
                         break
-                    del self.bot.crawler[ctx.author.id]
+                    del self.bot.crawler_next[ctx.author.id]
                     if current_link == firstchplink and i < 10:
                         return await ctx.reply(
                             'Error occurred . Some problem in the site. please try with second and third chapter or '
@@ -1292,7 +1302,7 @@ class Crawler(commands.Cog):
                     chp_text = ''
                     if no_of_tries > 30:
                         # await msg.delete()
-                        del self.bot.crawler[ctx.author.id]
+                        del self.bot.crawler_next[ctx.author.id]
                         return await ctx.send('Error occurred when crawling. Please Report to my developer')
                     else:
                         await asyncio.sleep(1)
@@ -1367,7 +1377,7 @@ class Crawler(commands.Cog):
             except:
                 pass
             try:
-                del self.bot.crawler[ctx.author.id]
+                del self.bot.crawler_next[ctx.author.id]
             except:
                 pass
             try:
