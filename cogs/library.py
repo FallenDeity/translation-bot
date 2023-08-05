@@ -32,7 +32,7 @@ class Library(commands.Cog):
         if len(lst) == 1:
             await ctx.send(embed=lst[0])
             return
-        menu = ViewMenu(ctx, menu_type=ViewMenu.TypeEmbed, remove_buttons_on_timeout=True)
+        menu = ViewMenu(ctx, menu_type=ViewMenu.TypeEmbed, remove_buttons_on_timeout=True, timeout=20)
         for i in lst:
             menu.add_page(i)
         back = ViewButton(
