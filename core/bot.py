@@ -35,6 +35,7 @@ class Raizel(commands.Bot):
         intents = discord.Intents.all()
         self.translator: t.Dict[int, str] = {}
         self.crawler: t.Dict[int, str] = {}
+        self.crawler_next: t.Dict[int, str] = {}
         self.translator_tasks: t.Dict[int, Task] = {}
         self.crawler_tasks: t.Dict[int, Task] = {}
         self.languages = choices
