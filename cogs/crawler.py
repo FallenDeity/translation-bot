@@ -731,8 +731,8 @@ class Crawler(commands.Cog):
                 "> **❌You cannot crawl two novels at the same time.**"
             )
         no_tries = 0
-        while (len(self.bot.crawler)+len(self.bot.translator)) > 3:
-            no_tries = no_tries + 1
+        while (len(self.bot.crawler)+len(self.bot.translator)) > 2:
+            no_tries = no_tries + 3
             try:
                 msg = await msg.edit(content=f"> **Currently bot is busy.Please wait some time. bot will retry in "
                                              f"some time **"
@@ -1198,8 +1198,8 @@ class Crawler(commands.Cog):
         crawled_urls = []
         repeats = 0
         no_tries = 0
-        while (len(self.bot.crawler)+len(self.bot.translator)) > 3:
-            no_tries = no_tries + 1
+        while (len(self.bot.crawler)+len(self.bot.translator)) > 2:
+            no_tries = no_tries + 3
             try:
                 msg = await msg.edit(content=f"> **Currently bot is busy.Please wait some time** bot will retry in "
                                              f"some time"
