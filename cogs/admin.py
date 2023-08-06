@@ -206,7 +206,7 @@ class Admin(commands.Cog):
                     await asyncio.sleep(3)
                 else:
                     break
-                if not self.bot.crawler.items() and not self.bot.translator.items():
+                if not self.bot.crawler.items() and not self.bot.translator.items() and not self.bot.crawler_next.items():
                     print("restart " + str(datetime.datetime.now()))
                     try:
                         await channel.send(embed=discord.Embed(description=f"Bot has started restarting"))
