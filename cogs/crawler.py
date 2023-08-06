@@ -587,8 +587,10 @@ class Crawler(commands.Cog):
         if (next_link := await FileHandler.find_toc_next(soup, link)) is not None:
             await ctx.send("> Multiple TOC's found.. getting the urls from TOC's", delete_after=8)
             print("Multi TOC found")
+            toc_no = 1
             toc_list = [link]
             while True:
+                toc_no += 1
                 toc_list.append(next_link)
                 print(next_link)
                 if cloudscrape:
@@ -601,7 +603,7 @@ class Crawler(commands.Cog):
                 for u in toc_urls:
                     urls.append(u)
                 next_link = await FileHandler.find_toc_next(soup, link)
-                if next_link is None or next_link in toc_list:
+                if next_link is None or next_link in toc_list or toc_no >= 50:
                     break
             await ctx.send(f"> {len(toc_list) + 1} toc's automatically detected ...", delete_after=8)
             print(len(urls))
