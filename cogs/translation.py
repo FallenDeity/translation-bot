@@ -669,6 +669,8 @@ class Translate(commands.Cog):
                 await msg.edit(embed=embed)
             else:
                 break
+            if int(split[0]) % 3 == 0:
+                await FileHandler.update_status(self.bot)
             if len(asyncio.all_tasks()) >= 9:
                 embed.set_field_at(index=3,
                                    name=f"Progress : ",

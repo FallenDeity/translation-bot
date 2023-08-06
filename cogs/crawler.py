@@ -261,6 +261,8 @@ class Crawler(commands.Cog):
                 await msg.edit(embed=embed)
             else:
                 break
+            if int(split[0])%3 ==0:
+                await FileHandler.update_status(self.bot)
             if len(asyncio.all_tasks()) >= 9:
                 embed.set_field_at(index=0,
                                    name=f"Progress : ",
@@ -289,6 +291,8 @@ class Crawler(commands.Cog):
                 await asyncio.sleep(wait_time)
             else:
                 break
+            if int(current_progress) % 3 == 0:
+                await FileHandler.update_status(self.bot)
             if len(asyncio.all_tasks()) > 9:
                 embed.set_field_at(index=0,
                                    name=f"Progress : ",
