@@ -978,6 +978,8 @@ class Crawler(commands.Cog):
                 f"> Bot is scheduled to restart within 60 sec  or after all current tasks are completed.. Please try after bot is restarted")
         title_css = "title"
         cloudscrape: bool = False
+        if "m.45zw.com" in firstchplink:
+            firstchplink = firstchplink.replace("m.45zw.com", "www.45zw.com")
         try:
             res = await self.bot.con.get(firstchplink)
             # print(await res.text())
