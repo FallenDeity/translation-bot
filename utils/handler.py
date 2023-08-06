@@ -65,7 +65,7 @@ class FileHandler:
                     status=discord.Status.do_not_disturb,
                 )
                 return
-            if len(bot.translator) == 0 and len(bot.crawler) == 0:
+            if len(bot.translator) == 0 and len(bot.crawler) == 0 and len(bot.crawler_next) == 0:
                 if random.randint(0, 10) > 5:
                     await bot.change_presence(
                         activity=discord.Activity(
@@ -87,6 +87,15 @@ class FileHandler:
                 outstr = ""
                 if len(bot.crawler) != 0:
                     outstr = f"crawling {len(bot.crawler)}"
+                    if len(bot.translator) != 0 and len(bot.crawler_next):
+                        outstr += " ,"
+                    else:
+                        outstr += " novels"
+                if len(bot.crawler_next) != 0:
+                    if len(bot.crawler) != 0:
+                        outstr = f"{outstr}crawling {len(bot.crawler_next)}"
+                    else:
+                        outstr = f"{outstr}, {len(bot.crawler_next)}"
                     if len(bot.translator) != 0:
                         outstr += " ,"
                     else:
@@ -97,6 +106,13 @@ class FileHandler:
                 if len(bot.crawler) != 0:
                     outstr += "Crawler : "
                     for keys, values in bot.crawler.items():
+                        user = bot.get_user(keys)
+                        user = user.name
+                        outstr = f"{outstr}{user}:{values}, "
+                    outstr += "\n"
+                if len(bot.crawler_next) != 0:
+                    outstr += "Crawlernext : "
+                    for keys, values in bot.crawler_next.items():
                         user = bot.get_user(keys)
                         user = user.name
                         outstr = f"{outstr}{user}:{values}, "
