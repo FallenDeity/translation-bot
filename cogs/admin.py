@@ -373,6 +373,14 @@ class Admin(commands.Cog):
                 user = self.bot.get_user(keys)
                 user = user.name
                 out = f"{out}{user} : {values} \n"
+        out = out + "\n**Crawlnext Tasks**\n"
+        if not self.bot.crawler_next.items():
+            out = out + "No tasks currently\n"
+        else:
+            for keys, values in self.bot.crawler_next.items():
+                user = self.bot.get_user(keys)
+                user = user.name
+                out = f"{out}{user} : {values} \n"
         out = out + "\n**Translator Tasks**\n"
         if not self.bot.translator.items():
             out = out + "No tasks currently\n"
