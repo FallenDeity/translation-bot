@@ -124,7 +124,7 @@ class Raizel(commands.Bot):
             await channel.send(f"Added Storage access to {n} users")
 
     async def add_roles(self) -> int:
-        guild = self.get_guild(940866934214373376)
+        guild = await self.fetch_guild(940866934214373376)
         role = guild.get_role(1076124121592770590)
         top = await self.mongo.library.get_user_novel_count(_top_200=True)
         top_200 = [(user_id, count) for user_id, count in top.items()]
@@ -135,16 +135,16 @@ class Raizel(commands.Bot):
             for user_id, count in chunk:
                 if count >= 20:
                     user_ids.append(user_id)
-        members = guild.members
-        banned_members  =  await self.mongo.blocker.get_all_banned_users()
+        members = [member async for member in guild.fetch_members()]
+        banned_members = await self.mongo.blocker.get_all_banned_users()
         for member in members:
             if member.id in user_ids:
                 if role in member.roles:
-                    break
+                    continue
                 if member.id in banned_members:
-                    break
+                    continue
                 no = no + 1
-                print(f"added role to {member.name}")
+                print(f"adding role to {member.name}")
                 await member.add_roles(role)
             # else:
             #     print(f"not adding access to  {member.name}")
