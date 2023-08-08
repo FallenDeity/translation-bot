@@ -87,13 +87,13 @@ class FileHandler:
                 outstr = ""
                 if len(bot.crawler) != 0:
                     outstr = f"crawling {len(bot.crawler)}"
-                    if len(bot.translator) != 0 and len(bot.crawler_next):
+                    if len(bot.translator) != 0 or len(bot.crawler_next) != 0:
                         outstr += " ,"
                     else:
                         outstr += " novels"
                 if len(bot.crawler_next) != 0:
-                    if len(bot.crawler) != 0:
-                        outstr = f"{outstr}crawling {len(bot.crawler_next)}"
+                    if len(bot.crawler) == 0:
+                        outstr = f"crawling {len(bot.crawler_next)}"
                     else:
                         outstr = f"{outstr}, {len(bot.crawler_next)}"
                     if len(bot.translator) != 0:
