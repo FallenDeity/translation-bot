@@ -563,14 +563,18 @@ class FileHandler:
             except:
                 pass
         else:
-            if original_language.lower() == "korean":
+            if original_language.lower() == "korean" and language.lower() == "english":
                 channel = bot.get_channel(
                     1086592167767711794
                 ) or await bot.fetch_channel(1086592167767711794)
-            else:
+            elif language.lower() == "english":
                 channel = bot.get_channel(
                     1086593341740818523
                 ) or await bot.fetch_channel(1086593341740818523)
+            else:
+                channel = bot.get_channel(
+                    1155398011229327400
+                ) or await bot.fetch_channel(1155398011229327400)
             msg = await channel.send(
                 embed=embed, file=discord.File(f"{ctx.author.id}.txt", f"{name}.txt"),
                 allowed_mentions=discord.AllowedMentions(users=False)
