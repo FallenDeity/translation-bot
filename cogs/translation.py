@@ -28,9 +28,10 @@ from utils.translate import Translator
 
 
 def term_raw(text, term_dict):
-    for i in term_dict:
-        text = text.replace(i, term_dict[i])
-    return text
+    # Create a regular expression pattern that matches any of the terms
+    pattern = re.compile("|".join(map(re.escape, term_dict.keys())))
+    # Use the sub method to replace all occurrences of the matched terms with their values
+    return pattern.sub(lambda match: term_dict[match.group(0)], text)
 
 
 class Translate(commands.Cog):
