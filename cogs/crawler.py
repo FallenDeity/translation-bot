@@ -152,7 +152,8 @@ class Crawler(commands.Cog):
                 for i, j in enumerate(urls)
             ]
             for future in concurrent.futures.as_completed(futures):
-                novel[future.result()[0]] = future.result()[1]
+                result = future.result()
+                novel[result[0]] = result[1]
                 if self.bot.crawler[name] == "break":
                     executor.shutdown(wait=False, cancel_futures=True)
                     return None
