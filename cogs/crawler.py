@@ -53,9 +53,7 @@ async def find_urls(soup, link, name):
             for j in [str(i.get("href")) for i in soup.find_all("a")]
             if "txt" not in j
         ]
-    utemp = []
-    for url in urls:
-        utemp.append(urljoin(link, url))
+    utemp = [urljoin(link, url) for url in urls]
     urls = [u for u in utemp if host in u]
     return urls
 
@@ -96,9 +94,8 @@ class Crawler(commands.Cog):
                 text = article['plain_text']
                 chpTitle = article['title']
                 # print(chpTitle)
-                full += str(chpTitle) + "\n\n"
-                for i in text:
-                    full += i['text'] + "\n"
+                lines = [str(chpTitle)+"\n"] + [i['text'] for i in text]
+                full = "\n".join(lines)
             except:
                 full = ""
 
