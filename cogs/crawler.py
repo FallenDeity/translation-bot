@@ -68,21 +68,20 @@ class Crawler(commands.Cog):
     @staticmethod
     def easy(nums: int, links: str, css: str, chptitleCSS: str, scraper) -> t.Tuple[int, str]:
         response = None
-        try:
-            if scraper is not None:
-                response = scraper.get(links, headers=FileHandler.get_handler(), timeout=20)
-            else:
-                response = requests.get(links, headers=FileHandler.get_handler(), timeout=20)
-        except Exception as e:
-            time.sleep(10)
+        retry_attempts = 2
+        for _ in range(retry_attempts):
             try:
                 if scraper is not None:
                     response = scraper.get(links, headers=FileHandler.get_handler(), timeout=20)
                 else:
-                    response = requests.get(links, headers=headers, timeout=20)
-            except:
+                    response = requests.get(links, headers=FileHandler.get_handler(), timeout=20)
+            except Exception as e:
                 print(e)
-                return nums, f"\ncouldn't get connection to {links}\n"
+                time.sleep(10)
+            else:
+                break
+        else:
+            return nums, f"\ncouldn't get connection to {links}\n"
         if response.status_code == 404:
             print("Response received as error status code 404")
             return nums, "\n----x---\n"
@@ -94,7 +93,7 @@ class Crawler(commands.Cog):
                 text = article['plain_text']
                 chpTitle = article['title']
                 # print(chpTitle)
-                lines = [str(chpTitle)+"\n"] + [i['text'] for i in text]
+                lines = [str(chpTitle) + "\n"] + [i['text'] for i in text]
                 full = "\n".join(lines)
             except:
                 full = ""
@@ -108,13 +107,13 @@ class Crawler(commands.Cog):
             sel = parsel.Selector(html)
             text = sel.css(css).extract()
 
-            if not chptitleCSS == "":
+            if chptitleCSS and not chptitleCSS == "":
                 try:
                     chpTitle = sel.css(chptitleCSS).extract_first()
                 except:
                     chpTitle = None
                 # print('chp' + str(chpTitle))
-                if not chpTitle is None:
+                if chpTitle is not None:
                     full += str(chpTitle) + "\n\n"
             # print(css)
             if text == []:
@@ -258,7 +257,7 @@ class Crawler(commands.Cog):
                 await msg.edit(embed=embed)
             else:
                 break
-            if int(split[0])%3 ==0:
+            if int(split[0]) % 3 == 0:
                 await FileHandler.update_status(self.bot)
             if len(asyncio.all_tasks()) >= 9:
                 embed.set_field_at(index=0,
@@ -891,7 +890,9 @@ class Crawler(commands.Cog):
                 pass
             if translate_to is None and add_terms is None:
                 try:
-                    if (self.bot.translation_count + self.bot.crawler_count) >= 15 and self.bot.app_status == "up" and len(self.bot.crawler_next) == 0:
+                    if (
+                            self.bot.translation_count + self.bot.crawler_count) >= 15 and self.bot.app_status == "up" and len(
+                        self.bot.crawler_next) == 0:
                         await ctx.reply(
                             "> **Bot will be Restarted when the bot is free due to max limit is reached.. Please be patient")
                         chan = self.bot.get_channel(
