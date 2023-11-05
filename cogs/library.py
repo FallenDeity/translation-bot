@@ -117,12 +117,14 @@ class Library(commands.Cog):
 
     async def make_list_embed_list(self, data: list[Novel]) -> list[discord.Embed]:
         embeds = []
-        n = 6
-        final = [data[i * n:(i + 1) * n] for i in range((len(data) + n - 1) // n)]
+        n = 6  # Number of novels per page
         page = 1
-        for novel in final:
-            embeds.append(await self.make_base_list_embed(novel, page))
+
+        for i in range(0, len(data), n):
+            page_data = data[i:i + n]
+            embeds.append(await self.make_base_list_embed(page_data, page))
             page += 1
+
         return embeds
 
     @commands.hybrid_group()
