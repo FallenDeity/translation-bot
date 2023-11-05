@@ -16,7 +16,7 @@ from utils.hints import Hints
 class Library(commands.Cog):
     def __init__(self, bot: Raizel) -> None:
         self.bot = bot
-        self.titles = joblib.load('titles.sav')
+        # self.titles = joblib.load('titles.sav')
         self.sorted_data: list = ["_id", "title", "rating", "size", "uploader", "date"]
 
     @staticmethod
