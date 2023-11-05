@@ -787,15 +787,16 @@ class Translate(commands.Cog):
             self, inter: discord.Interaction, term: str
     ) -> list[app_commands.Choice]:
         lst = [
-                  "naruto",
-                  "one-piece",
-                  "pokemon",
-                  "mixed",
-                  "prince-of-tennis",
-                  "marvel",
-                  "dc",
-                  "xianxia",
-              ] + list(map(str, range(1, 8)))
+            "naruto",
+            "one-piece",
+            "pokemon",
+            "mixed",
+            "prince-of-tennis",
+            "marvel",
+            "dc",
+            "xianxia",
+            *map(str, range(1, 8))
+        ]
         return [app_commands.Choice(name=i, value=i) for i in lst]
 
     @translate.autocomplete("term")
