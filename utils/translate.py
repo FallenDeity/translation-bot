@@ -2,7 +2,7 @@ import concurrent.futures
 import time
 import typing as t
 
-from deep_translator import GoogleTranslator, MyMemoryTranslator
+from deep_translator import GoogleTranslator
 
 from core.bot import Raizel
 
