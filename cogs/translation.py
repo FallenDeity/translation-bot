@@ -779,7 +779,8 @@ class Translate(commands.Cog):
     async def translate_complete(
             self, inter: discord.Interaction, language: str
     ) -> list[app_commands.Choice]:
-        lst = [i for i in self.bot.all_langs if language.lower() in i.lower()][:25]
+        language_lower = language.lower()
+        lst = [i for i in self.bot.all_langs if language_lower in i.lower()][:25]
         return [app_commands.Choice(name=i, value=i) for i in lst]
 
     @multi.autocomplete("add_terms")
@@ -812,7 +813,7 @@ class Translate(commands.Cog):
                   "marvel",
                   "dc",
                   "xianxia",
-              ] + list(map(str, range(1, 8)))
+              ]
         return [app_commands.Choice(name=i, value=i) for i in lst]
 
     @commands.hybrid_command(

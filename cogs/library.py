@@ -16,6 +16,7 @@ from utils.hints import Hints
 class Library(commands.Cog):
     def __init__(self, bot: Raizel) -> None:
         self.bot = bot
+        self.titles = joblib.load('titles.sav')
         self.sorted_data: list = ["_id", "title", "rating", "size", "uploader", "date"]
 
     @staticmethod
@@ -108,9 +109,7 @@ class Library(commands.Cog):
         output = [
             f"**#{novel['_id']}\t💠\t[{novel['title'].split('__')[0].strip()[:200]}]({novel['download']})**\n💠\tSize: **{round(novel['size'] / (1024 ** 2), 2)} MB**\t💠\tLanguage:** {novel['language']}** "
             for novel in data]
-        out_str = ""
-        for out in output:
-            out_str += out + "\n\n"
+        out_str = "\n\n".join(output)
         embed = discord.Embed(title=f"**Page {page}**",
                               description=out_str)
         embed.set_footer(text=f"Hint : {await Hints.get_single_hint()}", icon_url=await Hints.get_avatar())
@@ -309,10 +308,11 @@ class Library(commands.Cog):
     async def translate_complete(
             self, inter: discord.Interaction, title: str
     ) -> list[app_commands.Choice]:
-        titles = joblib.load('titles.sav')
+        if not hasattr(self, 'titles'):
+            self.titles = joblib.load('titles.sav')
         lst = [
                   str(i[:90]).strip()
-                  for i in titles
+                  for i in self.titles
                   if title.lower() in i.lower()
               ][:25]
         # print(lst)
