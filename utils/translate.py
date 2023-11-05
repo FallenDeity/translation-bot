@@ -66,7 +66,8 @@ class Translator:
                 for num, url in enumerate(chapters)
             ]
             for future in concurrent.futures.as_completed(futures):
-                self.order[future.result()[0]] = future.result()[1]
+                result = future.result()
+                self.order[result[0]] = result[1]
                 try:
                     if self.bot.translator[self.user] == "break":
                         executor.shutdown(wait=False, cancel_futures=True)
@@ -88,16 +89,11 @@ class Translator:
 
     @staticmethod
     def get_no_of_workers(no_tasks, size) -> int:
-        workers: int = 8
         if size <= 700:
-            workers = 10
+            return 10
         elif size <= 1400:
-            workers = 9
+            return 9
         elif size <= 2000:
-            workers = 8
+            return 8
         else:
-            if no_tasks > 8:
-                workers = 7
-            else:
-                workers = 8
-        return workers
+            return min(no_tasks, 7) if no_tasks > 8 else 8

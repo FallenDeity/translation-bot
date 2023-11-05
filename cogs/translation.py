@@ -323,7 +323,6 @@ class Translate(commands.Cog):
                         and language.lower() in str(n.language).lower() \
                         and size_found >= round(n.size / (1024 ** 2), 2):
                     library = n._id
-                    print(library)
                 if "english" == str(n.language).lower():
                     eng_check = True
                 if language == str(n.language).lower():
