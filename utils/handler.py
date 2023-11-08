@@ -84,51 +84,52 @@ class FileHandler:
                     )
                 return
             else:
-                outstr = ""
+                outstr = []
                 if len(bot.crawler) != 0:
-                    outstr = f"crawling {len(bot.crawler)}"
+                    outstr.append(f"crawling {len(bot.crawler)}")
                     if len(bot.translator) != 0 or len(bot.crawler_next) != 0:
-                        outstr += " ,"
+                        outstr.append(" ,")
                     else:
-                        outstr += " novels"
+                        outstr.append(" novels")
                 if len(bot.crawler_next) != 0:
                     if len(bot.crawler) == 0:
-                        outstr = f"crawling {len(bot.crawler_next)}"
+                        outstr.append(f"crawling {len(bot.crawler_next)}")
                     else:
-                        outstr = f"{outstr}, {len(bot.crawler_next)}"
+                        outstr.append(f", {len(bot.crawler_next)}")
                     if len(bot.translator) != 0:
-                        outstr += " ,"
+                        outstr.append(" ,")
                     else:
-                        outstr += " novels"
+                        outstr.append(" novels")
                 if len(bot.translator) != 0:
-                    outstr += f"translating {len(bot.translator)} novels"
-                outstr += "\n"
+                    outstr.append(f"translating {len(bot.translator)} novels")
+                outstr.append("\n")
                 if len(bot.crawler) != 0:
-                    outstr += "Crawler : "
+                    outstr.append("Crawler : ")
                     for keys, values in bot.crawler.items():
                         user = bot.get_user(keys)
                         user = user.name
-                        outstr = f"{outstr}{user}:{values}, "
-                    outstr += "\n"
+                        outstr.append(f"{user}:{values}, ")
+                    outstr.append("\n")
                 if len(bot.crawler_next) != 0:
-                    outstr += "Crawlernext : "
+                    outstr.append("Crawlernext : ")
                     for keys, values in bot.crawler_next.items():
                         user = bot.get_user(keys)
                         user = user.name
-                        outstr = f"{outstr}{user}:{values}, "
-                    outstr += "\n"
+                        outstr.append(f"{user}:{values}, ")
+                    outstr.append("\n")
                 if len(bot.translator) != 0:
-                    outstr += "Translator : "
+                    outstr.append("Translator : ")
                     for keys, values in bot.translator.items():
                         user = bot.get_user(keys)
                         user = user.name
-                        outstr = f"{outstr}{user}:{values}, "
-                if len(outstr) >= 128:
-                    outstr = outstr[:123] + "..."
+                        outstr.append(f"{user}:{values}, ")
+                output="".join(outstr)
+                if len(output) >= 128:
+                    output = output[:123] + "..."
                 await bot.change_presence(
                     activity=discord.Activity(
                         type=discord.ActivityType.watching, state="stat",
-                        name=f"{outstr}",
+                        name=f"{output}",
                     ),
                     status=discord.Status.online,
                 )
