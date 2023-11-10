@@ -66,7 +66,7 @@ class CssSelector:
         elif "m.akshu8.com" in link or "soruncg.com" in link or "www.630shu.net" in link\
                 or "www.yifan.net" in link or "www.soxscc.net" in link or "feixs.com" in link \
                 or "www.tsxsw.net" in link or "www.ttshu8.com" in link or "www.szhhlt.com" in link\
-                or "www.bqg789.net" in link or "www.9xzw.com" in link:
+                or "www.bqg789.net" in link or "www.9xzw.com" in link or "www.28zww.cc" in link:
             return "#content ::text"
         elif "www.wnmtl.org" in link:
             return "#reader > div > div.chapter-container ::text"
