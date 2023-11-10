@@ -6,7 +6,7 @@ from core import Raizel
 
 
 class ButtonsV(discord.ui.View):
-    def __init__(self, bot: Raizel, ctx: commands.Context, task: str, *, timeout=150):
+    def __init__(self, bot: Raizel, ctx: commands.Context, task: str, *, timeout=60):
         super().__init__(timeout=timeout)
         self.bot = bot
         self.ctx = ctx
