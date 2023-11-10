@@ -5,7 +5,7 @@ from core import Raizel
 
 
 class ButtonsV(discord.ui.View):
-    def __init__(self, bot: Raizel, ctx: commands.Context, task: str, *, timeout=180):
+    def __init__(self, bot: Raizel, ctx: commands.Context, task: str, *, timeout=150):
         super().__init__(timeout=timeout)
         self.bot = bot
         self.ctx = ctx
@@ -15,11 +15,11 @@ class ButtonsV(discord.ui.View):
     async def cancel(self, interaction: discord.Interaction, button: discord.ui.Button):
         print("here")
         print(interaction)
-        if self.task == "crawlnext":
+        if self.task == "crawlnext" and self.ctx.author.id in self.bot.crawler_next:
             self.bot.crawler_next[self.ctx.author.id] = "break"
-        if self.task == "crawl":
+        if self.task == "crawl" and self.ctx.author.id in self.bot.crawler:
             self.bot.crawler[self.ctx.author.id] = "break"
-        if self.task == "translate":
+        if self.task == "translate" and self.ctx.author.id in self.bot.translator:
             self.bot.translator[self.ctx.author.id] = "break"
         await interaction.response.send_message("Stopping the task")
 
