@@ -43,3 +43,6 @@ class ButtonsV(discord.ui.View):
         await self.bot.get_command("leaderboard").callback(Library(self.bot), self.ctx, self.ctx.author)
         button.disabled = True
         return await interaction.response.edit_message(view=self)
+
+    async def on_timeout(self):
+        self.clear_items()
