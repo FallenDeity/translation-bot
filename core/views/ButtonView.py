@@ -18,7 +18,7 @@ class ButtonsV(discord.ui.View):
             return False
         return True
 
-    @discord.ui.button(label="Cancel", style=discord.ButtonStyle.success, emoji='❌')
+    @discord.ui.button(label="Cancel", style=discord.ButtonStyle.red, emoji='❌')
     async def cancel(self, interaction: discord.Interaction, button: discord.ui.Button):
         if not await self.check_user_task(interaction):
             return
