@@ -240,123 +240,211 @@ class CssSelector:
         return "* ::text"
 
     def findchptitlecss(link):
-        if (
-                "trxs.me" in link
-                or "trxs.cc" in link
-                or "tongrenquan" in link
-                or "qbtr" in link
-                or "jpxs" in link
-        ):
-            return [".infos>h1:first-child", ""]
-        elif "ffxs8.com" in link:
-            return ["body > div.detail.clearfix > div > div.info-desc > div.desc-detail > h1", ""]
-        elif "txt520" in link or "ffxs" in link:
-            return ["title", ""]
-        elif "bixiang" in link or "powanjuan" in link:
-            return [".desc>h1", ""]
-        elif "sjks" in link:
-            return [".box-artic>h1", ""]
-        elif "sj.uukanshu" in link or "t.uukanshu" in link:
-            return [".bookname", "#divContent >h3 ::text"]
-        elif "uukanshu.cc" in link:
-            return [".booktitle", "h1 ::text"]
-        elif "uuks" in link:
-            return [".jieshao_content>h1", "h1#timu ::text"]
-        elif "uukanshu" in link:
-            return ["title", "h1#timu ::text"]
-        elif "69shu" in link:
-            return [".bread>a:nth-of-type(3)", "title ::text"]
-        elif "m.qidian" in link:
-            return ["#header > h1", ""]
-        elif "m.soxscc.net" in link or "m.ttshu8.com" in link:
-            return ["title", "#chapter > h1 ::text"]
-        elif "www.soxscc.net" in link or "www.bqg789.net" in link:
-            return ["#info > h1", "body > div.content_read > div > div.bookname > h1 ::text"]
-        elif "www.ops8.com" in link:
-            return ["div.book-title", "#BookCon > h1"]
-        elif "feixs.com" in link:
-            return ["title", "#main > div.bookinfo.m10.clearfix > div.info > p.chaptertitle ::text"]
-        elif "m.tsxsw.net" in link:
-            return ["title", "h2 ::text"]
-        elif "www.tsxsw.net" in link:
-            return ["div.articleinfo > div.r > div.l2 > div > h1", "title ::text"]
-        elif "tw.ixdzs.com" in link:
-            return ["h1", "title ::text"]
-        elif "www.asxs.com" in link:
-            return ["#a_main > div.bdsub > dl > dd.info > div.book > div.btitle > h1", "#amain > dl > dd:nth-child(2) > h1 ::text"]
-        elif "www.72xsw.net" in link:
-            return ["div.title > h1", "div > h1 ::text"]
-        elif "www.9xzw.com" in link:
-            return ["#info > div > h1", "div.bookname > h1 ::text"]
-        elif "m.ddxs.com" in link:
-            return ["body > div.header > h2 > font > font", "#nr_title ::text"]
-        elif "www.31dv.com" in link:
-            return ["#info > h1", "#wrapper > article > h1 ::text"]
-        else:
-            return ["title", "title ::text"]
+        domain_mappings = {
+            "trxs.me": [".infos>h1:first-child", ""],
+            "trxs.cc": [".infos>h1:first-child", ""],
+            "tongrenquan": [".infos>h1:first-child", ""],
+            "qbtr": [".infos>h1:first-child", ""],
+            "jpxs": [".infos>h1:first-child", ""],
+            "ffxs8.com": ["body > div.detail.clearfix > div > div.info-desc > div.desc-detail > h1", ""],
+            "txt520": ["title", ""],
+            "ffxs": ["title", ""],
+            "bixiang": [".desc>h1", ""],
+            "powanjuan": [".desc>h1", ""],
+            "sjks": [".box-artic>h1", ""],
+            "sj.uukanshu": [".bookname", "#divContent >h3 ::text"],
+            "t.uukanshu": [".bookname", "#divContent >h3 ::text"],
+            "uukanshu.cc": [".booktitle", "h1 ::text"],
+            "uuks": [".jieshao_content>h1", "h1#timu ::text"],
+            "uukanshu": ["title", "h1#timu ::text"],
+            "69shu": [".bread>a:nth-of-type(3)", "title ::text"],
+            "m.qidian": ["#header > h1", ""],
+            "m.soxscc.net": ["title", "#chapter > h1 ::text"],
+            "m.ttshu8.com": ["title", "#chapter > h1 ::text"],
+            "www.soxscc.net": ["#info > h1", "body > div.content_read > div > div.bookname > h1 ::text"],
+            "www.bqg789.net": ["#info > h1", "body > div.content_read > div > div.bookname > h1 ::text"],
+            "www.ops8.com": ["div.book-title", "#BookCon > h1"],
+            "feixs.com": ["title", "#main > div.bookinfo.m10.clearfix > div.info > p.chaptertitle ::text"],
+            "m.tsxsw.net": ["title", "h2 ::text"],
+            "www.tsxsw.net": ["div.articleinfo > div.r > div.l2 > div > h1", "title ::text"],
+            "tw.ixdzs.com": ["h1", "title ::text"],
+            "www.asxs.com": ["#a_main > div.bdsub > dl > dd.info > div.book > div.btitle > h1",
+                             "#amain > dl > dd:nth-child(2) > h1 ::text"],
+            "www.72xsw.net": ["div.title > h1", "div > h1 ::text"],
+            "www.9xzw.com": ["#info > div > h1", "div.bookname > h1 ::text"],
+            "m.ddxs.com": ["body > div.header > h2 > font > font", "#nr_title ::text"],
+            "www.31dv.com": ["#info > h1", "#wrapper > article > h1 ::text"],
+        }
+        for domain, ret_array in domain_mappings.items():
+            if domain in link:
+                return ret_array
+
+        return ["title", "title ::text"]
+        # if (
+        #         "trxs.me" in link
+        #         or "trxs.cc" in link
+        #         or "tongrenquan" in link
+        #         or "qbtr" in link
+        #         or "jpxs" in link
+        # ):
+        #     return [".infos>h1:first-child", ""]
+        # elif "ffxs8.com" in link:
+        #     return ["body > div.detail.clearfix > div > div.info-desc > div.desc-detail > h1", ""]
+        # elif "txt520" in link or "ffxs" in link:
+        #     return ["title", ""]
+        # elif "bixiang" in link or "powanjuan" in link:
+        #     return [".desc>h1", ""]
+        # elif "sjks" in link:
+        #     return [".box-artic>h1", ""]
+        # elif "sj.uukanshu" in link or "t.uukanshu" in link:
+        #     return [".bookname", "#divContent >h3 ::text"]
+        # elif "uukanshu.cc" in link:
+        #     return [".booktitle", "h1 ::text"]
+        # elif "uuks" in link:
+        #     return [".jieshao_content>h1", "h1#timu ::text"]
+        # elif "uukanshu" in link:
+        #     return ["title", "h1#timu ::text"]
+        # elif "69shu" in link:
+        #     return [".bread>a:nth-of-type(3)", "title ::text"]
+        # elif "m.qidian" in link:
+        #     return ["#header > h1", ""]
+        # elif "m.soxscc.net" in link or "m.ttshu8.com" in link:
+        #     return ["title", "#chapter > h1 ::text"]
+        # elif "www.soxscc.net" in link or "www.bqg789.net" in link:
+        #     return ["#info > h1", "body > div.content_read > div > div.bookname > h1 ::text"]
+        # elif "www.ops8.com" in link:
+        #     return ["div.book-title", "#BookCon > h1"]
+        # elif "feixs.com" in link:
+        #     return ["title", "#main > div.bookinfo.m10.clearfix > div.info > p.chaptertitle ::text"]
+        # elif "m.tsxsw.net" in link:
+        #     return ["title", "h2 ::text"]
+        # elif "www.tsxsw.net" in link:
+        #     return ["div.articleinfo > div.r > div.l2 > div > h1", "title ::text"]
+        # elif "tw.ixdzs.com" in link:
+        #     return ["h1", "title ::text"]
+        # elif "www.asxs.com" in link:
+        #     return ["#a_main > div.bdsub > dl > dd.info > div.book > div.btitle > h1", "#amain > dl > dd:nth-child(2) > h1 ::text"]
+        # elif "www.72xsw.net" in link:
+        #     return ["div.title > h1", "div > h1 ::text"]
+        # elif "www.9xzw.com" in link:
+        #     return ["#info > div > h1", "div.bookname > h1 ::text"]
+        # elif "m.ddxs.com" in link:
+        #     return ["body > div.header > h2 > font > font", "#nr_title ::text"]
+        # elif "www.31dv.com" in link:
+        #     return ["#info > h1", "#wrapper > article > h1 ::text"]
+        # else:
+        #     return ["title", "title ::text"]
 
     def find_next_selector(link):
-        if "readwn" in link or "wuxiax.co" in link or "novelmt.com" in link or "fannovels.com" in link or "novelmtl.com" in link or "www.wuxiap.com" in link or "www.wuxiau.com" in link:
-            return ["#chapter-article > header > div > aside > nav > div.action-select > a.chnav.next", "#chapter-article > header > div > div > h1 > a"]
-        elif "novelfull.com" in link:
-            return ["#next_chap", "#chapter > div > div > a"]
-        elif "novelroom.net" in link:
-            return ["#manga-reading-nav-foot > div > div.select-pagination > div > div.nav-next > a", "#manga-reading-nav-head > div > div.entry-header_wrap > div > div.c-breadcrumb > ol > li:nth-child(2) > a"]
-        elif "readlightnovel" in link:
-            return ["#ch-page-container > div > div.col-lg-8.content2 > div > div:nth-child(6) > ul > li:nth-child(3) > a", "#ch-page-container > div > div.col-lg-8.content2 > div > div:nth-child(1) > div > div > h1"]
-        elif "www.youyoukanshu.com" in link or "www.dongliuxiaoshuo.com" in link:
-            return ["None", "#content > div.readtop > div.pull-left.hidden-lg > a > font"]
-        elif "m.shubaow.net" in link:
-            return ["#novelcontent > div.page_chapter > ul > li:nth-child(4) > a", "#novelbody > div.head > div.nav_name > h1 > font > font"]
-        elif "m.xindingdianxsw.com" in link:
-            return ["#chapter > div:nth-child(9) > a:nth-child(3)", "#chapter > div.path > a:nth-child(2)"]
-        elif "www.xindingdianxsw.com" in link:
-            return ["#A3", "div.con_top > a:nth-child(3)"]
-        elif "m.longteng788.com/" in link:
-            return ["#pb_next", "#_52mb_h1"]
-        elif "m.75zw.com/" in link:
-            return ["#chapter > div.pager.z1 > a:nth-child(3)", "#chapter > div.path > a:nth-child(3) > font > font"]
-        elif "www.wnmtl.org" in link:
-            return ["#nextBtn", "#navBookName"]
-        elif "m.akshu8.com" in link or "soruncg.com" in link:
-            return ["#container > div > div > div.reader-main > div.section-opt.m-bottom-opt > a:nth-child(5)", "title"]
-        elif "m.77z5.com" in link:
-            return ["#pt_next", "#top > span > font > font:nth-child(3)"]
-        elif "m.yifan.net/" in link:
-            return ["#pb_next", "#read > div.header > span.title"]
-        elif "www.yifan.net" in link:
-            return ["#book > div.content > div:nth-child(5) > ul > li:nth-child(3) > a", "title"]
-        elif "m.630shu.net" in link:
-            return ["#pb_next", "title"]
-        # elif "m.soxscc.net" in link:
-        #     return ["#chapter > div.pager > a:nth-child(3)", "#bookname"]
-        elif "www.qcxxs.com" in link:
-            return ["body > div.container > div.row.row-detail > div > div > div.read_btn > a:nth-child(4)", "body > div.container > div.row.row-detail > div > h2 > a:nth-child(3)"]
-        elif "www.gonet.cc" in link:
-            return ["body > div.container > div.row.row-detail > div > div > div.read_btn > a:nth-child(4)", "body > div.container > div.row.row-detail > div > h2 > a:nth-child(3) > font > font"]
-        elif "mtl-novel.net" in link or "novelnext.com" in link:
-            return ["#next_chap", "#chapter > div > div > a"]
-        elif "ranobes.com" in link:
-            return ["#next", "#dle-speedbar > span > font:nth-child(2) > span:nth-child(4) > a > span"]
-        elif "booktoki216.com" in link:
-            return ["#goNextBtn", "title"]
-        elif "boxnovel.com" in link or "bonnovel.com" in link:
-            return ["None", "#manga-reading-nav-head > div > div.entry-header_wrap > div > div.c-breadcrumb > ol > li:nth-child(2) > a"]
-        elif "www.szhhlt.com" in link:
-            return ["None", "body > div.container > header > h1 > label > a"]
-        elif "69shu" in link:
-            return ["None", "title"]
-        elif "novelbin.net" in link:
-            return ["None", "#chapter > div > div > a"]
-        elif "1stkissnovel.org" in link:
-            return ["None", "#chapter-heading"]
-        elif "sangtacviet.vip" in link:
-            return ["None", "title"]
-        elif "m.sywx8.com" in link:
-            return ["None", "head > meta:nth-child(9)"]
-        # elif "www.novelcool.com" in link:
-        #     return ["None",  "div.chapter-reading-section-list > div > div > h2"]
-        # elif "m.bqg789.net" in link:
-        #     return ["#nextpage", "#novelbody > div.head > div.nav_name > h1"]
-        else:
-            return [None, "title"]
+        domain_mappings = {
+            "readwn": ["#chapter-article > header > div > aside > nav > div.action-select > a.chnav.next",
+                       "#chapter-article > header > div > div > h1 > a"],
+            "novelfull.com": ["#next_chap", "#chapter > div > div > a"],
+            "novelroom.net": ["#manga-reading-nav-foot > div > div.select-pagination > div > div.nav-next > a",
+                              "#manga-reading-nav-head > div > div.entry-header_wrap > div > div.c-breadcrumb > ol > li:nth-child(2) > a"],
+            "readlightnovel": [
+                "#ch-page-container > div > div.col-lg-8.content2 > div > div:nth-child(6) > ul > li:nth-child(3) > a",
+                "#ch-page-container > div > div.col-lg-8.content2 > div > div:nth-child(1) > div > div > h1"],
+            "www.youyoukanshu.com": ["None", "#content > div.readtop > div.pull-left.hidden-lg > a > font"],
+            "m.shubaow.net": ["#novelcontent > div.page_chapter > ul > li:nth-child(4) > a",
+                              "#novelbody > div.head > div.nav_name > h1 > font > font"],
+            "m.xindingdianxsw.com": ["#chapter > div:nth-child(9) > a:nth-child(3)",
+                                     "#chapter > div.path > a:nth-child(2)"],
+            "www.xindingdianxsw.com": ["#A3", "div.con_top > a:nth-child(3)"],
+            "m.longteng788.com/": ["#pb_next", "#_52mb_h1"],
+            "m.75zw.com/": ["#chapter > div.pager.z1 > a:nth-child(3)",
+                            "#chapter > div.path > a:nth-child(3) > font > font"],
+            "www.wnmtl.org": ["#nextBtn", "#navBookName"],
+            "m.akshu8.com": ["#container > div > div > div.reader-main > div.section-opt.m-bottom-opt > a:nth-child(5)",
+                             "title"],
+            "m.77z5.com": ["#pt_next", "#top > span > font > font:nth-child(3)"],
+            "m.yifan.net/": ["#pb_next", "#read > div.header > span.title"],
+            "www.yifan.net": ["#book > div.content > div:nth-child(5) > ul > li:nth-child(3) > a", "title"],
+            "m.630shu.net": ["#pb_next", "title"],
+            "www.qcxxs.com": ["body > div.container > div.row.row-detail > div > div > div.read_btn > a:nth-child(4)",
+                              "body > div.container > div.row.row-detail > div > h2 > a:nth-child(3)"],
+            "www.gonet.cc": ["body > div.container > div.row.row-detail > div > div > div.read_btn > a:nth-child(4)",
+                             "body > div.container > div.row.row-detail > div > h2 > a:nth-child(3) > font > font"],
+            "mtl-novel.net": ["#next_chap", "#chapter > div > div > a"],
+            "ranobes.com": ["#next", "#dle-speedbar > span > font:nth-child(2) > span:nth-child(4) > a > span"],
+            "booktoki216.com": ["#goNextBtn", "title"],
+            "boxnovel.com": ["None",
+                             "#manga-reading-nav-head > div > div.entry-header_wrap > div > div.c-breadcrumb > ol > li:nth-child(2) > a"],
+            "www.szhhlt.com": ["None", "body > div.container > header > h1 > label > a"],
+            "69shu": ["None", "title"],
+            "novelbin.net": ["None", "#chapter > div > div > a"],
+            "1stkissnovel.org": ["None", "#chapter-heading"],
+            "sangtacviet.vip": ["None", "title"],
+            "m.sywx8.com": ["None", "head > meta:nth-child(9)"],
+            # "www.novelcool.com": ["None",  "div.chapter-reading-section-list > div > div > h2"],
+            # "m.bqg789.net": ["#nextpage", "#novelbody > div.head > div.nav_name > h1"],
+        }
+        for domain, ret_array in domain_mappings.items():
+            if domain in link:
+                return ret_array
+
+        return [None, "title"]
+        # if "readwn" in link or "wuxiax.co" in link or "novelmt.com" in link or "fannovels.com" in link or "novelmtl.com" in link or "www.wuxiap.com" in link or "www.wuxiau.com" in link:
+        #     return ["#chapter-article > header > div > aside > nav > div.action-select > a.chnav.next", "#chapter-article > header > div > div > h1 > a"]
+        # elif "novelfull.com" in link:
+        #     return ["#next_chap", "#chapter > div > div > a"]
+        # elif "novelroom.net" in link:
+        #     return ["#manga-reading-nav-foot > div > div.select-pagination > div > div.nav-next > a", "#manga-reading-nav-head > div > div.entry-header_wrap > div > div.c-breadcrumb > ol > li:nth-child(2) > a"]
+        # elif "readlightnovel" in link:
+        #     return ["#ch-page-container > div > div.col-lg-8.content2 > div > div:nth-child(6) > ul > li:nth-child(3) > a", "#ch-page-container > div > div.col-lg-8.content2 > div > div:nth-child(1) > div > div > h1"]
+        # elif "www.youyoukanshu.com" in link or "www.dongliuxiaoshuo.com" in link:
+        #     return ["None", "#content > div.readtop > div.pull-left.hidden-lg > a > font"]
+        # elif "m.shubaow.net" in link:
+        #     return ["#novelcontent > div.page_chapter > ul > li:nth-child(4) > a", "#novelbody > div.head > div.nav_name > h1 > font > font"]
+        # elif "m.xindingdianxsw.com" in link:
+        #     return ["#chapter > div:nth-child(9) > a:nth-child(3)", "#chapter > div.path > a:nth-child(2)"]
+        # elif "www.xindingdianxsw.com" in link:
+        #     return ["#A3", "div.con_top > a:nth-child(3)"]
+        # elif "m.longteng788.com/" in link:
+        #     return ["#pb_next", "#_52mb_h1"]
+        # elif "m.75zw.com/" in link:
+        #     return ["#chapter > div.pager.z1 > a:nth-child(3)", "#chapter > div.path > a:nth-child(3) > font > font"]
+        # elif "www.wnmtl.org" in link:
+        #     return ["#nextBtn", "#navBookName"]
+        # elif "m.akshu8.com" in link or "soruncg.com" in link:
+        #     return ["#container > div > div > div.reader-main > div.section-opt.m-bottom-opt > a:nth-child(5)", "title"]
+        # elif "m.77z5.com" in link:
+        #     return ["#pt_next", "#top > span > font > font:nth-child(3)"]
+        # elif "m.yifan.net/" in link:
+        #     return ["#pb_next", "#read > div.header > span.title"]
+        # elif "www.yifan.net" in link:
+        #     return ["#book > div.content > div:nth-child(5) > ul > li:nth-child(3) > a", "title"]
+        # elif "m.630shu.net" in link:
+        #     return ["#pb_next", "title"]
+        # # elif "m.soxscc.net" in link:
+        # #     return ["#chapter > div.pager > a:nth-child(3)", "#bookname"]
+        # elif "www.qcxxs.com" in link:
+        #     return ["body > div.container > div.row.row-detail > div > div > div.read_btn > a:nth-child(4)", "body > div.container > div.row.row-detail > div > h2 > a:nth-child(3)"]
+        # elif "www.gonet.cc" in link:
+        #     return ["body > div.container > div.row.row-detail > div > div > div.read_btn > a:nth-child(4)", "body > div.container > div.row.row-detail > div > h2 > a:nth-child(3) > font > font"]
+        # elif "mtl-novel.net" in link or "novelnext.com" in link:
+        #     return ["#next_chap", "#chapter > div > div > a"]
+        # elif "ranobes.com" in link:
+        #     return ["#next", "#dle-speedbar > span > font:nth-child(2) > span:nth-child(4) > a > span"]
+        # elif "booktoki216.com" in link:
+        #     return ["#goNextBtn", "title"]
+        # elif "boxnovel.com" in link or "bonnovel.com" in link:
+        #     return ["None", "#manga-reading-nav-head > div > div.entry-header_wrap > div > div.c-breadcrumb > ol > li:nth-child(2) > a"]
+        # elif "www.szhhlt.com" in link:
+        #     return ["None", "body > div.container > header > h1 > label > a"]
+        # elif "69shu" in link:
+        #     return ["None", "title"]
+        # elif "novelbin.net" in link:
+        #     return ["None", "#chapter > div > div > a"]
+        # elif "1stkissnovel.org" in link:
+        #     return ["None", "#chapter-heading"]
+        # elif "sangtacviet.vip" in link:
+        #     return ["None", "title"]
+        # elif "m.sywx8.com" in link:
+        #     return ["None", "head > meta:nth-child(9)"]
+        # # elif "www.novelcool.com" in link:
+        # #     return ["None",  "div.chapter-reading-section-list > div > div > h2"]
+        # # elif "m.bqg789.net" in link:
+        # #     return ["#nextpage", "#novelbody > div.head > div.nav_name > h1"]
+        # else:
+        #     return [None, "title"]
