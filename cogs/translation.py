@@ -20,6 +20,7 @@ from discord.ext import commands
 from cogs.admin import Admin
 from cogs.library import Library
 from core.bot import Raizel
+from core.views.ButtonView import ButtonsV
 from core.views.linkview import LinkView
 from languages.terms import terms
 from utils.handler import FileHandler
@@ -506,7 +507,8 @@ class Translate(commands.Cog):
             embed.add_field(name="From", value=original_Language, inline=True)
             embed.add_field(name="Size", value=f"{round(size / (1024 ** 2), 2)} MB", inline=True)
             embed.set_footer(text=f"Hint : {await Hints.get_single_hint()}", icon_url=await Hints.get_avatar())
-            rep_msg = await rep_msg.edit(content="", embed=embed)
+            view = ButtonsV(self.bot, ctx, "translate")
+            rep_msg = await rep_msg.edit(content="", embed=embed, view=view)
             if library is not None:
                 await ctx.reply(content=f"> Updating {str(library)} with name : {name}")
             poke_words = ["elves ", "pokemon", "pokémon", " elf "]

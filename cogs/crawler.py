@@ -1260,8 +1260,9 @@ class Crawler(commands.Cog):
         embed.set_thumbnail(url=display_avatar)
         embed.set_image(url="https://cdn.discordapp.com/attachments/1004050326606852237/1064751851481870396"
                             "/loading_pi.gif")
+        view = ButtonsV(self.bot, ctx, "crawlnext")
         msg = await msg.edit(content="",
-                             embed=embed)
+                             embed=embed, view=view)
         embed.set_footer(text=f"Hint : {await Hints.get_single_hint()}", icon_url=await Hints.get_avatar())
         embed.add_field(name="Progress", value=chp_count)
         if library is not None:
