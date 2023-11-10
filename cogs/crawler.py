@@ -10,7 +10,6 @@ import time
 import traceback
 import typing
 import typing as t
-from asyncio import Task
 from urllib.parse import urljoin
 from urllib.parse import urlparse
 import cloudscraper
@@ -31,6 +30,7 @@ from cogs.admin import Admin
 from cogs.library import Library
 from cogs.translation import Translate
 from core.bot import Raizel
+from core.views.ButtonView import ButtonsV
 from utils.handler import FileHandler
 from utils.hints import Hints
 from utils.selector import CssSelector
@@ -315,7 +315,7 @@ class Crawler(commands.Cog):
                 "> **❌You have no tasks currently running.**"
             )
         if ctx.author.id in self.bot.crawler_next and crawler:
-            self.bot.crawler[ctx.author.id] = "break"
+            self.bot.crawler_next[ctx.author.id] = "break"
         if ctx.author.id in self.bot.crawler and crawler:
             self.bot.crawler[ctx.author.id] = "break"
         if ctx.author.id in self.bot.translator and translator:
@@ -779,8 +779,9 @@ class Crawler(commands.Cog):
             else:
                 embed.set_thumbnail(url=thumbnail)
             embed.set_footer(text=f"Hint : {await Hints.get_single_hint()}", icon_url=await Hints.get_avatar())
+            view = ButtonsV(self.bot, ctx, "crawl")
             msg = await msg.edit(content="",
-                                 embed=embed)
+                                 embed=embed, view=view)
             task = asyncio.create_task(self.cc_prog(msg, embed, ctx.author.id))
             if library is not None:
                 await ctx.reply(content=f"> Updating {str(library)} with name : {title_name}")
