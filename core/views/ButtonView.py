@@ -33,3 +33,5 @@ class ButtonsV(discord.ui.View):
             await interaction.response.send_message("Stopping the translation task.")
         else:
             await interaction.response.send_message("No active task to cancel.")
+        button.disabled = True
+        return await interaction.response.edit_message(view=self)
