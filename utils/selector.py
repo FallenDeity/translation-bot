@@ -39,7 +39,7 @@ class CssSelector:
             return ".chapter-content ::text"
         elif "novelsemperor" in link or "novelsknight.com" in link:
             return "* ::text"
-        elif "www.vbiquge.co" in link:
+        elif "www.vbiquge.co" in link or "www.wfxs.com.tw" in link:
             return "#rtext ::text"
         elif "2015txt.com" in link:
             return "#cont-body ::text"
@@ -102,7 +102,7 @@ class CssSelector:
             return "#htmlContent ::text"
         elif "ranobes.com" in link:
             return "div.block.story.shortstory ::text"
-        elif "m.bqg789.net" in link:
+        elif "m.bqg789.net" in link or "m.biquzw789.org" in link:
             return "#novelcontent ::text"
         elif "boxnovel.com" in link or "bonnovel.com" in link:
             return "div.cha-content ::text"
@@ -124,6 +124,8 @@ class CssSelector:
             return "p ::text"
         elif "m.sywx8.com" in link:
             return "#nr ::text"
+        elif "www.tadu.com" in link:
+            return "#partContent ::text"
         else:
             return "* ::text"
 
