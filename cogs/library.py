@@ -251,7 +251,7 @@ class Library(commands.Cog):
     @library.command(name="random", help="Gives 10 random novel in library.")
     async def random(
             self,
-            ctx: commands.Context, no_of_novels: int = 10
+            ctx: commands.Context, no_of_novels: int = 10, language: str = "english"
     ) -> None:
         """get random novels from library
                Parameters
@@ -260,9 +260,11 @@ class Library(commands.Cog):
                    The interaction
                no_of_novels : int, optional
                    number of novels , by default it is 10
+               language: str, optional
+                    language to be filtered
                """
         await ctx.defer()
-        novels = await self.bot.mongo.library.get_random_novel(no=no_of_novels)
+        novels = await self.bot.mongo.library.get_random_novel(no=no_of_novels, language=language)
         embeds = await self.make_list_embed(novels)
         return await self.buttons(embeds, ctx)
 

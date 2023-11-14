@@ -34,15 +34,18 @@ class ButtonsV(discord.ui.View):
             await interaction.response.send_message("Stopping the translation task.")
         else:
             await interaction.response.send_message("No active task to cancel.", delete_after=5)
-        button.disabled = True
-        return await interaction.response.edit_message(view=self)
+        return await interaction.response.defer()
 
     @discord.ui.button(label="leaderboard", style=discord.ButtonStyle.blurple, emoji='🏆')
     async def leaderboard(self, interaction: discord.Interaction, button: discord.ui.Button):
         await interaction.response.send_message("leaderboard started", delete_after=3)
         await self.bot.get_command("leaderboard").callback(Library(self.bot), self.ctx, self.ctx.author)
-        button.disabled = True
-        return await interaction.response.edit_message(view=self)
+        return await interaction.response.defer()
+
+    @discord.ui.button(label="Suggest Random Novel", style=discord.ButtonStyle.red, emoji='📖')
+    async def random(self, interaction: discord.Interaction, button: discord.ui.Button):
+        await self.bot.get_command("library random").callback(Library(self.bot), self.ctx)
+        return await interaction.response.defer()
 
     async def on_timeout(self):
         # self.disable_all
