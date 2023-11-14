@@ -34,8 +34,7 @@ class Library(commands.Cog):
             await ctx.send(embed=lst[0])
             return
         menu = ViewMenu(ctx, menu_type=ViewMenu.TypeEmbed, remove_buttons_on_timeout=True, timeout=40)
-        for i in lst:
-            menu.add_page(i)
+        menu.add_pages(lst)
         back = ViewButton(
             style=discord.ButtonStyle.blurple,
             emoji="<:ArrowLeft:989134685068202024>",

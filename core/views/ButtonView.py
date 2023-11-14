@@ -45,6 +45,7 @@ class ButtonsV(discord.ui.View):
         return await interaction.response.edit_message(view=self)
 
     async def on_timeout(self):
+        # self.disable_all
         self.clear_items()
         await self.ctx.message.edit(view=self)
 
