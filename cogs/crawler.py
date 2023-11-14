@@ -670,77 +670,9 @@ class Crawler(commands.Cog):
                 title_name = title + "__" + title_name
                 title = str(title[:100])
         novel_data = await self.bot.mongo.library.get_novel_by_name(title_name.split('__')[0])
-        # print(title_name)
-        if novel_data is not None:
-            name_lib_check = False
-            novel_data = list(novel_data)
-            ids = []
-            for n in novel_data:
-                ids.append(n._id)
-                org_str = re.sub("[^A-Za-z0-9]", "", title.split('__')[0]).lower()
-                org_str2 = re.sub("[^A-Za-z0-9]", "", title.split('  ')[0]).lower()
-                lib_str = re.sub("[^A-Za-z0-9]", "", n.title.split('__')[0]).lower()
-                lib_str2 = re.sub("[^A-Za-z0-9]", "", n.title.split('  ')[0]).lower()
-                if (title.split('__')[0].strip() == n.title.split('__')[0].strip()
-                    or org_str == lib_str or org_str2 == lib_str
-                    or lib_str2 == org_str2
-                    or title_name.split('  ')[0].lower() == n.title.split('  ')[0].lower()
-                    or (len(title) > 20 and org_str in lib_str)
-                    or (len(title) > 20 and org_str2 in lib_str2)
-                ) and original_Language in str(n.language).lower():
-                    library_update = True
-                    library = n._id
-                    print(library)
-                if title.strip('__')[0] in n.title or org_str in lib_str:
-                    name_lib_check = True
-            if len(ids) >= 20:
-                library = None
-            if True:
-                ids = ids[:20]
-                ctx.command = await self.bot.get_command("library search").callback(Library(self.bot), ctx,
-                                                                                    title_name.split('__')[0], None,
-                                                                                    None,
-                                                                                    None, None, None, None, None, None,
-                                                                                    False, "size", 20)
-                if len(ids) < 5 or name_lib_check:
-                    await ctx.send("**Please check from above library**", delete_after=20)
-                    await asyncio.sleep(5)
-                await asyncio.sleep(0.1)
-                chk_msg = await ctx.send(embed=discord.Embed(
-                    description=f"This novel **{title}** is already in our library with ids **{ids.__str__()}**...use arrow marks  in above  to navigate...  \n\nIf you want to continue crawling react with 🇳 \n\n**Note : Some files are in docx format, so file size maybe half the size of txt. and try to minimize translating if its already in library**"))
-                await chk_msg.add_reaction('🇾')
-                await chk_msg.add_reaction('🇳')
-
-                def check(reaction, user):
-                    return reaction.message.id == chk_msg.id and (
-                            str(reaction.emoji) == '🇾' or str(reaction.emoji) == '🇳') and user == ctx.author
-
-                try:
-                    res = await self.bot.wait_for(
-                        "reaction_add",
-                        check=check,
-                        timeout=20.0,
-                    )
-                except asyncio.TimeoutError:
-                    try:
-                        os.remove(f"{ctx.author.id}.txt")
-                    except:
-                        pass
-                    await ctx.send("No response detected. ", delete_after=5)
-                    await chk_msg.delete()
-                    return None
-                else:
-                    await ctx.send("Reaction received", delete_after=10)
-                    if str(res[0]) == '🇳':
-                        msg = await ctx.reply("Reaction received.. please wait")
-                    else:
-                        await ctx.send("Reaction received", delete_after=10)
-                        try:
-                            os.remove(f"{ctx.author.id}.txt")
-                        except:
-                            pass
-                        await chk_msg.delete()
-                        return None
+        library: int = await FileHandler.checkLibrary(novel_data, title_name, title, original_Language, ctx, self.bot)
+        if library == 0:
+            return None
         if ctx.author.id in self.bot.crawler:
             return await ctx.reply(
                 "> **❌You cannot crawl two novels at the same time.**"
@@ -1146,76 +1078,9 @@ class Crawler(commands.Cog):
                     source="auto", target="english"
                 ).translate(title_name).strip()
                 title = title_name
-        library: int = None
-        if novel_data is not None:
-            novel_data = list(novel_data)
-            name_lib_check = False
-            ids = []
-            for n in novel_data:
-                ids.append(n._id)
-                if title_name.strip('__')[0] in n.title:
-                    name_lib_check = True
-                org_str = re.sub("[^A-Za-z0-9]", "", title.split('__')[0]).lower()
-                org_str2 = re.sub("[^A-Za-z0-9]", "", title.split('  ')[0]).lower()
-                lib_str = re.sub("[^A-Za-z0-9]", "", n.title.split('__')[0]).lower()
-                lib_str2 = re.sub("[^A-Za-z0-9]", "", n.title.split('  ')[0]).lower()
-                if (title.split('__')[0].strip() == n.title.split('__')[0].strip()
-                    or org_str == lib_str or org_str2 == lib_str
-                    or lib_str2 == org_str2
-                    or title_name.split('  ')[0].lower() == n.title.split('  ')[0].lower()
-                    or (len(title) > 20 and org_str in lib_str)
-                    or (len(title) > 20 and org_str2 in lib_str2)
-                ) and original_Language in str(n.language).lower():
-                    library_update = True
-                    library = n._id
-                    print(library)
-            if len(ids) >= 20:
-                library = None
-            if True:
-                ids = ids[:20]
-                ctx.command = await self.bot.get_command("library search").callback(Library(self.bot), ctx,
-                                                                                    title_name.split('__')[0], None,
-                                                                                    None,
-                                                                                    None, None, None, None, None, None,
-                                                                                    False, "size", 20)
-                if len(ids) < 5 or name_lib_check:
-                    await ctx.send("**Please check from above library**", delete_after=20)
-                    await asyncio.sleep(5)
-                chk_msg = await ctx.send(embed=discord.Embed(
-                    description=f"This novel **{title}** is already in our library with ids **{ids.__str__()}**...use arrow marks in above to navigate...\nIf you want to continue crawling react with 🇳 \n\n**Note : Some files are in docx format, so file size maybe half the size of txt. and try to minimize translating if its already in library**"))
-                await chk_msg.add_reaction('🇾')
-                await chk_msg.add_reaction('🇳')
-
-                def check(reaction, user):
-                    return reaction.message.id == chk_msg.id and (
-                            str(reaction.emoji) == '🇾' or str(reaction.emoji) == '🇳') and user == ctx.author
-
-                try:
-                    res = await self.bot.wait_for(
-                        "reaction_add",
-                        check=check,
-                        timeout=20.0,
-                    )
-                except asyncio.TimeoutError:
-                    try:
-                        os.remove(f"{ctx.author.id}.txt")
-                    except:
-                        pass
-                    await ctx.send("No response detected.", delete_after=5)
-                    await chk_msg.delete()
-                    return None
-                else:
-                    await ctx.send("Reaction received", delete_after=10)
-                    if str(res[0]) == '🇳':
-                        msg = await ctx.reply("Reaction received.. please wait")
-                    else:
-                        await ctx.send("Reaction received", delete_after=10)
-                        try:
-                            os.remove(f"{ctx.author.id}.txt")
-                        except:
-                            pass
-                        await chk_msg.delete()
-                        return None
+        library: int = await FileHandler.checkLibrary(novel_data, title_name, title, original_Language, ctx, self.bot)
+        if library == 0:
+            return None
         crawled_urls = []
         repeats = 0
         no_tries = 0

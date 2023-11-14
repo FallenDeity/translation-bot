@@ -23,6 +23,7 @@ from readabilipy import simple_json_from_html_string
 from textblob import TextBlob
 from bs4 import BeautifulSoup
 
+from cogs.library import Library
 from core.bot import Raizel
 from core.views.linkview import LinkView
 from databases.data import Novel
@@ -41,6 +42,80 @@ class FileHandler:
     ENCODING: list[str] = ["utf-8", "cp936", "utf-16", "cp949"]
     TOTAL: int = len(ENCODING)
 
+    @staticmethod
+    async def checkLibrary(novel_data: list[Novel], title_name: str, title:  str, originalLanguage: str, ctx:commands.Context, bot: Raizel,):
+        if novel_data is not None:
+            library = None
+            novel_data = list(novel_data)
+            name_lib_check = False
+            ids = []
+            for n in novel_data:
+                ids.append(n._id)
+                if title_name.strip('__')[0] in n.title:
+                    name_lib_check = True
+                org_str = re.sub("[^A-Za-z0-9]", "", title.split('__')[0]).lower()
+                org_str2 = re.sub("[^A-Za-z0-9]", "", title.split('  ')[0]).lower()
+                lib_str = re.sub("[^A-Za-z0-9]", "", n.title.split('__')[0]).lower()
+                lib_str2 = re.sub("[^A-Za-z0-9]", "", n.title.split('  ')[0]).lower()
+                if (title.split('__')[0].strip() == n.title.split('__')[0].strip()
+                    or org_str == lib_str or org_str2 == lib_str
+                    or lib_str2 == org_str2
+                    or title_name.split('  ')[0].lower() == n.title.split('  ')[0].lower()
+                    or (len(title) > 20 and org_str in lib_str)
+                    or (len(title) > 20 and org_str2 in lib_str2)
+                ) and originalLanguage in str(n.language).lower():
+                    library = n._id
+            if len(ids) >= 20:
+                return None
+            if True:
+                ids = ids[:20]
+                ctx.command = await bot.get_command("library search").callback(Library(bot), ctx,
+                                                                                    title_name.split('__')[0], None,
+                                                                                    None,
+                                                                                    None, None, None, None, None, None,
+                                                                                    False, "size", 20)
+                if len(ids) < 5 or name_lib_check:
+                    await ctx.send("**Please check from above library**", delete_after=20)
+                    await asyncio.sleep(5)
+                chk_msg = await ctx.send(embed=discord.Embed(
+                    description=f"This novel **{title}** is already in our library with ids **{ids.__str__()}**...use arrow marks in above to navigate...\nIf you want to continue crawling react with 🇳 \n\n**Note : Some files are in docx format, so file size maybe half the size of txt. and try to minimize translating if its already in library**"))
+                await chk_msg.add_reaction('🇾')
+                await chk_msg.add_reaction('🇳')
+
+                def check(reaction, user):
+                    return reaction.message.id == chk_msg.id and (
+                            str(reaction.emoji) == '🇾' or str(reaction.emoji) == '🇳') and user == ctx.author
+
+                try:
+                    res = await bot.wait_for(
+                        "reaction_add",
+                        check=check,
+                        timeout=20.0,
+                    )
+                except asyncio.TimeoutError:
+                    try:
+                        os.remove(f"{ctx.author.id}.txt")
+                    except:
+                        pass
+                    await ctx.send("No response detected.", delete_after=5)
+                    await chk_msg.delete()
+                    return 0
+                else:
+                    await ctx.send("Reaction received", delete_after=10)
+                    await chk_msg.delete()
+                    if str(res[0]) == '🇳':
+                        msg = await ctx.reply("Reaction received.. please wait")
+                        return library
+                    else:
+                        await ctx.send("Reaction received", delete_after=10)
+                        try:
+                            os.remove(f"{ctx.author.id}.txt")
+                        except:
+                            pass
+                        await chk_msg.delete()
+                        return 0
+        else:
+            return None
     @staticmethod
     def get_handler():
         user_agent_list: list[str] = [
