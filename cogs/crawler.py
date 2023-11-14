@@ -5,7 +5,6 @@ import gc
 import itertools
 import os
 import random
-import re
 import time
 import traceback
 import typing
@@ -19,7 +18,7 @@ import discord
 import parsel
 import requests
 from StringProgressBar import progressBar
-from _socket import timeout
+
 from bs4 import BeautifulSoup
 from deep_translator import GoogleTranslator
 from discord import app_commands
@@ -27,7 +26,6 @@ from discord.ext import commands
 from readabilipy import simple_json_from_html_string
 
 from cogs.admin import Admin
-from cogs.library import Library
 from cogs.translation import Translate
 from core.bot import Raizel
 from core.views.ButtonView import ButtonsV
@@ -639,8 +637,6 @@ class Crawler(commands.Cog):
                 description = await FileHandler.get_description(soup, link, title=title_name)
             except:
                 description = ""
-        library_update: bool = False
-        library: int = None
         if 'b.faloo' in link or 'wap.faloo' in link:
             urls = urls[:200]
         if "www.uukanshu.com" in link:
