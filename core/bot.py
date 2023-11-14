@@ -1,7 +1,6 @@
 import asyncio
 import datetime
 import gc
-import logging
 import os
 import pickle
 import random
@@ -70,8 +69,7 @@ class Raizel(commands.Bot):
 
     async def setup_hook(self) -> None:
         try:
-            # await self._load_cogs()
-            logging.getLogger('__name__').info("added cogs")
+            await self._load_cogs()
             await self.load_extension("jishaku")
         except Exception as e:
             print(traceback.print_exc())
@@ -92,9 +90,9 @@ class Raizel(commands.Bot):
         return await super().setup_hook()
 
     async def startup(self, channel):
-        # nltk.download("brown")
-        # nltk.download("punkt")
-        # nltk.download("popular")
+        nltk.download("brown")
+        nltk.download("punkt")
+        nltk.download("popular")
         self.blocked: list[int] = await self.mongo.blocker.get_all_banned_users()
         self.dictionary = get_dictionary()
         for x in os.listdir():
@@ -105,7 +103,7 @@ class Raizel(commands.Bot):
         try:
             with open(os.getenv("MEGA"), 'rb') as f:
                 megastore = pickle.load(f)
-            # self.mega = Mega().login(megastore["user"], megastore["password"])
+            self.mega = Mega().login(megastore["user"], megastore["password"])
             print("Connected to Mega")
         except Exception as e:
             try:
