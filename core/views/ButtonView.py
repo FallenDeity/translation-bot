@@ -6,7 +6,7 @@ from core import Raizel
 
 
 class ButtonsV(discord.ui.View):
-    def __init__(self, bot: Raizel, ctx: commands.Context, task: str, *, timeout=60):
+    def __init__(self, bot: Raizel, ctx: commands.Context, task: str, *, timeout=180):
         super().__init__(timeout=timeout)
         self.bot = bot
         self.ctx = ctx
@@ -46,3 +46,6 @@ class ButtonsV(discord.ui.View):
 
     async def on_timeout(self):
         self.clear_items()
+        await self.ctx.message.edit(view=self)
+
+

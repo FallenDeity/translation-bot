@@ -587,12 +587,13 @@ class Translate(commands.Cog):
                     pass
             try:
                 task.cancel()
+                view = None
                 embed.set_field_at(index=3,
                                    name=f"Progress :  100%",
                                    value=progressBar.filledBar(100, 100,
                                                                size=10, line="🟥", slider="🟩")[
                                        0])
-                await rep_msg.edit(embed=embed)
+                await rep_msg.edit(embed=embed, view=view)
             except:
                 pass
             async with aiofiles.open(f"{ctx.author.id}.txt", "w", encoding="utf-8", errors="ignore") as f:
