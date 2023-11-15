@@ -101,7 +101,7 @@ class Library(Database):
         await self.library.update_one({"_id": novel._id}, {"$set": novel.__dict__})
 
     async def get_novel_by_name(self, name: str) -> list[Novel]:
-        name = await FileHandler.get_regex_from_name(name)
+        name = await fe.get_regex_from_name(name)
         novels = await self.library.find({"title": re.compile(name, re.IGNORECASE)}).to_list(None)
         return [Novel(**novel) for novel in novels] if novels else None
 
