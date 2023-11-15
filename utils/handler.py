@@ -257,8 +257,7 @@ class FileHandler:
 
     @staticmethod
     async def get_regex_from_name(title: str) -> str:
-        pattern = re.sub(r'[^a-zA-Z]', '.*', title)
-        return re.sub(r'(\.\*)\1+', r"\1", pattern)
+        return re.sub(r'(\.\*)\1+', r"\1", re.sub(r'[^a-zA-Z]', '.*', title))
         # output = ''
         # prev_check = True
         # for i in title:
