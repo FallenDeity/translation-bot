@@ -7,7 +7,7 @@ from motor import motor_asyncio
 
 from databases.blocked import User
 from databases.data import Novel
-from utils.handler import FileHandler as fe
+
 
 
 class Database:
@@ -37,6 +37,7 @@ class Library(Database):
             size: float,
     ) -> dict[str, Any]:
         match: dict[str, Any] = {}
+        from utils.handler import FileHandler as fe
         if title:
             for subString in ["completed", "ongoing", "complete", "latest", "updated"]:
                 title = str(re.sub('(?i)' + re.escape(subString), lambda k: "", title))
@@ -101,6 +102,7 @@ class Library(Database):
         await self.library.update_one({"_id": novel._id}, {"$set": novel.__dict__})
 
     async def get_novel_by_name(self, name: str) -> list[Novel]:
+        from utils.handler import FileHandler as fe
         name = await fe.get_regex_from_name(name)
         novels = await self.library.find({"title": re.compile(name, re.IGNORECASE)}).to_list(None)
         return [Novel(**novel) for novel in novels] if novels else None
