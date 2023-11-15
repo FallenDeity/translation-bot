@@ -257,16 +257,18 @@ class FileHandler:
 
     @staticmethod
     async def get_regex_from_name(title: str) -> str:
-        output = ''
-        prev_check = True
-        for i in title:
-            if i.isalpha():
-                output += i
-                prev_check = True
-            elif prev_check:
-                output += ".*"
-                prev_check = False
-        return output
+        pattern = re.sub(r'[^a-zA-Z]', '.*', title)
+        return re.sub(r'(\.\*)\1+', r"\1", pattern)
+        # output = ''
+        # prev_check = True
+        # for i in title:
+        #     if i.isalpha():
+        #         output += i
+        #         prev_check = True
+        #     elif prev_check:
+        #         output += ".*"
+        #         prev_check = False
+        # return output
 
     @staticmethod
     async def get_desc_from_text(text: str, title: str = None, link: str = ""):
