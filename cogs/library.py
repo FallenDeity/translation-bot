@@ -228,9 +228,9 @@ class Library(commands.Cog):
         if show_list:
             embeds = await self.make_list_embed_list(allnovels)
             if full_size != 0:
-                msg = await msg.edit(content=f"> Showing first **{str(no_of_novels)} **")
+                await msg.edit(content=f"> Showing first **{str(no_of_novels)} **")
             else:
-                msg = await msg.edit(content=f"> Found **{len(allnovels)}** novels")
+                await msg.edit(content=f"> Found **{len(allnovels)}** novels")
             try:
                 del allnovels
             except:
@@ -239,9 +239,9 @@ class Library(commands.Cog):
         else:
             embeds = await self.make_list_embed(allnovels)
             if full_size != 0:
-                msg = await msg.edit(content=f"> Showing first **{str(no_of_novels)}**")
+                await msg.edit(content=f"> Showing first **{str(no_of_novels)}**")
             else:
-                msg = await msg.edit(content=f"> Found **{len(embeds)}** novels")
+                await msg.edit(content=f"> Found **{len(embeds)}** novels")
             try:
                 del allnovels
             except:
