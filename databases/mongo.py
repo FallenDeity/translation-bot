@@ -7,6 +7,7 @@ from motor import motor_asyncio
 
 from databases.blocked import User
 from databases.data import Novel
+from utils.handler import FileHandler
 
 
 class Database:
@@ -14,17 +15,6 @@ class Database:
         self.db = motor_asyncio.AsyncIOMotorClient(os.getenv("DATABASE"))
 
 
-def get_regex_from_name(title: str) -> str:
-    output = ''
-    prev_check = True
-    for i in title:
-        if i.isalpha():
-            output += i
-            prev_check = True
-        elif prev_check:
-            output += ".*"
-            prev_check = False
-    return output
 
 
 class Library(Database):
@@ -36,7 +26,7 @@ class Library(Database):
         await self.library.insert_one(data.__dict__)
 
     @staticmethod
-    def _make_match(
+    async def _make_match(
             title: str,
             rating: float,
             language: str,
@@ -50,7 +40,7 @@ class Library(Database):
         if title:
             for subString in ["completed", "ongoing", "complete", "latest", "updated"]:
                 title = str(re.sub('(?i)' + re.escape(subString), lambda k: "", title))
-            title = get_regex_from_name(title)
+            title = await FileHandler.get_regex_from_name(title)
             match["title"] = {"$regex": title, "$options": "i"}
         if rating:
             match["rating"] = {"$gte": rating}
@@ -83,7 +73,7 @@ class Library(Database):
     ) -> list[Novel]:
         commons = await self.library.aggregate(
             [
-                {"$match": self._make_match(title, rating, language, original_language, uploader, category, tag, size)},
+                {"$match": await self._make_match(title, rating, language, original_language, uploader, category, tag, size)},
                 {"$sample": {"size": no}}
             ]
         ).to_list(None)
@@ -111,7 +101,7 @@ class Library(Database):
         await self.library.update_one({"_id": novel._id}, {"$set": novel.__dict__})
 
     async def get_novel_by_name(self, name: str) -> list[Novel]:
-        name = get_regex_from_name(name)
+        name = await FileHandler.get_regex_from_name(name)
         novels = await self.library.find({"title": re.compile(name, re.IGNORECASE)}).to_list(None)
         return [Novel(**novel) for novel in novels] if novels else None
 

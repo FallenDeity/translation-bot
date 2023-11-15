@@ -27,7 +27,6 @@ from cogs.library import Library
 from core.bot import Raizel
 from core.views.linkview import LinkView
 from databases.data import Novel
-from databases.mongo import get_regex_from_name
 from languages import languages
 from utils.category import Categories
 
@@ -257,6 +256,19 @@ class FileHandler:
         return random.choice(emojis)
 
     @staticmethod
+    async def get_regex_from_name(title: str) -> str:
+        output = ''
+        prev_check = True
+        for i in title:
+            if i.isalpha():
+                output += i
+                prev_check = True
+            elif prev_check:
+                output += ".*"
+                prev_check = False
+        return output
+
+    @staticmethod
     async def get_desc_from_text(text: str, title: str = None, link: str = ""):
         desc = ["introduction", "description", "简介", "描述", "描写", "summary", "prologue", "概括", "摘要", "总结",
                 "序幕", "开场白", "loadAdv(2,0)"]
@@ -265,7 +277,7 @@ class FileHandler:
             desc.append("loadAdv(2,0)")
             desc.append("chapter")
         if title:
-            text = re.sub(re.compile(get_regex_from_name(title), flags=re.IGNORECASE), "",
+            text = re.sub(re.compile(await FileHandler.get_regex_from_name(title), flags=re.IGNORECASE), "",
                           text)  # remove title from description
         if "69shu.com" in text or "jiu mu" in text.lower() or "jiumu" in text.lower():
             desc.append("chapter")
