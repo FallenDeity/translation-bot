@@ -7,7 +7,7 @@ from motor import motor_asyncio
 
 from databases.blocked import User
 from databases.data import Novel
-from utils.handler import FileHandler
+from utils.handler import FileHandler as fe
 
 
 class Database:
@@ -40,7 +40,7 @@ class Library(Database):
         if title:
             for subString in ["completed", "ongoing", "complete", "latest", "updated"]:
                 title = str(re.sub('(?i)' + re.escape(subString), lambda k: "", title))
-            title = await FileHandler.get_regex_from_name(title)
+            title = await fe.get_regex_from_name(title)
             match["title"] = {"$regex": title, "$options": "i"}
         if rating:
             match["rating"] = {"$gte": rating}
