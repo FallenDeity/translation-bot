@@ -930,10 +930,12 @@ class Crawler(commands.Cog):
                 res = await self.bot.con.get(firstchplink)
                 # print(await res.text())
             except Exception as e:
+                await ctx.send("> **Headless browser is turned on.. please be patient")
                 headless = True
                 driver = await self.bot.loop.run_in_executor(None, get_driver)
                 # return await ctx.send("We couldn't connect to the provided link. Please check the link")
         else:
+            await ctx.send("> **Headless browser is turned on.. please be patient")
             driver = await self.bot.loop.run_in_executor(None, get_driver)
         if secondchplink in self.bot.all_langs:
             translate_to = secondchplink
@@ -973,10 +975,11 @@ class Crawler(commands.Cog):
             else:
                 response = requests.get(firstchplink, headers=headers, timeout=20)
         except Exception as e:
-            if not headless:
+            if headless:
                 return await ctx.reply(
                     "> Couldn't connect to the provided link.... Please check the link")
             else:
+                await ctx.send("> **Headless browser is turned on.. please be patient")
                 headless = True
                 driver = await self.bot.loop.run_in_executor(None, get_driver)
                 driver.get(firstchplink)
