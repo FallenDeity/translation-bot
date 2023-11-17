@@ -19,15 +19,13 @@ import parsel
 import requests
 from StringProgressBar import progressBar
 
-from selenium.webdriver.chrome.options import Options
-from selenium import webdriver
+import undetected_chromedriver as uc
 
 from bs4 import BeautifulSoup
 from deep_translator import GoogleTranslator
 from discord import app_commands
 from discord.ext import commands
 from readabilipy import simple_json_from_html_string
-from selenium.webdriver.chrome.webdriver import WebDriver
 
 from cogs.admin import Admin
 from cogs.translation import Translate
@@ -61,11 +59,7 @@ async def find_urls(soup, link, name):
 
 
 def get_driver():
-    options = Options()
-    options.add_argument("--headless")
-    options.add_argument("window-size=1400,1500")
-
-    driver = webdriver.Chrome(options=options)
+    driver = uc.Chrome(headless=True, use_subprocess=True)
     return driver
 
 
@@ -172,7 +166,7 @@ class Crawler(commands.Cog):
                 self.bot.crawler[name] = f"{len(novel)}/{len(urls)}"
             return novel
 
-    async def getcontent(self, links: str, css: str, next_xpath, bot, tag, scraper, next_chp_finder: bool = False, driver: WebDriver = None):
+    async def getcontent(self, links: str, css: str, next_xpath, bot, tag, scraper, next_chp_finder: bool = False, driver = None):
         try:
             if driver is not None:
                 driver.get(links)
@@ -930,12 +924,12 @@ class Crawler(commands.Cog):
                 res = await self.bot.con.get(firstchplink)
                 # print(await res.text())
             except Exception as e:
-                await ctx.send("> **Headless browser is turned on.. please be patient")
+                await ctx.send("> **Headless browser is turned on.. please be patient**")
                 headless = True
                 driver = await self.bot.loop.run_in_executor(None, get_driver)
                 # return await ctx.send("We couldn't connect to the provided link. Please check the link")
         else:
-            await ctx.send("> **Headless browser is turned on.. please be patient")
+            await ctx.send("> **Headless browser is turned on.. please be patient**")
             driver = await self.bot.loop.run_in_executor(None, get_driver)
         if secondchplink in self.bot.all_langs:
             translate_to = secondchplink
@@ -972,6 +966,7 @@ class Crawler(commands.Cog):
                 response = scraper.get(firstchplink, headers=FileHandler.get_handler(), timeout=20)
                 await ctx.send("Cloudscrape is turned ON", delete_after=8)
                 await asyncio.sleep(0.25)
+
             else:
                 response = requests.get(firstchplink, headers=headers, timeout=20)
         except Exception as e:
@@ -979,18 +974,22 @@ class Crawler(commands.Cog):
                 return await ctx.reply(
                     "> Couldn't connect to the provided link.... Please check the link")
             else:
-                await ctx.send("> **Headless browser is turned on.. please be patient")
+                await ctx.send("> **Headless browser is turned on.. please be patient**")
                 headless = True
                 driver = await self.bot.loop.run_in_executor(None, get_driver)
                 driver.get(firstchplink)
 
         if not headless:
-            if response.status_code == 404:
-                return await ctx.reply("> Provided link gives 404 error... Please check the link")
-            response.encoding = response.apparent_encoding
-            soup = BeautifulSoup(response.content, 'html5lib', from_encoding=response.encoding)
-            htm = response.text
-
+            if str(response.status_code).startswith('4'):
+                await ctx.send("> **Headless browser is turned on.. please be patient**")
+                driver = await self.bot.loop.run_in_executor(None, get_driver)
+                driver.get(firstchplink)
+                soup = BeautifulSoup(driver.page_source, "html.parser")
+                htm = driver.page_source
+            else:
+                response.encoding = response.apparent_encoding
+                soup = BeautifulSoup(response.content, 'html5lib', from_encoding=response.encoding)
+                htm = response.text
         else:
             soup = BeautifulSoup(driver.page_source, "html.parser")
             htm = driver.page_source
