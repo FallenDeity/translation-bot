@@ -19,11 +19,15 @@ import parsel
 import requests
 from StringProgressBar import progressBar
 
+from selenium.webdriver.chrome.options import Options
+from selenium import webdriver
+
 from bs4 import BeautifulSoup
 from deep_translator import GoogleTranslator
 from discord import app_commands
 from discord.ext import commands
 from readabilipy import simple_json_from_html_string
+from selenium.webdriver.chrome.webdriver import WebDriver
 
 from cogs.admin import Admin
 from cogs.translation import Translate
@@ -54,6 +58,15 @@ async def find_urls(soup, link, name):
     utemp = [urljoin(link, url) for url in urls]
     urls = [u for u in utemp if host in u]
     return urls
+
+
+def get_driver():
+    options = Options()
+    options.add_argument("--headless")
+    options.add_argument("window-size=1400,1500")
+
+    driver = webdriver.Chrome(options=options)
+    return driver
 
 
 class Crawler(commands.Cog):
@@ -159,9 +172,12 @@ class Crawler(commands.Cog):
                 self.bot.crawler[name] = f"{len(novel)}/{len(urls)}"
             return novel
 
-    async def getcontent(self, links: str, css: str, next_xpath, bot, tag, scraper, next_chp_finder: bool = False):
+    async def getcontent(self, links: str, css: str, next_xpath, bot, tag, scraper, next_chp_finder: bool = False, driver: WebDriver = None):
         try:
-            if scraper is not None:
+            if driver is not None:
+                driver.get(links)
+                soup = BeautifulSoup(driver.page_source, "html.parser")
+            elif scraper is not None:
                 response = await self.bot.loop.run_in_executor(None, self.scrape, scraper, links)
                 response.encoding = response.apparent_encoding
                 soup = BeautifulSoup(response.text, "html.parser", from_encoding=response.encoding)
@@ -409,7 +425,7 @@ class Crawler(commands.Cog):
             soup1 = soup
             if int(str(response.status_code)[0]) == 4:
                 return await ctx.send(
-                    f"couldn't connect to the provided link. its returning {response.status_code} error")
+                    f"couldn't connect to the provided link. its returning {response.status_code} error\nor try with headless browser  in crawlnext")
             else:
                 await ctx.send("> **Cloudflare is detected.. Turned on  the cloudscraper**", delete_after=10)
         else:
@@ -774,7 +790,10 @@ class Crawler(commands.Cog):
                     pass
             title = title[:100]
             try:
-                task.cancel()
+                try:
+                    task.cancel()
+                except:
+                    pass
                 view = None
                 embed.set_field_at(index=0,
                                    name=f"Progress :  100%",
@@ -862,7 +881,7 @@ class Crawler(commands.Cog):
     async def crawlnext(
             self, ctx: commands.Context, firstchplink: str, secondchplink: str = None, lastchplink: str = None,
             nextselector: str = None, noofchapters: int = None,
-            cssselector: str = None, waittime: float = None, translate_to: str = None, add_terms: str = None
+            cssselector: str = None, waittime: float = None, translate_to: str = None, add_terms: str = None, headless: bool = False
     ) -> typing.Optional[discord.Message]:
         """crawl using first chapter link
                 Parameters
@@ -887,11 +906,14 @@ class Crawler(commands.Cog):
                     add terms to  finished novel
                 translate_to :
                     translate automatically after crawling
+                headless :
+                    use headless browsr for crawling
                 """
         try:
             await ctx.defer()
         except:
             pass
+        driver = None
         if ctx.author.id in self.bot.crawler_next:
             return await ctx.reply(
                 "> **❌You cannot crawl two novels at the same time.**"
@@ -903,17 +925,22 @@ class Crawler(commands.Cog):
         cloudscrape: bool = False
         if "m.45zw.com" in firstchplink:
             firstchplink = firstchplink.replace("m.45zw.com", "www.45zw.com")
-        try:
-            res = await self.bot.con.get(firstchplink)
-            # print(await res.text())
-        except Exception as e:
-            print(e)
-            return await ctx.send("We couldn't connect to the provided link. Please check the link")
+        if not headless:
+            try:
+                res = await self.bot.con.get(firstchplink)
+                # print(await res.text())
+            except Exception as e:
+                headless = True
+                driver = await self.bot.loop.run_in_executor(None, get_driver)
+                # return await ctx.send("We couldn't connect to the provided link. Please check the link")
+        else:
+            driver = await self.bot.loop.run_in_executor(None, get_driver)
         if secondchplink in self.bot.all_langs:
             translate_to = secondchplink
             secondchplink = None
-        if int(str(res.status)[0]) == 4:
-            cloudscrape = True
+        if not headless:
+            if int(str(res.status)[0]) == 4:
+                cloudscrape = True
         if nextselector is None:
             nextsel = CssSelector.find_next_selector(firstchplink)
             if nextsel[0] == "None":
@@ -936,27 +963,39 @@ class Crawler(commands.Cog):
         if noofchapters is None:
             noofchapters = 3000
         try:
-            if cloudscrape:
+            if headless:
+                driver.get(firstchplink)
+            elif cloudscrape:
                 scraper = cloudscraper.CloudScraper(delay=10)
                 response = scraper.get(firstchplink, headers=FileHandler.get_handler(), timeout=20)
                 await ctx.send("Cloudscrape is turned ON", delete_after=8)
                 await asyncio.sleep(0.25)
             else:
-                scraper = None
                 response = requests.get(firstchplink, headers=headers, timeout=20)
         except Exception as e:
-            print(e)
-            return await ctx.reply(
-                "> Couldn't connect to the provided link.... Please check the link")
-        if response.status_code == 404:
-            return await ctx.reply("> Provided link gives 404 error... Please check the link")
-        if 'b.faloo' in firstchplink or 'wap.faloo' in firstchplink:
-            noofchapters = 150
-        response.encoding = response.apparent_encoding
-        soup = BeautifulSoup(response.content, 'html5lib', from_encoding=response.encoding)
-        htm = response.text
+            if not headless:
+                return await ctx.reply(
+                    "> Couldn't connect to the provided link.... Please check the link")
+            else:
+                headless = True
+                driver = await self.bot.loop.run_in_executor(None, get_driver)
+                driver.get(firstchplink)
+
+        if not headless:
+            if response.status_code == 404:
+                return await ctx.reply("> Provided link gives 404 error... Please check the link")
+            response.encoding = response.apparent_encoding
+            soup = BeautifulSoup(response.content, 'html5lib', from_encoding=response.encoding)
+            htm = response.text
+
+        else:
+            soup = BeautifulSoup(driver.page_source, "html.parser")
+            htm = driver.page_source
         sel = parsel.Selector(htm)
         sel_tag = False
+        path = ""
+        if 'b.faloo' in firstchplink or 'wap.faloo' in firstchplink:
+            noofchapters = 150
         if secondchplink is None and nextselector is None:
             next_chp_find = True
             path = ""
@@ -967,7 +1006,7 @@ class Crawler(commands.Cog):
                 firstchplink = firstchplink.replace("/txt", "")
                 firstchplink = firstchplink.replace(".htm", "/")
                 response = requests.get(firstchplink, headers=headers, timeout=20)
-            firstchplink = parsel.Selector(response.text).css(
+            firstchplink = parsel.Selector(htm).css(
                 "#catalog > ul > li:nth-child(1) > a ::attr(href)").extract_first()
             response = requests.get(firstchplink, headers=headers, timeout=20)
             response.encoding = response.apparent_encoding
@@ -1023,7 +1062,10 @@ class Crawler(commands.Cog):
             title = await FileHandler.get_title(soup)
         if title is None or str(title).strip() == "":
             title = firstchplink
+        if (title is None or title == "") and headless:
+            title = driver.title
         chp_count = 1
+        scraper = None
         # print(title)
         if "69shu" in firstchplink:
             title = title.split("-")[0]
@@ -1136,6 +1178,8 @@ class Crawler(commands.Cog):
                 self.bot.crawler_next[ctx.author.id] = f"{i}/{noofchapters}"
                 if current_link in crawled_urls:
                     repeats += 1
+                    driver.close()
+                    driver = await self.bot.loop.run_in_executor(None, get_driver)
                 if current_link in crawled_urls and repeats > 5:
                     if i >= 30:
                         break
@@ -1150,7 +1194,7 @@ class Crawler(commands.Cog):
                         return await ctx.send(" There is some problem with the detected selector")
                 try:
 
-                    output = await self.getcontent(current_link, css, path, self.bot, sel_tag, scraper, next_chp_find)
+                    output = await self.getcontent(current_link, css, path, self.bot, sel_tag, scraper, next_chp_find, driver)
                     chp_text = output[0]
                 except Exception as e:
                     if i <= 10:
@@ -1164,6 +1208,9 @@ class Crawler(commands.Cog):
                 if chp_text == 'error':
                     no_of_tries += 1
                     chp_text = ''
+                    if no_of_tries % 2 != 0:
+                        driver.close()
+                        driver = await self.bot.loop.run_in_executor(None, get_driver)
                     if no_of_tries > 30:
                         # await msg.delete()
                         del self.bot.crawler_next[ctx.author.id]
@@ -1237,6 +1284,11 @@ class Crawler(commands.Cog):
             await ctx.send("> Error occurred .Please report to admin +\n" + str(e))
             raise e
         finally:
+            if driver is not None:
+                try:
+                    driver.close()
+                except:
+                    pass
             try:
                 del full_text
             except:
