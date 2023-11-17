@@ -1008,7 +1008,6 @@ class Crawler(commands.Cog):
             if "69shu" in firstchplink and "txt" in firstchplink:
                 firstchplink = firstchplink.replace("/txt", "")
                 firstchplink = firstchplink.replace(".htm", "/")
-                response = requests.get(firstchplink, headers=headers, timeout=20)
             firstchplink = parsel.Selector(htm).css(
                 "#catalog > ul > li:nth-child(1) > a ::attr(href)").extract_first()
             response = requests.get(firstchplink, headers=headers, timeout=20)
