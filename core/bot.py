@@ -79,10 +79,6 @@ class Raizel(commands.Bot):
         self.mongo = Mongo()
         print("Connected to mongo db")
         channel = await self.fetch_channel(991911644831678484)
-        try:
-            await self.tree.sync()
-        except:
-            pass
         await channel.send(embed=discord.Embed(description=f"Bot is up now"))
         txt_channel = await self.fetch_channel(984664133570031666)
         await txt_channel.send(embed=discord.Embed(description=f"Bot is up now"))
@@ -90,6 +86,10 @@ class Raizel(commands.Bot):
         return await super().setup_hook()
 
     async def startup(self, channel):
+        try:
+            await self.tree.sync()
+        except:
+            pass
         nltk.download("brown")
         nltk.download("punkt")
         nltk.download("popular")
