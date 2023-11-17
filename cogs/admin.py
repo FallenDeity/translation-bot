@@ -221,8 +221,8 @@ class Admin(commands.Cog):
                         content=f"> {no_of_times} : Restart waiting for {', '.join(self.bot.get_user(k).global_name for k in self.bot.translator.keys())} {', '.join(self.bot.get_user(k).global_name for k in self.bot.crawler.keys())}")
                     self.bot.translator = {}
                     self.bot.crawler = {}
-                    await asyncio.sleep(no_of_times * 6)
-                    if no_of_times > 5:
+                    await asyncio.sleep(no_of_times * 10)
+                    if no_of_times > 10:
                         self.bot.app_status = "up"
                         if git_update is True:
                             self.bot.update = True
