@@ -599,6 +599,7 @@ class FileHandler:
         else:
             next_no = library
         category = "Uncategorised"
+        name = name.split("ex=65")[0]
         try:
             category = Categories.from_string(name)
             if category == "Uncategorised":
@@ -745,6 +746,8 @@ class FileHandler:
         else:
             next_no = library
         category = "Uncategorised"
+        title = title.split("ex=65")[0]
+        title_name = title_name.split("ex=65")[0]
         bot.crawler_count = bot.crawler_count + 1
         if description is None:
             description = ""
