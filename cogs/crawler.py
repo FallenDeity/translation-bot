@@ -20,6 +20,7 @@ import requests
 from StringProgressBar import progressBar
 
 import undetected_chromedriver as uc
+from selenium import webdriver
 
 from bs4 import BeautifulSoup
 from deep_translator import GoogleTranslator
@@ -59,7 +60,19 @@ async def find_urls(soup, link, name):
 
 
 def get_driver():
-    driver = uc.Chrome(headless=True, use_subprocess=True)
+    options = webdriver.ChromeOptions()
+    options.add_argument("--headless")
+    options.add_argument("--disable-gpu")
+    options.add_argument("--window-size=1920x1080")
+    options.add_argument("--disable-extensions")
+    options.add_argument("--no-sandbox")
+    options.add_argument("--disable-dev-shm-usage")
+
+    # Add a user-agent string
+    options.add_argument(
+        "User-Agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36")
+
+    driver = webdriver.Chrome(options=options)
     return driver
 
 
