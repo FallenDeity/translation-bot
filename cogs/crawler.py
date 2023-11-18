@@ -1212,12 +1212,13 @@ class Crawler(commands.Cog):
                 try:
 
                     output = await self.getcontent(current_link, css, path, self.bot, sel_tag, scraper, next_chp_find, driver)
-                    chp_text = output[0]
+                    chp_text = str(output[0])
                 except Exception as e:
                     if i <= 10:
                         print(e)
                         return await ctx.send(f"Error occurred in crawling \n Error occurred at {current_link}")
                     else:
+                        asyncio.sleep(5)
                         print("error occured at " + current_link + str(e))
                         break
 
