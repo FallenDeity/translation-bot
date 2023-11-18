@@ -1192,7 +1192,10 @@ class Crawler(commands.Cog):
                 self.bot.crawler_next[ctx.author.id] = f"{i}/{noofchapters}"
                 if current_link in crawled_urls:
                     repeats += 1
-                    driver.close()
+                    try:
+                        driver.close()
+                    except:
+                        pass
                     driver = await self.bot.loop.run_in_executor(None, get_driver)
                 if current_link in crawled_urls and repeats > 5:
                     if i >= 30:
@@ -1223,7 +1226,10 @@ class Crawler(commands.Cog):
                     no_of_tries += 1
                     chp_text = ''
                     if no_of_tries % 2 != 0:
-                        driver.close()
+                        try:
+                            driver.close()
+                        except:
+                            pass
                         driver = await self.bot.loop.run_in_executor(None, get_driver)
                     if no_of_tries > 30:
                         # await msg.delete()
