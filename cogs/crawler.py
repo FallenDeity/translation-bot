@@ -19,7 +19,7 @@ import parsel
 import requests
 from StringProgressBar import progressBar
 
-import undetected_chromedriver as uc
+# import undetected_chromedriver as uc
 from selenium import webdriver
 
 from bs4 import BeautifulSoup
