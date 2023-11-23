@@ -339,6 +339,8 @@ class CssSelector:
         domain_mappings = {
             "readwn": ["#chapter-article > header > div > aside > nav > div.action-select > a.chnav.next",
                        "#chapter-article > header > div > div > h1 > a"],
+            "www.wuxiabee.com": ["#chapter-article > header > div > aside > nav > div.action-select > a.chnav.next",
+                       "#chapter-article > header > div > div > h1 > a"],
             "novelfull.com": ["#next_chap", "#chapter > div > div > a"],
             "novelroom.net": ["#manga-reading-nav-foot > div > div.select-pagination > div > div.nav-next > a",
                               "#manga-reading-nav-head > div > div.entry-header_wrap > div > div.c-breadcrumb > ol > li:nth-child(2) > a"],
