@@ -27,3 +27,4 @@ epub2txt~=0.1.6
 EbookLib~=0.18
 pypdf~=3.17.0
 undetected-chromedriver>=3.5.4
+selenium==4.15.2
