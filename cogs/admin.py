@@ -207,7 +207,11 @@ class Admin(commands.Cog):
                 else:
                     break
                 if not self.bot.crawler.items() and not self.bot.translator.items() and not self.bot.crawler_next.items():
-                    print("restart " + str(datetime.datetime.now()))
+                    await asyncio.sleep(3)
+                    if not self.bot.crawler.items() and not self.bot.translator.items() and not self.bot.crawler_next.items():
+                        print("restart " + str(datetime.datetime.now()))
+                    else:
+                        continue
                     try:
                         await channel.send(embed=discord.Embed(description=f"Bot has started restarting"))
                     except:
