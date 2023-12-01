@@ -548,7 +548,6 @@ class Translate(commands.Cog):
                 tr_channel = await self.bot.fetch_channel(1054014022019715092)
                 for liz_t in chunks:
                     cnt += 1
-                    print(len(liz_t))
                     self.bot.translator[ctx.author.id] = f"0/{len(liz_t)}"
                     translate = Translator(self.bot, ctx.author.id, language)
                     try:
