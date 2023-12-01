@@ -500,6 +500,7 @@ class Translate(commands.Cog):
             except:
                 description = ""
                 des = novel[:400]
+            name = name.split("ex=65")[0]
             embed = discord.Embed(title=str(f"{name[:240]}"), description=f"```yaml\n{des[:350]}```",
                                   colour=discord.Colour.blurple())
             embed.set_thumbnail(url=avatar)
