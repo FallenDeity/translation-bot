@@ -625,6 +625,7 @@ class FileHandler:
                     "Translation Completed... Your novel is too big.We are uploading to Mega.. Please wait",
                     delete_after=5,
                 )
+                embed.add_field(name="size", value=f"{round(size/ (1024 ** 2), 2)} MB")
                 # filename = f"{random.choice(string.ascii_letters)}{random.choice(string.digits)}{str(
                 # ctx.author.id)}_" \ f"trans{random.choice(string.ascii_letters)}{random.randint(100,1000)}.txt"
                 file = await bot.loop.run_in_executor(None, bot.mega.upload, f"{ctx.author.id}.txt", None,
@@ -789,6 +790,7 @@ class FileHandler:
                     "Crawling Completed... Your novel is too big.We are uploading to Mega.. Please wait",
                     delete_after=5,
                 )
+                embed.add_field(name="size", value=f"{round(size / (1024 ** 2), 2)} MB")
                 filelnk = await bot.loop.run_in_executor(None, bot.mega.get_upload_link, file)
                 view = LinkView({"Novel": [filelnk, await self.get_emoji_book()]})
                 channel = bot.get_channel(
