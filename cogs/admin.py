@@ -207,7 +207,7 @@ class Admin(commands.Cog):
                 else:
                     break
                 if not self.bot.crawler.items() and not self.bot.translator.items() and not self.bot.crawler_next.items():
-                    await asyncio.sleep(3)
+                    await asyncio.sleep(5)
                     if not self.bot.crawler.items() and not self.bot.translator.items() and not self.bot.crawler_next.items():
                         print("restart " + str(datetime.datetime.now()))
                     else:
