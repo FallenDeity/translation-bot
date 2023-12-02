@@ -149,6 +149,7 @@ class CssSelector:
             "novelcool.org/": "p ::text",
             "m.sywx8.com": "#nr ::text",
             "www.tadu.com": "#partContent ::text",
+            "www.biquge.bz/": "#content ::text"
         }
 
         for domain, css_selector in domain_mappings.items():
@@ -192,6 +193,7 @@ class CssSelector:
             "www.9xzw.com": ["#info > div > h1", "div.bookname > h1 ::text"],
             "m.ddxs.com": ["body > div.header > h2 > font > font", "#nr_title ::text"],
             "www.31dv.com": ["#info > h1", "#wrapper > article > h1 ::text"],
+            "www.biquge.bz/": ["#info > h1", "#wrapper > div.content_read > div > div.bookname > h1"],
         }
         for domain, ret_array in domain_mappings.items():
             if domain in link:
