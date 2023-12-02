@@ -149,7 +149,9 @@ class CssSelector:
             "novelcool.org/": "p ::text",
             "m.sywx8.com": "#nr ::text",
             "www.tadu.com": "#partContent ::text",
-            "www.biquge.bz/": "#content ::text"
+            "www.biquge.bz/": "#content ::text",
+            "www.yuyouku.com": "#txtContent ::text",
+            "m.yuyouku.com": "#content ::text",
         }
 
         for domain, css_selector in domain_mappings.items():
@@ -194,6 +196,8 @@ class CssSelector:
             "m.ddxs.com": ["body > div.header > h2 > font > font", "#nr_title ::text"],
             "www.31dv.com": ["#info > h1", "#wrapper > article > h1 ::text"],
             "www.biquge.bz/": ["#info > h1", "#wrapper > div.content_read > div > div.bookname > h1"],
+            "www.yuyouku.com": ["#btop-info > div.container > article > div > ul > li:nth-child(1) > h1", "#h1 > h1"],
+            "m.yuyouku.com": ["#btop-info > div.body > div > section > div.novel-cover > dl > dt", "#content > h1"],
         }
         for domain, ret_array in domain_mappings.items():
             if domain in link:
