@@ -67,31 +67,10 @@ class General(commands.Cog):
             link = file.url
             if name.strip() == "":
                 name = file.filename.replace(".txt", "").replace(".docx", "").replace(".epub", "").replace(".pdf", "")
-        category = Categories.from_string(name)
         no = await self.bot.mongo.library.next_number
-        novel_data = [
-            no,
-            name,
-            "",
-            0,
-            "english",
-            await FileHandler.get_tags(name),
-            link,
-            999999,
-            ctx.author.id,
-            datetime.datetime.now(datetime.timezone.utc).timestamp(),
-            # datetime.datetime.utcnow().timestamp(),
-            Categories.thumbnail_from_category(category),
-            "english",
-            category,
-            link
-        ]
-        data = Novel(*novel_data)
-        try:
-            await self.bot.mongo.library.add_novel(data)
-            await ctx.send(f"> added to bot with library id {no}")
-        except:
-            await ctx.send("couldn't add to library try again")
+        await ctx.send(f"> adding to bot with library id {no}")
+        await FileHandler().distribute(self.bot, ctx, name, "english", "english", name)
+
 
 
 
