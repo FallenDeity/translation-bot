@@ -100,7 +100,7 @@ class Crawler(commands.Cog):
                 break
         else:
             return nums, f"\ncouldn't get connection to {links}\n"
-        if response.status_code == 404:
+        if str(response.status_code).startswith('4'):
             print("Response received as error status code 404")
             return nums, "\n----x---\n"
         response.encoding = response.apparent_encoding
@@ -180,25 +180,38 @@ class Crawler(commands.Cog):
             return novel
 
     async def getcontent(self, links: str, css: str, next_xpath, bot, tag, scraper, next_chp_finder: bool = False, driver = None):
-        try:
-            if driver is not None:
-                driver.get(links)
-                soup = BeautifulSoup(driver.page_source, "html.parser")
-            elif scraper is not None:
-                response = await self.bot.loop.run_in_executor(None, self.scrape, scraper, links)
-                response.encoding = response.apparent_encoding
-                soup = BeautifulSoup(response.text, "html.parser", from_encoding=response.encoding)
-                if response.status_code == 404:
+        for _i in range(1, 5):
+            try:
+                if driver is not None:
+                    driver.get(links)
+                    soup = BeautifulSoup(driver.page_source, "html.parser")
+                elif scraper is not None:
+                    response = await self.bot.loop.run_in_executor(None, self.scrape, scraper, links)
+                    response.encoding = response.apparent_encoding
+                    soup = BeautifulSoup(response.text, "html.parser", from_encoding=response.encoding)
+                    if str(response.status_code).startswith('4'):
+                        if _i >= 4:
+                            return ['error', links]
+                        else:
+                            await asyncio.sleep(2)
+                            continue
+                    # await asyncio.sleep(0.1)
+                else:
+                    response = await bot.con.get(links, headers=FileHandler.get_handler())
+                    soup = BeautifulSoup(await response.read(), "html.parser", from_encoding=response.get_encoding())
+                    if response.status == 404:
+                        if _i >= 4:
+                            await asyncio.sleep(2)
+                            return ['error', links]
+                        else:
+                            continue
+                # response = requests.get(links, headers=headers, timeout=10)
+            except:
+                if _i >= 4:
+                    await asyncio.sleep(3)
                     return ['error', links]
-                # await asyncio.sleep(0.1)
-            else:
-                response = await bot.con.get(links, headers=FileHandler.get_handler())
-                soup = BeautifulSoup(await response.read(), "html.parser", from_encoding=response.get_encoding())
-                if response.status == 404:
-                    return ['error', links]
-            # response = requests.get(links, headers=headers, timeout=10)
-        except:
-            return ['error', links]
+                else:
+                    continue
 
         # response.encoding = response.apparent_encoding
         # chp_html = response.text
@@ -430,7 +443,7 @@ class Crawler(commands.Cog):
             response.encoding = response.apparent_encoding
             soup = BeautifulSoup(response.text, "html.parser", from_encoding=response.encoding)
             soup1 = soup
-            if int(str(response.status_code)[0]) == 4:
+            if str(response.status_code).startswith('4'):
                 return await ctx.send(
                     f"couldn't connect to the provided link. its returning {response.status_code} error\nor try with headless browser  in crawlnext")
             else:
