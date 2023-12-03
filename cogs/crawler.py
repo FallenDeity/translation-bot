@@ -424,7 +424,7 @@ class Crawler(commands.Cog):
         #     link = link[:-1]
         # if "m.uuks" in link:
         #     link = link.replace("m.", "")
-        if "novelsemperor" in link or "novelsknight.com" in link:
+        if "novelsemperor" in link or "novelsknight.com" in link or "noblemtl.com" in link:
             reverse = "true"
         if "www.xklxsw.com/" in link:
             link = link.replace("www", "m")

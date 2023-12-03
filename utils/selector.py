@@ -160,7 +160,8 @@ class CssSelector:
             "m.qbxsw.com": "#chapter > div.content ::text",
             "www.qbxsw.com": "#content ::text",
             "www.14sw.com": "#content ::text",
-            "m.14sw.com": "#ChapterView ::text"
+            "m.14sw.com": "#ChapterView ::text",
+            "noblemtl.com": "div.epcontent.entry-content ::text"
         }
 
         for domain, css_selector in domain_mappings.items():
@@ -216,6 +217,7 @@ class CssSelector:
             "www.qbxsw.com": ["#info > h1", "body > div.content_read > div > div.bookname > h1 ::text"],
             "www.14sw.com": ["#info > h1", "#main > h1 ::text"],
             "m.14sw.com": ["body > div.container > div.mod.detail > div.bd.column-2 > div.right > h1", "body > div.container > h1 ::text"],
+            "noblemtl.com": ["div.infox > h1", "div.epheader > h1 ::text"]
         }
         for domain, ret_array in domain_mappings.items():
             if domain in link:
