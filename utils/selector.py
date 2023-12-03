@@ -152,6 +152,15 @@ class CssSelector:
             "www.biquge.bz/": "#content ::text",
             "www.yuyouku.com": "#txtContent ::text",
             "m.yuyouku.com": "#content ::text",
+            "m.biquzw789.net": "#novelcontent ::text",
+            "www.biquzw789.net": "#content ::text",
+            "pandamtl.com/": "div.bixbox.episodedl > div > div.epcontent.entry-content ::text",
+            "www.bookbl.com": "#content > div.content ::text",
+            "www.60ks.cc": "#content ::text",
+            "m.qbxsw.com": "#chapter > div.content ::text",
+            "www.qbxsw.com": "#content ::text",
+            "www.14sw.com": "#content ::text",
+            "m.14sw.com": "#ChapterView ::text"
         }
 
         for domain, css_selector in domain_mappings.items():
@@ -195,9 +204,18 @@ class CssSelector:
             "www.9xzw.com": ["#info > div > h1", "div.bookname > h1 ::text"],
             "m.ddxs.com": ["body > div.header > h2 > font > font", "#nr_title ::text"],
             "www.31dv.com": ["#info > h1", "#wrapper > article > h1 ::text"],
-            "www.biquge.bz/": ["#info > h1", "#wrapper > div.content_read > div > div.bookname > h1"],
-            "www.yuyouku.com": ["#btop-info > div.container > article > div > ul > li:nth-child(1) > h1", "#h1 > h1"],
-            "m.yuyouku.com": ["#btop-info > div.body > div > section > div.novel-cover > dl > dt", "#content > h1"],
+            "www.biquge.bz/": ["#info > h1", "#wrapper > div.content_read > div > div.bookname > h1 ::text"],
+            "www.yuyouku.com": ["#btop-info > div.container > article > div > ul > li:nth-child(1) > h1", "#h1 > h1 ::text"],
+            "m.yuyouku.com": ["#btop-info > div.body > div > section > div.novel-cover > dl > dt", "#content > h1 ::text"],
+            "m.biquzw789.net": ["body > div.main > div.catalog > div.catalog1 > h1", "#novelbody > div.nr_function > h1 ::text"],
+            "www.biquzw789.net": ["#info", "#wrapper > div.content_read > div > div.bookname > h1 ::text"],
+            "www.bookbl.com": ["h1", "#content > h1 ::text"],
+            "www.60ks.cc": ["#bookinfo > div.bookright > div.booktitle > h1", "#center > div.title > h1 ::text"],
+            "m.60ks.cc": ["#_52mb_h1 > a", "#nr_title ::text"],
+            "m.qbxsw.com": ["#read > div.main > div.detail > p.name", "#chapter > h1 ::text"],
+            "www.qbxsw.com": ["#info > h1", "body > div.content_read > div > div.bookname > h1 ::text"],
+            "www.14sw.com": ["#info > h1", "#main > h1 ::text"],
+            "m.14sw.com": ["body > div.container > div.mod.detail > div.bd.column-2 > div.right > h1", "body > div.container > h1 ::text"],
         }
         for domain, ret_array in domain_mappings.items():
             if domain in link:
@@ -283,7 +301,7 @@ class CssSelector:
             "novelnext.com": ["#next_chap", "#chapter > div > div > a"],
             "bonnovel.com": ["None",
                              "#manga-reading-nav-head > div > div.entry-header_wrap > div > div.c-breadcrumb > ol > li:nth-child(2) > a"],
-
+            "pandamtl.com/": ["#post-9256 > div.bixbox.episodedl > div > div.navimedia > div.left > div > div:nth-child(3) > a", "#post-9256 > div.bixbox.episodedl > div > div.epheader > h1"]
             # "www.novelcool.com": ["None",  "div.chapter-reading-section-list > div > div > h2"],
             # "m.bqg789.net": ["#nextpage", "#novelbody > div.head > div.nav_name > h1"],
         }
