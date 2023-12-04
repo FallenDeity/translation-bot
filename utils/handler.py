@@ -42,7 +42,8 @@ class FileHandler:
     TOTAL: int = len(ENCODING)
 
     @staticmethod
-    async def checkLibrary(novel_data: list[Novel], title_name: str, title:  str, originalLanguage: str, ctx:commands.Context, bot: Raizel,):
+    async def checkLibrary(novel_data: list[Novel], title_name: str, title: str, originalLanguage: str,
+                           ctx: commands.Context, bot: Raizel, ):
         if novel_data is not None:
             library = None
             novel_data = list(novel_data)
@@ -69,10 +70,10 @@ class FileHandler:
             if True:
                 ids = ids[:20]
                 ctx.command = await bot.get_command("library search").callback(Library(bot), ctx,
-                                                                                    title_name.split('__')[0], None,
-                                                                                    None,
-                                                                                    None, None, None, None, None, None,
-                                                                                    False, "size", 20)
+                                                                               title_name.split('__')[0], None,
+                                                                               None,
+                                                                               None, None, None, None, None, None,
+                                                                               False, "size", 20)
                 if len(ids) < 5 or name_lib_check:
                     await ctx.send("**Please check from above library**", delete_after=20)
                     await asyncio.sleep(5)
@@ -115,6 +116,7 @@ class FileHandler:
                         return 0
         else:
             return None
+
     @staticmethod
     def get_handler():
         user_agent_list: list[str] = [
@@ -197,7 +199,7 @@ class FileHandler:
                         user = bot.get_user(keys)
                         user = user.name
                         outstr.append(f"{user}:{values}, ")
-                output="".join(outstr)
+                output = "".join(outstr)
                 if len(output) >= 128:
                     output = output[:123] + "..."
                 await bot.change_presence(
@@ -222,10 +224,8 @@ class FileHandler:
     @staticmethod
     async def distribute_genre(embed: discord.Embed, category: str, download_url: str, bot: Raizel):
         anime_cat = ["Naruto", "One-Piece", "Harry-Potter", "Pokemon""Fairy-Tail", "Genshin-Impact", "Doulou-Daluo",
-                     "Conan"
-            , "High-School-DXD", "Hunter-X-Hunter", "Doraemon", "Dragon-Ball", "Comprehensive", "Yugi-Oh", "Bleach",
-                     "Shokugeki-No-Soma",
-                     "Jackie-Chan", "One-Punch-Man", "Cartoonist"]
+                     "Conan", "High-School-DXD", "Hunter-X-Hunter", "Doraemon", "Dragon-Ball", "Comprehensive", "Yugi-Oh", "Bleach",
+                     "Shokugeki-No-Soma", "Jackie-Chan", "One-Punch-Man", "Cartoonist"]
         marvel_dc = ["DC", "Marvel"]
         villain = ["Villain"]
         magic = ["Fantasy", "Spirit-Recovery", "Reincarnation"]
@@ -419,7 +419,8 @@ class FileHandler:
     @staticmethod
     def find_next_chps(soup: BeautifulSoup, link: str = None):
         selectors = (
-            "下一页", "next page", "下一章", "next chapter", "next", "Вперёд »»", "Вперёд", "»»", "»", "下一节", "后一页",
+            "下一页", "next page", "下一章", "next chapter", "next", "Вперёд »»", "Вперёд", "»»", "»", "下一节",
+            "后一页",
             "chương sau", "next>>", "下一頁", "下章")  # 下一页  "下一章"- next chp 下一页
         for a in soup.find_all("a"):
             # print(a.get_text())
@@ -625,7 +626,7 @@ class FileHandler:
                     "Translation Completed... Your novel is too big.We are uploading to Mega.. Please wait",
                     delete_after=5,
                 )
-                embed.add_field(name="size", value=f"{round(size/ (1024 ** 2), 2)} MB")
+                embed.add_field(name="size", value=f"{round(size / (1024 ** 2), 2)} MB")
                 # filename = f"{random.choice(string.ascii_letters)}{random.choice(string.digits)}{str(
                 # ctx.author.id)}_" \ f"trans{random.choice(string.ascii_letters)}{random.randint(100,1000)}.txt"
                 file = await bot.loop.run_in_executor(None, bot.mega.upload, f"{ctx.author.id}.txt", None,
@@ -686,7 +687,7 @@ class FileHandler:
             pass
         if library is not None:
             data = await bot.mongo.library.get_novel_by_id(library)
-            if size+1000 < data['size']:
+            if size + 1000 < data['size']:
                 update = False
                 s = SequenceMatcher(None, data['description'], description)
                 if s.ratio() <= 0.7:
@@ -826,7 +827,7 @@ class FileHandler:
                 pass
         if library is not None:
             data = await bot.mongo.library.get_novel_by_id(library)
-            if size+1000 < data['size']:
+            if size + 1000 < data['size']:
                 update = False
                 s = SequenceMatcher(None, data['description'], description)
                 if s.ratio() <= 0.7:
