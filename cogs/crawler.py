@@ -679,6 +679,8 @@ class Crawler(commands.Cog):
             title_name = title_name.replace(tag, '')
         title_name = title_name.replace('_', ' ')
         original_Language = await FileHandler.find_language(text="title_name " + title_name, link=link)
+        if original_Language != "english" and translate_to is None and add_terms is None:
+            translate_to = "eng_auto"
         if title_name == "" or title_name == "None" or title_name is None:
             title = f"{ctx.author.id}_crl"
             title_name = link
@@ -871,10 +873,23 @@ class Crawler(commands.Cog):
                 translate_to is not None or add_terms is not None) and download_url is not None and not download_url.strip() == "":
             if translate_to is None:
                 translate_to = "english"
+            if translate_to == "eng_auto":
+                translate_to = "english"
+                new_ch = self.bot.get_channel(
+                    1054014022019715092
+                ) or await self.bot.fetch_channel(1054014022019715092)
+                msg_new_id = new_ch.last_message_id
+                try:
+                    msg_new = await new_ch.fetch_message(msg_new_id)
+                except:
+                    msg_new = await new_ch.fetch_message(1069535943738019840)
+                ctx1 = await self.bot.get_context(msg_new)
+            else:
+                ctx1 = ctx
             if translate_to not in self.bot.all_langs and original_Language not in ["english", "en"]:
                 translate_to = "english"
             await asyncio.sleep(1)
-            ctx.command = await self.bot.get_command("translate").callback(Translate(self.bot), ctx, download_url,
+            ctx.command = await self.bot.get_command("translate").callback(Translate(self.bot), ctx1, download_url,
                                                                            None,
                                                                            None,
                                                                            translate_to, title_name[:240] + "_crawl",
@@ -1103,6 +1118,8 @@ class Crawler(commands.Cog):
         full_text = "Source : " + firstchplink + '\n\n'
         no_of_tries = 0
         original_Language = await FileHandler.find_language("title_name " + title)
+        if original_Language != "english" and translate_to is None and add_terms is None:
+            translate_to = "eng_auto"
         org_title = title
         if title is None or str(title).strip() == "" or title == "None":
             title = f"{ctx.author.id}_crl"
@@ -1303,10 +1320,23 @@ class Crawler(commands.Cog):
                     translate_to is not None or add_terms is not None) and download_url is not None and not download_url.strip() == "":
                 if translate_to is None:
                     translate_to = "english"
+                if translate_to == "eng_auto":
+                    translate_to = "english"
+                    new_ch = self.bot.get_channel(
+                        1054014022019715092
+                    ) or await self.bot.fetch_channel(1054014022019715092)
+                    msg_new_id = new_ch.last_message_id
+                    try:
+                        msg_new = await new_ch.fetch_message(msg_new_id)
+                    except:
+                        msg_new = await new_ch.fetch_message(1069535943738019840)
+                    ctx1 = await self.bot.get_context(msg_new)
+                else:
+                    ctx1 = ctx
                 if translate_to not in self.bot.all_langs and original_Language not in ["english", "en"]:
                     translate_to = "english"
                 await asyncio.sleep(1)
-                ctx.command = await self.bot.get_command("translate").callback(Translate(self.bot), ctx, download_url,
+                ctx.command = await self.bot.get_command("translate").callback(Translate(self.bot), ctx1, download_url,
                                                                                None,
                                                                                None,
                                                                                translate_to,

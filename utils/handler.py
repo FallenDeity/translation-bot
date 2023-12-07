@@ -47,6 +47,12 @@ class FileHandler:
         if novel_data is not None:
             library = None
             novel_data = list(novel_data)
+            if title_name:
+                for subString in ["completed", "ongoing", "complete", "latest", "updated"]:
+                    title_name = str(re.sub('(?i)' + re.escape(subString), lambda k: "", title_name))
+            if title:
+                for subString in ["completed", "ongoing", "complete", "latest", "updated"]:
+                    title = str(re.sub('(?i)' + re.escape(subString), lambda k: "", title))
             name_lib_check = False
             ids = []
             for n in novel_data:

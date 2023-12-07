@@ -294,7 +294,11 @@ class Translate(commands.Cog):
             if "pdf" in file_type:
                 await FileHandler.pdf_to_txt(ctx)
             novel = await FileHandler().read_file(ctx)
-        novel_data = await self.bot.mongo.library.get_novel_by_name(name)
+        realname = name
+        if realname:
+            for subString in ["completed", "ongoing", "complete", "latest", "updated"]:
+                realname = str(re.sub('(?i)' + re.escape(subString), lambda k: "", realname))
+        novel_data = await self.bot.mongo.library.get_novel_by_name(realname)
         if novel_data is not None:
             novel_data = list(novel_data)
             ids = []
@@ -307,20 +311,20 @@ class Translate(commands.Cog):
             for n in novel_data:
                 ids.append(n._id)
                 org_name = re.sub("[^A-Za-z0-9]", "", n.title.split('  ')[0]).lower()
-                n_name = re.sub("[^A-Za-z0-9]", "", name.split('  ')[0]).lower()
+                n_name = re.sub("[^A-Za-z0-9]", "", realname.split('  ')[0]).lower()
                 org_name2 = re.sub("[^A-Za-z0-9]", "", n.title.split('__')[0]).lower()
-                n_name2 = re.sub("[^A-Za-z0-9]", "", name.split('__')[0]).lower()
+                n_name2 = re.sub("[^A-Za-z0-9]", "", realname.split('__')[0]).lower()
                 # print(f"{org_name}-{org_name2}-{n_name2}-{n_name}")
                 # print(f"{language}-{n.language}")
                 # print(f"{size_found}-{round(n.size / (1024 ** 2), 2)}")
                 if (name.split('__')[0].lower() == n.title.split('__')[0].lower()
-                    or n.title.split('  ')[0].lower() == name.split('  ')[0].lower()
-                    or org_name == name.strip().lower()
+                    or n.title.split('  ')[0].lower() == realname.split('  ')[0].lower()
+                    or org_name == realname.strip().lower()
                     or org_name2 == n_name2
                     or n_name == org_name
                     or org_name2 == n_name
-                    or (len(name) > 22 and n_name in org_name)
-                    or (len(name) > 22 and n_name2 in org_name2)) \
+                    or (len(realname) > 20 and n_name in org_name)
+                    or (len(realname) > 20 and n_name2 in org_name2)) \
                         and language.lower() in str(n.language).lower() \
                         and size_found >= round(n.size / (1024 ** 2), 2):
                     library = n._id
@@ -328,7 +332,7 @@ class Translate(commands.Cog):
                     eng_check = True
                 if language == str(n.language).lower():
                     lang_check = True
-                    org_str = ''.join(e for e in name.split('__')[0] if e.isalnum())
+                    org_str = ''.join(e for e in realname.split('__')[0] if e.isalnum())
                     lib_str = ''.join(e for e in str(n.title).split('__')[0] if e.isalnum())
                     if org_str.lower() in lib_str.lower():
                         name_lib_check = True
