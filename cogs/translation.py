@@ -48,7 +48,7 @@ class Translate(commands.Cog):
                 "> **❌You have no novel deposited for translation currently.**",
                 delete_after=5,
             )
-        return await ctx.send(f"> **🚄`{self.bot.translator[ctx.author.id]}`**")
+        return await ctx.send(f"> **🚄{self.bot.translator[ctx.author.id]}**")
 
     @commands.hybrid_command(
         help="Send file to be translated with the command. use correct novelname, otherwise you  will be banned",

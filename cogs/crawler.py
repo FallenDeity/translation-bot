@@ -266,11 +266,11 @@ class Crawler(commands.Cog):
                 "> **❌You have no novel deposited for crawling currently.**"
             )
         try:
-            await ctx.send(f"> crawler :  **🚄`{self.bot.crawler[ctx.author.id]}`**")
+            await ctx.send(f"> crawler :  **🚄{self.bot.crawler[ctx.author.id]}**")
         except:
             pass
         try:
-            await ctx.send(f"> crawlnext : **🚄`{self.bot.crawler_next[ctx.author.id]}`**")
+            await ctx.send(f"> crawlnext : **🚄{self.bot.crawler_next[ctx.author.id]}**")
         except:
             pass
 
