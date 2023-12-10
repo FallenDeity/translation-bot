@@ -19,7 +19,7 @@ class CssSelector:
                 "powanjuan": ".content p::text",
                 "ffxs": ".content p::text",
                 "sjks": ".content p::text",
-                "txt520": "div.content > p ::text",
+                "txt520": "body > div.box-artic > h1 ::text",
                 "69shu": ".txtnav ::text",
                 "ptwxz": "* ::text",
                 "shu05": "#htmlContent ::text",
