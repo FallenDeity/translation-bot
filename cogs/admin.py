@@ -195,6 +195,7 @@ class Admin(commands.Cog):
         msg = await ctx.send("Please wait")
         self.bot.app_status = "restart"
         no_of_times = 0
+        txt_channel = await self.bot.fetch_channel(984664133570031666)
         channel = self.bot.get_channel(
             991911644831678484
         ) or await self.bot.fetch_channel(991911644831678484)
@@ -214,6 +215,7 @@ class Admin(commands.Cog):
                         continue
                     try:
                         await channel.send(embed=discord.Embed(description=f"Bot has started restarting"))
+                        await txt_channel.send(embed=discord.Embed(description=f"Bot has started restarting"))
                     except:
                         pass
                     await asyncio.sleep(7)
@@ -231,6 +233,7 @@ class Admin(commands.Cog):
                         if git_update is True:
                             self.bot.update = True
                         await channel.send("Restart failed")
+                        await txt_channel.send("Restart failed")
                         return None
         except:
             self.bot.app_status = "up"
@@ -244,6 +247,7 @@ class Admin(commands.Cog):
                     color=discord.Color.random(),
                 ),
             )
+            await txt_channel.send(embed=discord.Embed(description=f"Bot is restarting..."))
         except:
             pass
         try:
@@ -259,6 +263,9 @@ class Admin(commands.Cog):
             await ctx.send(f"error occurred in deleting {x} {e}")
         try:
             await channel.send(
+                f"Bot has been restarted by user : {ctx.author.name} \nBot has translated {str(int(self.bot.translation_count * 3.1))} MB novels and crawled {str(self.bot.crawler_count)} novels"
+            )
+            await txt_channel.send(
                 f"Bot has been restarted by user : {ctx.author.name} \nBot has translated {str(int(self.bot.translation_count * 3.1))} MB novels and crawled {str(self.bot.crawler_count)} novels"
             )
             gc.collect()
