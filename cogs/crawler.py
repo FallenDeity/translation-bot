@@ -609,7 +609,7 @@ class Crawler(commands.Cog):
                 title_name = "None"
         if title_name == "" or title_name == "None" or title_name is None:
             try:
-                title_name = str(soup.select("h1 ::text")[0].text)
+                title_name = str(soup.select("h1")[0].text)
             except:
                 title_name = "None"
         if title_name.strip() == "" or title_name == "None" or title_name is None:
