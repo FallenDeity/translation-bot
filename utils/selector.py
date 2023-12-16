@@ -89,7 +89,6 @@ class CssSelector:
                 "www.shulinw.com/": "#htmlContent ::text",
                 "ranobes.com": "div.block.story.shortstory ::text",
                 "m.bqg789.net": "#novelcontent ::text",
-                "m.biquzw789.org": "#novelcontent ::text",
                 "boxnovel.com": "div.cha-content ::text",
                 "bonnovel.com": "div.cha-content ::text",
                 "www.asxs.com": "#contents ::text",

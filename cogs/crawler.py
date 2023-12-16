@@ -1056,8 +1056,8 @@ class Crawler(commands.Cog):
         if "readwn" in firstchplink or "wuxiax.co" in firstchplink or "novelmt.com" in firstchplink or "fannovels.com" in firstchplink or "novelmtl.com" in firstchplink or "booktoki216.com" in firstchplink or "69shu" in firstchplink or "wuxiap.com" in firstchplink or "www.wuxiau.com" in firstchplink\
                 or "wuxiabee" in firstchplink:
             waittime = 1.0
-        if "69shu" in firstchplink:
-            waittime = 1.65
+        if "69shu" in firstchplink or "biquzw789" in firstchplink:
+            waittime = 3
         if nextselector is not None:
             sel_tag = True
             if '::attr(href)' not in nextselector:
@@ -1285,8 +1285,7 @@ class Crawler(commands.Cog):
                     if i % 50 == 0:
                         await asyncio.sleep(4.5 * waittime)
                 elif random.randint(0, 50) == 10 or chp_count % 100 == 0:
-                    if "69shu" not in firstchplink:
-                        await asyncio.sleep(1)
+                    await asyncio.sleep(1)
                     full_text = full_text + f"\n\n for more novels ({random.randint(1000, 200000)}) join: https://discord.gg/SZxTKASsHq\n"
 
             async with aiofiles.open(f"{ctx.author.id}_cr.txt", 'w', encoding='utf-8', errors="ignore") as f:
