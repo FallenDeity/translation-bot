@@ -643,6 +643,10 @@ class FileHandler:
                     channel = bot.get_channel(
                         1086592167767711794
                     ) or await bot.fetch_channel(1086592167767711794)
+                elif language.lower() == "english":
+                    channel = bot.get_channel(
+                        1086593341740818523
+                    ) or await bot.fetch_channel(1086593341740818523)
                 else:
                     channel = bot.get_channel(
                         1086593341740818523
