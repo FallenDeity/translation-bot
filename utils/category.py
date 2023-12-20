@@ -658,8 +658,10 @@ class Categories(enum.Enum):
         genre = Counter()
         for category in cls:
             for term in category.value.tags:
-                if term.lower() in string.lower():
-                    genre[category] += 1
+                term_lower = term.lower()
+                str_lower = string.lower()
+                if term_lower in str_lower:
+                    genre[category] += str_lower.count(term_lower)
         most_common_genre = genre.most_common(1)
         if most_common_genre:
             return most_common_genre[0][0].value.name
