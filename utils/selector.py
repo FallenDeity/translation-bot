@@ -238,7 +238,8 @@ class CssSelector:
             "novelnext.com": ["#next_chap", "#chapter > div > div > a"],
             "bonnovel.com": ["None",
                              "#manga-reading-nav-head > div > div.entry-header_wrap > div > div.c-breadcrumb > ol > li:nth-child(2) > a"],
-            "pandamtl.com/": ["#post-9256 > div.bixbox.episodedl > div > div.navimedia > div.left > div > div:nth-child(3) > a", "#post-9256 > div.bixbox.episodedl > div > div.epheader > h1"]
+            "pandamtl.com/": ["#post-9256 > div.bixbox.episodedl > div > div.navimedia > div.left > div > div:nth-child(3) > a", "#post-9256 > div.bixbox.episodedl > div > div.epheader > h1"],
+            "www.xmrdy.com": [None, "title"],
             # "www.novelcool.com": ["None",  "div.chapter-reading-section-list > div > div > h2"],
             # "m.bqg789.net": ["#nextpage", "#novelbody > div.head > div.nav_name > h1"],
         }
