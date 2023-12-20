@@ -442,7 +442,7 @@ class Admin(commands.Cog):
                 cat = Categories.from_string(f"{title} {desc}")
                 if cat != novel['category']:
                     await self.bot.mongo.library.update_category(i, cat)
-                    txt = txt + f"{title} updated to {cat} from {novel['category']}\n"
+                    txt = txt + f"{i} : {title}   ---   {cat} from {novel['category']}\n"
                     if len(txt) >=1500:
                         await ctx.send(txt)
                         txt = ""
