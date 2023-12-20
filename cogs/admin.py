@@ -434,9 +434,9 @@ class Admin(commands.Cog):
     async def addcategory(self, ctx: commands.Context):
         await ctx.defer()
         txt = ""
-        for i in range(1, self.bot.mongo.library.next_number):
+        for i in range(1, await self.bot.mongo.library.next_number):
             try:
-                novel: Novel = self.bot.mongo.library.get_novel_by_id(id)
+                novel: Novel = await self.bot.mongo.library.get_novel_by_id(id)
                 title = novel['title']
                 desc = novel['description']
                 cat = Categories.from_string(f"{title} {desc}")
