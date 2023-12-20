@@ -608,9 +608,7 @@ class FileHandler:
         category = "Uncategorised"
         name = name.split("ex=65")[0]
         try:
-            category = Categories.from_string(name)
-            if category == "Uncategorised":
-                category = Categories.from_string(description)
+            category = Categories.from_string(name + " " + description)
             if thumbnail.strip() == "":
                 thumbnail = Categories.thumbnail_from_category(category)
         except Exception as e:
@@ -764,9 +762,7 @@ class FileHandler:
         if description is None:
             description = ""
         try:
-            category = Categories.from_string(title)
-            if category == "Uncategorised":
-                category = Categories.from_string(description)
+            category = Categories.from_string(title + " " + description)
             if thumbnail.strip() == "":
                 thumbnail = Categories.thumbnail_from_category(category)
         except Exception as e:

@@ -4,6 +4,8 @@ import random
 
 __all__: tuple[str, ...] = ("Categories",)
 
+from collections import Counter
+
 
 @dataclasses.dataclass
 class Category:
@@ -371,7 +373,7 @@ class Categories(enum.Enum):
     )
     TombRaider = Category(
         name="Tomb-Raider",
-        tags=["tomb raider", "tombraider", "tombraiders",],
+        tags=["tomb raider", "tombraider", "tombraiders", ],
         thumbnails=[
             "https://cdn.discordapp.com/attachments/1055445441958916167/1055682789372076082/2Q.png",
             "https://cdn.discordapp.com/attachments/1055445441958916167/1055683983918239744/FB_IMG_1671763662541.jpg",
@@ -495,7 +497,7 @@ class Categories(enum.Enum):
     )
     YugiOh = Category(
         name="Yugi-Oh",
-        tags=[ "yu-gi-oh", "yugio"],
+        tags=["yu-gi-oh", "yugio"],
         thumbnails=[
             "https://cdn.discordapp.com/attachments/1055445441958916167/1055495465333948496/image0.jpg",
         ],
@@ -653,9 +655,14 @@ class Categories(enum.Enum):
 
     @classmethod
     def from_string(cls, string: str) -> str:
+        genre = Counter()
         for category in cls:
-            if any(term.lower() in string.lower() for term in category.value.tags):
-                return category.value.name
+            for term in category.value.tags:
+                if term.lower() in string.lower():
+                    genre[category] += 1
+        most_common_genre = genre.most_common(1)
+        if most_common_genre:
+            return most_common_genre[0][0].value.name
         return cls.Uncategorised.name
 
     @classmethod
