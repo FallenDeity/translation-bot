@@ -674,7 +674,7 @@ class Crawler(commands.Cog):
                 description = ""
         if 'b.faloo' in link or 'wap.faloo' in link:
             urls = urls[:200]
-        if "www.uukanshu.com" in link:
+        if "www.uukanshu.com" in link or "www.uukanshu.net" in link:
             reverse = "true"
         if reverse is not None:
             urls.reverse()
