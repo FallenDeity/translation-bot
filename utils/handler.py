@@ -747,7 +747,7 @@ class FileHandler:
 
     async def crawlnsend(
             self, ctx: commands.Context, bot: Raizel, title: str, title_name: str, originallanguage: str,
-            description: str = None, thumbnail: str = "", link: str = None, library: int = None
+            description: str = "", thumbnail: str = "", link: str = None, library: int = None
     ) -> str:
         download_url = None
         update: bool = True
