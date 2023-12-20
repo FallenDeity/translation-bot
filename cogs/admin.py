@@ -432,16 +432,16 @@ class Admin(commands.Cog):
     @commands.has_role(1020638168237740042)
     @commands.hybrid_command(help="update category to all novels")
     async def addcategory(self, ctx: commands.Context):
-        await ctx.defer()
+        await ctx.send("> started task")
         txt = ""
         for i in range(1, await self.bot.mongo.library.next_number):
             try:
-                novel: Novel = await self.bot.mongo.library.get_novel_by_id(id)
+                novel: Novel = await self.bot.mongo.library.get_novel_by_id(i)
                 title = novel['title']
                 desc = novel['description']
                 cat = Categories.from_string(f"{title} {desc}")
                 if cat != novel['category']:
-                    await self.bot.mongo.library.update_category(id, cat)
+                    await self.bot.mongo.library.update_category(i, cat)
                     txt = txt + f"{title} updated to {cat} from {novel['category']}\n"
                     if len(txt) >=1500:
                         await ctx.send(txt)
