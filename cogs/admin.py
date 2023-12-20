@@ -17,6 +17,8 @@ from cogs.library import Library
 from core import Raizel
 from core.views.linkview import LinkView
 from databases.blocked import User
+from databases.data import Novel
+from utils.category import Categories
 from utils.hints import Hints
 
 
@@ -426,6 +428,26 @@ class Admin(commands.Cog):
             print(e.with_traceback())
             print(e)
         return
+
+    @commands.has_role(1020638168237740042)
+    @commands.hybrid_command(help="update category to all novels")
+    async def addcategory(self, ctx: commands.Context):
+        await ctx.defer()
+        txt = ""
+        for i in range(1, self.bot.mongo.library.next_number):
+            try:
+                novel: Novel = self.bot.mongo.library.get_novel_by_id(id)
+                title = novel['title']
+                desc = novel['description']
+                cat = Categories.from_string(f"{title} {desc}")
+                if cat != novel['category']:
+                    await self.bot.mongo.library.update_category(id, cat)
+                    txt = txt + f"{title} updated to {cat} from {novel['category']}\n"
+                    if len(txt) >=1500:
+                        await ctx.send(txt)
+                        txt = ""
+            except Exception as e:
+                await ctx.send(f"> failed in id {i} due to {e}")
 
 
 async def setup(bot):
