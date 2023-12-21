@@ -445,8 +445,8 @@ class Admin(commands.Cog):
                     cat = Categories.from_string(f"{title} {desc}")
                 if cat != novel['category']:
                     updates.append({"_id": i, "category": cat})
-                    txt = txt + f"{i} : {title}   ---   {cat} from {novel['category']}\n"
-                    if len(txt) >= 1500:
+                    txt = txt + f"{i} --->  {cat} -> {novel['category']}\n"
+                    if len(txt) >= 1900:
                         await ctx.send(txt)
                         await self.bot.mongo.library.update_bulk_category(updates)
                         updates = []
