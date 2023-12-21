@@ -435,7 +435,7 @@ class Admin(commands.Cog):
         await ctx.send("> started task")
         txt = ""
         updates = []
-        list_nov = await self.bot.mongo.library.find_common(no=await self.bot.mongo.library.get_total_novels())
+        list_nov = await self.bot.mongo.library.find_common(no=64904)
         for novel in list_nov:
             try:
                 if novel['_id'] % 100 == 0:
