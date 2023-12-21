@@ -438,23 +438,23 @@ class Admin(commands.Cog):
         list_nov = await self.bot.mongo.library.get_all_novels()
         for novel in list_nov:
             try:
-                if novel['_id'] % 100 == 0:
-                    await ctx.send(f"completed {novel['_id']}")
-                title = novel['title']
-                desc = novel['description']
+                if novel._id % 100 == 0:
+                    await ctx.send(f"completed {novel._id}")
+                title = novel.title
+                desc = novel.description
                 cat = Categories.from_string(f"{title}")
                 if cat == "Uncategorised" and not desc == "":
                     cat = Categories.from_string(f"{title} {desc}")
-                if cat != novel['category']:
-                    updates.append({"_id": novel['_id'], "category": cat})
-                    txt = txt + f"{novel['_id']} --->  {cat} -> {novel['category']}\n"
+                if cat != novel.category:
+                    updates.append({"_id": novel._id, "category": cat})
+                    txt = txt + f"{novel._id} --->  {cat} -> {novel.category}\n"
                     if len(txt) >= 1900:
                         await ctx.send(txt)
                         await self.bot.mongo.library.update_bulk_category(updates)
                         updates = []
                         txt = ""
             except Exception as e:
-                await ctx.send(f"> failed in id {novel['_id']} due to {e}")
+                await ctx.send(f"> failed in id {novel._id} due to {e}")
 
 
 async def setup(bot):
