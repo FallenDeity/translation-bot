@@ -204,9 +204,8 @@ class Library(Database):
     async def next_number(self) -> int:
         return await self.get_total_novels + 1
 
-    @property
     async def get_all_novels(self) -> list:
-        novels = await self.library.find().to_list(length=await self.get_total_novels)
+        novels = await self.library.find({}).to_list(None)
         return [Novel(**novel) for novel in novels]
 
     @property
