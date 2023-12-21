@@ -4,17 +4,15 @@ from datetime import datetime
 from typing import Any
 
 from motor import motor_asyncio
+from pymongo import UpdateOne
 
 from databases.blocked import User
 from databases.data import Novel
 
 
-
 class Database:
     def __init__(self) -> None:
         self.db = motor_asyncio.AsyncIOMotorClient(os.getenv("DATABASE"))
-
-
 
 
 class Library(Database):
@@ -74,7 +72,8 @@ class Library(Database):
     ) -> list[Novel]:
         commons = await self.library.aggregate(
             [
-                {"$match": await self._make_match(title, rating, language, original_language, uploader, category, tag, size)},
+                {"$match": await self._make_match(title, rating, language, original_language, uploader, category, tag,
+                                                  size)},
                 {"$sample": {"size": no}}
             ]
         ).to_list(None)
@@ -141,6 +140,11 @@ class Library(Database):
 
     async def update_category(self, _id: int, category: str) -> None:
         await self.library.update_one({"_id": _id}, {"$set": {"category": category}})
+
+    async def update_bulk_category(self, updates: list) -> None:
+        bulk_op = [UpdateOne({"_id": update["_id"]},{"$set": {"category": update["category"]}}) for update in updates]
+        if bulk_op:
+            await self.library.bulk_write(bulk_op)
 
     async def update_description(self, _id: int, description: str) -> None:
         await self.library.update_one(

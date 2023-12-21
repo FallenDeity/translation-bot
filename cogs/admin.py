@@ -434,6 +434,7 @@ class Admin(commands.Cog):
     async def addcategory(self, ctx: commands.Context, starts: int = 1):
         await ctx.send("> started task")
         txt = ""
+        updates = []
         for i in range(starts, await self.bot.mongo.library.next_number):
             try:
                 novel: Novel = await self.bot.mongo.library.get_novel_by_id(i)
@@ -443,10 +444,12 @@ class Admin(commands.Cog):
                 if cat == "Uncategorised" and not desc == "":
                     cat = Categories.from_string(f"{title} {desc}")
                 if cat != novel['category']:
-                    await self.bot.mongo.library.update_category(i, cat)
+                    updates.append({"_id": i, "category": cat})
                     txt = txt + f"{i} : {title}   ---   {cat} from {novel['category']}\n"
                     if len(txt) >= 1500:
                         await ctx.send(txt)
+                        await self.bot.mongo.library.update_bulk_category(updates)
+                        updates = []
                         txt = ""
             except Exception as e:
                 await ctx.send(f"> failed in id {i} due to {e}")
