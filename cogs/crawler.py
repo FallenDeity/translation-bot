@@ -265,14 +265,11 @@ class Crawler(commands.Cog):
             return await ctx.send(
                 "> **❌You have no novel deposited for crawling currently.**"
             )
-        try:
-            await ctx.send(f"> crawler :  **🚄{self.bot.crawler[ctx.author.id]}**")
-        except:
-            pass
-        try:
-            await ctx.send(f"> crawlnext : **🚄{self.bot.crawler_next[ctx.author.id]}**")
-        except:
-            pass
+        if ctx.author.id in self.bot.crawler:
+            await ctx.send(embed=discord.Embed(title="Crawler progress", description=f"**{self.bot.crawler[ctx.author.id]}**"))
+        if ctx.author.id in self.bot.crawler_next:
+            await ctx.send(embed=discord.Embed(title="CrawlNext progress", description=f"**{self.bot.crawler_next[ctx.author.id]}**"))
+
 
     async def cc_prog(self, msg: discord.Message, embed: discord.Embed, author_id: int, wait_time: float = 8) -> \
             typing.Optional[
