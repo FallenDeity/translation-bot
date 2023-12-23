@@ -115,7 +115,9 @@ class CssSelector:
                 "m.14sw.com": "#ChapterView ::text",
                 "noblemtl.com": "div.epcontent.entry-content ::text",
                 "www.piaotia.com": "#content ::text",
-                "www.xmrdy.com": "#TextContent ::text"
+                "www.xmrdy.com": "#TextContent ::text",
+                "m.98bxwx.com/": "#chapter > div.content ::text",
+                "www.novel543.com": "#chapterWarp > div.chapter-content.px-3 > div ::text",
             }
             for domain, css_selector in domain_mappings.items():
                 if domain in link:
@@ -172,6 +174,8 @@ class CssSelector:
             "noblemtl.com": ["div.infox > h1", "div.epheader > h1 ::text"],
             "www.piaotia.com": ["#tl > a:nth-child(3)", "#content > h1 ::text"],
             "www.xmrdy.com": [".d_title > h1", "h1 ::text"],
+            "m.98bxwx.com/": ["#read > div.main > div.detail > p.name > strong", "#chapter > h1 ::text"],
+            "www.novel543.com": ["h1", "#chapterWarp > div.chapter-content.px-3 > h1"]
         }
         for domain, ret_array in domain_mappings.items():
             if domain in link:
@@ -239,7 +243,9 @@ class CssSelector:
             "bonnovel.com": ["None",
                              "#manga-reading-nav-head > div > div.entry-header_wrap > div > div.c-breadcrumb > ol > li:nth-child(2) > a"],
             "pandamtl.com/": ["#post-9256 > div.bixbox.episodedl > div > div.navimedia > div.left > div > div:nth-child(3) > a", "#post-9256 > div.bixbox.episodedl > div > div.epheader > h1"],
-            "www.xmrdy.com": [None, "title"],
+            "www.xmrdy.com": ["None", "title"],
+            "m.98bxwx.com/": [None, "#chapter > div.path > a:nth-child(3) > font > font"],
+            "www.novel543.com": ["None", "#chapterWarp > div.header.px-3 > ul > li:nth-child(3) > a"]
             # "www.novelcool.com": ["None",  "div.chapter-reading-section-list > div > div > h2"],
             # "m.bqg789.net": ["#nextpage", "#novelbody > div.head > div.nav_name > h1"],
         }
