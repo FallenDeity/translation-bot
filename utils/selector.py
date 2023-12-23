@@ -245,7 +245,9 @@ class CssSelector:
             "pandamtl.com/": ["#post-9256 > div.bixbox.episodedl > div > div.navimedia > div.left > div > div:nth-child(3) > a", "#post-9256 > div.bixbox.episodedl > div > div.epheader > h1"],
             "www.xmrdy.com": ["None", "title"],
             "m.98bxwx.com/": [None, "#chapter > div.path > a:nth-child(3) > font > font"],
-            "www.novel543.com": ["None", "#chapterWarp > div.header.px-3 > ul > li:nth-child(3) > a"]
+            "www.novel543.com": ["None", "#chapterWarp > div.header.px-3 > ul > li:nth-child(3) > a"],
+            "m.biquzw789.net": ["#nextpage",  "#novelbody > div.head > div.nav_name > h2"],
+            "www.biquzw789.net": ["None", "#wrapper > div.content_read > div > div.con_top > a:nth-child(7)"],
             # "www.novelcool.com": ["None",  "div.chapter-reading-section-list > div > div > h2"],
             # "m.bqg789.net": ["#nextpage", "#novelbody > div.head > div.nav_name > h1"],
         }

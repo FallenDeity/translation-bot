@@ -1055,7 +1055,7 @@ class Crawler(commands.Cog):
             secondchplink = await self.bot.loop.run_in_executor(None, FileHandler.find_next_chps, soup, firstchplink)
             # secondchplink = await FileHandler.find_next_chps(soup, firstchplink)
         if "readwn" in firstchplink or "wuxiax.co" in firstchplink or "novelmt.com" in firstchplink or "fannovels.com" in firstchplink or "novelmtl.com" in firstchplink or "booktoki216.com" in firstchplink or "69shu" in firstchplink or "wuxiap.com" in firstchplink or "www.wuxiau.com" in firstchplink\
-                or "wuxiabee" in firstchplink:
+                or "wuxiabee" in firstchplink or "biquzw789" in firstchplink or "novel543" in firstchplink:
             waittime = 1.0
         if "69shu" in firstchplink or "biquzw789" in firstchplink:
             waittime = 3
