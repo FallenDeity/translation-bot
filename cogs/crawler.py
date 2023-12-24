@@ -334,7 +334,7 @@ class Crawler(commands.Cog):
                 return await msg.edit(embed=embed)
             await asyncio.sleep(wait_time)
         embed.set_field_at(index=0,
-                           name=f"Progress :  100%", )
+                           name=f"Progress :  100%", value="")
         # value=progressBar.filledBar(100, 100,
         #                             size=10, line="🟥", slider="🟩")[
         #     0])
@@ -857,7 +857,7 @@ class Crawler(commands.Cog):
                     pass
                 view = None
                 embed.set_field_at(index=0,
-                                   name=f"Progress :  100%", )
+                                   name=f"Progress :  100%", value="")
                 # value=progressBar.filledBar(100, 100,
                 #                             size=10, line="🟥", slider="🟩")[
                 #     0])

@@ -608,7 +608,7 @@ class Translate(commands.Cog):
                 task.cancel()
                 view = None
                 embed.set_field_at(index=3,
-                                   name=f"Progress :  100%",)
+                                   name=f"Progress :  100%", value="")
                                    # value=progressBar.filledBar(100, 100,
                                    #                             size=10, line="🟥", slider="🟩")[
                                    #     0])
@@ -704,7 +704,7 @@ class Translate(commands.Cog):
             await asyncio.sleep(timer)
 
         embed.set_field_at(index=3,
-                           name=f"Progress :  100%",)
+                           name=f"Progress :  100%", value="")
                            # value=progressBar.filledBar(100, 100,
                            #                             size=10, line="🟥", slider="🟩")[
                            #     0])
