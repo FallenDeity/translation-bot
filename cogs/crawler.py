@@ -180,7 +180,8 @@ class Crawler(commands.Cog):
                 self.bot.crawler[name] = f"{len(novel)}/{len(urls)}"
             return novel
 
-    async def getcontent(self, links: str, css: str, next_xpath, bot, tag, scraper, next_chp_finder: bool = False, driver = None):
+    async def getcontent(self, links: str, css: str, next_xpath, bot, tag, scraper, next_chp_finder: bool = False,
+                         driver=None):
         for _i in range(1, 5):
             try:
                 if driver is not None:
@@ -302,12 +303,11 @@ class Crawler(commands.Cog):
                 del self.bot.crawler_next[ctx.author.id]
                 return None
 
-
     async def cc_prog(self, msg: discord.Message, embed: discord.Embed, author_id: int, wait_time: float = 8) -> \
             typing.Optional[
                 discord.Message]:
         # bardata = progressBar.filledBar(100, 0, size=10, line="🟥", slider="🟩")
-        embed.add_field(name="Progress")
+        embed.add_field(name="Progress", value="")
         await asyncio.sleep(2)
         while author_id in self.bot.crawler:
             out = self.bot.crawler[author_id]
@@ -315,10 +315,11 @@ class Crawler(commands.Cog):
             if split[0].isnumeric():
                 progress = int(round(eval(out) * 100, 2))
                 embed.set_field_at(index=0,
-                                   name=f"Progress :  {str(progress)}%  ({out})", value="")
-                                   # value=progressBar.filledBar(int(split[1]), int(split[0]),
-                                   #                             size=10, line="🟥", slider="🟩")[
-                                   #           0] + f"  {discord.utils.format_dt(datetime.datetime.now(), style='R')}")
+                                   name=f"Progress :  {str(progress)}%  ({out}) {discord.utils.format_dt(datetime.datetime.now(), style='R')}",
+                                   value="")
+                # value=progressBar.filledBar(int(split[1]), int(split[0]),
+                #                             size=10, line="🟥", slider="🟩")[
+                #           0] + f"  {discord.utils.format_dt(datetime.datetime.now(), style='R')}")
                 embed.set_image(url=await Progress.get_image_url(progress))
 
                 await msg.edit(embed=embed)
@@ -333,10 +334,10 @@ class Crawler(commands.Cog):
                 return await msg.edit(embed=embed)
             await asyncio.sleep(wait_time)
         embed.set_field_at(index=0,
-                           name=f"Progress :  100%",)
-                           # value=progressBar.filledBar(100, 100,
-                           #                             size=10, line="🟥", slider="🟩")[
-                           #     0])
+                           name=f"Progress :  100%", )
+        # value=progressBar.filledBar(100, 100,
+        #                             size=10, line="🟥", slider="🟩")[
+        #     0])
         embed.set_image(url=await Progress.get_image_url(100))
         # print(embed)
         return await msg.edit(embed=embed)
@@ -856,10 +857,10 @@ class Crawler(commands.Cog):
                     pass
                 view = None
                 embed.set_field_at(index=0,
-                                   name=f"Progress :  100%",)
-                                   # value=progressBar.filledBar(100, 100,
-                                   #                             size=10, line="🟥", slider="🟩")[
-                                   #     0])
+                                   name=f"Progress :  100%", )
+                # value=progressBar.filledBar(100, 100,
+                #                             size=10, line="🟥", slider="🟩")[
+                #     0])
                 embed.set_image(url=await Progress.get_image_url(100))
                 await msg.edit(embed=embed, view=view)
             except:
@@ -914,7 +915,8 @@ class Crawler(commands.Cog):
                 translate_to = "english"
             if translate_to == "eng_auto":
                 translate_to = "english"
-                await ctx.send(content=f"> Translating to english as bot detected the novel language as {original_Language}")
+                await ctx.send(
+                    content=f"> Translating to english as bot detected the novel language as {original_Language}")
             if translate_to not in self.bot.all_langs and original_Language not in ["english", "en"]:
                 translate_to = "english"
             await asyncio.sleep(1)
@@ -945,7 +947,8 @@ class Crawler(commands.Cog):
     async def crawlnext(
             self, ctx: commands.Context, firstchplink: str, secondchplink: str = None, lastchplink: str = None,
             nextselector: str = None, noofchapters: int = None,
-            cssselector: str = None, waittime: float = None, translate_to: str = None, add_terms: str = None, headless: bool = False
+            cssselector: str = None, waittime: float = None, translate_to: str = None, add_terms: str = None,
+            headless: bool = False
     ) -> typing.Optional[discord.Message]:
         """crawl using first chapter link
                 Parameters
@@ -979,7 +982,7 @@ class Crawler(commands.Cog):
             pass
         driver = None
         if "trxs" in firstchplink or "jpxs" in firstchplink or "bixiang" in firstchplink or "powanjuan" in firstchplink or "ffxs" in firstchplink or "qbtr" in firstchplink or "tongrenquan" in firstchplink:
-                return await ctx.reply("> **Use crawl command")
+            return await ctx.reply("> **Use crawl command")
         if ctx.author.id in self.bot.crawler_next:
             return await ctx.reply(
                 "> **❌You cannot crawl two novels at the same time.**"
@@ -1088,7 +1091,7 @@ class Crawler(commands.Cog):
             soup = BeautifulSoup(response.content, 'html5lib', from_encoding=response.encoding)
             secondchplink = await self.bot.loop.run_in_executor(None, FileHandler.find_next_chps, soup, firstchplink)
             # secondchplink = await FileHandler.find_next_chps(soup, firstchplink)
-        if "readwn" in firstchplink or "wuxiax.co" in firstchplink or "novelmt.com" in firstchplink or "fannovels.com" in firstchplink or "novelmtl.com" in firstchplink or "booktoki216.com" in firstchplink or "69shu" in firstchplink or "wuxiap.com" in firstchplink or "www.wuxiau.com" in firstchplink\
+        if "readwn" in firstchplink or "wuxiax.co" in firstchplink or "novelmt.com" in firstchplink or "fannovels.com" in firstchplink or "novelmtl.com" in firstchplink or "booktoki216.com" in firstchplink or "69shu" in firstchplink or "wuxiap.com" in firstchplink or "www.wuxiau.com" in firstchplink \
                 or "wuxiabee" in firstchplink or "biquzw789" in firstchplink or "novel543" in firstchplink:
             waittime = 1.0
         if "69shu" in firstchplink or "biquzw789" in firstchplink:
@@ -1274,7 +1277,8 @@ class Crawler(commands.Cog):
                         return await ctx.send(" There is some problem with the detected selector")
                 try:
 
-                    output = await self.getcontent(current_link, css, path, self.bot, sel_tag, scraper, next_chp_find, driver)
+                    output = await self.getcontent(current_link, css, path, self.bot, sel_tag, scraper, next_chp_find,
+                                                   driver)
                     chp_text = str(output[0])
                 except Exception as e:
                     if i <= 10:

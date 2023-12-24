@@ -676,17 +676,17 @@ class Translate(commands.Cog):
         lst = [i for i in self.bot.all_langs if language.lower() in i.lower()][:25]
         return [app_commands.Choice(name=i, value=i) for i in lst]
 
-    async def cc_prog(self, msg: discord.Message, embed: discord.Embed, author_id: int) -> typing.Optional[
+    async def cc_prog(self, msg: discord.Message, embed: discord.Embed, author_id: int, timer: int =8) -> typing.Optional[
         discord.Message]:
         # bardata = progressBar.filledBar(100, 0, size=10, line="🟥", slider="🟩")
-        embed.add_field(name="Progress", inline=False)
+        embed.add_field(name="Progress", value="", inline=False)
         while author_id in self.bot.translator:
             out = self.bot.translator[author_id]
             split = out.split("/")
             if split[0].isnumeric():
                 progress = int(round(eval(out) * 100, 2))
                 embed.set_field_at(index=3,
-                                   name=f"Progress :  {str(progress)}%  ({out})")
+                                   name=f"Progress :  {str(progress)}%  ({out}) {discord.utils.format_dt(datetime.datetime.now(), style='R')}")
                                    # value=progressBar.filledBar(int(split[1]), int(split[0]),
                                    #                             size=10, line="🟥", slider="🟩")[
                                    #           0] + f"  {discord.utils.format_dt(datetime.datetime.now(), style='R')}")
@@ -701,7 +701,7 @@ class Translate(commands.Cog):
                                    name=f"Progress : ",
                                    value=f"progress bar is closed .please use .tp to check progress")
                 return await msg.edit(embed=embed)
-            await asyncio.sleep(8)
+            await asyncio.sleep(timer)
 
         embed.set_field_at(index=3,
                            name=f"Progress :  100%",)
