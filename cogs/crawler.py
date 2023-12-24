@@ -983,7 +983,7 @@ class Crawler(commands.Cog):
             pass
         driver = None
         if "trxs" in firstchplink or "jpxs" in firstchplink or "bixiang" in firstchplink or "powanjuan" in firstchplink or "ffxs" in firstchplink or "qbtr" in firstchplink or "tongrenquan" in firstchplink:
-            return await ctx.reply("> **Use crawl command")
+            return await ctx.reply("> **Use crawl command**")
         if ctx.author.id in self.bot.crawler_next:
             return await ctx.reply(
                 "> **❌You cannot crawl two novels at the same time.**"
