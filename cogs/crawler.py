@@ -17,7 +17,7 @@ import aiofiles
 import discord
 import parsel
 import requests
-from StringProgressBar import progressBar
+# from StringProgressBar import progressBar
 
 # import undetected_chromedriver as uc
 from selenium import webdriver
@@ -34,6 +34,7 @@ from core.bot import Raizel
 from core.views.ButtonView import ButtonsV
 from utils.handler import FileHandler
 from utils.hints import Hints
+from utils.progress import Progress
 from utils.selector import CssSelector
 
 headers = {
@@ -274,18 +275,21 @@ class Crawler(commands.Cog):
     async def cc_prog(self, msg: discord.Message, embed: discord.Embed, author_id: int, wait_time: float = 8) -> \
             typing.Optional[
                 discord.Message]:
-        bardata = progressBar.filledBar(100, 0, size=10, line="🟥", slider="🟩")
+        # bardata = progressBar.filledBar(100, 0, size=10, line="🟥", slider="🟩")
         embed.add_field(name="Progress", value=f"{bardata[0]}")
         await asyncio.sleep(2)
         while author_id in self.bot.crawler:
             out = self.bot.crawler[author_id]
             split = out.split("/")
             if split[0].isnumeric():
+                progress = int(round(eval(out) * 100, 2))
                 embed.set_field_at(index=0,
-                                   name=f"Progress :  {str(round(eval(out) * 100, 2))}%  ({out})",
-                                   value=progressBar.filledBar(int(split[1]), int(split[0]),
-                                                               size=10, line="🟥", slider="🟩")[
-                                             0] + f"  {discord.utils.format_dt(datetime.datetime.now(), style='R')}")
+                                   name=f"Progress :  {str(progress)}%  ({out})", value="")
+                                   # value=progressBar.filledBar(int(split[1]), int(split[0]),
+                                   #                             size=10, line="🟥", slider="🟩")[
+                                   #           0] + f"  {discord.utils.format_dt(datetime.datetime.now(), style='R')}")
+                embed.set_image(url=await Progress.get_image_url(progress))
+
                 await msg.edit(embed=embed)
             else:
                 break
@@ -298,10 +302,11 @@ class Crawler(commands.Cog):
                 return await msg.edit(embed=embed)
             await asyncio.sleep(wait_time)
         embed.set_field_at(index=0,
-                           name=f"Progress :  100%",
-                           value=progressBar.filledBar(100, 100,
-                                                       size=10, line="🟥", slider="🟩")[
-                               0])
+                           name=f"Progress :  100%",)
+                           # value=progressBar.filledBar(100, 100,
+                           #                             size=10, line="🟥", slider="🟩")[
+                           #     0])
+        embed.set_image(url=await Progress.get_image_url(100))
         # print(embed)
         return await msg.edit(embed=embed)
 
@@ -820,10 +825,11 @@ class Crawler(commands.Cog):
                     pass
                 view = None
                 embed.set_field_at(index=0,
-                                   name=f"Progress :  100%",
-                                   value=progressBar.filledBar(100, 100,
-                                                               size=10, line="🟥", slider="🟩")[
-                                       0])
+                                   name=f"Progress :  100%",)
+                                   # value=progressBar.filledBar(100, 100,
+                                   #                             size=10, line="🟥", slider="🟩")[
+                                   #     0])
+                embed.set_image(url=await Progress.get_image_url(100))
                 await msg.edit(embed=embed, view=view)
             except:
                 pass
