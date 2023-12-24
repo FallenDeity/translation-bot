@@ -686,7 +686,7 @@ class Translate(commands.Cog):
             if split[0].isnumeric():
                 progress = int(round(eval(out) * 100, 2))
                 embed.set_field_at(index=3,
-                                   name=f"Progress :  {str(progress)}%  ({out}) {discord.utils.format_dt(datetime.datetime.now(), style='R')}")
+                                   name=f"Progress :  {str(progress)}%  ({out}) {discord.utils.format_dt(datetime.datetime.now(), style='R')}", value="")
                                    # value=progressBar.filledBar(int(split[1]), int(split[0]),
                                    #                             size=10, line="🟥", slider="🟩")[
                                    #           0] + f"  {discord.utils.format_dt(datetime.datetime.now(), style='R')}")
