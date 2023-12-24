@@ -61,7 +61,7 @@ class Translate(commands.Cog):
                 content=f"> **❌You have no novel deposited for crawler currently. but bot has {split[0]} is in progress. it will be cleared now**",
                 delete_after=5,
             )
-            await asyncio.sleep(4)
+            await asyncio.sleep(2)
             del self.bot.translator[ctx.author.id]
             return None
 

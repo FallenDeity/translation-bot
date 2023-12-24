@@ -281,7 +281,7 @@ class Crawler(commands.Cog):
                     content=f"> **❌You have no novel deposited for crawler currently. but bot has {split[0]} is in progress. it will be cleared now**",
                     delete_after=5,
                 )
-                await asyncio.sleep(4)
+                await asyncio.sleep(2)
                 del self.bot.crawler[ctx.author.id]
                 return None
         if ctx.author.id in self.bot.crawler_next:
@@ -298,7 +298,7 @@ class Crawler(commands.Cog):
                     content=f"> **❌You have no novel deposited for crawler currently. but bot has {split[0]} is in progress. it will be cleared now**",
                     delete_after=5,
                 )
-                await asyncio.sleep(4)
+                await asyncio.sleep(2)
                 del self.bot.crawler_next[ctx.author.id]
                 return None
 
