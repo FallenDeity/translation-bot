@@ -456,16 +456,16 @@ class Admin(commands.Cog):
             except Exception as e:
                 await ctx.send(f"> failed in id {novel._id} due to {e}")
 
-
+    @commands.has_role(1020638168237740042)
     @commands.hybrid_command(help="update category to all novels")
     async def create(self, ctx: commands.Context):
         pic_dict: [int, str] = dict()
         for i in range(0, 101):
-            file = discord.File(f"img/{i}.png")
+            file = discord.File(f"utils/img/{i}.png")
             msg = await ctx.send(file=file)
             pic_dict[i] = msg.attachments[0].url
         print(pic_dict)
-        return await ctx.send(pic_dict)
+        # return await ctx.send(pic_dict)
 
 
 
