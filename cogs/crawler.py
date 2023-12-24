@@ -331,6 +331,7 @@ class Crawler(commands.Cog):
                 embed.set_field_at(index=0,
                                    name=f"Progress : ",
                                    value=f"progress bar is closed .please use .tcp to check progress")
+                embed.set_image(url="")
                 return await msg.edit(embed=embed)
             await asyncio.sleep(wait_time)
         embed.set_field_at(index=0,

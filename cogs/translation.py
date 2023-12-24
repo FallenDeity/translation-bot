@@ -700,6 +700,7 @@ class Translate(commands.Cog):
                 embed.set_field_at(index=3,
                                    name=f"Progress : ",
                                    value=f"progress bar is closed .please use .tp to check progress")
+                embed.set_image(url="")
                 return await msg.edit(embed=embed)
             await asyncio.sleep(timer)
 
