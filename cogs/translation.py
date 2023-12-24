@@ -11,7 +11,7 @@ from urllib.parse import urljoin
 import aiofiles
 import cloudscraper
 import discord
-from StringProgressBar import progressBar
+# from StringProgressBar import progressBar
 from bs4 import BeautifulSoup
 from deep_translator import GoogleTranslator
 from discord import app_commands
@@ -608,10 +608,11 @@ class Translate(commands.Cog):
                 task.cancel()
                 view = None
                 embed.set_field_at(index=3,
-                                   name=f"Progress :  100%",
-                                   value=progressBar.filledBar(100, 100,
-                                                               size=10, line="🟥", slider="🟩")[
-                                       0])
+                                   name=f"Progress :  100%",)
+                                   # value=progressBar.filledBar(100, 100,
+                                   #                             size=10, line="🟥", slider="🟩")[
+                                   #     0])
+                embed.set_image(url=await Progress.get_image_url(100))
                 await rep_msg.edit(embed=embed, view=view)
             except:
                 pass
@@ -677,17 +678,19 @@ class Translate(commands.Cog):
 
     async def cc_prog(self, msg: discord.Message, embed: discord.Embed, author_id: int) -> typing.Optional[
         discord.Message]:
-        bardata = progressBar.filledBar(100, 0, size=10, line="🟥", slider="🟩")
-        embed.add_field(name="Progress", value=f"{bardata[0]}", inline=False)
+        # bardata = progressBar.filledBar(100, 0, size=10, line="🟥", slider="🟩")
+        embed.add_field(name="Progress", inline=False)
         while author_id in self.bot.translator:
             out = self.bot.translator[author_id]
             split = out.split("/")
             if split[0].isnumeric():
+                progress = int(round(eval(out) * 100, 2))
                 embed.set_field_at(index=3,
-                                   name=f"Progress :  {str(round(eval(out) * 100, 2))}%  ({out})",
-                                   value=progressBar.filledBar(int(split[1]), int(split[0]),
-                                                               size=10, line="🟥", slider="🟩")[
-                                             0] + f"  {discord.utils.format_dt(datetime.datetime.now(), style='R')}")
+                                   name=f"Progress :  {str(progress)}%  ({out})")
+                                   # value=progressBar.filledBar(int(split[1]), int(split[0]),
+                                   #                             size=10, line="🟥", slider="🟩")[
+                                   #           0] + f"  {discord.utils.format_dt(datetime.datetime.now(), style='R')}")
+                embed.set_image(url=await Progress.get_image_url(progress))
                 await msg.edit(embed=embed)
             else:
                 break
@@ -701,11 +704,11 @@ class Translate(commands.Cog):
             await asyncio.sleep(8)
 
         embed.set_field_at(index=3,
-                           name=f"Progress :  100%",
-                           value=progressBar.filledBar(100, 100,
-                                                       size=10, line="🟥", slider="🟩")[
-                               0])
-        # print(embed)
+                           name=f"Progress :  100%",)
+                           # value=progressBar.filledBar(100, 100,
+                           #                             size=10, line="🟥", slider="🟩")[
+                           #     0])
+        embed.set_image(url=await Progress.get_image_url(100))
         return await msg.edit(embed=embed)
 
     @commands.hybrid_command(

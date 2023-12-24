@@ -457,5 +457,18 @@ class Admin(commands.Cog):
                 await ctx.send(f"> failed in id {novel._id} due to {e}")
 
 
+    @commands.hybrid_command(help="update category to all novels")
+    async def create(self, ctx: commands.Context):
+        pic_dict: [int, str] = dict()
+        for i in range(0, 101):
+            file = discord.File(f"img/{i}.png")
+            msg = await ctx.send(file=file)
+            pic_dict[i] = msg.attachments[0].url
+        print(pic_dict)
+        return await ctx.send(pic_dict)
+
+
+
+
 async def setup(bot):
     await bot.add_cog(Admin(bot))
