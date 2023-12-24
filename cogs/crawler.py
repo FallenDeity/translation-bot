@@ -267,9 +267,40 @@ class Crawler(commands.Cog):
                 "> **❌You have no novel deposited for crawling currently.**"
             )
         if ctx.author.id in self.bot.crawler:
-            await ctx.send(embed=discord.Embed(title="Crawler progress", description=f"**{self.bot.crawler[ctx.author.id]}**"))
+            out = self.bot.crawler[ctx.author.id]
+            split = out.split("/")
+            # await ctx.send(embed=discord.Embed(title="Crawler progress", description=f"**{self.bot.crawler[ctx.author.id]}**"))
+            if split[0].isnumeric():
+                progress = int(round(eval(out) * 100, 2))
+                embed = discord.Embed(title="Crawler progress",
+                                      description=f"**{self.bot.crawler[ctx.author.id]}    {progress}% completed**")
+                embed.set_image(url=await Progress.get_image_url(progress))
+                await ctx.send(embed=embed)
+            else:
+                await ctx.send(
+                    content=f"> **❌You have no novel deposited for crawler currently. but bot has {split[0]} is in progress. it will be cleared now**",
+                    delete_after=5,
+                )
+                await asyncio.sleep(4)
+                del self.bot.crawler[ctx.author.id]
+                return None
         if ctx.author.id in self.bot.crawler_next:
-            await ctx.send(embed=discord.Embed(title="CrawlNext progress", description=f"**{self.bot.crawler_next[ctx.author.id]}**"))
+            out = self.bot.crawler_next[ctx.author.id]
+            split = out.split("/")
+            if split[0].isnumeric():
+                progress = int(round(eval(out) * 100, 2))
+                embed = discord.Embed(title="CrawlNext progress",
+                                      description=f"**{self.bot.crawler_next[ctx.author.id]}    {progress}% completed**")
+                embed.set_image(url=await Progress.get_image_url(progress))
+                await ctx.send(embed=embed)
+            else:
+                await ctx.send(
+                    content=f"> **❌You have no novel deposited for crawler currently. but bot has {split[0]} is in progress. it will be cleared now**",
+                    delete_after=5,
+                )
+                await asyncio.sleep(4)
+                del self.bot.crawler_next[ctx.author.id]
+                return None
 
 
     async def cc_prog(self, msg: discord.Message, embed: discord.Embed, author_id: int, wait_time: float = 8) -> \

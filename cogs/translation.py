@@ -25,6 +25,7 @@ from core.views.linkview import LinkView
 from languages.terms import terms
 from utils.handler import FileHandler
 from utils.hints import Hints
+from utils.progress import Progress
 from utils.translate import Translator
 
 
@@ -48,7 +49,21 @@ class Translate(commands.Cog):
                 "> **❌You have no novel deposited for translation currently.**",
                 delete_after=5,
             )
-        return await ctx.send(embed=discord.Embed(title="Translator progress", description=f"**{self.bot.translator[ctx.author.id]}**"))
+        out = self.bot.translator[ctx.author.id]
+        split = out.split("/")
+        if split[0].isnumeric():
+            progress = int(round(eval(out) * 100, 2))
+            embed = discord.Embed(title="Translator progress", description=f"**{self.bot.translator[ctx.author.id]}    {progress}% completed**")
+            embed.set_image(url=await Progress.get_image_url(progress))
+            await ctx.send(embed=embed)
+        else:
+            await ctx.send(
+                content=f"> **❌You have no novel deposited for crawler currently. but bot has {split[0]} is in progress. it will be cleared now**",
+                delete_after=5,
+            )
+            await asyncio.sleep(4)
+            del self.bot.translator[ctx.author.id]
+            return None
 
     @commands.hybrid_command(
         help="Send file to be translated with the command. use correct novelname, otherwise you  will be banned",
