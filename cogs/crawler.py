@@ -276,7 +276,7 @@ class Crawler(commands.Cog):
             typing.Optional[
                 discord.Message]:
         # bardata = progressBar.filledBar(100, 0, size=10, line="🟥", slider="🟩")
-        embed.add_field(name="Progress", value=f"{bardata[0]}")
+        embed.add_field(name="Progress")
         await asyncio.sleep(2)
         while author_id in self.bot.crawler:
             out = self.bot.crawler[author_id]
