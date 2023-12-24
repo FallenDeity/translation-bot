@@ -549,7 +549,7 @@ class Translate(commands.Cog):
             self.bot.translator[ctx.author.id] = f"0/{len(liz)}"
             await FileHandler.update_status(self.bot)
             if ctx.author.id != 925597069748621353:
-                task = asyncio.create_task(self.cc_prog(rep_msg, embed=embed, author_id=ctx.author.id))
+                task = asyncio.create_task(self.cc_prog(rep_msg, embed=embed, author_id=ctx.author.id, timer=len(asyncio.all_tasks())-1))
             translate = Translator(self.bot, ctx.author.id, language)
             if len(liz) < 1700:
                 story = await translate.start(liz, len(asyncio.all_tasks()))

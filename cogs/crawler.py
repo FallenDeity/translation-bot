@@ -781,7 +781,7 @@ class Crawler(commands.Cog):
             view = ButtonsV(self.bot, ctx, "crawl")
             msg = await msg.edit(content="",
                                  embed=embed, view=view)
-            task = asyncio.create_task(self.cc_prog(msg, embed, ctx.author.id))
+            task = asyncio.create_task(self.cc_prog(msg, embed, ctx.author.id, len(asyncio.all_tasks())-1))
             if library is not None:
                 await ctx.reply(content=f"> Updating {str(library)} with name : {title_name}")
             if len(urls) < 1700:
