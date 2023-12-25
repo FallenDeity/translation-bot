@@ -231,32 +231,62 @@ class FileHandler:
 
     @staticmethod
     async def distribute_genre(embed: discord.Embed, category: str, download_url: str, bot: Raizel):
-        anime_cat = ["Naruto", "One-Piece", "Harry-Potter", "Pokemon""Fairy-Tail", "Genshin-Impact", "Doulou-Daluo",
-                     "Conan", "High-School-DXD", "Hunter-X-Hunter", "Doraemon", "Dragon-Ball", "Comprehensive", "Yugi-Oh", "Bleach",
-                     "Shokugeki-No-Soma", "Jackie-Chan", "One-Punch-Man", "Cartoonist"]
-        marvel_dc = ["DC", "Marvel"]
-        villain = ["Villain"]
-        magic = ["Fantasy", "Spirit-Recovery", "Reincarnation"]
-        r18 = ["R18"]
-        scifi = ["Technology"]
-        if category in anime_cat:
-            channel_id = 1110761695174983680
-        elif category in marvel_dc:
-            channel_id = 1110761272619839538
-        elif category in villain:
-            channel_id = 1110764343869571132
-        elif category in magic:
-            channel_id = 1110761401930240030
-        elif category in r18:
-            channel_id = 1112230192522481754
-        elif category in scifi:
-            channel_id = 1110761533631365220
-        else:
-            return
-        channel = await bot.fetch_channel(channel_id)
-        view = LinkView({"Novel": [download_url, await FileHandler.get_emoji_book()]})
-        await channel.send(embed=embed, view=view)
-        return
+        # anime_cat = ["Naruto", "One-Piece", "Harry-Potter", "Pokemon""Fairy-Tail", "Genshin-Impact", "Doulou-Daluo",
+        #              "Conan", "High-School-DXD", "Hunter-X-Hunter", "Doraemon", "Dragon-Ball", "Comprehensive", "Yugi-Oh", "Bleach",
+        #              "Shokugeki-No-Soma", "Jackie-Chan", "One-Punch-Man", "Cartoonist"]
+        # marvel_dc = ["DC", "Marvel"]
+        # villain = ["Villain"]
+        # magic = ["Fantasy", "Spirit-Recovery", "Reincarnation"]
+        # r18 = ["R18"]
+        # scifi = ["Technology"]
+        # if category in anime_cat:
+        #     channel_id = 1110761695174983680
+        # elif category in marvel_dc:
+        #     channel_id = 1110761272619839538
+        # elif category in villain:
+        #     channel_id = 1110764343869571132
+        # elif category in magic:
+        #     channel_id = 1110761401930240030
+        # elif category in r18:
+        #     channel_id = 1112230192522481754
+        # elif category in scifi:
+        #     channel_id = 1110761533631365220
+        # else:
+        #     return
+        category_channels = {
+            "Naruto": 1110761695174983680,
+            "One-Piece": 1110761695174983680,
+            "Harry-Potter": 1110761695174983680,
+            "Pokemon": 1110761695174983680,
+            "Fairy-Tail": 1110761695174983680,
+            "Genshin-Impact": 1110761695174983680,
+            "Doulou-Daluo": 1110761695174983680,
+            "Conan": 1110761695174983680,
+            "High-School-DXD": 1110761695174983680,
+            "Hunter-X-Hunter": 1110761695174983680,
+            "Doraemon": 1110761695174983680,
+            "Dragon-Ball": 1110761695174983680,
+            "Comprehensive": 1110761695174983680,
+            "Yugi-Oh": 1110761695174983680,
+            "Bleach": 1110761695174983680,
+            "Shokugeki-No-Soma": 1110761695174983680,
+            "Jackie-Chan": 1110761695174983680,
+            "One-Punch-Man": 1110761695174983680,
+            "Cartoonist": 1110761695174983680,
+            "DC": 1110761272619839538,
+            "Marvel": 1110761272619839538,
+            "Villain": 1110764343869571132,
+            "Fantasy": 1110761401930240030,
+            "Spirit-Recovery": 1110761401930240030,
+            "Reincarnation": 1110761401930240030,
+            "R18": 1112230192522481754,
+            "Technology": 1110761533631365220,
+        }
+        channel_id = category_channels.get(category)
+        if channel_id is not None:
+            channel = await bot.fetch_channel(channel_id)
+            view = LinkView({"Novel": [download_url, await FileHandler.get_emoji_book()]})
+            await channel.send(embed=embed, view=view)
 
     @staticmethod
     async def get_emoji_book() -> str:
