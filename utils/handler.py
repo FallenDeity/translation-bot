@@ -231,28 +231,6 @@ class FileHandler:
 
     @staticmethod
     async def distribute_genre(embed: discord.Embed, category: str, download_url: str, bot: Raizel):
-        # anime_cat = ["Naruto", "One-Piece", "Harry-Potter", "Pokemon""Fairy-Tail", "Genshin-Impact", "Doulou-Daluo",
-        #              "Conan", "High-School-DXD", "Hunter-X-Hunter", "Doraemon", "Dragon-Ball", "Comprehensive", "Yugi-Oh", "Bleach",
-        #              "Shokugeki-No-Soma", "Jackie-Chan", "One-Punch-Man", "Cartoonist"]
-        # marvel_dc = ["DC", "Marvel"]
-        # villain = ["Villain"]
-        # magic = ["Fantasy", "Spirit-Recovery", "Reincarnation"]
-        # r18 = ["R18"]
-        # scifi = ["Technology"]
-        # if category in anime_cat:
-        #     channel_id = 1110761695174983680
-        # elif category in marvel_dc:
-        #     channel_id = 1110761272619839538
-        # elif category in villain:
-        #     channel_id = 1110764343869571132
-        # elif category in magic:
-        #     channel_id = 1110761401930240030
-        # elif category in r18:
-        #     channel_id = 1112230192522481754
-        # elif category in scifi:
-        #     channel_id = 1110761533631365220
-        # else:
-        #     return
         category_channels = {
             "Naruto": 1110761695174983680,
             "One-Piece": 1110761695174983680,
@@ -290,8 +268,7 @@ class FileHandler:
 
     @staticmethod
     async def get_emoji_book() -> str:
-        emojis = ["📖", "📗", "📘", "📙", "📕", "📔", "📔"]
-        return random.choice(emojis)
+        return random.choice(["📖", "📗", "📘", "📙", "📕", "📔", "📔"])
 
     @staticmethod
     async def get_regex_from_name(title: str) -> str:
