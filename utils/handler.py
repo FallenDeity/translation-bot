@@ -597,7 +597,7 @@ class FileHandler:
             if i.get("property") == "og:image":
                 return urljoin(link, i.get("content", ""))
         for i in meta:
-            if i.get("property") == "twitter:image":
+            if i.get("property") == "twitter:image" or "image" in i.get("property"):
                 print(i.get("content"))
                 return urljoin(link, i.get("content", ""))
         return ""
