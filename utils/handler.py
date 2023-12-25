@@ -583,7 +583,7 @@ class FileHandler:
                         suffix in i or "/file" in i or midfix in i
                 ):
                     img = i
-                    if "images/logo.png" in img:
+                    if "images/logo.png" in img or "logo.png" in img:
                         continue
                     if "http" not in img:
                         img = urljoin(link, img)
