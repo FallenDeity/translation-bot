@@ -633,7 +633,7 @@ class FileHandler:
             category = Categories.from_string(f"{name}")
             if category == "Uncategorised" and not description == "":
                 category = Categories.from_string(f"{name} {description}")
-            if thumbnail.strip() == "":
+            if thumbnail is None or thumbnail.strip() == "":
                 thumbnail = Categories.thumbnail_from_category(category)
         except Exception as e:
             print("exception in  getting category")
