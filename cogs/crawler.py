@@ -871,6 +871,7 @@ class Crawler(commands.Cog):
             if description is None or description.strip() == "":
                 description = GoogleTranslator(source="auto", target="english").translate(
                     text[:500].strip().replace("\n\n", "\n"))
+                description = description.replace(f"{title}", "")
             download_url = await FileHandler().crawlnsend(ctx, self.bot, title, title_name, original_Language,
                                                           description, thumbnail, link=link, library=library)
         except Exception as e:
@@ -1238,6 +1239,7 @@ class Crawler(commands.Cog):
             print("error occured in getting thumbnail")
             print(traceback.format_exc())
             display_avatar = await Hints.get_avatar()
+        description = description.replace(f"{title}", "")
         embed = discord.Embed(title=str(f"{title_name[:240]}"), description=f"```yaml\n{description[:350]}```",
                               colour=discord.Colour.blurple())
         embed.set_thumbnail(url=display_avatar)
