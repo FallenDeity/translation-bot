@@ -992,6 +992,7 @@ class Crawler(commands.Cog):
             return await ctx.reply(
                 f"> Bot is scheduled to restart within 60 sec  or after all current tasks are completed.. Please try after bot is restarted")
         title_css = "title"
+        thumbnail = ""
         cloudscrape: bool = False
         if "m.45zw.com" in firstchplink:
             firstchplink = firstchplink.replace("m.45zw.com", "www.45zw.com")
@@ -1232,7 +1233,10 @@ class Crawler(commands.Cog):
                 display_avatar = await Hints.get_avatar()
             else:
                 display_avatar = thumbnail
-        except:
+        except Exception as e:
+            print(e)
+            print("error occured in getting thumbnail")
+            print(e.__traceback__)
             display_avatar = await Hints.get_avatar()
         embed = discord.Embed(title=str(f"{title_name[:240]}"), description=f"```yaml\n{description[:350]}```",
                               colour=discord.Colour.blurple())
