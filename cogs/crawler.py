@@ -1236,7 +1236,7 @@ class Crawler(commands.Cog):
         except Exception as e:
             print(e)
             print("error occured in getting thumbnail")
-            print(e.__traceback__)
+            print(traceback.format_exc())
             display_avatar = await Hints.get_avatar()
         embed = discord.Embed(title=str(f"{title_name[:240]}"), description=f"```yaml\n{description[:350]}```",
                               colour=discord.Colour.blurple())

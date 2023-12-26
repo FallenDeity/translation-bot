@@ -601,19 +601,20 @@ class FileHandler:
                         return img
         meta = soup.find_all("meta")
         for i in meta:
-            if i.get("property") == "og:image":
+            if i.get("property", None) == "og:image":
                 return urljoin(link, i.get("content", ""))
         for i in meta:
-            if i.get("property") == "twitter:image" or "image" in i.get("property"):
-                print(i.get("content"))
+            if i.get("property", None) == "twitter:image" or "image" in i.get("property", None):
                 return urljoin(link, i.get("content", ""))
         return ""
 
     async def get_og_image(self, soup: BeautifulSoup, link: str):
         meta = soup.find_all("meta")
         for i in meta:
-            if i.get("property") == "og:image" or "image" in i.get("property"):
-                print(i.get("content"))
+            print(i)
+            if i is None or i.get("property", None) is None:
+                continue
+            if i.get("property", None) == "og:image" or "image" in i.get("property", None):
                 return urljoin(link, i.get("content", ""))
         return await FileHandler().get_thumbnail(soup, link)
 
