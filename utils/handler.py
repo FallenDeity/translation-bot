@@ -335,8 +335,8 @@ class FileHandler:
             if description is not None and description.strip() != "":
                 return description
         for meta in soup.find_all("meta"):
-            if meta.get("name") in aliases:
-                description += meta.get("content")
+            if meta.get("name", "") in aliases:
+                description += meta.get("content", "")
         if description is None:
             description = ""
         return description
