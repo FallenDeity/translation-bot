@@ -629,7 +629,7 @@ class Categories(enum.Enum):
     )
     R18 = Category(
         name="R18",
-        tags=["sex", "horny", "incest", "busty", "r18", "fuck", "hynosis", "rape", "bitch"],
+        tags=["sex", "horny", "incest", "busty", "r18", "fuck", "hypnosis", "rape", "bitch"],
         thumbnails=[
             "https://cdn.discordapp.com/attachments/1055445441958916167/1055493803848519771/FB_IMG_1671010145233.jpg",
             "https://cdn.discordapp.com/attachments/1055445441958916167/1055669249311518812/small29"
