@@ -173,8 +173,6 @@ class FileHandler:
                     outstr.append(f"crawling {len(bot.crawler)}")
                     if len(bot.translator) != 0 or len(bot.crawler_next) != 0:
                         outstr.append(" ,")
-                    else:
-                        outstr.append(" novels")
                 if len(bot.crawler_next) != 0:
                     if len(bot.crawler) == 0:
                         outstr.append(f"crawling {len(bot.crawler_next)}")
@@ -182,31 +180,35 @@ class FileHandler:
                         outstr.append(f", {len(bot.crawler_next)}")
                     if len(bot.translator) != 0:
                         outstr.append(" ,")
-                    else:
-                        outstr.append(" novels")
+                outstr.append(" novels")
                 if len(bot.translator) != 0:
                     outstr.append(f"translating {len(bot.translator)} novels")
                 outstr.append("\n")
                 if len(bot.crawler) != 0:
                     outstr.append("Crawler : ")
-                    for keys, values in bot.crawler.items():
-                        user = bot.get_user(keys)
-                        user = user.name
-                        outstr.append(f"{user}:{values}, ")
+                    outstr.extend(
+                        [f"{bot.get_user(keys).name}:{values}, " for keys, values in bot.crawler.items()])
+                    # for keys, values in bot.crawler.items():
+                    #     user = bot.get_user(keys)
+                    #     user = user.name
+                    #     outstr.append(f"{user}:{values}, ")
                     outstr.append("\n")
                 if len(bot.crawler_next) != 0:
                     outstr.append("Crawlernext : ")
-                    for keys, values in bot.crawler_next.items():
-                        user = bot.get_user(keys)
-                        user = user.name
-                        outstr.append(f"{user}:{values}, ")
+                    outstr.extend(
+                        [f"{bot.get_user(keys).name}:{values}, " for keys, values in bot.crawler_next.items()])
+                    # for keys, values in bot.crawler_next.items():
+                    #     user = bot.get_user(keys)
+                    #     user = user.name
+                    #     outstr.append(f"{user}:{values}, ")
                     outstr.append("\n")
                 if len(bot.translator) != 0:
                     outstr.append("Translator : ")
-                    for keys, values in bot.translator.items():
-                        user = bot.get_user(keys)
-                        user = user.name
-                        outstr.append(f"{user}:{values}, ")
+                    outstr.extend([f"{bot.get_user(keys).name}:{values}, " for keys, values in bot.translator.items()])
+                    # for keys, values in bot.translator.items():
+                    #     user = bot.get_user(keys)
+                    #     user = user.name
+                    #     outstr.append(f"{user}:{values}, ")
                 output = "".join(outstr)
                 if len(output) >= 128:
                     output = output[:123] + "..."
