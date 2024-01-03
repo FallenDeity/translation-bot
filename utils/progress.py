@@ -1,6 +1,6 @@
 class Progress:
     images: [int, str] = {
-        0: 'https://cdn.discordapp.com/attachments/1004050326606852237/1188407613726146590/0.png?ex=659a69d6&is=6587f4d6&hm=d70af8ff32cd3482c9dcfd3b6d838f0b1940f936b0c87f255ecf7ce2714a7da8&',
+        0: 'https://cdn.discordapp.com/attachments/1004050326606852237/1188407620533506058/1.png?ex=659a69d8&is=6587f4d8&hm=9fb5697e67ec11fcce0d048a008516d8fd43dd78fff23ca631c37d34242e6e1b&',
         1: 'https://cdn.discordapp.com/attachments/1004050326606852237/1188407620533506058/1.png?ex=659a69d8&is=6587f4d8&hm=9fb5697e67ec11fcce0d048a008516d8fd43dd78fff23ca631c37d34242e6e1b&',
         2: 'https://cdn.discordapp.com/attachments/1004050326606852237/1188407623549206549/2.png?ex=659a69d9&is=6587f4d9&hm=9587517f3e2110da07c84a8a90c50b86d9d50574425d01dc84ad9ae5a8b5c8dd&',
         3: 'https://cdn.discordapp.com/attachments/1004050326606852237/1188407630843088896/3.png?ex=659a69da&is=6587f4da&hm=22d2a509cf134b0e1561ff4ab8892f476307d09766938d9222e0aa69803fbcb1&',
