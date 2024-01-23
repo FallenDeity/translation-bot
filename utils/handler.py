@@ -18,7 +18,7 @@ import parsel
 from PyDictionary import PyDictionary
 from deep_translator import single_detection
 from discord.ext import commands
-from epub2txt import epub2txt
+# from epub2txt import epub2txt
 from readabilipy import simple_json_from_html_string
 from textblob import TextBlob
 from bs4 import BeautifulSoup
@@ -474,16 +474,17 @@ class FileHandler:
     @staticmethod
     async def epub_to_txt(ctx: commands.Context):
         msg = await ctx.reply("> **Epub file detected please wait till we finish converting to .txt")
-        try:
-            filepath = f"{ctx.author.id}.epub"
-            res = epub2txt(filepath)
-            with open(f"{ctx.author.id}.txt", "w", encoding="utf-8") as f:
-                f.write(res)
-            await msg.delete()
-            os.remove(f"{ctx.author.id}.epub")
-        except Exception as e:
-            await ctx.reply("> Epub to txt conversion failed")
-            raise e
+        raise Exception("Failed to convert epub")
+        # try:
+        #     filepath = f"{ctx.author.id}.epub"
+        #     res = epub2txt(filepath)
+        #     with open(f"{ctx.author.id}.txt", "w", encoding="utf-8") as f:
+        #         f.write(res)
+        #     await msg.delete()
+        #     os.remove(f"{ctx.author.id}.epub")
+        # except Exception as e:
+        #     await ctx.reply("> Epub to txt conversion failed")
+        #     raise e
 
     @staticmethod
     async def pdf_to_txt(ctx: commands.Context):
