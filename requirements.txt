@@ -24,7 +24,7 @@ aiohttp~=3.8.3
 nltk~=3.8.1
 docx~=0.2.4
 epub2txt~=0.1.6
-EbookLib~=0.18
+EbookLib
 pypdf~=3.17.0
 undetected-chromedriver>=3.5.4
 selenium==4.15.2
