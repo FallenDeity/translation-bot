@@ -1097,7 +1097,7 @@ class Crawler(commands.Cog):
         if "readwn" in firstchplink or "wuxiax.co" in firstchplink or "novelmt.com" in firstchplink or "fannovels.com" in firstchplink or "novelmtl.com" in firstchplink or "booktoki216.com" in firstchplink or "69shu" in firstchplink or "wuxiap.com" in firstchplink or "www.wuxiau.com" in firstchplink \
                 or "wuxiabee" in firstchplink or "biquzw789" in firstchplink or "novel543" in firstchplink:
             waittime = 1.0
-        if "69shu" in firstchplink or "biquzw789" in firstchplink:
+        if "69shu" in firstchplink or "biquzw789" in firstchplink or "69xinshu.com" in firstchplink:
             waittime = 3
         if nextselector is not None:
             sel_tag = True
@@ -1148,7 +1148,7 @@ class Crawler(commands.Cog):
         chp_count = 1
         scraper = None
         # print(title)
-        if "69shu" in firstchplink:
+        if "69shu" in firstchplink or "69xinshu.com" in firstchplink:
             title = title.split("-")[0]
         current_link = firstchplink
         full_text = "Source : " + firstchplink + '\n\n'

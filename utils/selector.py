@@ -224,6 +224,7 @@ class CssSelector:
             "www.szhhlt.com": ["None", "body > div.container > header > h1 > label > a"],
             "69shu": ["None", "title"],
             "www.69shuba.com": ["None", "title"],
+            "69xinshu.com": ["None", "title"],
             "novelbin.net": ["None", "#chapter > div > div > a"],
             "1stkissnovel.org": ["None", "#chapter-heading"],
             "sangtacviet.vip": ["None", "title"],
