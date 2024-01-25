@@ -1422,7 +1422,7 @@ class Crawler(commands.Cog):
                   "marvel",
                   "dc",
                   "xianxia",
-              ] + list(map(str, range(1, 8)))
+              ]
         return [app_commands.Choice(name=i, value=i) for i in lst]
 
 
