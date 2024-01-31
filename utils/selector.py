@@ -21,6 +21,7 @@ class CssSelector:
                 "sjks": ".content p::text",
                 "txt520": "h1 ::text",
                 "69shu": ".txtnav ::text",
+                "69xinshu": ".txtnav ::text",
                 "ptwxz": "* ::text",
                 "shu05": "#htmlContent ::text",
                 "readwn": ".chapter-content ::text",
