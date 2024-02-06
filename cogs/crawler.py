@@ -185,7 +185,15 @@ class Crawler(commands.Cog):
         for _i in range(1, 5):
             try:
                 if driver is not None:
-                    driver.get(links)
+                    try:
+                        driver.get(links)
+                    except:
+                        try:
+                            driver.close()
+                        except:
+                            pass
+                        driver = get_driver()
+                        driver.get(links)
                     soup = BeautifulSoup(driver.page_source, "html.parser")
                 elif scraper is not None:
                     response = await self.bot.loop.run_in_executor(None, self.scrape, scraper, links)
@@ -1060,6 +1068,7 @@ class Crawler(commands.Cog):
 
         if not headless:
             if str(response.status_code).startswith('4'):
+                headless = True
                 await ctx.send("> **Headless browser is turned on.. please be patient**")
                 driver = await self.bot.loop.run_in_executor(None, get_driver)
                 driver.get(firstchplink)
@@ -1199,6 +1208,11 @@ class Crawler(commands.Cog):
         crawled_urls = []
         repeats = 0
         no_tries = 0
+        if self.bot.chrome == 1:
+            return await ctx.reply("> Headless browser chrome is already used by bot. please wait some time")
+        if headless:
+            self.bot.chrome = 1
+
         while (len(self.bot.crawler) + len(self.bot.translator)) >= 2 and len(self.bot.crawler_next) >= 2:
             no_tries = no_tries + 3
             try:
@@ -1292,7 +1306,7 @@ class Crawler(commands.Cog):
                         print(e)
                         return await ctx.send(f"Error occurred in crawling \n Error occurred at {current_link}")
                     else:
-                        asyncio.sleep(5)
+                        await asyncio.sleep(5)
                         print("error occured at " + current_link + str(e))
                         break
 
@@ -1329,8 +1343,20 @@ class Crawler(commands.Cog):
                         full_text = full_text + f"\n\n for more novels ({random.randint(1000, 200000)}) join: https://discord.gg/SZxTKASsHq\n"
                         await asyncio.sleep(2.5 * waittime)
                     if i % 50 == 0:
+                        if headless:
+                            try:
+                                driver.close()
+                            except:
+                                pass
+                            driver = await self.bot.loop.run_in_executor(None, get_driver)
                         await asyncio.sleep(4.5 * waittime)
                 elif random.randint(0, 50) == 10 or chp_count % 100 == 0:
+                    if headless:
+                        try:
+                            driver.close()
+                        except:
+                            pass
+                        driver = await self.bot.loop.run_in_executor(None, get_driver)
                     await asyncio.sleep(1)
                     full_text = full_text + f"\n\n for more novels ({random.randint(1000, 200000)}) join: https://discord.gg/SZxTKASsHq\n"
 
@@ -1382,6 +1408,8 @@ class Crawler(commands.Cog):
             await ctx.send("> Error occurred .Please report to admin +\n" + str(e))
             raise e
         finally:
+            if self.bot.chrome == 1:
+                self.bot.chrome = 0
             if driver is not None:
                 try:
                     driver.close()
