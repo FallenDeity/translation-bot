@@ -119,7 +119,8 @@ class CssSelector:
                 "www.xmrdy.com": "#TextContent ::text",
                 "m.98bxwx.com/": "#chapter > div.content ::text",
                 "www.novel543.com": "#chapterWarp > div.chapter-content.px-3 > div ::text",
-                "www.tingxs.net": "p ::text"
+                "www.tingxs.net": "p ::text",
+                "freewebnovel.com": "div.txt ::text"
             }
             for domain, css_selector in domain_mappings.items():
                 if domain in link:
