@@ -36,6 +36,7 @@ class Raizel(commands.Bot):
         self.translator: t.Dict[int, str] = {}
         self.crawler: t.Dict[int, str] = {}
         self.crawler_next: t.Dict[int, str] = {}
+        self.chrome = 0
         self.translator_tasks: t.Dict[int, Task] = {}
         self.crawler_tasks: t.Dict[int, Task] = {}
         self.languages = choices
