@@ -119,6 +119,7 @@ class CssSelector:
                 "www.xmrdy.com": "#TextContent ::text",
                 "m.98bxwx.com/": "#chapter > div.content ::text",
                 "www.novel543.com": "#chapterWarp > div.chapter-content.px-3 > div ::text",
+                "www.tingxs.net": "p ::text"
             }
             for domain, css_selector in domain_mappings.items():
                 if domain in link:
@@ -176,7 +177,8 @@ class CssSelector:
             "www.piaotia.com": ["#tl > a:nth-child(3)", "#content > h1 ::text"],
             "www.xmrdy.com": [".d_title > h1", "h1 ::text"],
             "m.98bxwx.com/": ["#read > div.main > div.detail > p.name > strong", "#chapter > h1 ::text"],
-            "www.novel543.com": ["h1", "#chapterWarp > div.chapter-content.px-3 > h1"]
+            "www.novel543.com": ["h1", "#chapterWarp > div.chapter-content.px-3 > h1"],
+            "www.tingxs.net": ["h1", "body > div.wp.mt10.ov > div.info_dv1.ov > h2 > font > font"],
         }
         for domain, ret_array in domain_mappings.items():
             if domain in link:
@@ -250,6 +252,7 @@ class CssSelector:
             "www.novel543.com": ["None", "#chapterWarp > div.header.px-3 > ul > li:nth-child(3) > a"],
             "m.biquzw789.net": ["#nextpage",  "#novelbody > div.head > div.nav_name > h2"],
             "www.biquzw789.net": ["None", "#wrapper > div.content_read > div > div.con_top > a:nth-child(7)"],
+            "www.tingxs.net": ["None", "body > div.wp.mt10.ov > div.info_dv1.ov > div.title > a:nth-child(3) > font"],
             # "www.novelcool.com": ["None",  "div.chapter-reading-section-list > div > div > h2"],
             # "m.bqg789.net": ["#nextpage", "#novelbody > div.head > div.nav_name > h1"],
         }
