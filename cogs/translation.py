@@ -124,6 +124,12 @@ class Translate(commands.Cog):
                 link = novel_data["download"]
             except:
                 return await ctx.reply("send a valid id")
+        if link in self.bot.all_langs:
+            language = link
+            link = None
+        if messageid in self.bot.all_langs:
+            language = messageid
+            messageid = None
         if self.bot.app_status == "restart":
             return await ctx.reply(
                 f"> Bot is scheduled to restart within 60 sec or after all current tasks are completed.. Please try after bot is restarted")
