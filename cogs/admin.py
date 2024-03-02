@@ -280,7 +280,7 @@ class Admin(commands.Cog):
             except Exception as e:
                 await channel.send("git update failed")
                 await channel.send(e.with_traceback().__str__()[:1900])
-        if random.randint(0, 20) > 12 or server is True:
+        if random.randint(0, 15) < 12 or server is True:
             try:
                 await channel.send("Server restarted")
                 subprocess.call(['sh', '/home/ubuntu/translation-bot/scripts/server-restart.sh'])
