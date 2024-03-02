@@ -653,45 +653,7 @@ class FileHandler:
         embed.set_thumbnail(url=thumbnail)
         embed.set_footer(text=f"Uploaded by {ctx.author}", icon_url=ctx.author.display_avatar)
         size = os.path.getsize(f"{ctx.author.id}.txt")
-        if (size := os.path.getsize(f"{ctx.author.id}.txt")) >0:
-            try:
-                await ctx.send(
-                    "We are uploading to Mega.. Please wait",
-                    delete_after=5,
-                )
-                embed.add_field(name="size", value=f"{round(size / (1024 ** 2), 2)} MB")
-                # filename = f"{random.choice(string.ascii_letters)}{random.choice(string.digits)}{str(
-                # ctx.author.id)}_" \ f"trans{random.choice(string.ascii_letters)}{random.randint(100,1000)}.txt"
-                file = await bot.loop.run_in_executor(None, bot.mega.upload, f"{ctx.author.id}.txt", None,
-                                                      f"{name[:100]}.txt")
-                filelnk = await bot.loop.run_in_executor(None, bot.mega.get_upload_link, file)
-                view = LinkView({"Novel": [filelnk, await self.get_emoji_book()]})
-                if original_language.lower() == "korean":
-                    channel = bot.get_channel(
-                        1086592167767711794
-                    ) or await bot.fetch_channel(1086592167767711794)
-                elif language.lower() == "english":
-                    channel = bot.get_channel(
-                        1086593341740818523
-                    ) or await bot.fetch_channel(1086593341740818523)
-                else:
-                    channel = bot.get_channel(
-                        1086593341740818523
-                    ) or await bot.fetch_channel(1086593341740818523)
-                await channel.send(
-                    embed=embed, view=view, allowed_mentions=discord.AllowedMentions(users=False)
-                )
-                download_url = filelnk
-            except Exception as e:
-                print(e)
-                await ctx.reply(
-                    "**Sorry your file was too big and mega seems down now. ping developers in support server to resolve the issue.. please split it and try again.**"
-                )
-            try:
-                os.remove(f"{ctx.author.id}.txt")
-            except:
-                pass
-        else:
+        if size < 25 * 10 ** 6:
             if original_language.lower() == "korean" and language.lower() == "english":
                 channel = bot.get_channel(
                     1086592167767711794
@@ -708,11 +670,50 @@ class FileHandler:
                 embed=embed, file=discord.File(f"{ctx.author.id}.txt", f"{name}.txt"),
                 allowed_mentions=discord.AllowedMentions(users=False)
             )
+        if size >0:
+            try:
+                await ctx.send(
+                    "We are uploading to Mega.. Please wait",
+                    delete_after=5,
+                )
+                embed.add_field(name="size", value=f"{round(size / (1024 ** 2), 2)} MB")
+                # filename = f"{random.choice(string.ascii_letters)}{random.choice(string.digits)}{str(
+                # ctx.author.id)}_" \ f"trans{random.choice(string.ascii_letters)}{random.randint(100,1000)}.txt"
+                file = await bot.loop.run_in_executor(None, bot.mega.upload, f"{ctx.author.id}.txt", None,
+                                                      f"{name[:100]}.txt")
+                filelnk = await bot.loop.run_in_executor(None, bot.mega.get_upload_link, file)
+                if size >= 25 * 10 ** 6:
+                    view = LinkView({"Novel": [filelnk, await self.get_emoji_book()]})
+                    if original_language.lower() == "korean":
+                        channel = bot.get_channel(
+                            1086592167767711794
+                        ) or await bot.fetch_channel(1086592167767711794)
+                    elif language.lower() == "english":
+                        channel = bot.get_channel(
+                            1086593341740818523
+                        ) or await bot.fetch_channel(1086593341740818523)
+                    else:
+                        channel = bot.get_channel(
+                            1086593341740818523
+                        ) or await bot.fetch_channel(1086593341740818523)
+                    await channel.send(
+                        embed=embed, view=view, allowed_mentions=discord.AllowedMentions(users=False)
+                    )
+                download_url = filelnk
+            except Exception as e:
+                print(e)
+                await ctx.reply(
+                    "**Sorry your file was too big and mega seems down now. ping developers in support server to resolve the issue.. please split it and try again.**"
+                )
             try:
                 os.remove(f"{ctx.author.id}.txt")
             except:
                 pass
-            download_url = msg.attachments[0].url
+
+        try:
+            os.remove(f"{ctx.author.id}.txt")
+        except:
+                pass
         bot.translation_count = bot.translation_count + (round(size / (1024 ** 2), 2) / 3.1)
         if raw_name is not None:
             name = name + "__" + raw_name
@@ -813,9 +814,21 @@ class FileHandler:
             channel_id = 1086593341740818523
         else:
             channel_id = 1086592655238103061
-        if (size := os.path.getsize(f"{ctx.author.id}_cr.txt")) > 0:
+
+        if (size := os.path.getsize(f"{ctx.author.id}_cr.txt")) < 25 * 10 ** 6:
+            channel = bot.get_channel(
+                channel_id
+            ) or await bot.fetch_channel(channel_id)
+
+            msg = await channel.send(
+                embed=embed,
+                file=discord.File(f"{ctx.author.id}_cr.txt", f"{title}.txt"),
+                allowed_mentions=discord.AllowedMentions(users=False)
+            )
+            download_url = msg.attachments[0].url
+        if size > 0:
             bot.crawler_count = bot.crawler_count + 1
-            # if size > 35 * 10 ** 6:
+            # if size :
             #     os.remove(f"{ctx.author.id}_cr.txt")
             #     bot.crawler_count = bot.crawler_count + 1
             #     return await ctx.send('Crawled file is too big. there is some problem in crawler')
@@ -828,16 +841,21 @@ class FileHandler:
                     "We are uploading to Mega.. Please wait",
                     delete_after=5,
                 )
+                try:
+                    os.remove(f"{ctx.author.id}_cr.txt")
+                except:
+                    pass
                 embed.add_field(name="size", value=f"{round(size / (1024 ** 2), 2)} MB")
                 filelnk = await bot.loop.run_in_executor(None, bot.mega.get_upload_link, file)
-                view = LinkView({"Novel": [filelnk, await self.get_emoji_book()]})
-                channel = bot.get_channel(
-                    channel_id
-                ) or await bot.fetch_channel(channel_id)
-                await channel.send(
-                    embed=embed,
-                    view=view, allowed_mentions=discord.AllowedMentions(users=False)
-                )
+                if size >= 25 * 10 ** 6:
+                    view = LinkView({"Novel": [filelnk, await self.get_emoji_book()]})
+                    channel = bot.get_channel(
+                        channel_id
+                    ) or await bot.fetch_channel(channel_id)
+                    await channel.send(
+                        embed=embed,
+                        view=view, allowed_mentions=discord.AllowedMentions(users=False)
+                    )
                 download_url = filelnk
             except Exception as e:
                 print(e)
@@ -847,21 +865,7 @@ class FileHandler:
                 os.remove(f"{ctx.author.id}_cr.txt")
             except:
                 pass
-        else:
-            channel = bot.get_channel(
-                channel_id
-            ) or await bot.fetch_channel(channel_id)
 
-            msg = await channel.send(
-                embed=embed,
-                file=discord.File(f"{ctx.author.id}_cr.txt", f"{title}.txt"),
-                allowed_mentions=discord.AllowedMentions(users=False)
-            )
-            download_url = msg.attachments[0].url
-            try:
-                os.remove(f"{ctx.author.id}_cr.txt")
-            except:
-                pass
         if library is not None:
             data = await bot.mongo.library.get_novel_by_id(library)
             if size + 1000 < data['size']:
