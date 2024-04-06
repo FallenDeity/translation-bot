@@ -670,6 +670,7 @@ class FileHandler:
                 embed=embed, file=discord.File(f"{ctx.author.id}.txt", f"{name}.txt"),
                 allowed_mentions=discord.AllowedMentions(users=False)
             )
+            download_url = msg.attachments[0].url
         if size >0:
             try:
                 await ctx.send(
@@ -703,7 +704,7 @@ class FileHandler:
             except Exception as e:
                 print(e)
                 await ctx.reply(
-                    "**Sorry your file was too big and mega seems down now. ping developers in support server to resolve the issue.. please split it and try again.**"
+                    "**Sorry your file was too big and mega seems down now. ping developers in support server to resolve the issue.. please split it and try again.**" + e[:1000] + ""
                 )
             try:
                 os.remove(f"{ctx.author.id}.txt")
@@ -860,7 +861,7 @@ class FileHandler:
             except Exception as e:
                 print(e)
                 await ctx.reply(
-                    "> **❌Sorry the file is too big to send and mega seems down now. ping developers in support server to resolve the issue..**")
+                    "> **❌Sorry the file is too big to send and mega seems down now. ping developers in support server to resolve the issue..**"+ e[:1000] + "")
             try:
                 os.remove(f"{ctx.author.id}_cr.txt")
             except:
