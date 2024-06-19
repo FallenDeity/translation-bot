@@ -477,7 +477,6 @@ class Admin(commands.Cog):
     @commands.has_role(1020638168237740042)
     @commands.hybrid_command(help="ban user.. Admin only command")
     async def getlog(self, ctx: commands.Context, file: bool = False, no: int = 1000):
-        last_bytes = None
         async with aiofiles.open(f"{self.bot.log_path}", "r", encoding="utf-8") as f:
             full = await f.read()
             last_bytes = full[:no]
@@ -486,7 +485,7 @@ class Admin(commands.Cog):
                 embed=discord.Embed(title=f"logs", description=last_bytes, colour=discord.Colour.random()), file=discord.File(f"{self.bot.log_path}"),
             )
         else:
-            return await ctx.send(f"```yaml\n{last_bytes.decode(encoding='utf-8',errors='ignore')}\n```")
+            return await ctx.send(f"```yaml\n{last_bytes}\n```")
 
 
 
