@@ -1,11 +1,13 @@
 import asyncio
 import datetime
 import gc
+import logging
 import os
 import pickle
 import random
 import traceback
 from asyncio import Task
+from logging.handlers import RotatingFileHandler
 
 import joblib
 import typing as t
@@ -32,6 +34,7 @@ class Raizel(commands.Bot):
     def __init__(self) -> None:
         self.blocked = None
         self.mega: Mega = None
+        self.logger = None
         intents = discord.Intents.all()
         self.translator: t.Dict[int, str] = {}
         self.crawler: t.Dict[int, str] = {}
@@ -76,14 +79,16 @@ class Raizel(commands.Bot):
             print(traceback.print_exc())
             print("cogs already loaded")
         self.allowed = sites
+        self.logger = self.setup_logging()
         self.con = aiohttp.ClientSession()
         self.mongo = Mongo()
-        print("Connected to mongo db")
+        self.logger.info("Connected to mongo db")
         channel = await self.fetch_channel(991911644831678484)
         await channel.send(embed=discord.Embed(description=f"Bot is up now"))
         txt_channel = await self.fetch_channel(984664133570031666)
         await txt_channel.send(embed=discord.Embed(description=f"Bot is up now"))
         asyncio.create_task(self.startup(channel=channel))
+        self.logger.info("Bot is up now")
         return await super().setup_hook()
 
     async def startup(self, channel):
@@ -164,6 +169,13 @@ class Raizel(commands.Bot):
         except Exception as e:
             print("error loading titles")
             print(e)
+
+    def setup_logging(self):
+        logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)-8s %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
+        _logger = logging.getLogger(__name__)
+        loghandler = RotatingFileHandler(filename="logs/bot.log", maxBytes=20 * 1024 * 1024, backupCount=2)
+        _logger.addHandler(loghandler)
+        return _logger
 
     async def start(self) -> None:
         try:
