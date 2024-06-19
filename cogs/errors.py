@@ -36,6 +36,7 @@ class ErrorHandler(commands.Cog):
 
     @commands.Cog.listener()
     async def on_command_error(self, ctx: commands.Context, error: Exception):
+        self.bot.logger.info(f"Error Occurred in command for user {ctx.author.name} with error {error} {error.__traceback__}.")
         if isinstance(error, commands.CommandNotFound):
             return
         elif isinstance(error, commands.MissingRequiredArgument):

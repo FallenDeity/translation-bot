@@ -2,6 +2,7 @@ import asyncio
 import os
 
 import discord
+from discord.ext import commands
 from discord.ext import tasks
 
 from cogs.admin import Admin
@@ -10,7 +11,7 @@ from utils.handler import FileHandler as handler
 from core.bot import Raizel
 
 bot = Raizel()
- 
+
 
 @tasks.loop(minutes=10)
 async def census():
@@ -37,6 +38,12 @@ async def on_ready():
     await bot.tree.sync()
     census.start()
     # bot.auto_restart.start()
+
+
+@bot.event
+async def on_command(ctx: commands.Context):
+    bot.logger.info(
+        f"Command {ctx.command if ctx.command else 'Unknown Command'} called by {ctx.author} in {ctx.channel} with args {ctx.args} and kargs {ctx.kwargs}")
 
 
 async def main():

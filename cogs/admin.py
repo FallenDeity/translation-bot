@@ -33,6 +33,7 @@ class Admin(commands.Cog):
     @commands.has_role(1020638168237740042)
     @commands.hybrid_command(help="update source code in next restart")
     async def update(self, ctx: commands.Context):
+        self.bot.logger.info("Called Update admin function")
         await ctx.defer()
         self.bot.update = True
         await ctx.send(content=f"> Bots source code will be updated in next restart. ")
@@ -43,6 +44,7 @@ class Admin(commands.Cog):
     async def ban(self, ctx: commands.Context, id: str,
                   reason: str = "continuous use of improper names in novel name translation"):
         await ctx.defer()
+
         if '#' in id:
             name_spl = id.split('#')
             name = name_spl[0]
@@ -57,6 +59,7 @@ class Admin(commands.Cog):
         ]
         user = User(*user_data)
         m_user = self.bot.get_user(id)
+        self.bot.logger.info("banning user with id " + id.__str__() + "name : " + m_user.mention.__str__())
         await self.bot.mongo.blocker.ban(user)
         self.bot.blocked = await self.bot.mongo.blocker.get_all_banned_users()
         try:
@@ -125,6 +128,7 @@ class Admin(commands.Cog):
         channel = self.bot.get_channel(
             991911644831678484
         ) or await self.bot.fetch_channel(991911644831678484)
+        self.bot.logger.info("banning user with id " + id.__str__() + "user :" + user.name)
         try:
             return await channel.send(embed=discord.Embed(
                 description=f"User {user.name} has been unbanned by {ctx.author.name}",
@@ -196,6 +200,7 @@ class Admin(commands.Cog):
             type=discord.ActivityType.unknown, name="Restarting bot"), status=discord.Status.do_not_disturb)
         msg = await ctx.send("Please wait")
         self.bot.app_status = "restart"
+        self.bot.logger.info(f"bot restarted by user : {ctx.author.name}")
         no_of_times = 0
         txt_channel = await self.bot.fetch_channel(984664133570031666)
         channel = self.bot.get_channel(
@@ -418,6 +423,7 @@ class Admin(commands.Cog):
         if password is None:
             password = megastore["password"]
         megastore = {"user": username, "password": password}
+        self.bot.logger.info(f"Mega password updated by user {ctx.author.name}")
         with open(os.getenv("MEGA"), 'wb') as f:
             pickle.dump(megastore, f)
         try:
