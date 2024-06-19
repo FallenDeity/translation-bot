@@ -175,9 +175,13 @@ class Raizel(commands.Bot):
         base_dir = os.path.dirname(os.path.abspath(__file__))
         self.log_path = os.path.join(base_dir, 'logs', 'bot.txt')
         os.makedirs(os.path.dirname(self.log_path), exist_ok=True)
-        logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)-8s %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
+        formatter = logging.Formatter('%(asctime)s %(levelname)-8s %(message)s')
+        logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)-8s %(message)s',
+                            datefmt='%Y-%m-%d %H:%M:%S')
         _logger = logging.getLogger(__name__)
-        loghandler = RotatingFileHandler(encoding="utf-8" ,filename=self.log_path, maxBytes=20 * 1024 * 1024, backupCount=2)
+        loghandler = RotatingFileHandler(encoding="utf-8", filename=self.log_path, maxBytes=20 * 1024 * 1024,
+                                         backupCount=2 )
+        loghandler.setFormatter(formatter)
         _logger.addHandler(loghandler)
         return _logger
 
@@ -217,75 +221,74 @@ class Raizel(commands.Bot):
         langs = list(self.languages.keys()) + list(self.languages.values())
         return langs
 
-
     # @tasks.loop(hours=2)
     # async def auto_restart(self):
     #     # if self.auto_restart.current_loop == 0:
     #         asyncio.create_task(self.load_title())
-        # i = 0
-        # if self.auto_restart.current_loop != 0:
-        #     await self.change_presence(
-        #         activity=discord.Activity(
-        #             type=discord.ActivityType.watching,
-        #             name="for Restart. Please don't start any other tasks till I turn idle",
-        #         ),
-        #         status=discord.Status.do_not_disturb,
-        #     )
-        #     self.app_status = "restart"
-        #     self.translator = {}
-        #     self.crawler = {}
-        #     await asyncio.sleep(50)
-        #     while True:
-        #         print("Started restart")
-        #         if (not self.crawler.items() and not self.translator.items()) or i == 20:
-        #             print("restart " + str(datetime.datetime.now()))
-        #             try:
-        #                 for x in os.listdir():
-        #                     if x.endswith("txt") and "requirements" not in x:
-        #                         print(f"deleting {x}")
-        #                         os.remove(x)
-        #                     if "titles.sav" in x:
-        #                         os.remove(x)
-        #             except Exception as e:
-        #                 print("exception occurred  in deleting")
-        #                 await channel.send(f"error occurred in deleting {x} {e}")
-        #             channel = self.get_channel(
-        #                 991911644831678484
-        #             ) or await self.bot.fetch_channel(991911644831678484)
-        #             try:
-        #                 await channel.send(embed=discord.Embed(
-        #                     description=f"Bot has been auto-restarted. \nBot has "
-        #                                 f"translated {str(int(self.translation_count*3.1))}MB novels and"
-        #                                 f" crawled {str(self.crawler_count)} novels"
-        #                     , colour=discord.Colour.brand_green()))
-        #                 del self.titles
-        #                 gc.collect()
-        #             except:
-        #                 pass
-        #             try:
-        #                 await self.close()
-        #                 raise Exception
-        #                 # new_ch = self.get_channel(
-        #                 #     991911644831678484
-        #                 # ) or await self.bot.fetch_channel(991911644831678484)
-        #                 # msg_new = await new_ch.fetch_message(1050579735840817202)
-        #                 # context_new = await self.bot.get_context(msg_new)
-        #                 # command = await self.get_command("restart").callback(Admin(self), context_new)
-        #             except Exception as e:
-        #                 await self.close()
-        #                 raise Exception("closed session")
-        #                 print("error occurred at restarting")
-        #                 print(e)
-        #             break
-        #         else:
-        #             i = i + 1
-        #             print("there are tasks waiting....")
-        #             channel = self.get_channel(
-        #                 991911644831678484
-        #             ) or await self.bot.fetch_channel(991911644831678484)
-        #             await channel.send(embed=discord.Embed(
-        #                 description="Task is already running.. waiting for it to finish for restart",
-        #                 colour=discord.Colour.random()))
-        #             self.bot.translator = {}
-        #             self.bot.crawler = {}
-        #             await asyncio.sleep(60)
+    # i = 0
+    # if self.auto_restart.current_loop != 0:
+    #     await self.change_presence(
+    #         activity=discord.Activity(
+    #             type=discord.ActivityType.watching,
+    #             name="for Restart. Please don't start any other tasks till I turn idle",
+    #         ),
+    #         status=discord.Status.do_not_disturb,
+    #     )
+    #     self.app_status = "restart"
+    #     self.translator = {}
+    #     self.crawler = {}
+    #     await asyncio.sleep(50)
+    #     while True:
+    #         print("Started restart")
+    #         if (not self.crawler.items() and not self.translator.items()) or i == 20:
+    #             print("restart " + str(datetime.datetime.now()))
+    #             try:
+    #                 for x in os.listdir():
+    #                     if x.endswith("txt") and "requirements" not in x:
+    #                         print(f"deleting {x}")
+    #                         os.remove(x)
+    #                     if "titles.sav" in x:
+    #                         os.remove(x)
+    #             except Exception as e:
+    #                 print("exception occurred  in deleting")
+    #                 await channel.send(f"error occurred in deleting {x} {e}")
+    #             channel = self.get_channel(
+    #                 991911644831678484
+    #             ) or await self.bot.fetch_channel(991911644831678484)
+    #             try:
+    #                 await channel.send(embed=discord.Embed(
+    #                     description=f"Bot has been auto-restarted. \nBot has "
+    #                                 f"translated {str(int(self.translation_count*3.1))}MB novels and"
+    #                                 f" crawled {str(self.crawler_count)} novels"
+    #                     , colour=discord.Colour.brand_green()))
+    #                 del self.titles
+    #                 gc.collect()
+    #             except:
+    #                 pass
+    #             try:
+    #                 await self.close()
+    #                 raise Exception
+    #                 # new_ch = self.get_channel(
+    #                 #     991911644831678484
+    #                 # ) or await self.bot.fetch_channel(991911644831678484)
+    #                 # msg_new = await new_ch.fetch_message(1050579735840817202)
+    #                 # context_new = await self.bot.get_context(msg_new)
+    #                 # command = await self.get_command("restart").callback(Admin(self), context_new)
+    #             except Exception as e:
+    #                 await self.close()
+    #                 raise Exception("closed session")
+    #                 print("error occurred at restarting")
+    #                 print(e)
+    #             break
+    #         else:
+    #             i = i + 1
+    #             print("there are tasks waiting....")
+    #             channel = self.get_channel(
+    #                 991911644831678484
+    #             ) or await self.bot.fetch_channel(991911644831678484)
+    #             await channel.send(embed=discord.Embed(
+    #                 description="Task is already running.. waiting for it to finish for restart",
+    #                 colour=discord.Colour.random()))
+    #             self.bot.translator = {}
+    #             self.bot.crawler = {}
+    #             await asyncio.sleep(60)
