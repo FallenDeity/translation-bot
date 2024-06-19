@@ -479,12 +479,12 @@ class Admin(commands.Cog):
     async def getlog(self, ctx: commands.Context, file: bool = False, no: int = 1000):
         if file:
             return await ctx.send(
-                content="Here is your log", file=discord.File(f"{self.bot.log_path}", "Discord_bot.log"),
+                content="Here is your log", file=discord.File(f"{self.bot.log_path}"),
             )
         else:
-            async with aiofiles.open(f"{self.bot.log_path}", "rb") as f:
-                await f.seek(-no, os.SEEK_END)
-                last_bytes = await f.read(no)
+            async with aiofiles.open(f"{self.bot.log_path}", "rb", encoding="utf-8") as f:
+                full = await f.read()
+                last_bytes = full[:no]
                 return await ctx.send(f"```yaml\n{last_bytes.decode(encoding='utf-8',errors='ignore')}\n```")
 
 

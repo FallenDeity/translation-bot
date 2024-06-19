@@ -173,7 +173,7 @@ class Raizel(commands.Bot):
 
     def setup_logging(self):
         base_dir = os.path.dirname(os.path.abspath(__file__))
-        self.log_path = os.path.join(base_dir, 'logs', 'bot.log')
+        self.log_path = os.path.join(base_dir, 'logs', 'bot.txt')
         os.makedirs(os.path.dirname(self.log_path), exist_ok=True)
         logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)-8s %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
         _logger = logging.getLogger(__name__)
