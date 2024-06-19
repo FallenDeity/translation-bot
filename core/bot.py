@@ -32,6 +32,7 @@ class Raizel(commands.Bot):
     mongo: Mongo
 
     def __init__(self) -> None:
+        self.log_path = None
         self.blocked = None
         self.mega: Mega = None
         self.logger = None
@@ -171,9 +172,12 @@ class Raizel(commands.Bot):
             print(e)
 
     def setup_logging(self):
+        base_dir = os.path.dirname(os.path.abspath(__file__))
+        self.log_path = os.path.join(base_dir, 'logs', 'bot.log')
+        os.makedirs(os.path.dirname(self.log_path), exist_ok=True)
         logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)-8s %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
         _logger = logging.getLogger(__name__)
-        loghandler = RotatingFileHandler(filename="logs/bot.log", maxBytes=20 * 1024 * 1024, backupCount=2)
+        loghandler = RotatingFileHandler(encoding="utf-8" ,filename=self.log_path, maxBytes=20 * 1024 * 1024, backupCount=2)
         _logger.addHandler(loghandler)
         return _logger
 

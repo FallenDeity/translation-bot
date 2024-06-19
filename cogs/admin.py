@@ -9,6 +9,7 @@ import socket
 import subprocess
 import sys
 
+import aiofiles
 import discord
 from discord.ext import commands
 from mega import Mega
@@ -472,6 +473,19 @@ class Admin(commands.Cog):
             pic_dict[i] = msg.attachments[0].url
         print(pic_dict)
         # return await ctx.send(pic_dict)
+
+    @commands.has_role(1020638168237740042)
+    @commands.hybrid_command(help="ban user.. Admin only command")
+    async def getlog(self, ctx: commands.Context, file: bool = False, no: int = 1000):
+        if file:
+            return await ctx.send(
+                content="Here is your log", file=discord.File(f"{self.bot.log_path}", "Discord_bot.log"),
+            )
+        else:
+            async with aiofiles.open(f"{self.bot.log_path}", "rb") as f:
+                await f.seek(-no, os.SEEK_END)
+                last_bytes = await f.read(no)
+                return await ctx.send(f"```yaml\n{last_bytes.decode(encoding='utf-8',errors='ignore')}\n```")
 
 
 
