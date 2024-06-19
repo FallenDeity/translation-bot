@@ -482,7 +482,7 @@ class Admin(commands.Cog):
                 content="Here is your log", file=discord.File(f"{self.bot.log_path}"),
             )
         else:
-            async with aiofiles.open(f"{self.bot.log_path}", "rb", encoding="utf-8") as f:
+            async with aiofiles.open(f"{self.bot.log_path}", "r", encoding="utf-8") as f:
                 full = await f.read()
                 last_bytes = full[:no]
                 return await ctx.send(f"```yaml\n{last_bytes.decode(encoding='utf-8',errors='ignore')}\n```")
