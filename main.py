@@ -12,6 +12,7 @@ from utils.handler import FileHandler as handler
 from core.bot import Raizel
 
 bot = Raizel()
+bot.cache_max_messages = 100
 
 
 @tasks.loop(minutes=10)
@@ -25,6 +26,7 @@ async def census():
         await chan.send("> Bot restart started with looper")
         command = await bot.get_command("restart").callback(Admin(bot), context_new2)
     await handler.update_status(bot)
+    gc.collect()
     return
 
 

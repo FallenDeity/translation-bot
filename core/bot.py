@@ -50,6 +50,7 @@ class Raizel(commands.Bot):
         self.update: bool = False
         self.translation_count: float = 0
         self.crawler_count = 0
+        self.cache_max_messages = 100
         super().__init__(
             command_prefix=commands.when_mentioned_or(".t"),
             intents=intents,
