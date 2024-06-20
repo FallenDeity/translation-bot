@@ -483,7 +483,7 @@ class Admin(commands.Cog):
         if file:
             return await ctx.send(
                 embed=discord.Embed(title=f"logs", description=last_bytes, colour=discord.Colour.random()),
-                file=discord.File(f"{self.bot.log_path}"),
+                file=discord.File(f"{self.bot.log_path}", "discord_botLog.txt"),
             )
         else:
             return await ctx.send(f"```yaml\n{last_bytes}\n```")
