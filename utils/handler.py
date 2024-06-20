@@ -525,6 +525,7 @@ class FileHandler:
                             novel = await f.read()
                     except Exception as e:
                         print(e)
+                        bot.logger.info(f"Error occurred {e} {e.__traceback__}")
                         return await ctx.reply(
                             "> **❌Currently we are only translating korean and chinese.**"
                         )
@@ -640,6 +641,7 @@ class FileHandler:
             if thumbnail is None or thumbnail.strip() == "":
                 thumbnail = Categories.thumbnail_from_category(category)
         except Exception as e:
+            bot.logger.info(f"error occurred when getting thumbnail {e} {e.__traceback__}")
             print("exception in  getting category")
             print(e)
             if thumbnail.strip() == "":
@@ -703,6 +705,7 @@ class FileHandler:
                 download_url = filelnk
             except Exception as e:
                 print(e)
+                bot.logger.info(f"Error occurred {e} {e.__traceback__}")
                 await ctx.reply(
                     "**Sorry your file was too big and mega seems down now. ping developers in support server to resolve the issue.. please split it and try again.**" + e[:1000] + ""
                 )
@@ -799,6 +802,7 @@ class FileHandler:
             if thumbnail.strip() == "":
                 thumbnail = Categories.thumbnail_from_category(category)
         except Exception as e:
+            bot.logger.info(f"Error occurred {e} {e.__traceback__}")
             print("exception in  getting category")
             print(e)
             if thumbnail.strip() == "":
@@ -859,6 +863,7 @@ class FileHandler:
                     )
                 download_url = filelnk
             except Exception as e:
+                bot.logger.info(f"Error occurred {e} {e.__traceback__}")
                 print(e)
                 await ctx.reply(
                     "> **❌Sorry the file is too big to send and mega seems down now. ping developers in support server to resolve the issue..**"+ e[:1000] + "")
@@ -896,11 +901,12 @@ class FileHandler:
                 data = Novel(*novel_data)
                 try:
                     await bot.mongo.library.add_novel(data)
-                except:
+                except Exception as e:
                     loop = True
                     no_of_tries = 0
                     while loop and no_of_tries < 6:
-                        print(f"couldn't add to library... trying for {no_of_tries + 2} times")
+                        bot.logger.info(f"Error occurred {e} {e.__traceback__}")
+                        bot.logger.info(f"couldn't add to library... trying for {no_of_tries + 2} times")
                         try:
                             await asyncio.sleep(3)
                             data[0] = await bot.mongo.library.next_number

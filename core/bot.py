@@ -1,19 +1,17 @@
 import asyncio
 import datetime
-import gc
 import logging
 import os
 import pickle
 import random
 import traceback
+import typing as t
 from asyncio import Task
 from logging.handlers import RotatingFileHandler
 
-import joblib
-import typing as t
-
 import aiohttp
 import discord
+import joblib
 import nltk
 from discord.ext import commands
 from mega import Mega
@@ -22,7 +20,6 @@ from languages.languages import choices
 from languages.sites import sites
 from languages.terms import get_dictionary
 from utils.connector import Mongo
-from discord.ext import tasks
 
 
 class Raizel(commands.Bot):

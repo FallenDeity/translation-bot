@@ -482,12 +482,11 @@ class Admin(commands.Cog):
             last_bytes = full[:no]
         if file:
             return await ctx.send(
-                embed=discord.Embed(title=f"logs", description=last_bytes, colour=discord.Colour.random()), file=discord.File(f"{self.bot.log_path}"),
+                embed=discord.Embed(title=f"logs", description=last_bytes, colour=discord.Colour.random()),
+                file=discord.File(f"{self.bot.log_path}"),
             )
         else:
             return await ctx.send(f"```yaml\n{last_bytes}\n```")
-
-
 
 
 async def setup(bot):
