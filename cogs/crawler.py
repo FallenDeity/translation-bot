@@ -96,6 +96,7 @@ class Crawler(commands.Cog):
                     response = requests.get(links, headers=FileHandler.get_handler(), timeout=20)
             except Exception as e:
                 print(e)
+                # bot.logger.info(f"Error Occurred {e} {e.__traceback__}")
                 time.sleep(10)
             else:
                 break
@@ -475,6 +476,7 @@ class Crawler(commands.Cog):
             res = await self.bot.con.get(link)
         except Exception as e:
             print(e)
+            self.bot.logger.info(f"Error Occurred {e} {e.__traceback__}")
             await msg.delete()
             return await ctx.send("We couldn't connect to the provided link. Please check the link")
         novel = {}
@@ -503,6 +505,7 @@ class Crawler(commands.Cog):
             if title_name == "" or title_name is None:
                 raise Exception
         except Exception as e:
+            self.bot.logger.info(f"Error Occurred {e} {e.__traceback__}")
             print(e)
             try:
                 title_name = ""
@@ -514,6 +517,7 @@ class Crawler(commands.Cog):
                 try:
                     title_name = sel.css(maintitleCSS + " ::text").extract_first()
                 except Exception as e:
+                    self.bot.logger.info(f"Error Occurred {e} {e.__traceback__}")
                     print("error at 200" + str(e))
                 if title_name.strip() == "" or title_name is None:
                     title_name = sel.css("title ::text").extract_first()
@@ -521,6 +525,7 @@ class Crawler(commands.Cog):
 
             except Exception as ex:
                 print(ex)
+                self.bot.logger.info(f"Error Occurred {e} {e.__traceback__}")
                 title_name = f"{ctx.author.id}_crl"
         # print('titlename'+title_name)
         self.chptitlecss = self.titlecss[1]
@@ -883,6 +888,7 @@ class Crawler(commands.Cog):
             download_url = await FileHandler().crawlnsend(ctx, self.bot, title, title_name, original_Language,
                                                           description, thumbnail, link=link, library=library)
         except Exception as e:
+            self.bot.logger.info(f"Error Occurred {e} {e.__traceback__}")
             await ctx.send("> Error occurred .Please report to admin +\n" + str(e))
             print(traceback.format_exc())
             raise e
@@ -1058,6 +1064,7 @@ class Crawler(commands.Cog):
                 response = requests.get(firstchplink, headers=headers, timeout=20)
         except Exception as e:
             if headless:
+                self.bot.logger.info(f"Error Occurred {e} {e.__traceback__}")
                 return await ctx.reply(
                     "> Couldn't connect to the provided link.... Please check the link")
             else:
@@ -1250,6 +1257,7 @@ class Crawler(commands.Cog):
                 display_avatar = thumbnail
         except Exception as e:
             print(e)
+            self.bot.logger.info(f"Error Occurred {e} {e.__traceback__}")
             print("error occured in getting thumbnail")
             print(traceback.format_exc())
             display_avatar = await Hints.get_avatar()
@@ -1306,6 +1314,7 @@ class Crawler(commands.Cog):
                         print(e)
                         return await ctx.send(f"Error occurred in crawling \n Error occurred at {current_link}")
                     else:
+                        self.bot.logger.info(f"Error Occurred {e} {e.__traceback__}")
                         await asyncio.sleep(5)
                         print("error occured at " + current_link + str(e))
                         break
@@ -1404,6 +1413,7 @@ class Crawler(commands.Cog):
             else:
                 return
         except Exception as e:
+            self.bot.logger.info(f"Error Occurred {e} {e.__traceback__}")
             print(traceback.format_exc())
             await ctx.send("> Error occurred .Please report to admin +\n" + str(e))
             raise e
