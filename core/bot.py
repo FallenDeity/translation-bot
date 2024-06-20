@@ -33,7 +33,10 @@ class Raizel(commands.Bot):
         self.blocked = None
         self.mega: Mega = None
         self.logger = None
-        intents = discord.Intents.all()
+        intents = discord.Intents.default()
+        intents.message_content = True
+        intents.typing = False
+        intents.presences = False
         self.translator: t.Dict[int, str] = {}
         self.crawler: t.Dict[int, str] = {}
         self.crawler_next: t.Dict[int, str] = {}
