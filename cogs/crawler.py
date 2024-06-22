@@ -190,7 +190,7 @@ class Crawler(commands.Cog):
                         driver.get(links)
                     except:
                         try:
-                            driver.close()
+                            driver.quit()
                             await asyncio.sleep(2)
                         except:
                             await asyncio.sleep(5)
@@ -1290,7 +1290,7 @@ class Crawler(commands.Cog):
                 if current_link in crawled_urls:
                     repeats += 1
                     try:
-                        driver.close()
+                        driver.quit()
                     except:
                         pass
                     driver = await self.bot.loop.run_in_executor(None, get_driver)
@@ -1327,7 +1327,7 @@ class Crawler(commands.Cog):
                     chp_text = ''
                     if no_of_tries % 2 != 0:
                         try:
-                            driver.close()
+                            driver.quit()
                         except:
                             pass
                         driver = await self.bot.loop.run_in_executor(None, get_driver)
@@ -1356,7 +1356,7 @@ class Crawler(commands.Cog):
                     if i % 50 == 0:
                         if headless:
                             try:
-                                driver.close()
+                                driver.quit()
                             except:
                                 pass
                             driver = await self.bot.loop.run_in_executor(None, get_driver)
@@ -1364,7 +1364,7 @@ class Crawler(commands.Cog):
                 elif random.randint(0, 50) == 10 or chp_count % 100 == 0:
                     if headless:
                         try:
-                            driver.close()
+                            driver.quit()
                         except:
                             pass
                         driver = await self.bot.loop.run_in_executor(None, get_driver)
@@ -1424,7 +1424,7 @@ class Crawler(commands.Cog):
                 self.bot.chrome = 0
             if driver is not None:
                 try:
-                    driver.close()
+                    driver.quit()
                 except:
                     pass
             try:
