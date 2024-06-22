@@ -191,7 +191,9 @@ class Crawler(commands.Cog):
                     except:
                         try:
                             driver.close()
+                            await asyncio.sleep(2)
                         except:
+                            await asyncio.sleep(5)
                             pass
                         driver = get_driver()
                         driver.get(links)
