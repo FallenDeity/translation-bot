@@ -34,6 +34,7 @@ class Raizel(commands.Bot):
         self.mega: Mega = None
         self.logger = None
         intents = discord.Intents.default()
+        intents.members = True
         intents.message_content = True
         intents.typing = False
         intents.presences = False
