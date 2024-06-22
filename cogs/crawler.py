@@ -27,6 +27,7 @@ from deep_translator import GoogleTranslator
 from discord import app_commands
 from discord.ext import commands
 from readabilipy import simple_json_from_html_string
+from selenium.webdriver.support.wait import WebDriverWait
 
 from cogs.admin import Admin
 from cogs.translation import Translate
@@ -188,6 +189,9 @@ class Crawler(commands.Cog):
                 if driver is not None:
                     try:
                         driver.get(links)
+                        WebDriverWait(driver, 10).until(
+                            lambda d: d.execute_script('return document.readyState') == 'complete'
+                        )
                     except:
                         try:
                             driver.quit()
@@ -197,6 +201,9 @@ class Crawler(commands.Cog):
                             pass
                         driver = get_driver()
                         driver.get(links)
+                        WebDriverWait(driver, 10).until(
+                            lambda d: d.execute_script('return document.readyState') == 'complete'
+                        )
                     soup = BeautifulSoup(driver.page_source, "html.parser")
                 elif scraper is not None:
                     response = await self.bot.loop.run_in_executor(None, self.scrape, scraper, links)
@@ -1056,6 +1063,9 @@ class Crawler(commands.Cog):
         try:
             if headless:
                 driver.get(firstchplink)
+                WebDriverWait(driver, 10).until(
+                    lambda d: d.execute_script('return document.readyState') == 'complete'
+                )
             elif cloudscrape:
                 scraper = cloudscraper.CloudScraper(delay=10)
                 response = scraper.get(firstchplink, headers=FileHandler.get_handler(), timeout=20)
@@ -1074,13 +1084,18 @@ class Crawler(commands.Cog):
                 headless = True
                 driver = await self.bot.loop.run_in_executor(None, get_driver)
                 driver.get(firstchplink)
-
+                WebDriverWait(driver, 10).until(
+                    lambda d: d.execute_script('return document.readyState') == 'complete'
+                )
         if not headless:
             if str(response.status_code).startswith('4'):
                 headless = True
                 await ctx.send("> **Headless browser is turned on.. please be patient**")
                 driver = await self.bot.loop.run_in_executor(None, get_driver)
                 driver.get(firstchplink)
+                WebDriverWait(driver, 10).until(
+                    lambda d: d.execute_script('return document.readyState') == 'complete'
+                )
                 soup = BeautifulSoup(driver.page_source, "html.parser")
                 htm = driver.page_source
             else:
