@@ -33,7 +33,7 @@ class Raizel(commands.Bot):
         self.blocked = None
         self.mega: Mega = None
         self.logger = None
-        intents = discord.Intents.default()
+        intents = discord.Intents.all()
         intents.members = True
         intents.message_content = True
         intents.typing = False
