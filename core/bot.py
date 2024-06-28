@@ -34,6 +34,10 @@ class Raizel(commands.Bot):
         self.mega: Mega = None
         self.logger = None
         intents = discord.Intents.all()
+        intents.members = True
+        intents.message_content = True
+        intents.typing = False
+        intents.presences = False
         self.translator: t.Dict[int, str] = {}
         self.crawler: t.Dict[int, str] = {}
         self.crawler_next: t.Dict[int, str] = {}
@@ -47,6 +51,7 @@ class Raizel(commands.Bot):
         self.update: bool = False
         self.translation_count: float = 0
         self.crawler_count = 0
+        self.cache_max_messages = 100
         super().__init__(
             command_prefix=commands.when_mentioned_or(".t"),
             intents=intents,
@@ -169,8 +174,9 @@ class Raizel(commands.Bot):
             print(e)
 
     def setup_logging(self):
-        base_dir = os.path.dirname(os.path.abspath(__file__))
-        self.log_path = os.path.join(base_dir, 'logs', 'bot.txt')
+        # base_dir = os.path.dirname(os.path.abspath(__file__))
+        # self.log_path = os.path.join(base_dir, 'logs', 'bot.txt')
+        self.log_path = os.path.join("home", "ubuntu", 'applogs', 'bot.txt')
         os.makedirs(os.path.dirname(self.log_path), exist_ok=True)
         formatter = logging.Formatter('%(asctime)s %(levelname)-8s %(message)s')
         logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)-8s %(message)s',

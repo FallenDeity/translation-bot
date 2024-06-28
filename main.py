@@ -1,4 +1,5 @@
 import asyncio
+import gc
 import os
 
 import discord
@@ -11,6 +12,7 @@ from utils.handler import FileHandler as handler
 from core.bot import Raizel
 
 bot = Raizel()
+bot.cache_max_messages = 100
 
 
 @tasks.loop(minutes=10)
@@ -24,6 +26,7 @@ async def census():
         await chan.send("> Bot restart started with looper")
         command = await bot.get_command("restart").callback(Admin(bot), context_new2)
     await handler.update_status(bot)
+    gc.collect()
     return
 
 
@@ -42,6 +45,7 @@ async def on_ready():
 
 @bot.event
 async def on_command(ctx: commands.Context):
+    gc.collect()
     bot.logger.info(
         f"Command {ctx.command if ctx.command else 'Unknown Command'} called by {ctx.author} in {ctx.channel} with args {ctx.args} and kargs {ctx.kwargs}")
 
