@@ -106,6 +106,7 @@ class Translate(commands.Cog):
                ignore_warnings :
                     give true to ignore the library check
                """
+        story = ""
         try:
             await ctx.defer()
         except:
@@ -622,6 +623,7 @@ class Translate(commands.Cog):
                 await rep_msg.edit(embed=embed, view=view)
             except:
                 pass
+            story = FileHandler.split_paragraphs(story)
             async with aiofiles.open(f"{ctx.author.id}.txt", "w", encoding="utf-8", errors="ignore") as f:
                 await f.write(story)
             if description.strip() == "":
