@@ -804,7 +804,7 @@ class Crawler(commands.Cog):
             view = ButtonsV(self.bot, ctx, "crawl")
             msg = await msg.edit(content="",
                                  embed=embed, view=view)
-            task = asyncio.create_task(self.cc_prog(msg, embed, ctx.author.id, len(asyncio.all_tasks())-1))
+            task = asyncio.create_task(self.cc_prog(msg, embed, ctx.author.id, len(asyncio.all_tasks()) - 1))
             if library is not None:
                 await ctx.reply(content=f"> Updating {str(library)} with name : {title_name}")
             if len(urls) < 1700:
@@ -1291,100 +1291,119 @@ class Crawler(commands.Cog):
         embed.add_field(name="Progress", value=chp_count)
         if library is not None:
             await ctx.reply(content=f"> Updating {str(library)} with name : {title_name}")
+        # full_
         try:
             self.bot.crawler_next[ctx.author.id] = f"0/{noofchapters}"
             await FileHandler.update_status(self.bot)
             task = asyncio.create_task(self.cc_prog_cr_next(msg, embed, ctx.author.id, 20))
-            for i in range(1, noofchapters):
-                try:
-                    if self.bot.crawler_next[ctx.author.id] == "break":
-                        return await ctx.send("> **Stopped Crawling...**")
-                except:
-                    break
-                self.bot.crawler_next[ctx.author.id] = f"{i}/{noofchapters}"
-                if current_link in crawled_urls:
-                    repeats += 1
+            try:
+                for i in range(1, noofchapters):
                     try:
-                        driver.quit()
+                        if self.bot.crawler_next[ctx.author.id] == "break":
+                            return await ctx.send("> **Stopped Crawling...**")
                     except:
-                        pass
-                    driver = await self.bot.loop.run_in_executor(None, get_driver)
-                if current_link in crawled_urls and repeats > 5:
-                    if i >= 30:
                         break
-                    del self.bot.crawler_next[ctx.author.id]
-                    if current_link == firstchplink and i < 10:
-                        return await ctx.reply(
-                            'Error occurred . Some problem in the site. please try with second and third chapter or '
-                            'give valid css selector for next page button')
-                    if sel_tag:
-                        return await ctx.send(" There is some problem with the provided selector")
-                    else:
-                        return await ctx.send(" There is some problem with the detected selector")
-                try:
-
-                    output = await self.getcontent(current_link, css, path, self.bot, sel_tag, scraper, next_chp_find,
-                                                   driver)
-                    chp_text = str(output[0])
-                except Exception as e:
-                    if i <= 10:
-                        print(e)
-                        return await ctx.send(f"Error occurred in crawling \n Error occurred at {current_link}")
-                    else:
-                        self.bot.logger.info(f"Error Occurred {e} {e.__traceback__}")
-                        await asyncio.sleep(5)
-                        print("error occured at " + current_link + str(e))
-                        break
-
-                # print(i)
-                if chp_text == 'error':
-                    no_of_tries += 1
-                    chp_text = ''
-                    if no_of_tries % 2 != 0:
+                    self.bot.crawler_next[ctx.author.id] = f"{i}/{noofchapters}"
+                    if current_link in crawled_urls:
+                        repeats += 1
                         try:
-                            driver.quit()
+                            driver.close()
                         except:
                             pass
                         driver = await self.bot.loop.run_in_executor(None, get_driver)
-                    if no_of_tries > 30:
-                        # await msg.delete()
+                    if current_link in crawled_urls and repeats > 5:
+                        if i >= 30:
+                            break
                         del self.bot.crawler_next[ctx.author.id]
-                        return await ctx.send('Error occurred when crawling. Please Report to my developer')
-                    else:
-                        await asyncio.sleep(1)
-                full_text += chp_text
-                # print(current_link)
-                if current_link == lastchplink or i >= noofchapters or output[1] is None:
-                    full_text = full_text + f"\n\n for more novels ({random.randint(1000, 200000)}) join: https://discord.gg/SZxTKASsHq"
-                    print('break')
-                    break
-                chp_count += 1
-                crawled_urls.append(current_link)
-                current_link = output[1]
-                if waittime:
-                    await asyncio.sleep(waittime)
-                    if random.randint(0, 200) == 10:
-                        await asyncio.sleep(5 * waittime)
-                    if i % 25 == 0:
-                        full_text = full_text + f"\n\n for more novels ({random.randint(1000, 200000)}) join: https://discord.gg/SZxTKASsHq\n"
-                        await asyncio.sleep(2.5 * waittime)
-                    if i % 50 == 0:
-                        if headless:
+                        if current_link == firstchplink and i < 10:
+                            return await ctx.reply(
+                                'Error occurred . Some problem in the site. please try with second and third chapter or '
+                                'give valid css selector for next page button')
+                        if sel_tag:
+                            return await ctx.send(" There is some problem with the provided selector")
+                        else:
+                            return await ctx.send(" There is some problem with the detected selector")
+                    try:
+
+                        output = await self.getcontent(current_link, css, path, self.bot, sel_tag, scraper,
+                                                       next_chp_find,
+                                                       driver)
+                        chp_text = str(output[0])
+                    except Exception as e:
+                        if i <= 10:
+                            print(e)
+                            await ctx.send(f"Error occurred in crawling \n Error occurred at {current_link}")
+                            if chp_count < 20:
+                                return await ctx.send("Stopped crawling")
+                            raise e
+                        else:
+                            self.bot.logger.info(f"Error Occurred {e} {e.__traceback__}")
+                            await asyncio.sleep(5)
+                            print("error occured at " + current_link + str(e))
+                            break
+
+                    # print(i)
+                    if chp_text == 'error':
+                        no_of_tries += 1
+                        chp_text = ''
+                        if no_of_tries % 2 != 0:
                             try:
-                                driver.quit()
+                                driver.close()
                             except:
                                 pass
                             driver = await self.bot.loop.run_in_executor(None, get_driver)
-                        await asyncio.sleep(4.5 * waittime)
-                elif random.randint(0, 50) == 10 or chp_count % 100 == 0:
-                    if headless:
-                        try:
-                            driver.quit()
-                        except:
-                            pass
-                        driver = await self.bot.loop.run_in_executor(None, get_driver)
-                    await asyncio.sleep(1)
-                    full_text = full_text + f"\n\n for more novels ({random.randint(1000, 200000)}) join: https://discord.gg/SZxTKASsHq\n"
+                        if no_of_tries > 30:
+                            # await msg.delete()
+                            del self.bot.crawler_next[ctx.author.id]
+                            return await ctx.send('Error occurred when crawling. Please Report to my developer')
+                        else:
+                            await asyncio.sleep(1)
+                    full_text += chp_text
+                    # print(current_link)
+                    if current_link == lastchplink or i >= noofchapters or output[1] is None:
+                        full_text = full_text + f"\n\n for more novels ({random.randint(1000, 200000)}) join: https://discord.gg/SZxTKASsHq"
+                        print('break')
+                        break
+                    chp_count += 1
+                    crawled_urls.append(current_link)
+                    current_link = output[1]
+                    if waittime:
+                        await asyncio.sleep(waittime)
+                        if random.randint(0, 200) == 10:
+                            await asyncio.sleep(5 * waittime)
+                        if i % 25 == 0:
+                            full_text = full_text + f"\n\n for more novels ({random.randint(1000, 200000)}) join: https://discord.gg/SZxTKASsHq\n"
+                            await asyncio.sleep(2.5 * waittime)
+                        if i % 50 == 0:
+                            if headless:
+                                try:
+                                    driver.close()
+                                except:
+                                    pass
+                                driver = await self.bot.loop.run_in_executor(None, get_driver)
+                            await asyncio.sleep(4.5 * waittime)
+                    elif random.randint(0, 50) == 10 or chp_count % 100 == 0:
+                        if headless:
+                            try:
+                                driver.close()
+                            except:
+                                pass
+                            driver = await self.bot.loop.run_in_executor(None, get_driver)
+                        await asyncio.sleep(1)
+                        full_text = full_text + f"\n\n for more novels ({random.randint(1000, 200000)}) join: https://discord.gg/SZxTKASsHq\n"
+
+                await ctx.send(f"Crawled {chp_count} pages.")
+                try:
+                    task.cancel()
+                    embed.set_image(url="")
+                    view = None
+                    embed.set_field_at(index=0, name="Progress",
+                                       value=f"Completed crawling")
+                    await msg.edit(embed=embed, view=view)
+                except:
+                    pass
+            except:
+                pass
 
             async with aiofiles.open(f"{ctx.author.id}_cr.txt", 'w', encoding='utf-8', errors="ignore") as f:
                 await f.write(full_text)
@@ -1395,16 +1414,7 @@ class Crawler(commands.Cog):
                               :500]).strip()
             except:
                 pass
-            await ctx.send(f"Crawled {chp_count} pages.")
-            try:
-                task.cancel()
-                embed.set_image(url="")
-                view = None
-                embed.set_field_at(index=0, name="Progress",
-                                   value=f"Completed crawling")
-                await msg.edit(embed=embed, view=view)
-            except:
-                pass
+
             download_url = await FileHandler().crawlnsend(ctx, self.bot, title, title_name, original_Language,
                                                           description=description, thumbnail=thumbnail,
                                                           link=firstchplink, library=library)
@@ -1469,15 +1479,15 @@ class Crawler(commands.Cog):
             self, inter: discord.Interaction, term: str
     ) -> list[app_commands.Choice]:
         lst = [
-                  "naruto",
-                  "one-piece",
-                  "pokemon",
-                  "mixed",
-                  "prince-of-tennis",
-                  "marvel",
-                  "dc",
-                  "xianxia",
-              ]
+            "naruto",
+            "one-piece",
+            "pokemon",
+            "mixed",
+            "prince-of-tennis",
+            "marvel",
+            "dc",
+            "xianxia",
+        ]
         return [app_commands.Choice(name=i, value=i) for i in lst]
 
 
