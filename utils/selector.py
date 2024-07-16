@@ -122,7 +122,8 @@ class CssSelector:
                 "www.novel543.com": "#chapterWarp > div.chapter-content.px-3 > div ::text",
                 "www.tingxs.net": "p ::text",
                 "freewebnovel.com": "div.txt ::text",
-                "requiemtls.com": ""
+                "requiemtls.com": "div.epcontent.entry-content ::text",
+                "requimtl.com": "#content ::text"
             }
             for domain, css_selector in domain_mappings.items():
                 if domain in link:
@@ -184,6 +185,7 @@ class CssSelector:
             "www.tingxs.net": ["h1", "body > div.wp.mt10.ov > div.info_dv1.ov > h2 > font > font"],
             "m.38xs.com": ["#read > div.main > div.detail > p.name > strong > font > font", "#chapter > h1 > font > font"],
             "requiemtls.com": ["div.infox > h1","div.epheader"],
+            "requimtl.com": ["h1","h2"]
         }
         for domain, ret_array in domain_mappings.items():
             if domain in link:
@@ -261,6 +263,8 @@ class CssSelector:
             "www.fannovels.org": ["#chapter-article > header > div > aside > nav > div.action-select.notranslate > a.chnav.next", "#chapter-article > header > div > div > h1 > a"]
             # "www.novelcool.com": ["None",  "div.chapter-reading-section-list > div > div > h2"],
             # "m.bqg789.net": ["#nextpage", "#novelbody > div.head > div.nav_name > h1"],
+            "requiemtls.com": ["div.bixbox.episodedl > div > div.navimedia > div.left > div > div:nth-child(3) > a", "div.ts-breadcrumb.bixbox > div > span:nth-child(2) > a > span"],
+            # "requimtl.com": ["",]
         }
         for domain, ret_array in domain_mappings.items():
             if domain in link:
