@@ -121,7 +121,8 @@ class CssSelector:
                 "m.98bxwx.com/": "#chapter > div.content ::text",
                 "www.novel543.com": "#chapterWarp > div.chapter-content.px-3 > div ::text",
                 "www.tingxs.net": "p ::text",
-                "freewebnovel.com": "div.txt ::text"
+                "freewebnovel.com": "div.txt ::text",
+                "requiemtls.com": ""
             }
             for domain, css_selector in domain_mappings.items():
                 if domain in link:
@@ -182,6 +183,7 @@ class CssSelector:
             "www.novel543.com": ["h1", "#chapterWarp > div.chapter-content.px-3 > h1"],
             "www.tingxs.net": ["h1", "body > div.wp.mt10.ov > div.info_dv1.ov > h2 > font > font"],
             "m.38xs.com": ["#read > div.main > div.detail > p.name > strong > font > font", "#chapter > h1 > font > font"],
+            "requiemtls.com": ["div.infox > h1","div.epheader"],
         }
         for domain, ret_array in domain_mappings.items():
             if domain in link:
