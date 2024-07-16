@@ -185,7 +185,7 @@ class CssSelector:
             "www.tingxs.net": ["h1", "body > div.wp.mt10.ov > div.info_dv1.ov > h2 > font > font"],
             "m.38xs.com": ["#read > div.main > div.detail > p.name > strong > font > font", "#chapter > h1 > font > font"],
             "requiemtls.com": ["div.infox > h1","div.epheader"],
-            "requimtl.com": ["h1","h2"]
+            "requimtl.com": ["head > title","h2"]  #body > div.min-h-screen.w-full.bg-gray-100.pb-12.text-\[\#444\].dark\:bg-\[\#2f303e\].dark\:text-\[\#9CA9BA\] > main > div.mx-auto.max-w-6xl.p-2.md\:px-8.md\:py-4 > div > div.flex.w-full.flex-col.gap-2 > div.relative.text-\[\#111\].dark\:text-white.md\:text-white > h1
         }
         for domain, ret_array in domain_mappings.items():
             if domain in link:
