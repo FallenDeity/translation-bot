@@ -260,7 +260,7 @@ class CssSelector:
             "m.biquzw789.net": ["#nextpage",  "#novelbody > div.head > div.nav_name > h2"],
             "www.biquzw789.net": ["None", "#wrapper > div.content_read > div > div.con_top > a:nth-child(7)"],
             "www.tingxs.net": ["None", "body > div.wp.mt10.ov > div.info_dv1.ov > div.title > a:nth-child(3) > font"],
-            "www.fannovels.org": ["#chapter-article > header > div > aside > nav > div.action-select.notranslate > a.chnav.next", "#chapter-article > header > div > div > h1 > a"]
+            "www.fannovels.org": ["#chapter-article > header > div > aside > nav > div.action-select.notranslate > a.chnav.next", "#chapter-article > header > div > div > h1 > a"],
             # "www.novelcool.com": ["None",  "div.chapter-reading-section-list > div > div > h2"],
             # "m.bqg789.net": ["#nextpage", "#novelbody > div.head > div.nav_name > h1"],
             "requiemtls.com": ["div.bixbox.episodedl > div > div.navimedia > div.left > div > div:nth-child(3) > a", "div.ts-breadcrumb.bixbox > div > span:nth-child(2) > a > span"],
