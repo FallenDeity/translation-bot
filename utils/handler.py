@@ -627,6 +627,7 @@ class FileHandler:
             description: str = "", thumbnail: str = "", library: int = None, novel_url: str = None
     ) -> None:
         download_url = None
+        discord_dnld_url= None
         update: bool = True
         if library is None:
             next_no = await bot.mongo.library.next_number
@@ -673,6 +674,7 @@ class FileHandler:
                 allowed_mentions=discord.AllowedMentions(users=False)
             )
             download_url = msg.attachments[0].url
+            discord_dnld_url = download_url
         if size >0:
             try:
                 await ctx.send(
@@ -725,8 +727,10 @@ class FileHandler:
             if language == "english":
                 embed.add_field(name="size", value=f"{round(size / (1024 ** 2), 2)} MB")
                 await self.distribute_genre(embed, category, download_url, bot)
-        except:
-            pass
+        except Exception as e:
+            bot.logger.info("Error occured when Distributing {}", e)
+            bot.logger.error("Eroor distributing " +e, e)
+            # pass
         if library is not None:
             data = await bot.mongo.library.get_novel_by_id(library)
             if size + 1000 < data['size']:
@@ -774,7 +778,7 @@ class FileHandler:
                                                   download=download_url, size=size,
                                                   date=datetime.datetime.now(datetime.timezone.utc).timestamp(),
                                                   thumbnail=thumbnail, category=category, crawled_from=novel_url)
-        view = LinkView({"Novel": [download_url, await self.get_emoji_book()]})
+        view = LinkView({"Novel": [discord_dnld_url if discord_dnld_url else download_url, await self.get_emoji_book()]})
         await ctx.reply(content=f"> **{ctx.author.mention} 🎉Here is your translated novel #{next_no} {name}**",
                         view=view)
         return
