@@ -810,11 +810,8 @@ class FileHandler:
                                                   download=download_url, size=size,
                                                   date=datetime.datetime.now(datetime.timezone.utc).timestamp(),
                                                   thumbnail=thumbnail, category=category, crawled_from=novel_url)
-        if discord_dnld_url is None:
-            link_dwnl = download_url
-        else :
-            link_dwnl = discord_dnld_url
-        view = LinkView({"Novel": [link_dwnl, await self.get_emoji_book()]})
+
+        view = LinkView({"Novel": [download_url, await self.get_emoji_book()]})
         await ctx.reply(content=f"> **{ctx.author.mention} 🎉Here is your translated novel #{next_no} {name}**",
                         view=view)
         return
