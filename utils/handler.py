@@ -760,8 +760,8 @@ class FileHandler:
                 embed.add_field(name="size", value=f"{round(size / (1024 ** 2), 2)} MB")
                 await self.distribute_genre(embed, category, download_url, bot)
         except Exception as e:
-            bot.logger.info("Error occured when Distributing {}", e)
-            bot.logger.error("Eroor distributing " +e, e)
+            bot.logger.info(f"Error Occurred distributing genre{e} {e.__traceback__}")
+
             # pass
         if library is not None:
             data = await bot.mongo.library.get_novel_by_id(library)
@@ -810,8 +810,11 @@ class FileHandler:
                                                   download=download_url, size=size,
                                                   date=datetime.datetime.now(datetime.timezone.utc).timestamp(),
                                                   thumbnail=thumbnail, category=category, crawled_from=novel_url)
-
-        view = LinkView({"Novel": [download_url, await self.get_emoji_book()]})
+        if discord_dnld_url is None:
+            link_dwnl = download_url
+        else :
+            link_dwnl = discord_dnld_url
+        view = LinkView({"Novel": [link_dwnl, await self.get_emoji_book()]})
         await ctx.reply(content=f"> **{ctx.author.mention} 🎉Here is your translated novel #{next_no} {name}**",
                         view=view)
         return
