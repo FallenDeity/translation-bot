@@ -121,7 +121,9 @@ class CssSelector:
                 "m.98bxwx.com/": "#chapter > div.content ::text",
                 "www.novel543.com": "#chapterWarp > div.chapter-content.px-3 > div ::text",
                 "www.tingxs.net": "p ::text",
-                "freewebnovel.com": "div.txt ::text"
+                "freewebnovel.com": "div.txt ::text",
+                "requiemtls.com": "div.epcontent.entry-content ::text",
+                "requimtl.com": "#content ::text"
             }
             for domain, css_selector in domain_mappings.items():
                 if domain in link:
@@ -179,9 +181,11 @@ class CssSelector:
             "www.piaotia.com": ["#tl > a:nth-child(3)", "#content > h1 ::text"],
             "www.xmrdy.com": [".d_title > h1", "h1 ::text"],
             "m.98bxwx.com/": ["#read > div.main > div.detail > p.name > strong", "#chapter > h1 ::text"],
-            "www.novel543.com": ["h1", "#chapterWarp > div.chapter-content.px-3 > h1"],
-            "www.tingxs.net": ["h1", "body > div.wp.mt10.ov > div.info_dv1.ov > h2 > font > font"],
-            "m.38xs.com": ["#read > div.main > div.detail > p.name > strong > font > font", "#chapter > h1 > font > font"],
+            "www.novel543.com": ["h1", "#chapterWarp > div.chapter-content.px-3 > h1 ::text ::text"],
+            "www.tingxs.net": ["h1", "body > div.wp.mt10.ov > div.info_dv1.ov > h2 > font > font ::text"],
+            "m.38xs.com": ["#read > div.main > div.detail > p.name > strong > font > font", "#chapter > h1 > font > font ::text"],
+            "requiemtls.com": ["div.infox > h1","div.epheader ::text"],
+            "requimtl.com": ["head > title","h2 ::text"]  #body > div.min-h-screen.w-full.bg-gray-100.pb-12.text-\[\#444\].dark\:bg-\[\#2f303e\].dark\:text-\[\#9CA9BA\] > main > div.mx-auto.max-w-6xl.p-2.md\:px-8.md\:py-4 > div > div.flex.w-full.flex-col.gap-2 > div.relative.text-\[\#111\].dark\:text-white.md\:text-white > h1
         }
         for domain, ret_array in domain_mappings.items():
             if domain in link:
@@ -256,9 +260,11 @@ class CssSelector:
             "m.biquzw789.net": ["#nextpage",  "#novelbody > div.head > div.nav_name > h2"],
             "www.biquzw789.net": ["None", "#wrapper > div.content_read > div > div.con_top > a:nth-child(7)"],
             "www.tingxs.net": ["None", "body > div.wp.mt10.ov > div.info_dv1.ov > div.title > a:nth-child(3) > font"],
-            "www.fannovels.org": ["#chapter-article > header > div > aside > nav > div.action-select.notranslate > a.chnav.next", "#chapter-article > header > div > div > h1 > a"]
+            "www.fannovels.org": ["#chapter-article > header > div > aside > nav > div.action-select.notranslate > a.chnav.next", "#chapter-article > header > div > div > h1 > a"],
             # "www.novelcool.com": ["None",  "div.chapter-reading-section-list > div > div > h2"],
             # "m.bqg789.net": ["#nextpage", "#novelbody > div.head > div.nav_name > h1"],
+            "requiemtls.com": ["div.bixbox.episodedl > div > div.navimedia > div.left > div > div:nth-child(3) > a", "div.ts-breadcrumb.bixbox > div > span:nth-child(2) > a > span"],
+            # "requimtl.com": ["",]
         }
         for domain, ret_array in domain_mappings.items():
             if domain in link:

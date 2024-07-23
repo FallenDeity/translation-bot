@@ -447,7 +447,7 @@ class Crawler(commands.Cog):
             return await ctx.reply(f"> **❌Enter a link for crawling.**")
         allowed = self.bot.allowed
         next_sel = CssSelector.find_next_selector(link)
-        if next_sel[0] is not None:
+        if next_sel[0] is not None and "requiemtls.com" not in link:
             return await ctx.reply(
                 "> **Provided site is found in crawl_next available sites. This site doesn't have TOC page........ so proceed with /crawlnext or .tcrawlnext <first_chapter_link>**")
         msg = await ctx.reply('Started crawling please wait')
@@ -477,7 +477,7 @@ class Crawler(commands.Cog):
         #     link = link[:-1]
         # if "m.uuks" in link:
         #     link = link.replace("m.", "")
-        if "novelsemperor" in link or "novelsknight.com" in link or "noblemtl.com" in link:
+        if "novelsemperor" in link or "novelsknight.com" in link or "noblemtl.com" in link or "requiemtls.com" in link or "requimtl.com" in link:
             reverse = "true"
         if "www.xklxsw.com/" in link:
             link = link.replace("www", "m")

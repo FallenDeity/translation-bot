@@ -44,6 +44,37 @@ class FileHandler:
     TOTAL: int = len(ENCODING)
 
     @staticmethod
+    def split_paragraphs(text, max_words=150):
+        paragraphs = text.split("\n")
+        new_paragraphs = []
+
+        for paragraph in paragraphs:
+            words = paragraph.split()
+            if len(words) <= max_words * 1.8:
+                new_paragraphs.append(paragraph)
+            else:
+                start = 0
+                while start < len(words):
+                    end = start + max_words
+                    if end >= len(words):
+                        new_paragraphs.append(" ".join(words[start:]))
+                        break
+
+                    # Find the end of the sentence
+                    sentence_end = end
+                    while sentence_end < len(words) and not words[sentence_end].endswith(('.', '!', '?')):
+                        sentence_end += 1
+
+                    # If no sentence end found within reasonable range, use max_words
+                    if sentence_end >= len(words) or sentence_end > end + max_words // 2:
+                        sentence_end = end
+
+                    new_paragraphs.append(" ".join(words[start:sentence_end + 1]))
+                    start = sentence_end + 1
+
+        return "\n\n".join(new_paragraphs)
+
+    @staticmethod
     async def checkLibrary(novel_data: list[Novel], title_name: str, title: str, originalLanguage: str,
                            ctx: commands.Context, bot: Raizel, ):
         if novel_data is not None:
@@ -525,7 +556,7 @@ class FileHandler:
                             novel = await f.read()
                     except Exception as e:
                         print(e)
-                        bot.logger.info(f"Error occurred {e} {e.__traceback__}")
+                        # .bot.logger.info(f"Error occurred {e} {e.__traceback__}")
                         return await ctx.reply(
                             "> **❌Currently we are only translating korean and chinese.**"
                         )
@@ -675,7 +706,7 @@ class FileHandler:
             )
             download_url = msg.attachments[0].url
             discord_dnld_url = download_url
-        if size >0:
+        if size > 0:
             try:
                 await ctx.send(
                     "We are uploading to Mega.. Please wait",
@@ -709,7 +740,8 @@ class FileHandler:
                 print(e)
                 bot.logger.info(f"Error occurred {e} {e.__traceback__}")
                 await ctx.reply(
-                    "**Sorry your file was too big and mega seems down now. ping developers in support server to resolve the issue.. please split it and try again.**" + e[:1000] + ""
+                    "**Sorry your file was too big and mega seems down now. ping developers in support server to resolve the issue.. please split it and try again.**" + e[
+                                                                                                                                                                         :1000] + ""
                 )
             try:
                 os.remove(f"{ctx.author.id}.txt")
@@ -719,7 +751,7 @@ class FileHandler:
         try:
             os.remove(f"{ctx.author.id}.txt")
         except:
-                pass
+            pass
         bot.translation_count = bot.translation_count + (round(size / (1024 ** 2), 2) / 3.1)
         if raw_name is not None:
             name = name + "__" + raw_name
@@ -870,7 +902,8 @@ class FileHandler:
                 bot.logger.info(f"Error occurred {e} {e.__traceback__}")
                 print(e)
                 await ctx.reply(
-                    "> **❌Sorry the file is too big to send and mega seems down now. ping developers in support server to resolve the issue..**"+ e[:1000] + "")
+                    "> **❌Sorry the file is too big to send and mega seems down now. ping developers in support server to resolve the issue..**" + e[
+                                                                                                                                                   :1000] + "")
             try:
                 os.remove(f"{ctx.author.id}_cr.txt")
             except:
