@@ -194,7 +194,10 @@ class Translate(commands.Cog):
             #         "> **❌ File size is too big... Please split the file and translate**"
             #     )
             name = info.get("name")
-            name = bytes(name, encoding="raw_unicode_escape", errors="ignore").decode()
+            try:
+                name = bytes(name, encoding="raw_unicode_escape", errors="ignore").decode()
+            except:
+                name = name.__str__()
             file_type = name.split(".")[-1]
             path = await self.bot.loop.run_in_executor(None, self.bot.mega.download_url,
                                                        link, None, f"{ctx.author.id}.{file_type}")
