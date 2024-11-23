@@ -123,7 +123,10 @@ class CssSelector:
                 "www.tingxs.net": "p ::text",
                 "freewebnovel.com": "div.txt ::text",
                 "requiemtls.com": "div.epcontent.entry-content ::text",
-                "requimtl.com": "#content ::text"
+                "requimtl.com": "#content ::text",
+                "m.shuhaige": "#chapter > div.content ::text",
+                "www.fantinovels.com": "#htmlContent ::text",
+                "zeustranslations.blogspot.com": "#readingBox ::text"
             }
             for domain, css_selector in domain_mappings.items():
                 if domain in link:
