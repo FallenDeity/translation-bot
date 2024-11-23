@@ -2,19 +2,24 @@ import asyncio
 import datetime
 import gc
 import os
+import pickle
 import platform
 import random
 import socket
 import subprocess
 import sys
 
+import aiofiles
 import discord
 from discord.ext import commands
+from mega import Mega
 
 from cogs.library import Library
 from core import Raizel
 from core.views.linkview import LinkView
 from databases.blocked import User
+from databases.data import Novel
+from utils.category import Categories
 from utils.hints import Hints
 
 
@@ -27,10 +32,20 @@ class Admin(commands.Cog):
         self.bot = bot
 
     @commands.has_role(1020638168237740042)
+    @commands.hybrid_command(help="update source code in next restart")
+    async def update(self, ctx: commands.Context):
+        self.bot.logger.info("Called Update admin function")
+        await ctx.defer()
+        self.bot.update = True
+        await ctx.send(content=f"> Bots source code will be updated in next restart. ")
+        return
+
+    @commands.has_role(1020638168237740042)
     @commands.hybrid_command(help="ban user.. Admin only command")
     async def ban(self, ctx: commands.Context, id: str,
                   reason: str = "continuous use of improper names in novel name translation"):
         await ctx.defer()
+
         if '#' in id:
             name_spl = id.split('#')
             name = name_spl[0]
@@ -45,6 +60,9 @@ class Admin(commands.Cog):
         ]
         user = User(*user_data)
         m_user = self.bot.get_user(id)
+        self.bot.logger.info("banning user with id " + id.__str__() + "name : " + m_user.mention.__str__())
+        await self.bot.mongo.blocker.ban(user)
+        self.bot.blocked = await self.bot.mongo.blocker.get_all_banned_users()
         try:
             await m_user.send(embed=discord.Embed(
                 title="Blocked",
@@ -53,8 +71,6 @@ class Admin(commands.Cog):
             ))
         except:
             pass
-        await self.bot.mongo.blocker.ban(user)
-        self.bot.blocked = await self.bot.mongo.blocker.get_all_banned_users()
         await ctx.send(
             f"User {m_user.mention} banned due to {reason}"
         )
@@ -113,6 +129,7 @@ class Admin(commands.Cog):
         channel = self.bot.get_channel(
             991911644831678484
         ) or await self.bot.fetch_channel(991911644831678484)
+        self.bot.logger.info("banning user with id " + id.__str__() + "user :" + user.name)
         try:
             return await channel.send(embed=discord.Embed(
                 description=f"User {user.name} has been unbanned by {ctx.author.name}",
@@ -143,18 +160,39 @@ class Admin(commands.Cog):
 
     @commands.has_role(1020638168237740042)
     @commands.hybrid_command(help="get id of the user if name and discriminator provided. Admin only command")
-    async def get_id(self, ctx: commands.Context, name: str, discriminator: str = None):
+    async def get_id(self, ctx: commands.Context, library_id: int = None, name: str = None, discriminator: str = None):
+        """Get id of a user with library id or username
+                       Parameters
+                       ----------
+                       ctx : commands.Context
+                           The interaction
+                       library_id :
+                           it will return the userid of the user who uploaded the novel with this library id
+                       name :
+                            return the user id of the user with given name
+                       discriminator :
+                            discriminator(need to be updated, use library id for now
+                       """
         await ctx.defer()
-        if '#' in name:
-            name_spl = name.split('#')
-            name = name_spl[0]
-            discriminator = name_spl[1]
-        user = discord.utils.get(self.bot.get_all_members(), name=name, discriminator=discriminator)
-        return await ctx.send(content=f"{user.id}", ephemeral=True)
+        if library_id:
+            userid = await self.bot.mongo.library.get_uploader_by_id(library_id)
+            await ctx.send(content=f"{userid}")
+            return await ctx.send(
+                content=f"> uploader of library id {library_id} is :{self.bot.get_user(userid).mention}")
+        elif name:
+            if '#' in name:
+                name_spl = name.split('#')
+                name = name_spl[0]
+                discriminator = name_spl[1]
+            user = discord.utils.get(self.bot.get_all_members(), name=name, discriminator=discriminator)
+            return await ctx.send(content=f"{user.id}", ephemeral=True)
+        else:
+            return await ctx.reply(content="> please provide library id or user name")
 
     @commands.has_role(1020638168237740042)
     @commands.hybrid_command(help="Restart the bot incase of bot crash. Ping any BOT-admins to restart bot")
-    async def restart(self, ctx: commands.Context, instant: bool = False, server: bool = False):
+    async def restart(self, ctx: commands.Context, instant: bool = False, server: bool = False,
+                      git_update: bool = False):
         try:
             await ctx.defer()
         except:
@@ -163,33 +201,52 @@ class Admin(commands.Cog):
             type=discord.ActivityType.unknown, name="Restarting bot"), status=discord.Status.do_not_disturb)
         msg = await ctx.send("Please wait")
         self.bot.app_status = "restart"
+        self.bot.logger.info(f"bot restarted by user : {ctx.author.name}")
         no_of_times = 0
+        txt_channel = await self.bot.fetch_channel(984664133570031666)
         channel = self.bot.get_channel(
             991911644831678484
         ) or await self.bot.fetch_channel(991911644831678484)
-        while True:
-            no_of_times += 1
-            print("Started restart")
-            if not instant:
-                await asyncio.sleep(10)
-            else:
-                break
-            if not self.bot.crawler.items() and not self.bot.translator.items():
-                print("restart " + str(datetime.datetime.now()))
-                try:
-                    await channel.send(embed=discord.Embed(description=f"Bot has started restarting"))
-                except:
-                    pass
-                break
-            else:
-                print("waiting")
-                self.bot.app_status = "restart"
-                self.bot.translator = {}
-                self.bot.crawler = {}
-                await asyncio.sleep(60)
-                if no_of_times > 5:
-                    self.bot.app_status = "up"
-                    await channel.send("Restart failed")
+        try:
+            while True:
+                no_of_times += 1
+                print("Started restart")
+                if not instant:
+                    await asyncio.sleep(3)
+                else:
+                    break
+                if not self.bot.crawler.items() and not self.bot.translator.items() and not self.bot.crawler_next.items():
+                    await asyncio.sleep(5)
+                    if not self.bot.crawler.items() and not self.bot.translator.items() and not self.bot.crawler_next.items():
+                        print("restart " + str(datetime.datetime.now()))
+                    else:
+                        continue
+                    try:
+                        await channel.send(embed=discord.Embed(description=f"Bot has started restarting"))
+                        await txt_channel.send(embed=discord.Embed(description=f"Bot has started restarting"))
+                    except:
+                        pass
+                    await asyncio.sleep(7)
+                    break
+                else:
+                    print("waiting")
+                    self.bot.app_status = "restart"
+                    await channel.send(
+                        content=f"> {no_of_times} : Restart waiting for {', '.join(self.bot.get_user(k).global_name for k in self.bot.translator.keys())} {', '.join(self.bot.get_user(k).global_name for k in self.bot.crawler.keys())}")
+                    self.bot.translator = {}
+                    self.bot.crawler = {}
+                    await asyncio.sleep(no_of_times * 10)
+                    if no_of_times > 10:
+                        self.bot.app_status = "up"
+                        if git_update is True:
+                            self.bot.update = True
+                        await channel.send("Restart failed")
+                        await txt_channel.send("Restart failed")
+                        return None
+        except:
+            self.bot.app_status = "up"
+        finally:
+            self.bot.app_status = "up"
         try:
             await msg.edit(
                 content="",
@@ -198,6 +255,7 @@ class Admin(commands.Cog):
                     color=discord.Color.random(),
                 ),
             )
+            await txt_channel.send(embed=discord.Embed(description=f"Bot is restarting..."))
         except:
             pass
         try:
@@ -211,18 +269,24 @@ class Admin(commands.Cog):
         except Exception as e:
             print("exception occurred  in deleting")
             await ctx.send(f"error occurred in deleting {x} {e}")
-        channel = self.bot.get_channel(
-            991911644831678484
-        ) or await self.bot.fetch_channel(991911644831678484)
         try:
             await channel.send(
                 f"Bot has been restarted by user : {ctx.author.name} \nBot has translated {str(int(self.bot.translation_count * 3.1))} MB novels and crawled {str(self.bot.crawler_count)} novels"
             )
-            del self.bot.titles
+            await txt_channel.send(
+                f"Bot has been restarted by user : {ctx.author.name} \nBot has translated {str(int(self.bot.translation_count * 3.1))} MB novels and crawled {str(self.bot.crawler_count)} novels"
+            )
             gc.collect()
         except:
             pass
-        if random.randint(0, 20) > 12 or server is True:
+        if git_update or self.bot.update:
+            try:
+                subprocess.call(['sh', '/home/ubuntu/translation-bot/scripts/git_update.sh'])
+                await ctx.reply(content="> ** source code updated**")
+            except Exception as e:
+                await channel.send("git update failed")
+                await channel.send(e.with_traceback().__str__()[:1900])
+        if random.randint(0, 15) < 12 or server is True:
             try:
                 await channel.send("Server restarted")
                 subprocess.call(['sh', '/home/ubuntu/translation-bot/scripts/server-restart.sh'])
@@ -328,6 +392,14 @@ class Admin(commands.Cog):
                 user = self.bot.get_user(keys)
                 user = user.name
                 out = f"{out}{user} : {values} \n"
+        out = out + "\n**Crawlnext Tasks**\n"
+        if not self.bot.crawler_next.items():
+            out = out + "No tasks currently\n"
+        else:
+            for keys, values in self.bot.crawler_next.items():
+                user = self.bot.get_user(keys)
+                user = user.name
+                out = f"{out}{user} : {values} \n"
         out = out + "\n**Translator Tasks**\n"
         if not self.bot.translator.items():
             out = out + "No tasks currently\n"
@@ -338,6 +410,83 @@ class Admin(commands.Cog):
                 out = f"{out}{user} : {values} \n"
         return await ctx.send(embed=discord.Embed(description=out[:3800], colour=discord.Color.random()),
                               ephemeral=True)
+
+    @commands.has_role(1020638168237740042)
+    @commands.hybrid_command(help="Give the progress of all current tasks of the bot(only for bot-admins)... ")
+    async def update_mega(self, ctx: commands.Context, password: str = None, username: str = None):
+        try:
+            with open(os.getenv("MEGA"), 'rb') as f:
+                megastore = pickle.load(f)
+        except:
+            pass
+        if username is None:
+            username = megastore["user"]
+        if password is None:
+            password = megastore["password"]
+        megastore = {"user": username, "password": password}
+        self.bot.logger.info(f"Mega password updated by user {ctx.author.name}")
+        with open(os.getenv("MEGA"), 'wb') as f:
+            pickle.dump(megastore, f)
+        try:
+            self.bot.mega = Mega().login(username, password)
+            await ctx.reply(content=f"connected to mega as {username}")
+        except Exception as e:
+            await ctx.reply(content=f"Connecting to mega failed due to \n> {e}")
+            print(e.with_traceback())
+            print(e)
+        return
+
+    @commands.has_role(1020638168237740042)
+    @commands.hybrid_command(help="update category to all novels")
+    async def addcategory(self, ctx: commands.Context, starts: int = 1):
+        await ctx.send("> started task")
+        txt = ""
+        updates = []
+        list_nov = await self.bot.mongo.library.get_all_novels()
+        for novel in list_nov:
+            try:
+                if novel._id % 100 == 0:
+                    await ctx.send(f"completed {novel._id}")
+                title = novel.title
+                desc = novel.description
+                cat = Categories.from_string(f"{title}")
+                if cat == "Uncategorised" and not desc == "":
+                    cat = Categories.from_string(f"{title} {desc}")
+                if cat != novel.category:
+                    updates.append({"_id": novel._id, "category": cat})
+                    txt = txt + f"{novel._id} --->  {cat} -> {novel.category}\n"
+                    if len(txt) >= 1900:
+                        await ctx.send(txt)
+                        await self.bot.mongo.library.update_bulk_category(updates)
+                        updates = []
+                        txt = ""
+            except Exception as e:
+                await ctx.send(f"> failed in id {novel._id} due to {e}")
+
+    @commands.has_role(1020638168237740042)
+    @commands.hybrid_command(help="update category to all novels")
+    async def create(self, ctx: commands.Context):
+        pic_dict: [int, str] = dict()
+        for i in range(0, 101):
+            file = discord.File(f"utils/img/{i}.png")
+            msg = await ctx.send(file=file)
+            pic_dict[i] = msg.attachments[0].url
+        print(pic_dict)
+        # return await ctx.send(pic_dict)
+
+    @commands.has_role(1020638168237740042)
+    @commands.hybrid_command(help="ban user.. Admin only command")
+    async def getlog(self, ctx: commands.Context, file: bool = False, no: int = 1500):
+        async with aiofiles.open(f"{self.bot.log_path}", "r", encoding="utf-8") as f:
+            full = await f.read()
+            last_bytes = full[len(full) - no:]
+        if file:
+            return await ctx.send(
+                embed=discord.Embed(title=f"logs", description=last_bytes, colour=discord.Colour.random()),
+                file=discord.File(f"{self.bot.log_path}", "discord_botLog.txt"),
+            )
+        else:
+            return await ctx.send(f"```yaml\n{last_bytes}\n```")
 
 
 async def setup(bot):

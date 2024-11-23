@@ -36,6 +36,8 @@ class ErrorHandler(commands.Cog):
 
     @commands.Cog.listener()
     async def on_command_error(self, ctx: commands.Context, error: Exception):
+        self.bot.logger.info(
+            f"Error Occurred in command for user {ctx.author.name} with error {error} {error.__traceback__}.")
         if isinstance(error, commands.CommandNotFound):
             return
         elif isinstance(error, commands.MissingRequiredArgument):
@@ -216,7 +218,9 @@ class ErrorHandler(commands.Cog):
                 ),
             )
         elif "CloudflareChallengeError" in str(error):
-            await ctx.send(embed=discord.Embed(description="Error occured in bypassing cloudflare challenge. This site is not supported by bot for now.", colour=discord.Color.red()))
+            await ctx.send(embed=discord.Embed(
+                description="Error occured in bypassing cloudflare challenge. This site is not supported by bot for now.",
+                colour=discord.Color.red()))
         elif "Missing Access" in str(error):
             await ctx.send(embed=discord.Embed(
                 description="> **Couldn't access the link provided. Bot doesn't have access to it**",
@@ -230,13 +234,16 @@ class ErrorHandler(commands.Cog):
                 991911644831678484
             ) or await self.bot.fetch_channel(991911644831678484)
             try:
+                self.bot.logger.info(
+                    f"```yaml\n({ctx.message.jump_url}) \n{(''.join(traceback.format_exception(error, error, error.__traceback__)))[:2000]}\n```")
                 await channel.send(
-                    f"```yaml\n({ctx.message.jump_url}) \n{(''.join(traceback.format_exception(error, error, error.__traceback__)))[:2000]}\n```"
+                    content="error occurred check logs"
                 )
             except:
                 await channel.send(f"({ctx.message.jump_url}) \n{str(error)}")
                 await channel.send(error.__traceback__[:4000])
             raise error
+        return
 
 
 async def setup(bot: Raizel) -> None:

@@ -16,6 +16,7 @@ from utils.hints import Hints
 class Library(commands.Cog):
     def __init__(self, bot: Raizel) -> None:
         self.bot = bot
+        # self.titles = joblib.load('titles.sav')
         self.sorted_data: list = ["_id", "title", "rating", "size", "uploader", "date"]
 
     @staticmethod
@@ -30,10 +31,10 @@ class Library(commands.Cog):
     @staticmethod
     async def buttons(lst: list[discord.Embed], ctx: commands.Context) -> None:
         if len(lst) == 1:
-            return await ctx.send(embed=lst[0])
-        menu = ViewMenu(ctx, menu_type=ViewMenu.TypeEmbed, remove_buttons_on_timeout=True)
-        for i in lst:
-            menu.add_page(i)
+            await ctx.send(embed=lst[0])
+            return
+        menu = ViewMenu(ctx, menu_type=ViewMenu.TypeEmbed, remove_buttons_on_timeout=True, timeout=40)
+        menu.add_pages(lst)
         back = ViewButton(
             style=discord.ButtonStyle.blurple,
             emoji="<:ArrowLeft:989134685068202024>",
@@ -84,6 +85,11 @@ class Library(commands.Cog):
         uploader = self.bot.get_user(data['uploader']) or await self.bot.fetch_user(
             data['uploader']
         )
+        try:
+            if data['crawled_from'] is not None:
+                embed.add_field(name="source", value=f"{data['crawled_from']}")
+        except:
+            pass
         embed.add_field(name="Uploader", value=f"Uploaded by {uploader} \n{discord.utils.format_dt(datetime.datetime.fromtimestamp(data['date']), style='R')}")
         embed.set_thumbnail(url=data['thumbnail'])
         embed.set_footer(
@@ -102,9 +108,7 @@ class Library(commands.Cog):
         output = [
             f"**#{novel['_id']}\t💠\t[{novel['title'].split('__')[0].strip()[:200]}]({novel['download']})**\n💠\tSize: **{round(novel['size'] / (1024 ** 2), 2)} MB**\t💠\tLanguage:** {novel['language']}** "
             for novel in data]
-        out_str = ""
-        for out in output:
-            out_str += out + "\n\n"
+        out_str = "\n\n".join(output)
         embed = discord.Embed(title=f"**Page {page}**",
                               description=out_str)
         embed.set_footer(text=f"Hint : {await Hints.get_single_hint()}", icon_url=await Hints.get_avatar())
@@ -112,12 +116,14 @@ class Library(commands.Cog):
 
     async def make_list_embed_list(self, data: list[Novel]) -> list[discord.Embed]:
         embeds = []
-        n = 6
-        final = [data[i * n:(i + 1) * n] for i in range((len(data) + n - 1) // n)]
+        n = 6  # Number of novels per page
         page = 1
-        for novel in final:
-            embeds.append(await self.make_base_list_embed(novel, page))
+
+        for i in range(0, len(data), n):
+            page_data = data[i:i + n]
+            embeds.append(await self.make_base_list_embed(page_data, page))
             page += 1
+
         return embeds
 
     @commands.hybrid_group()
@@ -222,9 +228,9 @@ class Library(commands.Cog):
         if show_list:
             embeds = await self.make_list_embed_list(allnovels)
             if full_size != 0:
-                msg = await msg.edit(content=f"> Showing first **{str(no_of_novels)} **")
+                await msg.edit(content=f"> Showing first **{str(no_of_novels)} **")
             else:
-                msg = await msg.edit(content=f"> Found **{len(allnovels)}** novels")
+                await msg.edit(content=f"> Found **{len(allnovels)}** novels")
             try:
                 del allnovels
             except:
@@ -233,9 +239,9 @@ class Library(commands.Cog):
         else:
             embeds = await self.make_list_embed(allnovels)
             if full_size != 0:
-                msg = await msg.edit(content=f"> Showing first **{str(no_of_novels)}**")
+                await msg.edit(content=f"> Showing first **{str(no_of_novels)}**")
             else:
-                msg = await msg.edit(content=f"> Found **{len(embeds)}** novels")
+                await msg.edit(content=f"> Found **{len(embeds)}** novels")
             try:
                 del allnovels
             except:
@@ -245,7 +251,7 @@ class Library(commands.Cog):
     @library.command(name="random", help="Gives 10 random novel in library.")
     async def random(
             self,
-            ctx: commands.Context, no_of_novels: int = 10
+            ctx: commands.Context, no_of_novels: int = 10, language: str = "english"
     ) -> None:
         """get random novels from library
                Parameters
@@ -254,9 +260,11 @@ class Library(commands.Cog):
                    The interaction
                no_of_novels : int, optional
                    number of novels , by default it is 10
+               language: str, optional
+                    language to be filtered
                """
         await ctx.defer()
-        novels = await self.bot.mongo.library.get_random_novel(no=no_of_novels)
+        novels = await self.bot.mongo.library.get_random_novel(no=no_of_novels, language=language)
         embeds = await self.make_list_embed(novels)
         return await self.buttons(embeds, ctx)
 
@@ -303,10 +311,11 @@ class Library(commands.Cog):
     async def translate_complete(
             self, inter: discord.Interaction, title: str
     ) -> list[app_commands.Choice]:
-        titles = joblib.load('titles.sav')
+        if not hasattr(self, 'titles'):
+            self.titles = joblib.load('titles.sav')
         lst = [
                   str(i[:90]).strip()
-                  for i in titles
+                  for i in self.titles
                   if title.lower() in i.lower()
               ][:25]
         # print(lst)
@@ -389,7 +398,7 @@ class Library(commands.Cog):
         user_rank = await self.bot.mongo.library.get_user_novel_count(user_id=ld_user_id)
         top_200 = await self.bot.mongo.library.get_user_novel_count(_top_200=True)
         embeds = []
-        top_200 = [(user_id, count) for user_id, count in top_200.items()]
+        top_200 = [(user_id, count) for user_id, count in top_200.items() if user_id != 925597069748621353]
         chunks = [top_200[i: i + 10] for i in range(0, len(top_200), 10)]
         n = 1
         for chunk in chunks:
@@ -405,7 +414,7 @@ class Library(commands.Cog):
                 try:
                     embed.add_field(
                         name=f"{n}. {count} novels",
-                        value=f"**{(self.bot.get_user(user_id)).name} **-> <@{user_id}>",
+                        value=f"**{(self.bot.get_user(user_id)).global_name} **-> <@{user_id}>",
                         inline=False,
                     )
                 except:

@@ -26,7 +26,7 @@ class Hints:
         "<link> en where en is eng)",
         "novel less than 300kb won't be added in library",
         "you can use .thelp <command> to  get help for the given command. (eg. .thelp translate)",
-        "our categorizer depends on keywords shared by volunteers. sometimes it maybe wrong. you can help us by "
+        "our categorize depends on keywords shared by volunteers. sometimes it maybe wrong. you can help us by "
         "providing keywords.",
         "you can share images for different categories with us to add in bot",
         "you can translate multiple novels using .tmulti  and attach all text files ",
@@ -44,9 +44,9 @@ class Hints:
         "we can't crawl sites which have high level cloudflare protection",
         "we(bot-admins) can ban you from using bot, if you don't use proper novelname when translating",
         "message id's from dm's won't work due to discord  policy.. copy the library id or attachment url to translate",
-        "add a review to your faviorite novel using library review command. so many others can enjoy it too",
-        "add a review to your faviorite novel using library review command. so many others can enjoy it too",
-        "add a review to your faviorite novel using library review command. so many others can enjoy it too",
+        "add a review to your favorite novel using library review command. so many others can enjoy it too",
+        "add a review to your favorite novel using library review command. so many others can enjoy it too",
+        "add a review to your favorite novel using library review command. so many others can enjoy it too",
         "for more novels join: https://discord.gg/SZxTKASsHq",
         "for more novels join: https://discord.gg/SZxTKASsHq",
         "for more novels join: https://discord.gg/SZxTKASsHq",

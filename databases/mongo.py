@@ -1,8 +1,10 @@
 import os
 import re
+from datetime import datetime
 from typing import Any
 
 from motor import motor_asyncio
+from pymongo import UpdateOne
 
 from databases.blocked import User
 from databases.data import Novel
@@ -11,19 +13,6 @@ from databases.data import Novel
 class Database:
     def __init__(self) -> None:
         self.db = motor_asyncio.AsyncIOMotorClient(os.getenv("DATABASE"))
-
-
-def get_regex_from_name(title: str) -> str:
-    output = ''
-    prev_check = True
-    for i in title:
-        if i.isalpha():
-            output += i
-            prev_check = True
-        elif prev_check:
-            output += ".*"
-            prev_check = False
-    return output
 
 
 class Library(Database):
@@ -35,7 +24,7 @@ class Library(Database):
         await self.library.insert_one(data.__dict__)
 
     @staticmethod
-    def _make_match(
+    async def _make_match(
             title: str,
             rating: float,
             language: str,
@@ -46,8 +35,11 @@ class Library(Database):
             size: float,
     ) -> dict[str, Any]:
         match: dict[str, Any] = {}
+        from utils.handler import FileHandler as fe
         if title:
-            title = get_regex_from_name(title)
+            for subString in ["completed", "ongoing", "complete", "latest", "updated"]:
+                title = str(re.sub('(?i)' + re.escape(subString), lambda k: "", title))
+            title = await fe.get_regex_from_name(title)
             match["title"] = {"$regex": title, "$options": "i"}
         if rating:
             match["rating"] = {"$gte": rating}
@@ -77,10 +69,11 @@ class Library(Database):
             tag: str = "",
             size: float = 0.0,
             no: int = 300,
-    ) ->list[Novel]:
+    ) -> list[Novel]:
         commons = await self.library.aggregate(
             [
-                {"$match": self._make_match(title, rating, language, original_language, uploader, category, tag, size)},
+                {"$match": await self._make_match(title, rating, language, original_language, uploader, category, tag,
+                                                  size)},
                 {"$sample": {"size": no}}
             ]
         ).to_list(None)
@@ -94,15 +87,22 @@ class Library(Database):
         novel = await self.library.find_one({"_id": _id})
         return novel['title']
 
-    async def get_random_novel(self, no: int = 10) -> Novel:
-        novel = await self.library.aggregate([{"$sample": {"size": no}}]).to_list(None)
+    async def get_uploader_by_id(self, _id: int):
+        novel = await self.library.find_one({"_id": _id})
+        return novel['uploader']
+
+    async def get_random_novel(self, no: int = 10, language: str = "english"):
+        novel = await self.library.aggregate([
+            {"$match": {"language": language}},
+            {"$sample": {"size": no}}]).to_list(None)
         return novel
 
     async def update_novel(self, novel: Novel) -> None:
         await self.library.update_one({"_id": novel._id}, {"$set": novel.__dict__})
 
     async def get_novel_by_name(self, name: str) -> list[Novel]:
-        name = get_regex_from_name(name)
+        from utils.handler import FileHandler as fe
+        name = await fe.get_regex_from_name(name)
         novels = await self.library.find({"title": re.compile(name, re.IGNORECASE)}).to_list(None)
         return [Novel(**novel) for novel in novels] if novels else None
 
@@ -141,6 +141,11 @@ class Library(Database):
     async def update_category(self, _id: int, category: str) -> None:
         await self.library.update_one({"_id": _id}, {"$set": {"category": category}})
 
+    async def update_bulk_category(self, updates: list) -> None:
+        bulk_op = [UpdateOne({"_id": update["_id"]},{"$set": {"category": update["category"]}}) for update in updates]
+        if bulk_op:
+            await self.library.bulk_write(bulk_op)
+
     async def update_description(self, _id: int, description: str) -> None:
         await self.library.update_one(
             {"_id": _id}, {"$set": {"description": description}}
@@ -164,6 +169,15 @@ class Library(Database):
     async def update_date(self, _id: int, date: float) -> None:
         await self.library.update_one(
             {"_id": _id}, {"$set": {"date": date}}
+        )
+
+    async def update_novel_(self, _id: int, title: str, description: str, download: str, size: float,
+                            date: datetime.timestamp
+                            , thumbnail: str, category: str, crawled_from: str) -> None:
+        await self.library.update_one(
+            {"_id": _id}, {"$set": {"title": title, "description": description, "download": download, "size": size,
+                                    "date": date, "thumbnail": thumbnail, "category": category,
+                                    "crawled_from": crawled_from}}
         )
 
     async def get_user_novel_count(self, user_id: int = None, _top_200: bool = False) -> dict[int, int]:
@@ -190,16 +204,14 @@ class Library(Database):
     async def next_number(self) -> int:
         return await self.get_total_novels + 1
 
-    @property
     async def get_all_novels(self) -> list:
-        novels = await self.library.find().to_list(length=await self.get_total_novels)
+        novels = await self.library.find({}).to_list(None)
         return [Novel(**novel) for novel in novels]
 
     @property
     async def get_all_tags(self) -> list[str]:
         tags = await self.library.distinct("tags")
         return tags
-
 
     @property
     async def get_all_distinct_titles(self) -> list[str]:
@@ -238,4 +250,3 @@ class Blocker(Database):
         users = await self.blocker.find().to_list(length=await self.blocker.count_documents({}))
         users_id = [i['userid'] for i in users]
         return users_id
-
