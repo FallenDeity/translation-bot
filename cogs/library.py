@@ -398,7 +398,7 @@ class Library(commands.Cog):
         user_rank = await self.bot.mongo.library.get_user_novel_count(user_id=ld_user_id)
         top_200 = await self.bot.mongo.library.get_user_novel_count(_top_200=True)
         embeds = []
-        top_200 = [(user_id, count) for user_id, count in top_200.items()]
+        top_200 = [(user_id, count) for user_id, count in top_200.items() if user_id != 925597069748621353]
         chunks = [top_200[i: i + 10] for i in range(0, len(top_200), 10)]
         n = 1
         for chunk in chunks:
